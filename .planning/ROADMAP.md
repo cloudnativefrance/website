@@ -54,9 +54,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — i18n configuration, translation utilities, bilingual page routing (FNDN-02)
-- [ ] 02-02-PLAN.md — Language toggle component and Layout integration (FNDN-03)
-- [ ] 02-03-PLAN.md — Content collections with Zod schemas and sample bilingual data (FNDN-04)
+- [x] 02-01-PLAN.md — i18n configuration, translation utilities, bilingual page routing (FNDN-02)
+- [x] 02-02-PLAN.md — Language toggle component and Layout integration (FNDN-03)
+- [x] 02-03-PLAN.md — Content collections with Zod schemas and sample bilingual data (FNDN-04)
 
 ### Phase 3: Hero & Landing
 **Goal**: A visitor landing on the homepage immediately understands what, when, where, and how to register
