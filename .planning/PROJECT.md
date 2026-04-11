@@ -12,12 +12,13 @@ A first-time visitor should immediately understand what the event is, when and w
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Bilingual site (French + English) with language toggle — Validated in Phase 2: Bilingual Architecture & Content Collections
+- [x] Modular content architecture: speakers, talks, sponsors, team as Markdown/YAML content collections — Validated in Phase 2: Bilingual Architecture & Content Collections
 
 ### Active
 
 - [ ] Bold, technical yet community-warm aesthetic (dark theme, geometric shapes, real event photos)
-- [ ] Bilingual site (French + English) with language toggle
+- [x] Bilingual site (French + English) with language toggle
 - [ ] Hero section with event name, date (June 3, 2027), venue (CENTQUATRE-PARIS), countdown, and CTA
 - [ ] Interactive schedule: filterable by track, bookmarkable talks, personal agenda export (iCal), visual timeline with parallel tracks
 - [ ] Speaker profiles: grid overview + individual pages with bio, company, talk abstract, social links
@@ -26,7 +27,7 @@ A first-time visitor should immediately understand what the event is, when and w
 - [ ] Venue page: map, transport options, nearby hotels, accessibility info
 - [ ] Previous edition section: video recap, photo gallery link, key numbers
 - [ ] Footer: social links (LinkedIn, YouTube, Bluesky, X), association info, legal pages (privacy, CoC, terms)
-- [ ] Modular content architecture: speakers, talks, sponsors, team as Markdown/YAML content collections
+- [x] Modular content architecture: speakers, talks, sponsors, team as Markdown/YAML content collections
 - [ ] Responsive design: mobile-first, works on all devices
 - [ ] External tool integration: links to Conference Hall (CFP) and Open Feedback
 - [ ] Post-event mode: countdown switches to "watch replays" with YouTube playlist link
@@ -75,4 +76,4 @@ A first-time visitor should immediately understand what the event is, when and w
 | shadcn/ui components | Accessible, production-ready, pairs with Tailwind, customizable | — Pending |
 
 ---
-*Last updated: 2026-04-11 after initialization*
+*Last updated: 2026-04-11 after Phase 2 completion — bilingual i18n routing, language toggle, content collections*
