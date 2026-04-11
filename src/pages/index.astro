@@ -1,126 +1,16 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import GeoBackground from "@/components/patterns/GeoBackground.astro";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import HeroSection from "@/components/hero/HeroSection.astro";
+import KeyNumbers from "@/components/hero/KeyNumbers";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 ---
 
-<Layout title="Cloud Native Days France 2027 — Design System Preview">
+<Layout title={t("site.title")}>
   <main>
-    {/* ── Hero Section ─────────────────────────────────────── */}
-    <section class="relative flex min-h-[80vh] lg:min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-20 text-center">
-      <GeoBackground class="absolute inset-0" />
-      <div class="relative z-10 mx-auto flex max-w-4xl flex-col items-center gap-6">
-        <h1 class="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl" style="line-height:1.05; letter-spacing:-0.02em;">
-          Cloud Native Days France
-        </h1>
-        <p class="max-w-2xl text-lg text-muted-foreground sm:text-xl" style="line-height:1.4;">
-          3 juin 2027 &mdash; CENTQUATRE-PARIS (104)
-        </p>
-
-        {/* CTA Buttons */}
-        <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Button client:idle size="lg" className="h-[52px] px-8 text-lg font-medium shadow-[0_0_20px_oklch(62.5%_0.162_259.9_/_0.3)] hover:translate-y-[-1px] transition-all duration-150">
-            Reserver
-          </Button>
-          <Button client:idle variant="outline" size="lg" className="h-[52px] px-8 text-lg font-medium">
-            Voir le programme
-          </Button>
-        </div>
-      </div>
-    </section>
-
-    <Separator client:idle className="mx-auto max-w-5xl" />
-
-    {/* ── Stats Cards Section ──────────────────────────────── */}
-    <section class="mx-auto max-w-5xl px-4 py-16 lg:py-24">
-      <h2 class="mb-10 text-center text-3xl font-bold tracking-tight sm:text-4xl" style="letter-spacing:-0.02em;">
-        L'evenement en chiffres
-      </h2>
-      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <Card client:idle className="border-border transition-colors duration-200 hover:border-primary/50">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">50+ Talks</CardTitle>
-            <CardDescription>Conferences, lightning talks et ateliers sur plusieurs parcours</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p class="text-sm text-muted-foreground">Des fondamentaux Kubernetes aux bonnes pratiques du platform engineering</p>
-          </CardContent>
-        </Card>
-
-        <Card client:idle className="border-border transition-colors duration-200 hover:border-primary/50">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">1700+ Participants</CardTitle>
-            <CardDescription>Le plus grand rassemblement cloud-native en France</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p class="text-sm text-muted-foreground">Ingenieurs, architectes et decideurs de toute l'Europe</p>
-          </CardContent>
-        </Card>
-
-        <Card client:idle className="border-border transition-colors duration-200 hover:border-primary/50">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">40+ Partenaires</CardTitle>
-            <CardDescription>Leaders de l'industrie et startups innovantes soutenant l'evenement</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p class="text-sm text-muted-foreground">Sponsors Platinum, Gold, Silver et Communaute</p>
-          </CardContent>
-        </Card>
-      </div>
-    </section>
-
-    <Separator client:idle className="mx-auto max-w-5xl" />
-
-    {/* ── Badges Section ───────────────────────────────────── */}
-    <section class="mx-auto max-w-5xl px-4 py-16 lg:py-24">
-      <h2 class="mb-6 text-center text-3xl font-bold tracking-tight sm:text-4xl" style="letter-spacing:-0.02em;">
-        Parcours
-      </h2>
-      <p class="mb-8 text-center text-muted-foreground">Explorez les sessions de nos parcours thematiques</p>
-      <div class="flex flex-wrap items-center justify-center gap-3">
-        <Badge client:idle className="bg-primary/15 text-primary px-3 py-1 text-xs font-medium uppercase tracking-widest rounded-full">Kubernetes</Badge>
-        <Badge client:idle variant="secondary" className="bg-accent/15 text-accent px-3 py-1 text-xs font-medium uppercase tracking-widest rounded-full">Platform Engineering</Badge>
-        <Badge client:idle variant="secondary" className="bg-chart-4/15 text-chart-4 px-3 py-1 text-xs font-medium uppercase tracking-widest rounded-full">Observability</Badge>
-        <Badge client:idle variant="secondary" className="bg-destructive/15 text-destructive px-3 py-1 text-xs font-medium uppercase tracking-widest rounded-full">Security</Badge>
-      </div>
-    </section>
-
-    <Separator client:idle className="mx-auto max-w-5xl" />
-
-    {/* ── Typography Showcase ──────────────────────────────── */}
-    <section class="mx-auto max-w-5xl px-4 py-16 lg:py-24">
-      <h2 class="mb-10 text-center text-3xl font-bold tracking-tight sm:text-4xl" style="letter-spacing:-0.02em;">
-        Echelle typographique
-      </h2>
-      <div class="space-y-6">
-        <div>
-          <p class="mb-1 text-xs uppercase tracking-widest text-muted-foreground">h1 &mdash; text-6xl / 64px / Bold</p>
-          <h1 class="text-6xl font-bold" style="line-height:1.05; letter-spacing:-0.02em;">Heading One</h1>
-        </div>
-        <div>
-          <p class="mb-1 text-xs uppercase tracking-widest text-muted-foreground">h2 &mdash; text-4xl / 36px / Bold</p>
-          <h2 class="text-4xl font-bold" style="line-height:1.2; letter-spacing:-0.02em;">Heading Two</h2>
-        </div>
-        <div>
-          <p class="mb-1 text-xs uppercase tracking-widest text-muted-foreground">h3 &mdash; text-3xl / 30px / SemiBold</p>
-          <h3 class="text-3xl font-semibold" style="line-height:1.3; letter-spacing:-0.01em;">Heading Three</h3>
-        </div>
-        <div>
-          <p class="mb-1 text-xs uppercase tracking-widest text-muted-foreground">Body &mdash; text-base / 16px / Regular</p>
-          <p class="text-base" style="line-height:1.6;">Cloud Native Days France rassemble les esprits les plus brillants de la technologie cloud-native pour une journee complete d'apprentissage, de networking et de communaute.</p>
-        </div>
-        <div>
-          <p class="mb-1 text-xs uppercase tracking-widest text-muted-foreground">Muted &mdash; text-sm / 14px / Regular</p>
-          <p class="text-sm text-muted-foreground" style="line-height:1.5;">Les textes secondaires et legendes apparaissent en muted-foreground pour une hierarchie visuelle claire.</p>
-        </div>
-      </div>
-    </section>
+    <HeroSection />
+    <KeyNumbers client:idle lang={lang} />
   </main>
 </Layout>
