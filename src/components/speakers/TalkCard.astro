@@ -1,0 +1,74 @@
+---
+import { cn } from "@/lib/utils";
+import { getLocalePath, useTranslations } from "@/i18n/utils";
+import type { Locale } from "@/i18n/ui";
+
+interface Props {
+  title: string;
+  track: "cloud-infra" | "devops-platform" | "security" | "community";
+  format: "talk" | "lightning" | "workshop" | "keynote";
+  duration: number;
+  coSpeakers: Array<{ slug: string; name: string }>;
+  lang: Locale;
+}
+
+const { title, track, format, duration, coSpeakers, lang } = Astro.props;
+const t = useTranslations(lang);
+
+const trackColors: Record<string, string> = {
+  "cloud-infra": "bg-primary/15 text-primary",
+  "devops-platform": "bg-accent/15 text-accent",
+  "security": "bg-destructive/15 text-destructive",
+  "community": "bg-chart-4/15 text-chart-4",
+};
+
+const trackNames: Record<string, string> = {
+  "cloud-infra": "Cloud & Infra",
+  "devops-platform": "DevOps & Platform",
+  "security": "Security",
+  "community": "Community",
+};
+
+const capitalizedFormat = format.charAt(0).toUpperCase() + format.slice(1);
+---
+
+<div
+  class={cn(
+    "rounded-lg border border-border bg-card p-4",
+    "transition-colors duration-200 hover:border-primary/50",
+  )}
+>
+  <h3 class="text-base font-bold text-foreground">{title}</h3>
+  <div class="flex items-center gap-3 mt-2">
+    <span
+      class={cn(
+        "inline-block px-2 py-0.5 text-sm uppercase tracking-widest rounded-full",
+        trackColors[track],
+      )}
+    >
+      {trackNames[track]}
+    </span>
+    <span class="text-sm text-muted-foreground">
+      {capitalizedFormat} - {duration}min
+    </span>
+  </div>
+  {coSpeakers.length > 0 && (
+    <p class="text-sm text-muted-foreground mt-2">
+      {t("speakers.cospeaker_prefix")}{" "}
+      {coSpeakers.map((cs, i) => (
+        <>
+          <a
+            href={getLocalePath(lang, `/speakers/${cs.slug}`)}
+            class="text-primary hover:underline"
+          >
+            {cs.name}
+          </a>
+          {i < coSpeakers.length - 1 && ", "}
+        </>
+      ))}
+    </p>
+  )}
+  <span class="text-sm text-muted-foreground cursor-default mt-2 block">
+    {t("speakers.schedule_placeholder")}
+  </span>
+</div>

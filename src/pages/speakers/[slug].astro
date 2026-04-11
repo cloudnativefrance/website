@@ -1,0 +1,83 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import SpeakerProfile from "@/components/speakers/SpeakerProfile.astro";
+import TalkCard from "@/components/speakers/TalkCard.astro";
+import {
+  getSlug,
+  getTalksForSpeaker,
+  getCoSpeakersForTalk,
+  getSpeakersByLocale,
+} from "@/lib/speakers";
+import { useTranslations } from "@/i18n/utils";
+
+export async function getStaticPaths() {
+  const speakers = await getCollection("speakers");
+  const frSpeakers = speakers.filter((s) => s.id.startsWith("fr/"));
+  return frSpeakers.map((speaker) => ({
+    params: { slug: getSlug(speaker.id) },
+    props: { speaker },
+  }));
+}
+
+const { speaker } = Astro.props;
+const lang: "fr" = "fr";
+const t = useTranslations(lang);
+const slug = getSlug(speaker.id);
+const talks = await getTalksForSpeaker("fr", slug);
+const { Content } = await render(speaker);
+
+// Resolve co-speaker names for each talk
+const allSpeakers = await getSpeakersByLocale("fr");
+const speakerMap = new Map(allSpeakers.map((s) => [getSlug(s.id), s.data.name]));
+---
+
+<Layout title={`${speaker.data.name} | ${t("site.title")}`}>
+  <main class="px-4 md:px-6 lg:px-8 pt-8 md:pt-12 pb-16 md:pb-24">
+    <SpeakerProfile
+      name={speaker.data.name}
+      company={speaker.data.company}
+      role={speaker.data.role}
+      photo={speaker.data.photo}
+      social={speaker.data.social}
+      lang={lang}
+    >
+      <article class="prose prose-invert max-w-none">
+        <Content />
+      </article>
+
+      <section slot="talks" class="mt-10">
+        {talks.length > 0 ? (
+          <>
+            <h2 class="text-2xl font-bold text-foreground mb-4">
+              {t("speakers.talks_heading")}
+            </h2>
+            <div class="flex flex-col gap-4">
+              {talks.map((talk) => {
+                const coSpeakerSlugs = getCoSpeakersForTalk(talk, slug);
+                const coSpeakers = coSpeakerSlugs.map((cs) => ({
+                  slug: cs,
+                  name: speakerMap.get(cs) ?? cs,
+                }));
+                return (
+                  <TalkCard
+                    title={talk.data.title}
+                    track={talk.data.track}
+                    format={talk.data.format}
+                    duration={talk.data.duration}
+                    coSpeakers={coSpeakers}
+                    lang={lang}
+                  />
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          <p class="text-sm text-muted-foreground mt-8">
+            {t("speakers.no_talks")}
+          </p>
+        )}
+      </section>
+    </SpeakerProfile>
+  </main>
+</Layout>

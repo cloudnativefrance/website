@@ -1,0 +1,71 @@
+---
+import SpeakerAvatar from "./SpeakerAvatar.astro";
+import SocialLinks from "./SocialLinks.astro";
+import { getLocalePath, useTranslations } from "@/i18n/utils";
+import type { Locale } from "@/i18n/ui";
+
+interface Props {
+  name: string;
+  company?: string;
+  role?: string;
+  photo?: string;
+  social?: {
+    github?: string;
+    linkedin?: string;
+    bluesky?: string;
+    website?: string;
+    twitter?: string;
+  };
+  lang: Locale;
+}
+
+const { name, company, role, photo, social, lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<div class="max-w-3xl mx-auto">
+  <a
+    href={getLocalePath(lang, "/speakers")}
+    class="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
+  >
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="mr-1"
+    >
+      <path d="m15 18-6-6 6-6" />
+    </svg>
+    {t("speakers.back")}
+  </a>
+
+  <SpeakerAvatar name={name} photo={photo} size="lg" class="mx-auto" />
+
+  <h1
+    class="text-4xl font-bold text-foreground text-center mt-4"
+    style="letter-spacing: -0.02em;"
+  >
+    {name}
+  </h1>
+
+  {(role || company) && (
+    <p class="text-base text-muted-foreground text-center mt-1">
+      {role}{role && company ? " \u00B7 " : ""}{company}
+    </p>
+  )}
+
+  <div class="flex justify-center mt-3">
+    <SocialLinks social={social} />
+  </div>
+
+  <section class="mt-8">
+    <slot />
+  </section>
+
+  <slot name="talks" />
+</div>
