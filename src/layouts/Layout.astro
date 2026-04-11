@@ -1,0 +1,21 @@
+---
+import { Font } from "astro:assets";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+}
+
+const { title = "Cloud Native Days France 2027" } = Astro.props;
+---
+<html lang="fr" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <Font cssVariable="--font-dm-sans" preload />
+  </head>
+  <body class="bg-background text-foreground font-sans antialiased min-h-screen">
+    <slot />
+  </body>
+</html>
