@@ -2,7 +2,7 @@
 title: "Building Internal Platforms with Crossplane"
 speaker: "speaker-1"
 track: "devops-platform"
-format: "talk"
+format: "keynote"
 duration: 45
 tags:
   - "crossplane"
@@ -10,4 +10,4 @@ tags:
   - "kubernetes"
 ---
 
-In this talk, we will explore how Crossplane enables building internal platforms using Kubernetes-native abstractions.
+In this keynote, Marie Laurent shares her experience building internal platforms with Crossplane. Discover how Kubernetes-native abstractions enable teams to consume infrastructure as self-service while maintaining governance and security controls.

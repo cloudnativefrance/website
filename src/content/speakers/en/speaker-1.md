@@ -1,12 +1,11 @@
 ---
-name: "Jane Doe"
-company: "Acme Cloud"
-role: "Staff Engineer"
-photo: "/speakers/jane-doe.jpg"
-bio: "Cloud-native platform expert with 10 years of experience in distributed systems."
+name: "Marie Laurent"
+company: "CloudScale"
+role: "Lead SRE"
+bio: "Expert in cloud-native system reliability and large-scale platform engineering."
 social:
-  linkedin: "https://linkedin.com/in/janedoe"
-  github: "https://github.com/janedoe"
+  github: "https://github.com/mlaurent"
+  linkedin: "https://linkedin.com/in/mlaurent"
 ---
 
-Jane is a Kubernetes enthusiast and active contributor to the CNCF ecosystem. She has deployed production clusters for Fortune 500 companies.
+Marie helps engineering teams build reliable internal platforms. She has deployed Crossplane in production for several Fortune 500 companies and actively contributes to CNCF infrastructure-as-code projects.
