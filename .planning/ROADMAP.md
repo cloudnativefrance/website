@@ -39,7 +39,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01: Scaffold Astro 6 project with React + Tailwind 4 + shadcn/ui (FNDN-01)
 - [x] 01-02: Design system in Stitch + DESIGN.md (DSGN-01, DSGN-02, DSGN-03, DSGN-04)
-- [ ] 01-03: Wire design tokens + responsive sample page (DSGN-05, DSGN-06, FNDN-05)
+- [x] 01-03: Wire design tokens + responsive sample page (DSGN-05, DSGN-06, FNDN-05)
 - [x] 01-04: Docker + Dagger + GitHub Actions CI (FNDN-06)
 
 ### Phase 2: Bilingual Architecture & Content Collections

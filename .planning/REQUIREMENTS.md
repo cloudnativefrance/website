@@ -13,8 +13,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **DSGN-02**: DESIGN.md exported and committed to project root as the single source of truth for all visual decisions
 - [ ] **DSGN-03**: Dark theme with bold/technical aesthetic and warm community accents (real event photos, friendly tone)
 - [ ] **DSGN-04**: Brand continuity preserved: DM Sans font, geometric shapes, CND France + KCD logos
-- [ ] **DSGN-05**: Tailwind CSS 4 theme tokens derived from DESIGN.md (colors, spacing, typography, radii)
-- [ ] **DSGN-06**: shadcn/ui components customized to match design system
+- [x] **DSGN-05**: Tailwind CSS 4 theme tokens derived from DESIGN.md (colors, spacing, typography, radii)
+- [x] **DSGN-06**: shadcn/ui components customized to match design system
 
 ### Foundation
 
@@ -22,7 +22,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **FNDN-02**: Bilingual routing: French as default (no prefix), English under /en/
 - [ ] **FNDN-03**: Language toggle component visible on all pages
 - [ ] **FNDN-04**: Content collections with Zod schemas for speakers, talks, sponsors, team
-- [ ] **FNDN-05**: Responsive layout system: mobile-first, works on all devices
+- [x] **FNDN-05**: Responsive layout system: mobile-first, works on all devices
 - [x] **FNDN-06**: Docker multi-stage build (Node build → Nginx Alpine) producing < 50MB image
 - [ ] **FNDN-07**: Kubernetes deployment manifests (Deployment, Service, Ingress)
 
@@ -127,13 +127,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DSGN-02 | Phase 1: Design System & Foundation | Pending |
 | DSGN-03 | Phase 1: Design System & Foundation | Pending |
 | DSGN-04 | Phase 1: Design System & Foundation | Pending |
-| DSGN-05 | Phase 1: Design System & Foundation | Pending |
-| DSGN-06 | Phase 1: Design System & Foundation | Pending |
+| DSGN-05 | Phase 1: Design System & Foundation | Complete |
+| DSGN-06 | Phase 1: Design System & Foundation | Complete |
 | FNDN-01 | Phase 1: Design System & Foundation | Pending |
 | FNDN-02 | Phase 2: Bilingual Architecture & Content Collections | Pending |
 | FNDN-03 | Phase 2: Bilingual Architecture & Content Collections | Pending |
 | FNDN-04 | Phase 2: Bilingual Architecture & Content Collections | Pending |
-| FNDN-05 | Phase 1: Design System & Foundation | Pending |
+| FNDN-05 | Phase 1: Design System & Foundation | Complete |
 | FNDN-06 | Phase 1: Design System & Foundation | Complete |
 | FNDN-07 | Deferred to cnd-platform repo (GitOps) | Pending |
 | HERO-01 | Phase 3: Hero & Landing | Pending |
