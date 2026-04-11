@@ -1,0 +1,359 @@
+# Cloud Native Days France -- Design System
+
+> Single source of truth for all visual decisions. Every color, font, spacing, and component
+> pattern used in the site must reference this file.
+
+---
+
+## Color Palette
+
+All colors are derived from the Cloud Native Days France logo (`src/assets/logos/principal/logo.svg`).
+Values are expressed in OKLCH for Tailwind CSS 4 compatibility.
+
+### Logo Source Colors
+
+| Name | Hex | OKLCH | Role |
+|------|-----|-------|------|
+| CND Red | #cf0822 | oklch(54.0% 0.216 25.2) | Accent, highlights, urgency |
+| CND Blue | #4985e8 | oklch(62.5% 0.162 259.9) | Primary interactive color |
+| CND Deep Purple | #20134d | oklch(24.6% 0.101 286.7) | Background family origin |
+| CND Light Blue | #b8deff | oklch(88.4% 0.061 244.8) | Informational, subtle highlights |
+| CND Pink | #ff8a9e | oklch(76.6% 0.142 10.1) | Warm community accent |
+| White | #ffffff | oklch(100.0% 0.000 0) | Text on dark backgrounds |
+
+### Semantic Token Map
+
+These are the CSS custom properties wired into Tailwind 4 via `@theme` in `src/styles/global.css`.
+
+| Token | OKLCH Value | Hex Approx | Usage |
+|-------|-------------|------------|-------|
+| `--color-background` | oklch(16.8% 0.052 286.4) | #0e0a24 | Page background |
+| `--color-foreground` | oklch(95.6% 0.023 291.3) | #f0eeff | Primary text |
+| `--color-card` | oklch(22.5% 0.083 285.5) | #1a1240 | Card and surface backgrounds |
+| `--color-card-foreground` | oklch(95.6% 0.023 291.3) | #f0eeff | Text on cards |
+| `--color-primary` | oklch(62.5% 0.162 259.9) | #4985e8 | Buttons, links, interactive elements |
+| `--color-primary-foreground` | oklch(100.0% 0.000 0) | #ffffff | Text on primary backgrounds |
+| `--color-accent` | oklch(76.6% 0.142 10.1) | #ff8a9e | Warm highlights, badges, special CTAs |
+| `--color-accent-foreground` | oklch(16.8% 0.052 286.4) | #0e0a24 | Text on accent backgrounds |
+| `--color-secondary` | oklch(27.1% 0.091 286.5) | #251c50 | Secondary surfaces, hover states |
+| `--color-secondary-foreground` | oklch(95.6% 0.023 291.3) | #f0eeff | Text on secondary surfaces |
+| `--color-muted` | oklch(27.1% 0.091 286.5) | #251c50 | Muted backgrounds |
+| `--color-muted-foreground` | oklch(66.8% 0.047 290.8) | #9490b0 | Secondary text, captions |
+| `--color-destructive` | oklch(54.0% 0.216 25.2) | #cf0822 | Error states, destructive actions |
+| `--color-destructive-foreground` | oklch(100.0% 0.000 0) | #ffffff | Text on destructive backgrounds |
+| `--color-border` | oklch(30.8% 0.102 285.5) | #2d2460 | Borders, dividers |
+| `--color-input` | oklch(30.8% 0.102 285.5) | #2d2460 | Input field borders |
+| `--color-ring` | oklch(62.5% 0.162 259.9) | #4985e8 | Focus rings |
+| `--color-popover` | oklch(22.5% 0.083 285.5) | #1a1240 | Dropdown/popover backgrounds |
+| `--color-popover-foreground` | oklch(95.6% 0.023 291.3) | #f0eeff | Text in popovers |
+| `--color-chart-1` | oklch(62.5% 0.162 259.9) | #4985e8 | Chart color 1 (blue) |
+| `--color-chart-2` | oklch(54.0% 0.216 25.2) | #cf0822 | Chart color 2 (red) |
+| `--color-chart-3` | oklch(76.6% 0.142 10.1) | #ff8a9e | Chart color 3 (pink) |
+| `--color-chart-4` | oklch(88.4% 0.061 244.8) | #b8deff | Chart color 4 (light blue) |
+| `--color-chart-5` | oklch(24.6% 0.101 286.7) | #20134d | Chart color 5 (deep purple) |
+
+### Color Usage Guidelines
+
+- **Primary blue** (`--color-primary`): All interactive elements -- buttons, links, active tabs, focus states.
+- **Accent pink** (`--color-accent`): Sparingly for warmth -- event date badges, speaker count highlights, special CTAs like "Submit a Talk". Do not overuse; one accent per visual section maximum.
+- **CND Red**: Reserved for the logo and destructive/error states only. Not for general UI accents.
+- **Light blue**: Informational badges, subtle hover backgrounds, tag pills.
+- **Background gradient**: For hero sections, consider a subtle gradient from `--color-background` to a slightly lighter purple to add depth without introducing new colors.
+
+---
+
+## Typography
+
+### Font Family
+
+**DM Sans** -- the existing CND France brand font. A geometric sans-serif with excellent readability at all sizes.
+
+```
+--font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+```
+
+Load via Astro 6 built-in Fonts API using `fontProviders.google()` for automatic optimization, preloading, and fallback font generation.
+
+### Type Scale
+
+Bold and energetic -- headings are deliberately oversized for visual impact. Body text stays comfortable for reading.
+
+| Token | Size | Line Height | Weight | Usage |
+|-------|------|-------------|--------|-------|
+| `--text-xs` | 12px (0.75rem) | 1.5 | 400 | Captions, fine print |
+| `--text-sm` | 14px (0.875rem) | 1.5 | 400 | Secondary text, labels |
+| `--text-base` | 16px (1rem) | 1.6 | 400 | Body text |
+| `--text-lg` | 18px (1.125rem) | 1.6 | 400 | Large body, card descriptions |
+| `--text-xl` | 20px (1.25rem) | 1.4 | 500 | Small headings, emphasized text |
+| `--text-2xl` | 24px (1.5rem) | 1.3 | 600 | Section sub-headings (h4) |
+| `--text-3xl` | 30px (1.875rem) | 1.3 | 600 | Section headings (h3) |
+| `--text-4xl` | 36px (2.25rem) | 1.2 | 700 | Page headings (h2) |
+| `--text-5xl` | 48px (3rem) | 1.1 | 700 | Hero sub-heading |
+| `--text-6xl` | 64px (4rem) | 1.05 | 700 | Hero title |
+
+### Font Weights
+
+| Weight | Token | Usage |
+|--------|-------|-------|
+| 400 | Regular | Body text, paragraphs |
+| 500 | Medium | Emphasized body, navigation links, button text |
+| 600 | SemiBold | Sub-headings (h3, h4), card titles |
+| 700 | Bold | Main headings (h1, h2), hero text |
+
+### Letter Spacing
+
+- Headings (h1-h2): `-0.02em` (tight, impactful)
+- Sub-headings (h3-h4): `-0.01em` (slightly tight)
+- Body: `0` (default)
+- Uppercase labels/badges: `0.05em` (generous tracking)
+
+---
+
+## Spacing Scale
+
+Base unit: **4px**. All spacing values are multiples of 4.
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--spacing-0` | 0px | Reset |
+| `--spacing-1` | 4px (0.25rem) | Tight inner gaps |
+| `--spacing-2` | 8px (0.5rem) | Icon gaps, compact padding |
+| `--spacing-3` | 12px (0.75rem) | Small padding, list spacing |
+| `--spacing-4` | 16px (1rem) | Default padding, card internal |
+| `--spacing-5` | 20px (1.25rem) | Medium padding |
+| `--spacing-6` | 24px (1.5rem) | Section internal spacing |
+| `--spacing-8` | 32px (2rem) | Card padding, component gaps |
+| `--spacing-10` | 40px (2.5rem) | Between components |
+| `--spacing-12` | 48px (3rem) | Section padding |
+| `--spacing-16` | 64px (4rem) | Section gaps |
+| `--spacing-20` | 80px (5rem) | Large section spacing |
+| `--spacing-24` | 96px (6rem) | Page section padding (top/bottom) |
+
+### Container Widths
+
+| Breakpoint | Max Width |
+|------------|-----------|
+| Default (mobile) | 100% with 16px horizontal padding |
+| `sm` (640px) | 640px |
+| `md` (768px) | 768px |
+| `lg` (1024px) | 1024px |
+| `xl` (1280px) | 1280px |
+| `2xl` (1440px) | 1280px (content does not exceed this) |
+
+---
+
+## Border Radius
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--radius-sm` | 4px | Small elements (badges, tags) |
+| `--radius-md` | 6px | Default (buttons, inputs, cards) |
+| `--radius-lg` | 8px | Larger cards, modals |
+| `--radius-xl` | 12px | Featured cards, hero elements |
+| `--radius-full` | 9999px | Pills, avatars, circular elements |
+
+Default `--radius`: **6px** -- slightly rounded, modern but not bubbly. Consistent with a technical aesthetic.
+
+---
+
+## Shadows
+
+Dark themes need subtle shadows. Use elevation through lighter surfaces rather than traditional drop shadows.
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--shadow-sm` | `0 1px 2px oklch(0% 0 0 / 0.3)` | Subtle lift for small elements |
+| `--shadow-md` | `0 4px 12px oklch(0% 0 0 / 0.4)` | Cards, dropdowns |
+| `--shadow-lg` | `0 8px 24px oklch(0% 0 0 / 0.5)` | Modals, elevated panels |
+| `--shadow-glow-primary` | `0 0 20px oklch(62.5% 0.162 259.9 / 0.3)` | Glow effect on primary CTAs |
+| `--shadow-glow-accent` | `0 0 20px oklch(76.6% 0.142 10.1 / 0.25)` | Glow effect on accent elements |
+
+---
+
+## Component Patterns
+
+### Buttons
+
+#### Primary Button
+- Background: `--color-primary` (blue)
+- Text: `--color-primary-foreground` (white)
+- Border radius: `--radius-md` (6px)
+- Padding: `12px 24px` (spacing-3 vertical, spacing-6 horizontal)
+- Font: DM Sans 500 (medium), `--text-base`
+- Hover: Lighten background by ~10% (increase OKLCH lightness)
+- Active: Darken by ~5%
+- Focus: `--color-ring` with 2px offset ring
+- Transition: `background-color 150ms ease, transform 100ms ease`
+- Hover transform: `translateY(-1px)` for subtle lift
+
+#### Secondary Button
+- Background: `--color-secondary`
+- Text: `--color-secondary-foreground`
+- Border: 1px solid `--color-border`
+- Same radius, padding, and font as primary
+
+#### Accent Button (special CTAs)
+- Background: `--color-accent` (pink)
+- Text: `--color-accent-foreground` (dark)
+- Same dimensions as primary
+- Use sparingly: "Submit a Talk", "Register Now"
+
+#### Ghost Button
+- Background: transparent
+- Text: `--color-foreground`
+- Hover: `--color-secondary` background
+- For navigation and toolbar actions
+
+#### Sizes
+| Size | Padding | Font Size | Height |
+|------|---------|-----------|--------|
+| sm | `8px 16px` | 14px | 36px |
+| md (default) | `12px 24px` | 16px | 44px |
+| lg | `16px 32px` | 18px | 52px |
+
+### Cards
+
+- Background: `--color-card`
+- Border: 1px solid `--color-border`
+- Border radius: `--radius-lg` (8px)
+- Padding: `--spacing-6` (24px)
+- Hover: Border color transitions to `--color-primary` at 50% opacity
+- Transition: `border-color 200ms ease`
+
+#### Speaker Card
+- Avatar: 64px circle with `--radius-full`
+- Name: `--text-lg`, weight 600
+- Company: `--text-sm`, `--color-muted-foreground`
+- Talk title: `--text-base`, weight 500, `--color-foreground`
+
+#### Sponsor Card
+- Logo: centered, max-height varies by tier (Platinum: 56px, Gold: 48px, Silver: 40px)
+- Background: `--color-card` with subtle hover glow matching tier color
+- Border radius: `--radius-md`
+
+### Badges / Tags
+
+- Background: `--color-secondary`
+- Text: `--color-primary` or `--color-accent` depending on category
+- Font: `--text-xs`, weight 500, uppercase, `letter-spacing: 0.05em`
+- Padding: `4px 10px`
+- Border radius: `--radius-full` (pill shape)
+
+#### Track Badges (schedule)
+Use distinct hues from the palette for each track:
+- Cloud Infrastructure: `--color-primary` (blue)
+- DevOps & Platform: `--color-accent` (pink)
+- Security: CND Red (destructive)
+- Community: `--color-chart-4` (light blue)
+
+### Navigation
+
+- Background: `--color-background` with `backdrop-filter: blur(12px)` and 90% opacity
+- Sticky top, z-index 50
+- Links: `--color-muted-foreground`, hover `--color-foreground`
+- Active link: `--color-primary` with bottom border indicator
+- Mobile: hamburger menu, slide-in panel from right
+- Font: `--text-sm`, weight 500
+
+### Hero Section
+
+- Full viewport height (100vh) on desktop, auto on mobile
+- Background: `--color-background` with geometric pattern overlay (see below)
+- Event name: `--text-6xl` (64px), weight 700, `--color-foreground`
+- Date/location: `--text-xl`, `--color-muted-foreground`
+- Countdown: individual digit cards using `--color-card` background
+- CTA buttons: Primary ("Register") and Accent ("Submit a Talk")
+
+---
+
+## Geometric Background Pattern
+
+**Style: Hex mesh network** -- a cloud-native reference evoking interconnected nodes and services.
+
+### Description
+A subtle, low-opacity pattern of hexagonal cells connected by thin lines, reminiscent of molecular structures and network topologies. The pattern sits behind content as a texture, never competing for attention.
+
+### Implementation
+- SVG-based, tileable pattern
+- Stroke color: `--color-border` at 30-40% opacity
+- Optional: subtle gradient fill on a few hexagons using `--color-primary` at 5-8% opacity
+- Pattern should be most visible in the hero section and fade/disappear in content-heavy sections
+- Consider a radial gradient mask so the pattern is strongest at the center/top and fades at edges
+
+### Specifications
+- Hex cell size: ~60px across (desktop), ~40px (mobile)
+- Stroke width: 1px
+- Node dots at intersections: 2px circles at `--color-primary` / 15% opacity
+- Connection lines: 1px at `--color-border` / 20% opacity
+- Total pattern opacity on page: 10-20% max
+
+---
+
+## Dark Theme Rationale
+
+The dark theme is chosen for the following reasons:
+
+1. **Developer audience**: Cloud-native professionals overwhelmingly prefer dark interfaces. A dark conference site signals "this is for you."
+2. **Color vibrancy**: The CND logo colors (blue, red, pink) are more vivid and impactful against dark backgrounds than light ones.
+3. **Visual hierarchy**: Dark backgrounds with bright foreground elements create strong natural contrast, directing the eye to content.
+4. **KubeCon energy**: The bold/energetic mood requested aligns with high-contrast dark themes used by KubeCon, GitHub Universe, and similar tech events.
+5. **Brand alignment**: The deepest logo color (#20134d, deep purple) naturally extends into a rich dark background that feels native to the brand rather than arbitrary.
+
+The background is not pure black but a deep purple-tinted dark (`#0e0a24`), maintaining the brand's color DNA even in the darkest surfaces. Every surface layer shifts toward the purple family, creating a cohesive tonal system.
+
+---
+
+## Accessibility Notes
+
+- All text meets WCAG 2.1 AA contrast ratios against their respective backgrounds:
+  - Foreground on background: ~15:1 (exceeds AAA)
+  - Muted foreground on background: ~5.5:1 (exceeds AA)
+  - Primary on background: ~6:1 (exceeds AA)
+  - Accent on background: ~8:1 (exceeds AA)
+- Focus indicators use a visible ring (`--color-ring`) with 2px offset
+- Interactive elements have minimum 44px touch targets on mobile
+- Color is never the sole indicator of state -- always paired with text, icons, or shape changes
+
+---
+
+## Token Export Reference
+
+For `src/styles/global.css`, wire these values into Tailwind 4's `@theme` directive:
+
+```css
+@theme {
+  --color-background: oklch(16.8% 0.052 286.4);
+  --color-foreground: oklch(95.6% 0.023 291.3);
+  --color-card: oklch(22.5% 0.083 285.5);
+  --color-card-foreground: oklch(95.6% 0.023 291.3);
+  --color-popover: oklch(22.5% 0.083 285.5);
+  --color-popover-foreground: oklch(95.6% 0.023 291.3);
+  --color-primary: oklch(62.5% 0.162 259.9);
+  --color-primary-foreground: oklch(100.0% 0.000 0);
+  --color-secondary: oklch(27.1% 0.091 286.5);
+  --color-secondary-foreground: oklch(95.6% 0.023 291.3);
+  --color-muted: oklch(27.1% 0.091 286.5);
+  --color-muted-foreground: oklch(66.8% 0.047 290.8);
+  --color-accent: oklch(76.6% 0.142 10.1);
+  --color-accent-foreground: oklch(16.8% 0.052 286.4);
+  --color-destructive: oklch(54.0% 0.216 25.2);
+  --color-destructive-foreground: oklch(100.0% 0.000 0);
+  --color-border: oklch(30.8% 0.102 285.5);
+  --color-input: oklch(30.8% 0.102 285.5);
+  --color-ring: oklch(62.5% 0.162 259.9);
+  --color-chart-1: oklch(62.5% 0.162 259.9);
+  --color-chart-2: oklch(54.0% 0.216 25.2);
+  --color-chart-3: oklch(76.6% 0.142 10.1);
+  --color-chart-4: oklch(88.4% 0.061 244.8);
+  --color-chart-5: oklch(24.6% 0.101 286.7);
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+}
+```
+
+---
+
+*This file is the design contract. All implementation must reference these values. Do not introduce colors, fonts, or spacing values that are not defined here.*
