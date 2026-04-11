@@ -1,0 +1,17 @@
+- id: acme-cloud
+  name: Acme Cloud
+  tier: platinum
+  logo: /sponsors/acme-cloud.svg
+  url: https://acmecloud.example.com
+  description:
+    fr: "Leader mondial des solutions cloud-native pour l'entreprise."
+    en: "Global leader in cloud-native enterprise solutions."
+
+- id: kube-corp
+  name: KubeCorp
+  tier: gold
+  logo: /sponsors/kubecorp.svg
+  url: https://kubecorp.example.com
+  description:
+    fr: "Solutions Kubernetes pour l'entreprise."
+    en: "Enterprise Kubernetes solutions."

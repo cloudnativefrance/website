@@ -1,0 +1,19 @@
+- id: alice-martin
+  name: Alice Martin
+  role:
+    fr: "Directrice de conference"
+    en: "Conference Director"
+  group: core
+  photo: /team/alice-martin.jpg
+  social:
+    linkedin: "https://linkedin.com/in/alicemartin"
+    github: "https://github.com/alicemartin"
+
+- id: bob-dupont
+  name: Bob Dupont
+  role:
+    fr: "Responsable programme"
+    en: "Program Chair"
+  group: program-committee
+  social:
+    linkedin: "https://linkedin.com/in/bobdupont"
