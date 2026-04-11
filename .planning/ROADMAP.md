@@ -165,6 +165,48 @@ Plans:
 Plans:
 - [ ] 09-01: TBD
 
+### Phase 10: Site Navigation & Component Wiring
+**Goal**: Visitors can navigate between all site sections, and orphaned components from earlier phases are wired into the UI
+**Depends on**: Phase 3
+**Requirements**: (integration gaps — no new requirements)
+**Gap Closure:** Closes integration gaps from v1.0 audit
+**Success Criteria** (what must be TRUE):
+  1. A navigation/header component exists with links to all major sections (home, speakers, sponsors, team, venue, schedule)
+  2. nav.* i18n keys are consumed by the navigation component in both FR and EN
+  3. TranslationNotice component is placed on relevant pages
+  4. Orphaned shadcn Card/Separator components are either integrated into pages or removed
+
+Plans:
+- [ ] 10-01: TBD
+
+### Phase 11: Security & i18n Hardcode Fixes
+**Goal**: All hardcoded English strings use i18n, locale detection is consistent, and the SocialLinks XSS vector is closed
+**Depends on**: Phase 4
+**Requirements**: (tech debt — closes CR-01, IN-01, IN-02, WR-01, WR-02, keynote_badge, schedule_link)
+**Gap Closure:** Closes integration and tech debt gaps from v1.0 audit
+**Success Criteria** (what must be TRUE):
+  1. SocialLinks.astro validates URLs before rendering href attributes (no javascript: URIs)
+  2. All locale-dependent strings (track badges, keynote label, countdown aria-label) use i18n translation keys
+  3. All page data calls use getLangFromUrl result instead of hardcoded 'fr'/'en'
+  4. twitter field in SocialLinks is either rendered or removed from the Props type
+
+Plans:
+- [ ] 11-01: TBD
+
+### Phase 12: CTA & Brand Completion
+**Goal**: Hero CTA buttons are functional and brand identity documentation is complete
+**Depends on**: Phase 3
+**Requirements**: HERO-03, DSGN-04
+**Gap Closure:** Closes requirement and flow gaps from v1.0 audit
+**Success Criteria** (what must be TRUE):
+  1. "Register" CTA links to the external ticketing page (or a clearly marked placeholder page if URL not yet available)
+  2. "View Schedule" CTA either links to a working route or is conditionally hidden until Phase 7 builds /programme
+  3. DESIGN.md includes KCD logo usage guidelines (placement, dimensions, co-branding rules)
+  4. All satisfied requirements in REQUIREMENTS.md have updated checkboxes
+
+Plans:
+- [ ] 12-01: TBD
+
 ## Progress
 
 **Execution Order:**
@@ -181,3 +223,6 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | 7. Interactive Schedule | 0/? | Not started | - |
 | 8. Event Lifecycle | 0/? | Not started | - |
 | 9. SEO, Legal & Polish | 0/? | Not started | - |
+| 10. Site Navigation & Component Wiring | 0/? | Not started | - |
+| 11. Security & i18n Hardcode Fixes | 0/? | Not started | - |
+| 12. CTA & Brand Completion | 0/? | Not started | - |

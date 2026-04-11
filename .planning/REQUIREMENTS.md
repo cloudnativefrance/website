@@ -9,29 +9,29 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Design System
 
-- [ ] **DSGN-01**: Design system defined in Google Stitch with colors, typography, spacing, and component patterns
-- [ ] **DSGN-02**: DESIGN.md exported and committed to project root as the single source of truth for all visual decisions
-- [ ] **DSGN-03**: Dark theme with bold/technical aesthetic and warm community accents (real event photos, friendly tone)
+- [x] **DSGN-01**: Design system defined in Google Stitch with colors, typography, spacing, and component patterns
+- [x] **DSGN-02**: DESIGN.md exported and committed to project root as the single source of truth for all visual decisions
+- [x] **DSGN-03**: Dark theme with bold/technical aesthetic and warm community accents (real event photos, friendly tone)
 - [ ] **DSGN-04**: Brand continuity preserved: DM Sans font, geometric shapes, CND France + KCD logos
 - [x] **DSGN-05**: Tailwind CSS 4 theme tokens derived from DESIGN.md (colors, spacing, typography, radii)
 - [x] **DSGN-06**: shadcn/ui components customized to match design system
 
 ### Foundation
 
-- [ ] **FNDN-01**: Astro 6 project scaffolded with React islands + Tailwind CSS 4 + shadcn/ui
-- [ ] **FNDN-02**: Bilingual routing: French as default (no prefix), English under /en/
-- [ ] **FNDN-03**: Language toggle component visible on all pages
-- [ ] **FNDN-04**: Content collections with Zod schemas for speakers, talks, sponsors, team
+- [x] **FNDN-01**: Astro 6 project scaffolded with React islands + Tailwind CSS 4 + shadcn/ui
+- [x] **FNDN-02**: Bilingual routing: French as default (no prefix), English under /en/
+- [x] **FNDN-03**: Language toggle component visible on all pages
+- [x] **FNDN-04**: Content collections with Zod schemas for speakers, talks, sponsors, team
 - [x] **FNDN-05**: Responsive layout system: mobile-first, works on all devices
 - [x] **FNDN-06**: Docker multi-stage build (Node build → Nginx Alpine) producing < 50MB image
 - [ ] **FNDN-07**: Kubernetes deployment manifests (Deployment, Service, Ingress)
 
 ### Hero & Landing
 
-- [ ] **HERO-01**: Hero section with event name, date (June 3, 2027), venue (CENTQUATRE-PARIS), geometric background
-- [ ] **HERO-02**: Countdown timer to event date (pre-event mode)
+- [x] **HERO-01**: Hero section with event name, date (June 3, 2027), venue (CENTQUATRE-PARIS), geometric background
+- [x] **HERO-02**: Countdown timer to event date (pre-event mode)
 - [ ] **HERO-03**: Prominent CTA button linking to external registration/ticketing
-- [ ] **HERO-04**: Key numbers section: 1700+ attendees, 50+ talks, 40+ partners
+- [x] **HERO-04**: Key numbers section: 1700+ attendees, 50+ talks, 40+ partners
 
 ### Schedule
 
@@ -45,10 +45,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Speakers
 
-- [ ] **SPKR-01**: Speaker grid overview with photo, name, company
+- [x] **SPKR-01**: Speaker grid overview with photo, name, company
 - [x] **SPKR-02**: Individual speaker page with bio, company, photo, social links, talk abstract
 - [x] **SPKR-03**: Link from speaker page to their talk(s) in the schedule
-- [ ] **SPKR-04**: Speaker data managed via Markdown files (bilingual: fr/ and en/ subfolders)
+- [x] **SPKR-04**: Speaker data managed via Markdown files (bilingual: fr/ and en/ subfolders)
 
 ### Sponsors
 
@@ -123,23 +123,23 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DSGN-01 | Phase 1: Design System & Foundation | Pending |
-| DSGN-02 | Phase 1: Design System & Foundation | Pending |
-| DSGN-03 | Phase 1: Design System & Foundation | Pending |
-| DSGN-04 | Phase 1: Design System & Foundation | Pending |
+| DSGN-01 | Phase 1: Design System & Foundation | Complete |
+| DSGN-02 | Phase 1: Design System & Foundation | Complete |
+| DSGN-03 | Phase 1: Design System & Foundation | Complete |
+| DSGN-04 | Phase 12: CTA & Brand Completion | Pending |
 | DSGN-05 | Phase 1: Design System & Foundation | Complete |
 | DSGN-06 | Phase 1: Design System & Foundation | Complete |
-| FNDN-01 | Phase 1: Design System & Foundation | Pending |
-| FNDN-02 | Phase 2: Bilingual Architecture & Content Collections | Pending |
-| FNDN-03 | Phase 2: Bilingual Architecture & Content Collections | Pending |
-| FNDN-04 | Phase 2: Bilingual Architecture & Content Collections | Pending |
+| FNDN-01 | Phase 1: Design System & Foundation | Complete |
+| FNDN-02 | Phase 2: Bilingual Architecture & Content Collections | Complete |
+| FNDN-03 | Phase 2: Bilingual Architecture & Content Collections | Complete |
+| FNDN-04 | Phase 2: Bilingual Architecture & Content Collections | Complete |
 | FNDN-05 | Phase 1: Design System & Foundation | Complete |
 | FNDN-06 | Phase 1: Design System & Foundation | Complete |
 | FNDN-07 | Deferred to cnd-platform repo (GitOps) | Pending |
-| HERO-01 | Phase 3: Hero & Landing | Pending |
-| HERO-02 | Phase 3: Hero & Landing | Pending |
-| HERO-03 | Phase 3: Hero & Landing | Pending |
-| HERO-04 | Phase 3: Hero & Landing | Pending |
+| HERO-01 | Phase 3: Hero & Landing | Complete |
+| HERO-02 | Phase 3: Hero & Landing | Complete |
+| HERO-03 | Phase 12: CTA & Brand Completion | Pending |
+| HERO-04 | Phase 3: Hero & Landing | Complete |
 | SCHD-01 | Phase 7: Interactive Schedule | Pending |
 | SCHD-02 | Phase 7: Interactive Schedule | Pending |
 | SCHD-03 | Phase 7: Interactive Schedule | Pending |
@@ -147,10 +147,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCHD-05 | Phase 7: Interactive Schedule | Pending |
 | SCHD-06 | Phase 7: Interactive Schedule | Pending |
 | SCHD-07 | Phase 7: Interactive Schedule | Pending |
-| SPKR-01 | Phase 4: Speakers | Pending |
+| SPKR-01 | Phase 4: Speakers | Complete |
 | SPKR-02 | Phase 4: Speakers | Complete |
 | SPKR-03 | Phase 4: Speakers | Complete |
-| SPKR-04 | Phase 4: Speakers | Pending |
+| SPKR-04 | Phase 4: Speakers | Complete |
 | SPNS-01 | Phase 5: Sponsors & Team | Pending |
 | SPNS-02 | Phase 5: Sponsors & Team | Pending |
 | SPNS-03 | Phase 5: Sponsors & Team | Pending |
@@ -177,7 +177,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 - v1 requirements: 49 total
 - Mapped to phases: 49
 - Unmapped: 0
+- Complete: 18
+- Pending: 31
 
 ---
 *Requirements defined: 2026-04-11*
-*Last updated: 2026-04-11 after roadmap creation*
+*Last updated: 2026-04-12 after gap closure phases added*
