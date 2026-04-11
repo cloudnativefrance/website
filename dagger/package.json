@@ -1,0 +1,14 @@
+{
+  "name": "cndfrance-website-ci",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@dagger.io/dagger": "latest"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
