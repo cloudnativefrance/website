@@ -54,12 +54,12 @@ This phase introduces one new UI element (language toggle). Typography follows t
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 16px | 400 | 1.6 |
-| Label | 14px | 500 | 1.5 |
+| Label | 14px | 600 | 1.5 |
 | Heading | 24px | 600 | 1.3 |
-| Display | 36px | 700 | 1.2 |
+| Display | 36px | 600 | 1.2 |
 
 Phase-specific usage:
-- Language toggle labels ("FR" / "EN"): 14px, weight 500, uppercase, letter-spacing 0.05em
+- Language toggle labels ("FR" / "EN"): 14px, weight 600, uppercase, letter-spacing 0.05em
 - Translation missing fallback notice: 14px, weight 400
 
 Source: `DESIGN.md` Type Scale section
@@ -110,7 +110,7 @@ This phase introduces exactly one new visual component. All other work is infras
 | Button size | min-width 40px, height 32px (compact), 44px touch target via padding on mobile |
 | Active button | `--color-primary` background, `--color-primary-foreground` text, `--radius-sm` (4px) |
 | Inactive button | transparent background, `--color-muted-foreground` text |
-| Label text | 14px, weight 500, uppercase, letter-spacing 0.05em |
+| Label text | 14px, weight 600, uppercase, letter-spacing 0.05em |
 | Hover (inactive) | `--color-secondary` background lightens slightly (increase OKLCH lightness 5%) |
 | Focus | 2px `--color-ring` offset ring on the individual button |
 | Transition | background-color 150ms ease |
@@ -155,11 +155,11 @@ This phase introduces exactly one new visual component. All other work is infras
 | Element | Specification |
 |---------|---------------|
 | Container | full-width banner, `--color-card` background, 1px `--color-border` top/bottom border |
-| Padding | 12px vertical (spacing-3), 16px horizontal (spacing-4) |
+| Padding | 16px vertical (spacing-md), 16px horizontal (spacing-md) |
 | Icon | `lucide:info` at 16px, `--color-primary`, inline before heading text |
-| Heading | 14px, weight 500, `--color-foreground` |
+| Heading | 14px, weight 600, `--color-foreground` |
 | Body | 14px, weight 400, `--color-muted-foreground` |
-| CTA link | 14px, weight 500, `--color-primary`, underline on hover |
+| CTA link | 14px, weight 600, `--color-primary`, underline on hover |
 
 ---
 
