@@ -1,0 +1,51 @@
+---
+import { cn } from "@/lib/utils";
+
+interface Props {
+  name: string;
+  photo?: string;
+  size?: "sm" | "lg";
+  class?: string;
+}
+
+const { name, photo, size = "sm", class: className } = Astro.props;
+
+const initials = name
+  .split(" ")
+  .map((w) => w[0])
+  .join("")
+  .slice(0, 2)
+  .toUpperCase();
+
+const sizeClasses = {
+  sm: "w-16 h-16 rounded-full",
+  lg: "w-32 h-32 rounded-xl",
+};
+
+const initialsSizeClasses = {
+  sm: "text-base",
+  lg: "text-3xl",
+};
+---
+
+{
+  photo ? (
+    <img
+      src={photo}
+      alt={name}
+      class={cn(sizeClasses[size], "object-cover", className)}
+    />
+  ) : (
+    <div
+      class={cn(
+        sizeClasses[size],
+        "bg-secondary flex items-center justify-center font-bold text-muted-foreground",
+        initialsSizeClasses[size],
+        className,
+      )}
+      aria-label={name}
+    >
+      {initials}
+    </div>
+  )
+}
