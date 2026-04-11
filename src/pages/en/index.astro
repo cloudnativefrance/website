@@ -1,5 +1,5 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import Layout from "../../layouts/Layout.astro";
 import GeoBackground from "@/components/patterns/GeoBackground.astro";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -21,16 +21,16 @@ const t = useTranslations(lang);
           Cloud Native Days France
         </h1>
         <p class="max-w-2xl text-lg text-muted-foreground sm:text-xl" style="line-height:1.4;">
-          3 juin 2027 &mdash; CENTQUATRE-PARIS (104)
+          June 3, 2027 &mdash; CENTQUATRE-PARIS (104)
         </p>
 
         {/* CTA Buttons */}
         <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Button client:idle size="lg" className="h-[52px] px-8 text-lg font-medium shadow-[0_0_20px_oklch(62.5%_0.162_259.9_/_0.3)] hover:translate-y-[-1px] transition-all duration-150">
-            Reserver
+            Get Your Ticket
           </Button>
           <Button client:idle variant="outline" size="lg" className="h-[52px] px-8 text-lg font-medium">
-            Voir le programme
+            View Schedule
           </Button>
         </div>
       </div>
@@ -41,36 +41,36 @@ const t = useTranslations(lang);
     {/* ── Stats Cards Section ──────────────────────────────── */}
     <section class="mx-auto max-w-5xl px-4 py-16 lg:py-24">
       <h2 class="mb-10 text-center text-3xl font-bold tracking-tight sm:text-4xl" style="letter-spacing:-0.02em;">
-        L'evenement en chiffres
+        The Event in Numbers
       </h2>
       <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <Card client:idle className="border-border transition-colors duration-200 hover:border-primary/50">
           <CardHeader>
             <CardTitle className="text-lg font-semibold">50+ Talks</CardTitle>
-            <CardDescription>Conferences, lightning talks et ateliers sur plusieurs parcours</CardDescription>
+            <CardDescription>Deep dives, lightning talks, and workshops across multiple tracks</CardDescription>
           </CardHeader>
           <CardContent>
-            <p class="text-sm text-muted-foreground">Des fondamentaux Kubernetes aux bonnes pratiques du platform engineering</p>
+            <p class="text-sm text-muted-foreground">From Kubernetes internals to platform engineering best practices</p>
           </CardContent>
         </Card>
 
         <Card client:idle className="border-border transition-colors duration-200 hover:border-primary/50">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">1700+ Participants</CardTitle>
-            <CardDescription>Le plus grand rassemblement cloud-native en France</CardDescription>
+            <CardTitle className="text-lg font-semibold">1700+ Attendees</CardTitle>
+            <CardDescription>The largest cloud-native community gathering in France</CardDescription>
           </CardHeader>
           <CardContent>
-            <p class="text-sm text-muted-foreground">Ingenieurs, architectes et decideurs de toute l'Europe</p>
+            <p class="text-sm text-muted-foreground">Engineers, architects, and decision-makers from across Europe</p>
           </CardContent>
         </Card>
 
         <Card client:idle className="border-border transition-colors duration-200 hover:border-primary/50">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">40+ Partenaires</CardTitle>
-            <CardDescription>Leaders de l'industrie et startups innovantes soutenant l'evenement</CardDescription>
+            <CardTitle className="text-lg font-semibold">40+ Partners</CardTitle>
+            <CardDescription>Industry leaders and innovative startups supporting the event</CardDescription>
           </CardHeader>
           <CardContent>
-            <p class="text-sm text-muted-foreground">Sponsors Platinum, Gold, Silver et Communaute</p>
+            <p class="text-sm text-muted-foreground">Platinum, Gold, Silver, and Community sponsors</p>
           </CardContent>
         </Card>
       </div>
@@ -81,9 +81,9 @@ const t = useTranslations(lang);
     {/* ── Badges Section ───────────────────────────────────── */}
     <section class="mx-auto max-w-5xl px-4 py-16 lg:py-24">
       <h2 class="mb-6 text-center text-3xl font-bold tracking-tight sm:text-4xl" style="letter-spacing:-0.02em;">
-        Parcours
+        Conference Tracks
       </h2>
-      <p class="mb-8 text-center text-muted-foreground">Explorez les sessions de nos parcours thematiques</p>
+      <p class="mb-8 text-center text-muted-foreground">Explore sessions across our curated tracks</p>
       <div class="flex flex-wrap items-center justify-center gap-3">
         <Badge client:idle className="bg-primary/15 text-primary px-3 py-1 text-xs font-medium uppercase tracking-widest rounded-full">Kubernetes</Badge>
         <Badge client:idle variant="secondary" className="bg-accent/15 text-accent px-3 py-1 text-xs font-medium uppercase tracking-widest rounded-full">Platform Engineering</Badge>
@@ -97,7 +97,7 @@ const t = useTranslations(lang);
     {/* ── Typography Showcase ──────────────────────────────── */}
     <section class="mx-auto max-w-5xl px-4 py-16 lg:py-24">
       <h2 class="mb-10 text-center text-3xl font-bold tracking-tight sm:text-4xl" style="letter-spacing:-0.02em;">
-        Echelle typographique
+        Typography Scale
       </h2>
       <div class="space-y-6">
         <div>
@@ -114,11 +114,11 @@ const t = useTranslations(lang);
         </div>
         <div>
           <p class="mb-1 text-xs uppercase tracking-widest text-muted-foreground">Body &mdash; text-base / 16px / Regular</p>
-          <p class="text-base" style="line-height:1.6;">Cloud Native Days France rassemble les esprits les plus brillants de la technologie cloud-native pour une journee complete d'apprentissage, de networking et de communaute.</p>
+          <p class="text-base" style="line-height:1.6;">Cloud Native Days France brings together the brightest minds in cloud-native technology for a full day of learning, networking, and community building.</p>
         </div>
         <div>
           <p class="mb-1 text-xs uppercase tracking-widest text-muted-foreground">Muted &mdash; text-sm / 14px / Regular</p>
-          <p class="text-sm text-muted-foreground" style="line-height:1.5;">Les textes secondaires et legendes apparaissent en muted-foreground pour une hierarchie visuelle claire.</p>
+          <p class="text-sm text-muted-foreground" style="line-height:1.5;">Secondary text and captions appear in muted-foreground for clear visual hierarchy.</p>
         </div>
       </div>
     </section>

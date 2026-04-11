@@ -4,11 +4,13 @@ import "../styles/global.css";
 
 interface Props {
   title?: string;
+  lang?: string;
 }
 
-const { title = "Cloud Native Days France 2027" } = Astro.props;
+const { title = "Cloud Native Days France 2027", lang } = Astro.props;
+const resolvedLang = lang ?? Astro.currentLocale ?? "fr";
 ---
-<html lang="fr" class="dark">
+<html lang={resolvedLang} class="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
