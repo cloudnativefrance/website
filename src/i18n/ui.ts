@@ -34,6 +34,21 @@ export const ui = {
     "keynumbers.attendees": "Participants",
     "keynumbers.talks": "Talks",
     "keynumbers.partners": "Partenaires",
+    "speakers.heading": "Nos Speakers",
+    "speakers.subtext":
+      "Decouvrez les intervenants de Cloud Native Days France 2027",
+    "speakers.keynote_badge": "Keynote",
+    "speakers.talks_heading": "Ses talks",
+    "speakers.cospeaker_prefix": "Avec",
+    "speakers.schedule_link": "Voir dans le programme",
+    "speakers.schedule_placeholder": "Programme a venir",
+    "speakers.empty_heading": "Speakers a venir",
+    "speakers.empty_body":
+      "La liste des speakers sera annoncee prochainement. Revenez bientot !",
+    "speakers.back": "Retour aux speakers",
+    "speakers.no_talks": "Aucun talk annonce pour le moment.",
+    "speakers.not_found":
+      "Speaker introuvable. Retournez a la liste des speakers.",
   },
   en: {
     "nav.home": "Home",
@@ -64,5 +79,20 @@ export const ui = {
     "keynumbers.attendees": "Attendees",
     "keynumbers.talks": "Talks",
     "keynumbers.partners": "Partners",
+    "speakers.heading": "Our Speakers",
+    "speakers.subtext":
+      "Meet the speakers of Cloud Native Days France 2027",
+    "speakers.keynote_badge": "Keynote",
+    "speakers.talks_heading": "Their Talks",
+    "speakers.cospeaker_prefix": "With",
+    "speakers.schedule_link": "View in schedule",
+    "speakers.schedule_placeholder": "Schedule coming soon",
+    "speakers.empty_heading": "Speakers Coming Soon",
+    "speakers.empty_body":
+      "The speaker lineup will be announced shortly. Check back soon!",
+    "speakers.back": "Back to speakers",
+    "speakers.no_talks": "No talks announced yet.",
+    "speakers.not_found":
+      "Speaker not found. Return to the speakers page.",
   },
 } as const;

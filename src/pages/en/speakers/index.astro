@@ -1,0 +1,62 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import SpeakerCard from "@/components/speakers/SpeakerCard.astro";
+import { getSortedSpeakers, getSlug, getTalksByLocale } from "@/lib/speakers";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const speakers = await getSortedSpeakers("en");
+const talks = await getTalksByLocale("en");
+
+// Build keynote speaker slug set for badge display
+const keynoteSlugs = new Set<string>();
+for (const talk of talks) {
+  if (talk.data.format === "keynote") {
+    keynoteSlugs.add(talk.data.speaker);
+    talk.data.cospeakers?.forEach((cs) => keynoteSlugs.add(cs));
+  }
+}
+---
+
+<Layout title={`${t("speakers.heading")} | ${t("site.title")}`}>
+  <main class="px-4 md:px-6 lg:px-8">
+    <section class="pt-16 md:pt-24 pb-12 md:pb-16 text-center">
+      <h1
+        class="text-4xl font-bold text-foreground tracking-tight"
+        style="letter-spacing: -0.02em;"
+      >
+        {t("speakers.heading")}
+      </h1>
+      <p class="mt-2 text-base text-muted-foreground">
+        {t("speakers.subtext")}
+      </p>
+    </section>
+
+    {
+      speakers.length === 0 ? (
+        <section class="text-center py-16">
+          <h2 class="text-2xl font-bold text-foreground">
+            {t("speakers.empty_heading")}
+          </h2>
+          <p class="mt-2 text-muted-foreground">{t("speakers.empty_body")}</p>
+        </section>
+      ) : (
+        <section class="max-w-7xl mx-auto pb-16 md:pb-24">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            {speakers.map((speaker) => (
+              <SpeakerCard
+                name={speaker.data.name}
+                company={speaker.data.company}
+                slug={getSlug(speaker.id)}
+                photo={speaker.data.photo}
+                isKeynote={keynoteSlugs.has(getSlug(speaker.id))}
+                lang="en"
+              />
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </main>
+</Layout>
