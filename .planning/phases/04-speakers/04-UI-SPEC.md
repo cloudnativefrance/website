@@ -5,6 +5,7 @@ status: draft
 shadcn_initialized: true
 preset: base-nova
 created: 2026-04-11
+revised: 2026-04-11
 ---
 
 # Phase 4 — UI Design Contract
@@ -45,16 +46,20 @@ Exceptions: 44px minimum touch target for social link icons on mobile (accessibi
 
 ## Typography
 
-All values from DESIGN.md. Phase 4 uses this subset:
+All values from DESIGN.md. Phase 4 uses exactly 4 sizes and 2 weights:
 
 | Role | Size | Weight | Line Height | Phase 4 Usage |
 |------|------|--------|-------------|---------------|
-| Body | 16px (1rem) | 400 | 1.6 | Speaker bio text, talk abstract body |
-| Label | 14px (0.875rem) | 400 | 1.5 | Company name on grid card, talk duration/format text |
-| Card title | 18px (1.125rem) | 600 | 1.6 | Speaker name on grid card, talk title on talk card |
+| Label / Badge | 14px (0.875rem) | 400 | 1.5 | Company name on grid card, talk duration/format text, track badge text (uppercase, letter-spacing 0.05em for badges) |
+| Body / Card title | 16px (1rem) | 400 | 1.6 | Speaker bio text, talk abstract body, speaker name on grid card, talk title on talk card, role + company on profile page |
+| Sub-heading | 24px (1.5rem) | 700 | 1.3 | "Keynotes" section label, "Talks" section label on profile |
 | Section heading | 36px (2.25rem) | 700 | 1.2 | Page heading "Speakers" / "Nos Speakers" |
-| Sub-heading | 24px (1.5rem) | 600 | 1.3 | "Keynotes" section label, "Talks" section label on profile |
-| Small | 12px (0.75rem) | 500 | 1.5 | Track badge text (uppercase, letter-spacing 0.05em) |
+
+**Weight rules:** 400 (regular) for body text, labels, badges, and card content. 700 (bold) for all headings and sub-headings. No intermediate weights.
+
+**Badge differentiation:** Track badges use 14px at weight 400 with `text-transform: uppercase` and `letter-spacing: 0.05em` to achieve visual distinction without a separate size or weight.
+
+**Card title differentiation:** Speaker name on grid card uses 16px at weight 700 to stand out from the 16px/400 body text within the same card context.
 
 ---
 
@@ -97,9 +102,9 @@ Source: DESIGN.md Track Badges section + RESEARCH.md Pattern 5.
 | Container | shadcn `Card` with `--color-card` background, `--radius-lg` (8px), 1px `--color-border` |
 | Layout | Centered column: avatar, name, company. Padding 24px. |
 | Avatar | 64px circle (`rounded-full`). Initials fallback on `--color-secondary` with `--color-muted-foreground` text. |
-| Name | 18px, weight 600, `--color-foreground` |
+| Name | 16px, weight 700, `--color-foreground` |
 | Company | 14px, weight 400, `--color-muted-foreground` |
-| Keynote badge | Pill badge below name: "Keynote" in `--color-accent` text on `--color-accent/15` background, 12px uppercase |
+| Keynote badge | Pill badge below name: "Keynote" in `--color-accent` text on `--color-accent/15` background, 14px uppercase, letter-spacing 0.05em |
 | Hover | Border color transitions to `--color-primary/50` over 200ms. Card lifts `translateY(-2px)` over 200ms. |
 | Click | Entire card is a link to `/speakers/{slug}` (or `/en/speakers/{slug}`) |
 | Grid | 4 columns at xl (1280px+), 3 at lg (1024px+), 2 at md (768px+), 1 at mobile. Gap: 24px desktop, 16px mobile. |
@@ -111,18 +116,18 @@ Source: DESIGN.md Track Badges section + RESEARCH.md Pattern 5.
 | Layout | Single column, centered, max-width 768px. |
 | Avatar | 128px circle (`rounded-full`) on grid, 128px `rounded-xl` on profile page. Initials fallback at 30px font size. |
 | Name | 36px, weight 700, `--color-foreground`, letter-spacing -0.02em |
-| Role + Company | 18px, weight 400, `--color-muted-foreground` |
-| Social links | Horizontal icon row below name. 20px icons. Gap 12px. Color: `--color-muted-foreground`, hover: `--color-primary`. Transition 150ms. Min touch target 44px. |
+| Role + Company | 16px, weight 400, `--color-muted-foreground` |
+| Social links | Horizontal icon row below name. 20px icons. Gap 8px. Color: `--color-muted-foreground`, hover: `--color-primary`. Transition 150ms. Min touch target 44px. |
 | Bio | Rendered Markdown in `prose prose-invert` with `max-w-none`. Body at 16px/1.6. |
-| Talks section | Heading "Talks" at 24px/600. Talk cards stacked vertically with 16px gap. |
+| Talks section | Heading "Talks" at 24px/700. Talk cards stacked vertically with 16px gap. |
 
 ### TalkCard (on speaker profile)
 
 | Property | Specification |
 |----------|---------------|
 | Container | shadcn `Card`, padding 16px, `--radius-lg` border |
-| Title | 18px, weight 500, `--color-foreground` |
-| Track badge | Pill badge using track color map above. 12px, weight 500, uppercase, 0.05em tracking. Padding 4px 10px. |
+| Title | 16px, weight 700, `--color-foreground` |
+| Track badge | Pill badge using track color map above. 14px, weight 400, uppercase, 0.05em tracking. Padding 4px 8px. |
 | Format + Duration | 14px, weight 400, `--color-muted-foreground`. Format capitalized (e.g., "Talk - 45min"). |
 | Co-speakers | 14px, `--color-muted-foreground`. Names as `--color-primary` links to their profile pages. |
 | Schedule link | Text link "View in schedule" in `--color-primary`, 14px. Disabled/muted until Phase 7 (render as `--color-muted-foreground` with `cursor-default`). |
@@ -135,7 +140,7 @@ Source: DESIGN.md Track Badges section + RESEARCH.md Pattern 5.
 | Size `sm` | 64px width/height. Font 16px for initials. |
 | Size `lg` | 128px width/height. Font 30px for initials. |
 | Photo present | `<img>` with `object-cover`, matching size and border-radius. |
-| Photo absent | `--color-secondary` circle/rounded-square with initials in `--color-muted-foreground`, weight 600. |
+| Photo absent | `--color-secondary` circle/rounded-square with initials in `--color-muted-foreground`, weight 700. |
 | Border radius | `rounded-full` on grid cards. `rounded-xl` on profile page (size `lg`). |
 
 ### SocialLinks (icon row)
@@ -143,7 +148,7 @@ Source: DESIGN.md Track Badges section + RESEARCH.md Pattern 5.
 | Property | Specification |
 |----------|---------------|
 | Icons | GitHub, LinkedIn, Bluesky (inline SVG), Globe (website). Each 20px. |
-| Layout | Horizontal flex, gap 12px, vertically centered. |
+| Layout | Horizontal flex, gap 8px, vertically centered. |
 | Color | `--color-muted-foreground` default, `--color-primary` on hover. |
 | Transition | `color 150ms ease` |
 | Accessibility | Each link has `aria-label` (e.g., "GitHub profile"), `target="_blank"`, `rel="noopener noreferrer"`. |
@@ -154,7 +159,7 @@ Source: DESIGN.md Track Badges section + RESEARCH.md Pattern 5.
 | Property | Specification |
 |----------|---------------|
 | Heading | "Nos Speakers" (FR) / "Our Speakers" (EN). 36px, weight 700, `--color-foreground`, letter-spacing -0.02em. Centered. |
-| Subtext | "Decouvrez les intervenants de Cloud Native Days France 2027" (FR) / "Meet the speakers of Cloud Native Days France 2027" (EN). 18px, weight 400, `--color-muted-foreground`. Centered. |
+| Subtext | "Decouvrez les intervenants de Cloud Native Days France 2027" (FR) / "Meet the speakers of Cloud Native Days France 2027" (EN). 16px, weight 400, `--color-muted-foreground`. Centered. |
 | Spacing | Heading to subtext: 8px. Section to grid: 48px. Page top padding: 64px. |
 
 ---
