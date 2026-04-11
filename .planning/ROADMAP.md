@@ -27,18 +27,20 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### Phase 1: Design System & Foundation
 **Goal**: Visual identity is defined and approved, project is scaffolded and deployable, design tokens flow into code
 **Depends on**: Nothing (first phase)
-**Requirements**: DSGN-01, DSGN-02, DSGN-03, DSGN-04, DSGN-05, DSGN-06, FNDN-01, FNDN-05, FNDN-06, FNDN-07
+**Requirements**: DSGN-01, DSGN-02, DSGN-03, DSGN-04, DSGN-05, DSGN-06, FNDN-01, FNDN-05, FNDN-06
 **Success Criteria** (what must be TRUE):
   1. DESIGN.md exists in repo with approved colors, typography, spacing, component patterns from Stitch
   2. Running `pnpm dev` starts an Astro 6 site with Tailwind 4, React islands, and shadcn/ui components rendering correctly
   3. Tailwind theme tokens (colors, spacing, typography, radii) match DESIGN.md values exactly
   4. A sample page renders correctly on mobile, tablet, and desktop viewports
-  5. `docker build` produces a working Nginx image under 50MB, and K8s manifests exist for Deployment/Service/Ingress
-**Plans**: TBD
+  5. `docker build` produces a working Nginx image under 50MB; K8s manifests live in `cnd-platform` repo per GitOps decision
+**Plans**: 4
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01: Scaffold Astro 6 project with React + Tailwind 4 + shadcn/ui (FNDN-01)
+- [ ] 01-02: Design system in Stitch + DESIGN.md (DSGN-01, DSGN-02, DSGN-03, DSGN-04)
+- [ ] 01-03: Wire design tokens + responsive sample page (DSGN-05, DSGN-06, FNDN-05)
+- [ ] 01-04: Docker + Dagger + GitHub Actions CI (FNDN-06)
 
 ### Phase 2: Bilingual Architecture & Content Collections
 **Goal**: Site supports French and English with validated content schemas ready for all data types
@@ -166,7 +168,7 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Design System & Foundation | 0/? | Not started | - |
+| 1. Design System & Foundation | 0/4 | Planned | - |
 | 2. Bilingual Architecture & Content Collections | 0/? | Not started | - |
 | 3. Hero & Landing | 0/? | Not started | - |
 | 4. Speakers | 0/? | Not started | - |

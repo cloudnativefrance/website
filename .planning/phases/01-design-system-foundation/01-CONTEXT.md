@@ -32,6 +32,11 @@ Define visual identity in Google Stitch, scaffold the Astro 6 project with Tailw
 - Container image built via GitHub Actions on merge to main, pushed to GHCR (ghcr.io)
 - Reference workflow for image builds: `Smana/cloud-native-ref` repo `.github/workflows/build-container-images.yml`
 
+### Local testing with Dagger
+- Use Dagger to provide a local build/test pipeline (build site, run in container, verify)
+- Same pipeline can be reused in CI for consistency
+- Allows contributors to test the full containerized site locally without manual Docker commands
+
 ### Claude's Discretion
 - Geometric pattern style choice
 - Typography selection (weight, family) within bold/energetic direction

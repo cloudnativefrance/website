@@ -135,7 +135,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FNDN-04 | Phase 2: Bilingual Architecture & Content Collections | Pending |
 | FNDN-05 | Phase 1: Design System & Foundation | Pending |
 | FNDN-06 | Phase 1: Design System & Foundation | Pending |
-| FNDN-07 | Phase 1: Design System & Foundation | Pending |
+| FNDN-07 | Deferred to cnd-platform repo (GitOps) | Pending |
 | HERO-01 | Phase 3: Hero & Landing | Pending |
 | HERO-02 | Phase 3: Hero & Landing | Pending |
 | HERO-03 | Phase 3: Hero & Landing | Pending |
