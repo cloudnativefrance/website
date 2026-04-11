@@ -69,8 +69,8 @@ Plans:
   4. Key numbers section displays 1700+ attendees, 50+ talks, 40+ partners in a visually distinct block
 **Plans**: 2 plans
 
-- [ ] 03-01-PLAN.md — Hero section, countdown timer, translations (HERO-01, HERO-02, HERO-03)
-- [ ] 03-02-PLAN.md — Key numbers with animated counters, wire homepage (HERO-04)
+- [x] 03-01-PLAN.md — Hero section, countdown timer, translations (HERO-01, HERO-02, HERO-03)
+- [x] 03-02-PLAN.md — Key numbers with animated counters, wire homepage (HERO-04)
 
 ### Phase 4: Speakers
 **Goal**: Visitors can browse all speakers and read detailed profiles with links to their talks
