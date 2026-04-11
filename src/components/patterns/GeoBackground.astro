@@ -1,0 +1,89 @@
+---
+/**
+ * GeoBackground -- Hex mesh network pattern from DESIGN.md
+ *
+ * A subtle, low-opacity SVG pattern of hexagonal cells connected by thin lines,
+ * reminiscent of molecular structures and network topologies.
+ *
+ * Props:
+ *   class - Additional CSS classes for positioning (e.g., "absolute inset-0")
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+---
+
+<div
+  class:list={[
+    "pointer-events-none overflow-hidden",
+    className,
+  ]}
+  aria-hidden="true"
+>
+  <svg
+    class="h-full w-full"
+    xmlns="http://www.w3.org/2000/svg"
+    preserveAspectRatio="xMidYMid slice"
+  >
+    <defs>
+      {/* Hex mesh pattern -- 60px cells on desktop */}
+      <pattern
+        id="hex-mesh"
+        x="0"
+        y="0"
+        width="60"
+        height="104"
+        patternUnits="userSpaceOnUse"
+      >
+        {/* Hexagon edges */}
+        <path
+          d="M30 0 L60 17.3 L60 52 L30 69.3 L0 52 L0 17.3 Z"
+          fill="none"
+          stroke="oklch(30.8% 0.102 285.5)"
+          stroke-opacity="0.25"
+          stroke-width="1"
+        />
+        <path
+          d="M30 34.7 L60 52 L60 86.6 L30 104 L0 86.6 L0 52 Z"
+          fill="none"
+          stroke="oklch(30.8% 0.102 285.5)"
+          stroke-opacity="0.2"
+          stroke-width="1"
+        />
+        {/* Subtle fill on one hexagon */}
+        <path
+          d="M30 0 L60 17.3 L60 52 L30 69.3 L0 52 L0 17.3 Z"
+          fill="oklch(62.5% 0.162 259.9)"
+          fill-opacity="0.06"
+        />
+        {/* Node dots at intersections */}
+        <circle cx="30" cy="0" r="1.5" fill="oklch(62.5% 0.162 259.9)" fill-opacity="0.15" />
+        <circle cx="60" cy="17.3" r="1.5" fill="oklch(62.5% 0.162 259.9)" fill-opacity="0.15" />
+        <circle cx="60" cy="52" r="1.5" fill="oklch(62.5% 0.162 259.9)" fill-opacity="0.15" />
+        <circle cx="30" cy="69.3" r="1.5" fill="oklch(62.5% 0.162 259.9)" fill-opacity="0.15" />
+        <circle cx="0" cy="52" r="1.5" fill="oklch(62.5% 0.162 259.9)" fill-opacity="0.15" />
+        <circle cx="0" cy="17.3" r="1.5" fill="oklch(62.5% 0.162 259.9)" fill-opacity="0.15" />
+        {/* Connection lines between hexagons */}
+        <line x1="30" y1="0" x2="30" y2="34.7" stroke="oklch(30.8% 0.102 285.5)" stroke-opacity="0.15" stroke-width="0.5" />
+        <line x1="0" y1="17.3" x2="60" y2="17.3" stroke="oklch(30.8% 0.102 285.5)" stroke-opacity="0.1" stroke-width="0.5" />
+      </pattern>
+      {/* Radial gradient mask -- pattern strongest at center/top, fades at edges */}
+      <radialGradient id="hex-fade" cx="50%" cy="30%" r="70%">
+        <stop offset="0%" stop-color="white" stop-opacity="1" />
+        <stop offset="100%" stop-color="white" stop-opacity="0" />
+      </radialGradient>
+      <mask id="hex-mask">
+        <rect width="100%" height="100%" fill="url(#hex-fade)" />
+      </mask>
+    </defs>
+    <rect
+      width="100%"
+      height="100%"
+      fill="url(#hex-mesh)"
+      mask="url(#hex-mask)"
+      opacity="0.15"
+    />
+  </svg>
+</div>
