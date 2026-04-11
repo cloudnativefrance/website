@@ -51,10 +51,12 @@ Plans:
   2. Language toggle is visible on all pages and switches between FR/EN preserving the current page
   3. Content collections for speakers, talks, sponsors, and team have Zod schemas that fail the build on invalid data
   4. Sample content entries in both FR and EN render correctly through the collection pipeline
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — i18n configuration, translation utilities, bilingual page routing (FNDN-02)
+- [ ] 02-02-PLAN.md — Language toggle component and Layout integration (FNDN-03)
+- [ ] 02-03-PLAN.md — Content collections with Zod schemas and sample bilingual data (FNDN-04)
 
 ### Phase 3: Hero & Landing
 **Goal**: A visitor landing on the homepage immediately understands what, when, where, and how to register
@@ -169,7 +171,7 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Design System & Foundation | 0/4 | Planned | - |
-| 2. Bilingual Architecture & Content Collections | 0/? | Not started | - |
+| 2. Bilingual Architecture & Content Collections | 0/3 | Planned | - |
 | 3. Hero & Landing | 0/? | Not started | - |
 | 4. Speakers | 0/? | Not started | - |
 | 5. Sponsors & Team | 0/? | Not started | - |
