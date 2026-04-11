@@ -1,0 +1,65 @@
+---
+import GeoBackground from "@/components/patterns/GeoBackground.astro";
+import CountdownTimer from "./CountdownTimer";
+import { Badge } from "@/components/ui/badge";
+import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section
+  class="relative flex min-h-[80vh] lg:min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-16 lg:py-24 text-center"
+>
+  <GeoBackground class="absolute inset-0" />
+
+  <div
+    class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--color-background)_0%,_var(--color-secondary)_100%)] opacity-60"
+  />
+
+  <div class="relative z-10 mx-auto flex max-w-4xl flex-col items-center gap-10">
+    <div class="flex flex-col items-center gap-4">
+      <h1
+        class="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
+        style="line-height:1.05; letter-spacing:-0.02em;"
+      >
+        {t("hero.title")}
+      </h1>
+      <p
+        class="flex flex-wrap items-center justify-center gap-3 text-xl text-muted-foreground"
+        style="line-height:1.4;"
+      >
+        <Badge className="bg-accent/15 text-accent text-base font-normal uppercase tracking-widest rounded-full px-3 py-1">
+          {t("hero.subtitle")}
+        </Badge>
+        <span>&mdash;</span>
+        <span>{t("hero.venue")}</span>
+      </p>
+    </div>
+
+    <CountdownTimer client:load lang={lang} />
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:gap-4">
+      <a
+        href="#register"
+        class={cn(
+          buttonVariants({ variant: "default", size: "lg" }),
+          "h-[52px] px-8 text-lg font-bold shadow-[0_0_20px_oklch(62.5%_0.162_259.9_/_0.3)] hover:translate-y-[-1px] transition-all duration-150"
+        )}
+      >
+        {t("hero.cta.register")}
+      </a>
+      <a
+        href={getLocalePath(lang, "programme")}
+        class={cn(
+          buttonVariants({ variant: "outline", size: "lg" }),
+          "h-[52px] px-8 text-lg font-bold"
+        )}
+      >
+        {t("hero.cta.schedule")}
+      </a>
+    </div>
+  </div>
+</section>
