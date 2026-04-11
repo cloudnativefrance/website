@@ -23,7 +23,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **FNDN-03**: Language toggle component visible on all pages
 - [ ] **FNDN-04**: Content collections with Zod schemas for speakers, talks, sponsors, team
 - [ ] **FNDN-05**: Responsive layout system: mobile-first, works on all devices
-- [ ] **FNDN-06**: Docker multi-stage build (Node build → Nginx Alpine) producing < 50MB image
+- [x] **FNDN-06**: Docker multi-stage build (Node build → Nginx Alpine) producing < 50MB image
 - [ ] **FNDN-07**: Kubernetes deployment manifests (Deployment, Service, Ingress)
 
 ### Hero & Landing
@@ -134,7 +134,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FNDN-03 | Phase 2: Bilingual Architecture & Content Collections | Pending |
 | FNDN-04 | Phase 2: Bilingual Architecture & Content Collections | Pending |
 | FNDN-05 | Phase 1: Design System & Foundation | Pending |
-| FNDN-06 | Phase 1: Design System & Foundation | Pending |
+| FNDN-06 | Phase 1: Design System & Foundation | Complete |
 | FNDN-07 | Deferred to cnd-platform repo (GitOps) | Pending |
 | HERO-01 | Phase 3: Hero & Landing | Pending |
 | HERO-02 | Phase 3: Hero & Landing | Pending |
