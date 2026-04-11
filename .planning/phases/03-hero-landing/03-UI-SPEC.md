@@ -50,20 +50,40 @@ Exceptions: Countdown digit cards use 44px minimum touch target height (WCAG, pe
 
 ## Typography
 
-All values from DESIGN.md type scale. This phase uses 4 sizes and 3 weights.
+All values from DESIGN.md type scale. This phase uses **4 size roles** and **2 weights**.
 
-| Role | Size | Weight | Line Height | Letter Spacing |
-|------|------|--------|-------------|----------------|
-| Hero title (h1) | 64px (text-6xl) desktop, 36px (text-4xl) mobile | 700 (Bold) | 1.05 | -0.02em |
-| Hero subtitle (date/venue) | 20px (text-xl) | 400 (Regular) | 1.4 | 0 |
-| Key-number value | 48px (text-5xl) desktop, 30px (text-3xl) mobile | 700 (Bold) | 1.1 | -0.02em |
-| Key-number label | 16px (text-base) | 400 (Regular) | 1.6 | 0 |
-| Countdown digit | 30px (text-3xl) | 700 (Bold) | 1.0 | 0 |
-| Countdown label | 12px (text-xs) | 500 (Medium) | 1.5 | 0.05em |
-| CTA button | 18px (text-lg) | 500 (Medium) | 1 | 0 |
-| Body (event tagline) | 16px (text-base) | 400 (Regular) | 1.6 | 0 |
+Responsive variants of the same role count as one size role, not two.
 
-Source: DESIGN.md Typography section
+| Role | Size (desktop) | Size (mobile) | Weight | Line Height | Letter Spacing |
+|------|----------------|---------------|--------|-------------|----------------|
+| Display (h1, hero title) | 64px (text-6xl) | 36px (text-4xl) | 700 (Bold) | 1.05 | -0.02em |
+| Feature number (key-number value, countdown digit) | 48px (text-5xl) | 20px (text-xl) | 700 (Bold) | 1.1 | -0.02em |
+| Subtitle (hero date/venue, CTA button) | 20px (text-xl) | 20px (text-xl) | 700 (Bold) | 1.4 | 0 |
+| Body (key-number label, countdown label, tagline) | 16px (text-base) | 16px (text-base) | 400 (Regular) | 1.6 | 0 |
+
+### Size Role Mapping
+
+| Component Element | Size Role | Notes |
+|-------------------|-----------|-------|
+| Hero title (h1) | Display | 64px desktop, 36px mobile |
+| Key-number value | Feature number | 48px desktop, 20px mobile |
+| Countdown digit | Feature number | 48px desktop, 20px mobile |
+| Hero subtitle (date/venue) | Subtitle | 20px at all breakpoints |
+| CTA button text | Subtitle | 20px at all breakpoints |
+| Key-number label | Body | 16px at all breakpoints |
+| Countdown label | Body | Uppercase, letter-spacing 0.05em |
+| Event tagline | Body | 16px at all breakpoints |
+
+### Weight Rules
+
+Only 2 weights are permitted in this phase:
+
+| Weight | Token | Usage |
+|--------|-------|-------|
+| 400 | Regular | Body text, labels, countdown labels, key-number labels |
+| 700 | Bold | Headings, hero title, CTA buttons, countdown digits, key-number values, emphasized text |
+
+Source: DESIGN.md Typography section, aligned with Phase 02 weight consolidation (commit d2b4c1a)
 
 ---
 
@@ -100,17 +120,23 @@ Source: DESIGN.md Color Usage Guidelines, Hero Section pattern
 
 Full-viewport landing section. Astro component (no client JS except countdown).
 
+**Visual Hierarchy (focal point order):**
+
+1. **Primary focal point:** h1 event name -- largest text (Display size role, 64px desktop), bold 700, highest contrast (`--color-foreground` on `--color-background`)
+2. **Secondary focal point:** Primary CTA "Register" button -- `--color-primary` background with glow shadow, positioned after the title block, size="lg"
+3. **Tertiary focal point:** Date badge -- `--color-accent` pill at 15% opacity background, positioned on the subtitle line, draws the eye after the CTA
+
 | Element | Spec |
 |---------|------|
 | Container | `min-h-screen` on desktop (`lg:`), `min-h-[80vh]` on mobile, `relative`, `overflow-hidden` |
 | Background | GeoBackground.astro (existing) positioned `absolute inset-0` + radial gradient overlay |
 | Content wrapper | `relative z-10`, `max-w-4xl`, centered flex column, `gap-10` (40px) |
-| Event name (h1) | text-6xl bold on lg, text-4xl on mobile, `--color-foreground` |
-| Date/venue line | text-xl, `--color-muted-foreground` |
-| Date badge | Accent pill badge: `--color-accent` background at 15% opacity, `--color-accent` text, radius-full, text-xs uppercase tracking-widest |
+| Event name (h1) | Display size role: text-6xl bold on lg, text-4xl on mobile, `--color-foreground` |
+| Date/venue line | Subtitle size role: text-xl, weight 400 (exception: this line uses Regular for contrast against the bold h1), `--color-muted-foreground` |
+| Date badge | Accent pill badge: `--color-accent` background at 15% opacity, `--color-accent` text, radius-full, Body size role uppercase tracking-widest |
 | CTA group | Flex row on sm+, column on mobile, gap-4 (16px) |
-| Primary CTA | shadcn Button size="lg", `--color-primary` bg, white text, glow shadow, hover translateY(-1px) |
-| Secondary CTA | shadcn Button variant="outline" size="lg", transparent bg, border-border |
+| Primary CTA | shadcn Button size="lg", `--color-primary` bg, white text, glow shadow, hover translateY(-1px), Subtitle size role bold |
+| Secondary CTA | shadcn Button variant="outline" size="lg", transparent bg, border-border, Subtitle size role bold |
 
 ### 2. CountdownTimer
 
@@ -120,11 +146,11 @@ React island (`client:load`). Counts down to June 3, 2027 09:00 CEST.
 |---------|------|
 | Container | Flex row, gap-4 (16px) between digit groups, centered |
 | Digit card | `--color-card` background, `--color-border` border (1px), radius-lg (8px), min-width 72px, padding 12px 8px, text-center |
-| Digit value | text-3xl bold, `--color-foreground` |
-| Digit label | text-xs medium uppercase, `--color-muted-foreground`, tracking-widest |
-| Separator | Colon character in `--color-muted-foreground` at text-3xl between groups, or thin border |
+| Digit value | Feature number size role: text-5xl bold desktop, text-xl bold mobile, `--color-foreground` |
+| Digit label | Body size role: text-base regular uppercase, `--color-muted-foreground`, tracking-widest |
+| Separator | Colon character in `--color-muted-foreground` at Feature number size between groups, or thin border |
 | Update | setInterval at 1000ms, no visible flicker (use state batching) |
-| Mobile | 4 digit groups in a row, reduce card min-width to 60px, text-xl digit value |
+| Mobile | 4 digit groups in a row, reduce card min-width to 60px |
 | a11y | `aria-live="polite"` on the container, `aria-label` with full time remaining text, update aria every 60s not every second |
 
 Target date: `2027-06-03T09:00:00+02:00` (CEST)
@@ -137,9 +163,9 @@ Static Astro component. Three stat blocks in a row.
 |---------|------|
 | Container | `max-w-5xl` centered, grid `grid-cols-1 sm:grid-cols-3`, gap-8 (32px), padding-y spacing-12 (48px) |
 | Stat block | `--color-card` background, `--color-border` border (1px), radius-lg (8px), padding spacing-6 (24px), text-center |
-| Number value | text-5xl bold on desktop, text-3xl on mobile, `--color-primary` text |
+| Number value | Feature number size role: text-5xl bold on desktop, text-xl bold on mobile, `--color-primary` text |
 | Number suffix | Inline with value, same size, `--color-accent` text (the "+" character) |
-| Label | text-base regular, `--color-muted-foreground` |
+| Label | Body size role: text-base regular, `--color-muted-foreground` |
 | Hover | Border transitions to `--color-primary` at 50% opacity, 200ms ease |
 
 Data:
@@ -211,9 +237,9 @@ No error states in this phase (all content is static/hardcoded).
 - No click action (purely informational)
 
 ### Responsive Behavior
-- Mobile (<640px): Single column layout, hero text-4xl, key numbers stacked, countdown digits smaller
-- Tablet (640-1023px): Key numbers in 3-column grid, hero text-5xl
-- Desktop (1024px+): Full viewport hero, text-6xl title, all elements at full size
+- Mobile (<640px): Single column layout, hero Display role at 36px, key numbers stacked, countdown digits at text-xl
+- Tablet (640-1023px): Key numbers in 3-column grid, hero Display role at 48px
+- Desktop (1024px+): Full viewport hero, Display role at 64px, all elements at full size
 
 ---
 
