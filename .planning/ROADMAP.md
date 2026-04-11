@@ -81,10 +81,12 @@ Plans:
   2. Clicking a speaker opens their individual page with bio, company, photo, social links, and talk abstract
   3. Speaker pages link to their talk(s) in the schedule (link targets may be placeholder until Phase 7)
   4. Speaker content exists in both fr/ and en/ subfolders as Markdown files, rendered per locale
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: TBD
+- [ ] 04-01-PLAN.md — Speaker data layer: utility functions and sample content (SPKR-04)
+- [ ] 04-02-PLAN.md — Speaker grid page with components and i18n (SPKR-01)
+- [ ] 04-03-PLAN.md — Speaker profile pages with talk cross-references (SPKR-02, SPKR-03)
 
 ### Phase 5: Sponsors & Team
 **Goal**: Sponsors see their brand represented by tier, and the organizing team is visible to attendees
@@ -173,7 +175,7 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | 1. Design System & Foundation | 0/4 | Planned | - |
 | 2. Bilingual Architecture & Content Collections | 0/3 | Planned | - |
 | 3. Hero & Landing | 0/? | Not started | - |
-| 4. Speakers | 0/? | Not started | - |
+| 4. Speakers | 0/3 | Planned | - |
 | 5. Sponsors & Team | 0/? | Not started | - |
 | 6. Venue & Previous Editions | 0/? | Not started | - |
 | 7. Interactive Schedule | 0/? | Not started | - |
