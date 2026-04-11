@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Design System & Foundation** - Define visual identity in Stitch, scaffold Astro project, configure Tailwind/shadcn, set up Docker/K8s pipeline
 - [ ] **Phase 2: Bilingual Architecture & Content Collections** - i18n routing, language toggle, Zod-validated content schemas for all data types
 - [ ] **Phase 3: Hero & Landing** - Hero section with countdown, CTA, key numbers -- the first thing visitors see
-- [ ] **Phase 4: Speakers** - Speaker grid, individual pages, bilingual content, talk cross-references
+- [x] **Phase 4: Speakers** - Speaker grid, individual pages, bilingual content, talk cross-references (completed 2026-04-11)
 - [ ] **Phase 5: Sponsors & Team** - Tiered sponsor showcase and team page with role grouping
 - [ ] **Phase 6: Venue & Previous Editions** - Venue details with map/transport/accessibility, plus past edition recap
 - [ ] **Phase 7: Interactive Schedule** - Full schedule with filtering, timeline view, bookmarks, iCal export, Open Feedback links
@@ -84,9 +84,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Speaker data layer: utility functions and sample content (SPKR-04)
-- [ ] 04-02-PLAN.md — Speaker grid page with components and i18n (SPKR-01)
-- [ ] 04-03-PLAN.md — Speaker profile pages with talk cross-references (SPKR-02, SPKR-03)
+- [x] 04-01-PLAN.md — Speaker data layer: utility functions and sample content (SPKR-04)
+- [x] 04-02-PLAN.md — Speaker grid page with components and i18n (SPKR-01)
+- [x] 04-03-PLAN.md — Speaker profile pages with talk cross-references (SPKR-02, SPKR-03)
 
 ### Phase 5: Sponsors & Team
 **Goal**: Sponsors see their brand represented by tier, and the organizing team is visible to attendees
@@ -175,7 +175,7 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | 1. Design System & Foundation | 0/4 | Planned | - |
 | 2. Bilingual Architecture & Content Collections | 0/3 | Planned | - |
 | 3. Hero & Landing | 0/? | Not started | - |
-| 4. Speakers | 0/3 | Planned | - |
+| 4. Speakers | 3/3 | Complete   | 2026-04-11 |
 | 5. Sponsors & Team | 0/? | Not started | - |
 | 6. Venue & Previous Editions | 0/? | Not started | - |
 | 7. Interactive Schedule | 0/? | Not started | - |

@@ -46,8 +46,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Speakers
 
 - [ ] **SPKR-01**: Speaker grid overview with photo, name, company
-- [ ] **SPKR-02**: Individual speaker page with bio, company, photo, social links, talk abstract
-- [ ] **SPKR-03**: Link from speaker page to their talk(s) in the schedule
+- [x] **SPKR-02**: Individual speaker page with bio, company, photo, social links, talk abstract
+- [x] **SPKR-03**: Link from speaker page to their talk(s) in the schedule
 - [ ] **SPKR-04**: Speaker data managed via Markdown files (bilingual: fr/ and en/ subfolders)
 
 ### Sponsors
@@ -148,8 +148,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCHD-06 | Phase 7: Interactive Schedule | Pending |
 | SCHD-07 | Phase 7: Interactive Schedule | Pending |
 | SPKR-01 | Phase 4: Speakers | Pending |
-| SPKR-02 | Phase 4: Speakers | Pending |
-| SPKR-03 | Phase 4: Speakers | Pending |
+| SPKR-02 | Phase 4: Speakers | Complete |
+| SPKR-03 | Phase 4: Speakers | Complete |
 | SPKR-04 | Phase 4: Speakers | Pending |
 | SPNS-01 | Phase 5: Sponsors & Team | Pending |
 | SPNS-02 | Phase 5: Sponsors & Team | Pending |
