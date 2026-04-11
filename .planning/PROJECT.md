@@ -21,7 +21,7 @@ A first-time visitor should immediately understand what the event is, when and w
 - [x] Bilingual site (French + English) with language toggle
 - [ ] Hero section with event name, date (June 3, 2027), venue (CENTQUATRE-PARIS), countdown, and CTA
 - [ ] Interactive schedule: filterable by track, bookmarkable talks, personal agenda export (iCal), visual timeline with parallel tracks
-- [ ] Speaker profiles: grid overview + individual pages with bio, company, talk abstract, social links
+- [x] Speaker profiles: grid overview + individual pages with bio, company, talk abstract, social links
 - [ ] Sponsor/partner showcase: tiered layout (Platinum, Gold, Silver, Community) with logo, description, link
 - [ ] Team page: photos, roles, social links, grouped by function (core, program committee, volunteers) — ~10-20 people
 - [ ] Venue page: map, transport options, nearby hotels, accessibility info
@@ -76,4 +76,4 @@ A first-time visitor should immediately understand what the event is, when and w
 | shadcn/ui components | Accessible, production-ready, pairs with Tailwind, customizable | — Pending |
 
 ---
-*Last updated: 2026-04-11 after Phase 2 completion — bilingual i18n routing, language toggle, content collections*
+*Last updated: 2026-04-11 after Phase 4 completion — speaker grid, profile pages, talk cross-references, co-speaker links*
