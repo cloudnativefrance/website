@@ -1,6 +1,7 @@
 ---
 import { Font } from "astro:assets";
 import "../styles/global.css";
+import LanguageToggle from "@/components/LanguageToggle.astro";
 
 interface Props {
   title?: string;
@@ -18,6 +19,9 @@ const resolvedLang = lang ?? Astro.currentLocale ?? "fr";
     <Font cssVariable="--font-dm-sans" preload />
   </head>
   <body class="bg-background text-foreground font-sans antialiased min-h-screen">
+    <header class="sticky top-0 z-50 flex items-center justify-end px-4 py-3 backdrop-blur-sm bg-background/90">
+      <LanguageToggle />
+    </header>
     <slot />
   </body>
 </html>
