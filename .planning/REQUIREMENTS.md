@@ -123,13 +123,61 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| — | — | Pending |
+| DSGN-01 | Phase 1: Design System & Foundation | Pending |
+| DSGN-02 | Phase 1: Design System & Foundation | Pending |
+| DSGN-03 | Phase 1: Design System & Foundation | Pending |
+| DSGN-04 | Phase 1: Design System & Foundation | Pending |
+| DSGN-05 | Phase 1: Design System & Foundation | Pending |
+| DSGN-06 | Phase 1: Design System & Foundation | Pending |
+| FNDN-01 | Phase 1: Design System & Foundation | Pending |
+| FNDN-02 | Phase 2: Bilingual Architecture & Content Collections | Pending |
+| FNDN-03 | Phase 2: Bilingual Architecture & Content Collections | Pending |
+| FNDN-04 | Phase 2: Bilingual Architecture & Content Collections | Pending |
+| FNDN-05 | Phase 1: Design System & Foundation | Pending |
+| FNDN-06 | Phase 1: Design System & Foundation | Pending |
+| FNDN-07 | Phase 1: Design System & Foundation | Pending |
+| HERO-01 | Phase 3: Hero & Landing | Pending |
+| HERO-02 | Phase 3: Hero & Landing | Pending |
+| HERO-03 | Phase 3: Hero & Landing | Pending |
+| HERO-04 | Phase 3: Hero & Landing | Pending |
+| SCHD-01 | Phase 7: Interactive Schedule | Pending |
+| SCHD-02 | Phase 7: Interactive Schedule | Pending |
+| SCHD-03 | Phase 7: Interactive Schedule | Pending |
+| SCHD-04 | Phase 7: Interactive Schedule | Pending |
+| SCHD-05 | Phase 7: Interactive Schedule | Pending |
+| SCHD-06 | Phase 7: Interactive Schedule | Pending |
+| SCHD-07 | Phase 7: Interactive Schedule | Pending |
+| SPKR-01 | Phase 4: Speakers | Pending |
+| SPKR-02 | Phase 4: Speakers | Pending |
+| SPKR-03 | Phase 4: Speakers | Pending |
+| SPKR-04 | Phase 4: Speakers | Pending |
+| SPNS-01 | Phase 5: Sponsors & Team | Pending |
+| SPNS-02 | Phase 5: Sponsors & Team | Pending |
+| SPNS-03 | Phase 5: Sponsors & Team | Pending |
+| TEAM-01 | Phase 5: Sponsors & Team | Pending |
+| TEAM-02 | Phase 5: Sponsors & Team | Pending |
+| TEAM-03 | Phase 5: Sponsors & Team | Pending |
+| VENU-01 | Phase 6: Venue & Previous Editions | Pending |
+| VENU-02 | Phase 6: Venue & Previous Editions | Pending |
+| VENU-03 | Phase 6: Venue & Previous Editions | Pending |
+| VENU-04 | Phase 6: Venue & Previous Editions | Pending |
+| EVNT-01 | Phase 8: Event Lifecycle | Pending |
+| EVNT-02 | Phase 8: Event Lifecycle | Pending |
+| EVNT-03 | Phase 6: Venue & Previous Editions | Pending |
+| EVNT-04 | Phase 8: Event Lifecycle | Pending |
+| META-01 | Phase 9: SEO, Legal & Polish | Pending |
+| META-02 | Phase 9: SEO, Legal & Polish | Pending |
+| META-03 | Phase 9: SEO, Legal & Polish | Pending |
+| META-04 | Phase 9: SEO, Legal & Polish | Pending |
+| META-05 | Phase 9: SEO, Legal & Polish | Pending |
+| META-06 | Phase 9: SEO, Legal & Polish | Pending |
+| META-07 | Phase 9: SEO, Legal & Polish | Pending |
 
 **Coverage:**
-- v1 requirements: 38 total
-- Mapped to phases: 0
-- Unmapped: 38 ⚠️
+- v1 requirements: 49 total
+- Mapped to phases: 49
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-11*
-*Last updated: 2026-04-11 after initial definition*
+*Last updated: 2026-04-11 after roadmap creation*
