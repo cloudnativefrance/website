@@ -518,6 +518,121 @@ Jane est une passionnee de Kubernetes et contribue activement a l'ecosysteme CNC
 
 Step 2.6: SKIPPED (no external dependencies identified -- this phase is purely code/config changes using already-installed Astro 6).
 
+## Validation Architecture
+
+### Test Framework
+| Property | Value |
+|----------|-------|
+| Framework | No test runner installed -- validation relies on `astro build` (Zod schema enforcement) and `astro check` (TypeScript) |
+| Config file | None -- no test framework config needed |
+| Quick run command | `npx astro build` |
+| Full suite command | `npx astro build && npx astro check` |
+
+**Rationale:** This phase is an SSG static site with Zod-validated content collections. Astro's build process IS the validation layer -- it fails hard on schema violations, missing imports, and type errors. Adding a test runner (Vitest, Playwright) would test Astro's own internals rather than project logic. The build command plus targeted grep assertions provide complete coverage.
+
+### Phase Requirements -> Testable Assertions
+
+| Req ID | Behavior to Prove | Validation Method | Automated Command |
+|--------|-------------------|-------------------|-------------------|
+| FNDN-02a | FR pages serve at root paths (no /fr/ prefix) | Build output inspection | `ls dist/index.html && [ ! -d dist/fr ]` |
+| FNDN-02b | EN pages serve under /en/ | Build output inspection | `ls dist/en/index.html` |
+| FNDN-02c | i18n config has defaultLocale "fr" and prefixDefaultLocale false | Config grep | `grep -q 'defaultLocale.*fr' astro.config.mjs && grep -q 'prefixDefaultLocale.*false' astro.config.mjs` |
+| FNDN-03a | Language toggle present in built HTML | Output grep | `grep -q 'aria-label="Language selector\|Selecteur de langue"' dist/index.html` |
+| FNDN-03b | Toggle links to opposite locale preserving path | Output grep | `grep -q 'href="/en/"' dist/index.html && grep -q 'href="/"' dist/en/index.html` |
+| FNDN-03c | Toggle visible on all pages (present in Layout) | Source grep | `grep -q 'LanguageToggle' src/layouts/Layout.astro` |
+| FNDN-04a | content.config.ts exists at correct location | File check | `[ -f src/content.config.ts ]` |
+| FNDN-04b | All 4 collections defined (speakers, talks, sponsors, team) | Source grep | `grep -cE 'defineCollection' src/content.config.ts` (expect 4) |
+| FNDN-04c | Zod schemas reject invalid data at build time | Negative test -- intentionally invalid frontmatter | Introduce invalid entry, run `npx astro build`, expect failure, then revert |
+| FNDN-04d | Sample FR content entries exist and parse | Build succeeds | `npx astro build` (exits 0 with sample content loaded) |
+| FNDN-04e | Sample EN content entries exist and parse | Build succeeds | `npx astro build` (exits 0 with sample content loaded) |
+| SC-01 | html lang attribute is dynamic (not hardcoded "fr") | Output grep | `grep -q 'lang="fr"' dist/index.html && grep -q 'lang="en"' dist/en/index.html` |
+
+### Validation Commands (Copy-Paste Ready)
+
+**Primary gate -- must pass before phase is complete:**
+```bash
+# Full build validates: Zod schemas, i18n config, content parsing, page generation
+npx astro build
+```
+
+**Routing assertions (run after build):**
+```bash
+# FR root pages exist (no /fr/ prefix)
+[ -f dist/index.html ] && echo "PASS: FR root" || echo "FAIL: FR root missing"
+[ ! -d dist/fr ] && echo "PASS: no /fr/ prefix" || echo "FAIL: /fr/ directory exists"
+
+# EN pages exist under /en/
+[ -f dist/en/index.html ] && echo "PASS: EN route" || echo "FAIL: EN route missing"
+```
+
+**Language toggle assertions (run after build):**
+```bash
+# Toggle present in FR page with link to EN
+grep -q 'href="/en/"' dist/index.html && echo "PASS: FR->EN link" || echo "FAIL: FR->EN link missing"
+
+# Toggle present in EN page with link to FR
+grep -q 'href="/"' dist/en/index.html && echo "PASS: EN->FR link" || echo "FAIL: EN->FR link missing"
+```
+
+**html lang attribute assertions (run after build):**
+```bash
+# FR page has lang="fr"
+grep -q 'lang="fr"' dist/index.html && echo "PASS: FR lang attr" || echo "FAIL: FR lang attr"
+
+# EN page has lang="en"
+grep -q 'lang="en"' dist/en/index.html && echo "PASS: EN lang attr" || echo "FAIL: EN lang attr"
+```
+
+**Content collection assertions (run before build):**
+```bash
+# content.config.ts exists at correct path
+[ -f src/content.config.ts ] && echo "PASS: config location" || echo "FAIL: config location"
+
+# All 4 collections defined
+COLLECTIONS=$(grep -c 'defineCollection' src/content.config.ts)
+[ "$COLLECTIONS" -ge 4 ] && echo "PASS: $COLLECTIONS collections" || echo "FAIL: only $COLLECTIONS collections"
+
+# Sample content exists for both locales
+ls src/content/speakers/fr/*.md >/dev/null 2>&1 && echo "PASS: FR speakers" || echo "FAIL: FR speakers missing"
+ls src/content/speakers/en/*.md >/dev/null 2>&1 && echo "PASS: EN speakers" || echo "FAIL: EN speakers missing"
+ls src/content/talks/fr/*.md >/dev/null 2>&1 && echo "PASS: FR talks" || echo "FAIL: FR talks missing"
+ls src/content/talks/en/*.md >/dev/null 2>&1 && echo "PASS: EN talks" || echo "FAIL: EN talks missing"
+[ -f src/content/sponsors/sponsors.yaml ] && echo "PASS: sponsors YAML" || echo "FAIL: sponsors YAML missing"
+[ -f src/content/team/team.yaml ] && echo "PASS: team YAML" || echo "FAIL: team YAML missing"
+```
+
+**Schema enforcement negative test:**
+```bash
+# Temporarily add invalid entry, confirm build fails, then revert
+echo -e "---\ntitle: 123\n---\nBad." > src/content/speakers/fr/_test-invalid.md
+npx astro build 2>&1 | grep -qi "error\|invalid\|fail" && echo "PASS: schema rejects invalid" || echo "FAIL: schema did not reject"
+rm -f src/content/speakers/fr/_test-invalid.md
+```
+
+### Sampling Strategy
+
+- **Per task commit:** Run `npx astro build` -- catches schema violations and routing errors immediately
+- **Per wave merge:** Run full validation commands above (build + all grep assertions)
+- **Phase gate:** All validation commands pass; negative schema test passes; visual spot-check of both / and /en/ in browser via `npx astro preview`
+
+### Risk Areas Requiring Extra Validation
+
+| Risk | Why | Extra Validation |
+|------|-----|------------------|
+| YAML file() loader with array + id field | Assumption A2 -- not verified at runtime yet | Build must succeed with sample sponsors.yaml and team.yaml; if it fails, switch to object-keyed YAML format |
+| html lang attribute regression | Easy to miss during layout refactoring | Grep both dist/index.html and dist/en/index.html for correct lang values |
+| Language toggle link correctness | Off-by-one in path stripping can produce wrong URLs | Grep dist output for exact href values; also manually click toggle in preview |
+| EN page fallback behavior | Astro's fallback config may serve FR content silently for missing EN pages | Verify dist/en/ contains actual EN content, not just FR fallback copies |
+| Content ID format with locale prefix | Filtering by `id.startsWith("fr/")` depends on glob() ID derivation | Log collection entry IDs during development to confirm format matches expectations |
+
+### Wave 0 Gaps
+
+- [ ] No test framework installed -- not needed for this phase (build-as-test is sufficient)
+- [ ] No content files exist yet -- sample entries must be created as part of implementation
+- [ ] No `src/content.config.ts` exists yet -- must be created
+
+*(Gaps are all greenfield creation tasks, not missing infrastructure)*
+
 ## Sources
 
 ### Primary (HIGH confidence)
@@ -541,6 +656,7 @@ Step 2.6: SKIPPED (no external dependencies identified -- this phase is purely c
 - Architecture: HIGH - Content Layer API with glob/file loaders is the current standard, verified in docs
 - Pitfalls: HIGH - Astro 6 breaking change verified via PR, content config location verified in docs
 - Schemas: MEDIUM - Exact YAML file() loader behavior with arrays needs build-time validation (A2)
+- Validation: HIGH - Build-as-test is the standard Astro pattern; grep assertions are deterministic
 
 **Research date:** 2026-04-11
 **Valid until:** 2026-05-11 (Astro 6 stable, slow-moving API)
