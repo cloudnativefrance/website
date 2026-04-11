@@ -1,0 +1,25 @@
+---
+import { languages, type Locale } from "@/i18n/ui";
+import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
+
+const currentLang = getLangFromUrl(Astro.url);
+const currentPath = Astro.url.pathname;
+const t = useTranslations(currentLang);
+---
+
+<nav aria-label={t("toggle.aria")} class="inline-flex items-center gap-0 rounded-md border border-border bg-secondary p-1">
+  {Object.entries(languages).map(([lang, label]) => (
+    <a
+      href={getLocalePath(lang as Locale, currentPath)}
+      aria-current={lang === currentLang ? "true" : undefined}
+      class:list={[
+        "inline-flex min-w-[40px] items-center justify-center rounded-sm px-3 py-1.5 text-sm font-semibold uppercase tracking-widest transition-colors duration-150",
+        lang === currentLang
+          ? "bg-primary text-primary-foreground"
+          : "text-muted-foreground hover:bg-secondary/80",
+      ]}
+    >
+      {label}
+    </a>
+  ))}
+</nav>
