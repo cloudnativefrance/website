@@ -1,0 +1,50 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import SponsorTierSection from "@/components/sponsors/SponsorTierSection.astro";
+import SponsorCTA from "@/components/sponsors/SponsorCTA.astro";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const all = await getCollection("sponsors");
+const TIER_ORDER = ["platinum", "gold", "silver", "community"] as const;
+const byTier = Object.fromEntries(
+  TIER_ORDER.map((tier) => [tier, all.filter((s) => s.data.tier === tier)])
+) as Record<(typeof TIER_ORDER)[number], CollectionEntry<"sponsors">[]>;
+
+const hasAnySponsor = all.length > 0;
+
+const tierTitles = {
+  platinum: t("sponsors.tier.platinum"),
+  gold: t("sponsors.tier.gold"),
+  silver: t("sponsors.tier.silver"),
+  community: t("sponsors.tier.community"),
+} as const;
+---
+
+<Layout title={`${t("sponsors.page.title")} | Cloud Native Days France 2027`} lang={lang}>
+  <main class="mx-auto max-w-7xl px-4 md:px-6 py-24">
+    <header class="text-center">
+      <h1 class="text-4xl font-bold text-foreground">{t("sponsors.page.title")}</h1>
+      <p class="mt-4 text-base text-muted-foreground max-w-2xl mx-auto">
+        {t("sponsors.page.intro")}
+      </p>
+    </header>
+
+    {hasAnySponsor &&
+      TIER_ORDER.map((tier) =>
+        byTier[tier].length > 0 ? (
+          <SponsorTierSection
+            tier={tier}
+            sponsors={byTier[tier]}
+            lang={lang}
+            title={tierTitles[tier]}
+          />
+        ) : null
+      )}
+
+    <SponsorCTA lang={lang} />
+  </main>
+</Layout>
