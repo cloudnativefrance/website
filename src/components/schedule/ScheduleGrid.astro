@@ -561,6 +561,21 @@ const CSS_VARS = {
     line-clamp: 1;
   }
 
+  /* Modal description: markdown-rendered paragraphs + inline elements */
+  #schedule-session-modal-description p + p { margin-top: 0.75em; }
+  #schedule-session-modal-description strong { color: var(--color-foreground); font-weight: 700; }
+  #schedule-session-modal-description em { font-style: italic; }
+  #schedule-session-modal-description code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    background-color: color-mix(in oklch, var(--color-background) 60%, transparent);
+    color: var(--color-foreground);
+  }
+  #schedule-session-modal-description a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  #schedule-session-modal-description a:hover { text-decoration: underline; }
+
   /* Modal bookmark button on-state */
   #schedule-session-modal-bookmark.is-on {
     color: var(--color-primary);
@@ -669,6 +684,31 @@ const CSS_VARS = {
       });
     });
 
+    /**
+     * Minimal Markdown → HTML renderer for the session description.
+     * - HTML-escapes first so admin-authored content can't inject tags.
+     * - Supports **bold**, __bold__, *italic*, _italic_, `code`, [text](url),
+     *   paragraphs (blank line), and single newlines (<br>).
+     * - Links must start with http(s):// or / to render — prevents javascript:
+     *   or data: URIs from being rewritten into <a href>.
+     */
+    function mdToHtml(src) {
+      const esc = (x) => String(x)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      let h = esc(src);
+      h = h.replace(/`([^`\n]+)`/g, '<code class="rounded bg-background/60 px-1 py-0.5 text-[0.95em]">$1</code>');
+      h = h.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
+      h = h.replace(/__([^_\n]+)__/g, "<strong>$1</strong>");
+      h = h.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
+      h = h.replace(/(^|[^_])_([^_\n]+)_(?!_)/g, "$1<em>$2</em>");
+      h = h.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_m, t, u) => {
+        if (!/^(https?:\/\/|\/)/.test(u)) return `[${t}](${u})`;
+        return `<a href="${u}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">${t}</a>`;
+      });
+      return h.split(/\n{2,}/).map((p) => `<p>${p.replace(/\n/g, "<br>")}</p>`).join("");
+    }
+
     // Session detail modal
     const modal = document.getElementById("schedule-session-modal");
     const modalTitle = document.getElementById("schedule-session-modal-title");
@@ -752,9 +792,9 @@ const CSS_VARS = {
       // Tags (not in data-* currently — skip)
       if (modalTags) modalTags.innerHTML = "";
 
-      // Description
+      // Description — render Markdown → safe HTML (admins edit in Sheets; escape first).
       if (modalDescription) {
-        modalDescription.textContent = description || "";
+        modalDescription.innerHTML = description ? mdToHtml(description) : "";
         modalDescription.classList.toggle("hidden", !description);
       }
 
