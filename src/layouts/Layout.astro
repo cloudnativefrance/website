@@ -1,29 +1,100 @@
 ---
 import { Font } from "astro:assets";
 import "../styles/global.css";
-import Navigation from "@/components/Navigation.astro";
-import TranslationNotice from "@/components/TranslationNotice.astro";
-import { defaultLang } from "@/i18n/ui";
+import LanguageToggle from "@/components/LanguageToggle.astro";
+import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
+import type { Locale } from "@/i18n/ui";
 
 interface Props {
   title?: string;
+  description?: string;
+  ogImage?: string;
+  ogType?: "website" | "event";
   lang?: string;
+  canonicalPath?: string;
 }
 
-const { title = "Cloud Native Days France 2027", lang } = Astro.props;
-const resolvedLang = lang ?? Astro.currentLocale ?? "fr";
-const showTranslationNotice = resolvedLang !== defaultLang;
+const {
+  title = "Cloud Native Days France 2027",
+  description,
+  ogImage = "/og-default.png",
+  ogType = "website",
+  lang,
+  canonicalPath,
+} = Astro.props;
+
+const resolvedLang = (lang ?? getLangFromUrl(Astro.url)) as Locale;
+const t = useTranslations(resolvedLang);
+
+// Same-origin OG image allowlist (threat T-09-01): accept only leading-slash
+// paths or absolute URLs starting with Astro.site. Anything else falls back.
+const siteOrigin = Astro.site ? Astro.site.origin : "";
+const safeOgImage = (() => {
+  if (ogImage.startsWith("/")) return ogImage;
+  if (siteOrigin && ogImage.startsWith(siteOrigin)) return ogImage;
+  return "/og-default.png";
+})();
+
+// Absolute URLs
+const currentPath = canonicalPath ?? Astro.url.pathname;
+const canonicalUrl = new URL(currentPath, Astro.site).toString();
+const ogImageUrl = new URL(safeOgImage, Astro.site).toString();
+
+// hreflang alternate paths — normalize trailing slash, strip locale, re-prefix.
+// Normalizing first ensures /en/privacy/ and /en/privacy emit identical hreflang URLs.
+const normalizedPath = currentPath.replace(/\/+$/, "") || "/";
+const pathNoLocale = normalizedPath.replace(/^\/en(\/|$)/, "/") || "/";
+const frPath = getLocalePath("fr", pathNoLocale);
+const enPath = getLocalePath("en", pathNoLocale);
+const frUrl = new URL(frPath, Astro.site).toString();
+const enUrl = new URL(enPath, Astro.site).toString();
+
+const metaDescription = description ?? t("seo.default_description");
+const ogLocale = resolvedLang === "fr" ? "fr_FR" : "en_US";
+const siteName = t("seo.og_site_name");
+const ogImageAlt = t("seo.og_image_alt");
 ---
 <html lang={resolvedLang} class="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+    <meta name="description" content={metaDescription} />
+
+    <!-- Canonical -->
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- hreflang alternates -->
+    <link rel="alternate" hreflang="fr" href={frUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={frUrl} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:locale" content={ogLocale} />
+    <meta property="og:site_name" content={siteName} />
+
+    <!-- Twitter card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={metaDescription} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
     <Font cssVariable="--font-dm-sans" preload />
   </head>
   <body class="bg-background text-foreground font-sans antialiased min-h-screen">
-    <Navigation />
-    {showTranslationNotice && <TranslationNotice />}
+    <header class="sticky top-0 z-50 flex items-center justify-end px-4 py-3 backdrop-blur-sm bg-background/90">
+      <LanguageToggle />
+    </header>
     <slot />
   </body>
 </html>
