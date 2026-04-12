@@ -829,6 +829,27 @@ const CSS_VARS = {
       if (ev.key === "Escape" && modal && !modal.classList.contains("hidden")) closeModal();
     });
 
+    // Auto-open a session modal when the URL hash matches #session-{id}
+    // (deep-links from the /speakers/{slug} page "Ses talks" cards)
+    function openFromHash() {
+      const hash = window.location.hash || "";
+      const m = hash.match(/^#session-([^/?&#]+)/);
+      if (!m) return;
+      const id = decodeURIComponent(m[1]);
+      const card = document.querySelector(`.schedule-session[data-session-id="${CSS.escape(id)}"]`);
+      if (card) {
+        // Scroll the card into view first so the page is anchored correctly when modal closes
+        card.scrollIntoView({ block: "center", behavior: "instant" });
+        openModal(card);
+      }
+    }
+    // Run on initial load and when hash changes (in-page navigation)
+    if (window.location.hash.startsWith("#session-")) {
+      // Defer so the rest of this script finishes wiring first
+      setTimeout(openFromHash, 0);
+    }
+    window.addEventListener("hashchange", openFromHash);
+
     // Bookmark button inside modal
     modalBookmarkBtn?.addEventListener("click", () => {
       if (!modalSessionId) return;

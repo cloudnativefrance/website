@@ -163,11 +163,24 @@ export async function loadSessions(): Promise<SessionRow[]> {
     .filter((s) => s.status !== "hidden" && s.id);
 }
 
-/** Unique sorted room list from a set of sessions. */
+/**
+ * Preferred room order in the schedule grid. Rooms encountered in the data
+ * but not listed here are appended alphabetically after the priority set.
+ */
+const ROOM_ORDER = ["Monet", "Piaf", "Debussy", "Dumas"];
+
+/** Unique room list ordered per the physical floor layout (falls back to alpha). */
 export function listRooms(sessions: SessionRow[]): string[] {
   const set = new Set<string>();
   for (const s of sessions) if (s.room) set.add(s.room);
-  return Array.from(set).sort();
+  const priority: string[] = [];
+  for (const r of ROOM_ORDER) {
+    if (set.has(r)) {
+      priority.push(r);
+      set.delete(r);
+    }
+  }
+  return [...priority, ...Array.from(set).sort()];
 }
 
 /** Unique sorted format list from a set of sessions. */
