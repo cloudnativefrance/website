@@ -111,6 +111,12 @@ const CSS_VARS = {
 <div
   class="schedule-root"
   data-date={dayDateIso}
+  data-schedule-format-keynote={t("schedule.format.keynote")}
+  data-schedule-format-talk={t("schedule.format.talk")}
+  data-schedule-format-lightning={t("schedule.format.lightning")}
+  data-schedule-format-workshop={t("schedule.format.workshop")}
+  data-schedule-agenda-remove={t("schedule.agenda.remove")}
+  data-schedule-empty={t("schedule.agenda.empty")}
   style={`--grid-rows: ${GRID_ROWS}; --grid-cols: ${rooms.length};`}
 >
   <!-- Filter bar — multi-select chips grouped by role, two rows -->
@@ -894,11 +900,12 @@ const CSS_VARS = {
     let modalSessionId = null;
 
     const formatPalette = {
-      keynote: { label: "KEYNOTE", cls: "bg-accent/15 text-accent" },
-      talk: { label: "TALK", cls: "bg-primary/15 text-primary" },
-      lightning: { label: "LIGHTNING", cls: "bg-[color:var(--color-tertiary)]/15 text-[color:var(--color-tertiary)]" },
-      workshop: { label: "WORKSHOP", cls: "bg-secondary text-foreground" },
+      keynote:   { label: root?.getAttribute("data-schedule-format-keynote")   || "Keynote",   cls: "bg-accent/15 text-accent" },
+      talk:      { label: root?.getAttribute("data-schedule-format-talk")      || "Talk",      cls: "bg-primary/15 text-primary" },
+      lightning: { label: root?.getAttribute("data-schedule-format-lightning") || "Lightning", cls: "bg-[color:var(--color-tertiary)]/15 text-[color:var(--color-tertiary)]" },
+      workshop:  { label: root?.getAttribute("data-schedule-format-workshop")  || "Workshop",  cls: "bg-secondary text-foreground" },
     };
+    const agendaRemoveLabel = root?.getAttribute("data-schedule-agenda-remove") || "Remove";
 
     function openModal(card) {
       if (!modal) return;
@@ -1080,7 +1087,7 @@ const CSS_VARS = {
     // Agenda drawer
     const drawer = document.getElementById("schedule-agenda-drawer");
     const agendaList = document.getElementById("schedule-agenda-list");
-    const emptyLabel = document.documentElement.getAttribute("data-schedule-empty") || "";
+    const emptyLabel = root?.getAttribute("data-schedule-empty") || "";
     const openDrawer = () => {
       if (!drawer) return;
       drawer.classList.remove("translate-x-full");
@@ -1103,7 +1110,7 @@ const CSS_VARS = {
       if (bookmarks.size === 0) {
         const p = document.createElement("p");
         p.className = "text-sm text-muted-foreground";
-        p.textContent = emptyLabel || "Votre agenda est vide.";
+        p.textContent = emptyLabel;
         agendaList.appendChild(p);
         return;
       }
@@ -1126,7 +1133,7 @@ const CSS_VARS = {
             <div class="text-xs text-muted-foreground">${timeLabel} · ${room}</div>
             <div class="text-sm font-semibold text-foreground truncate">${title}</div>
           </div>
-          <button type="button" class="agenda-remove shrink-0 text-muted-foreground hover:text-foreground" aria-label="Remove">
+          <button type="button" class="agenda-remove shrink-0 text-muted-foreground hover:text-foreground" aria-label="${agendaRemoveLabel}">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
           </button>
         `;
