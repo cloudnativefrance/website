@@ -2,17 +2,11 @@
 
 Out-of-scope issues discovered during execution of plan 10-01. Not caused by this plan's changes; logged here per the GSD scope-boundary rule.
 
-## Missing `@types/node` → `astro check` reports 16 errors
+## ~~Missing `@types/node` → `astro check` reports 16 errors~~ RESOLVED
 
 - **Found:** while running the Phase 10 validation gate (`npm run astro check`)
-- **Affected files (all pre-existing, not touched by 10-01):**
-  - `vitest.config.ts` — `__dirname`, `path` not found
-  - `dagger/src/index.ts` — `process` not found, `@dagger.io/dagger` missing declarations
-  - `tests/build/speaker-profile.test.ts` — `fs`, `path`, `import.meta.dirname`
-  - `tests/build/speaker-talks.test.ts` — same
-  - `tests/build/speakers-grid.test.ts` — same
-- **Fix (future phase):** `pnpm add -D @types/node` and add `"types": ["node"]` to the relevant `tsconfig.json`. Also install `@dagger.io/dagger` if the dagger module is still in use.
-- **Impact on Phase 10:** none. `npm run build` succeeds; only the stricter `astro check` reports these errors. All Phase 10 artifacts (`Navigation.astro`, `Layout.astro`, `src/components/ui/README.md`) pass typecheck cleanly.
+- **Resolved:** 2026-04-12 (post-phase housekeeping)
+- **Fix applied:** `pnpm add -D @types/node` (covers `fs`, `path`, `import.meta.dirname`, `__dirname`, `process` in vitest.config.ts and tests/build/*). Root `tsconfig.json` now also excludes `dagger/` — that sub-module has its own `package.json` + `tsconfig.json` and should not be type-checked by the root astro check. Result: `npm run astro check` exits with 0 errors (13 hints remain — see Zod section below).
 
 ## Zod deprecation warnings in `src/content.config.ts`
 
