@@ -42,9 +42,15 @@ export default function CountdownTimer({ lang }: CountdownTimerProps) {
       const now = Date.now();
       if (now - lastAriaUpdate.current >= 60000 || lastAriaUpdate.current === 0) {
         lastAriaUpdate.current = now;
-        setAriaLabel(
-          `${tl.days} ${t("countdown.days")}, ${tl.hours} ${t("countdown.hours")}, ${tl.minutes} ${t("countdown.minutes")} remaining`
-        );
+        const tpl = t("countdown.aria_template");
+        const label = tpl
+          .replace("{days}", String(tl.days))
+          .replace("{daysLabel}", t("countdown.days"))
+          .replace("{hours}", String(tl.hours))
+          .replace("{hoursLabel}", t("countdown.hours"))
+          .replace("{minutes}", String(tl.minutes))
+          .replace("{minutesLabel}", t("countdown.minutes"));
+        setAriaLabel(label);
       }
     };
 
