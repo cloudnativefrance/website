@@ -31,6 +31,8 @@ export const ui = {
     "countdown.hours": "heures",
     "countdown.minutes": "minutes",
     "countdown.seconds": "secondes",
+    "countdown.aria_template":
+      "Plus que {days} {daysLabel}, {hours} {hoursLabel} et {minutes} {minutesLabel}",
     "hero.post_event": "L'evenement est termine !",
     "hero.cta.replays": "Voir les replays",
     "keynumbers.heading": "L'evenement en chiffres",
@@ -56,6 +58,10 @@ export const ui = {
     "speakers.no_talks": "Aucun talk annonce pour le moment.",
     "speakers.not_found":
       "Speaker introuvable. Retournez a la liste des speakers.",
+    "talks.track.cloud-infra": "Cloud & Infra",
+    "talks.track.devops-platform": "DevOps & Platform",
+    "talks.track.security": "Security",
+    "talks.track.community": "Community",
     "venue.heading": "Lieu",
     "venue.rail_label": "Lieu & informations pratiques",
     "venue.event_date": "3 juin 2027",
@@ -135,6 +141,7 @@ export const ui = {
     "schedule.agenda.title": "Votre agenda personnel",
     "schedule.agenda.empty":
       "Aucune session bookmarkee. Cliquez sur l'icone marque-page d'une session pour l'ajouter.",
+    "schedule.agenda.remove": "Retirer",
     "schedule.export_all": "Exporter le programme (.ics)",
     "schedule.export_agenda": "Exporter mon agenda (.ics)",
     "schedule.close": "Fermer",
@@ -165,6 +172,8 @@ export const ui = {
     "countdown.hours": "hours",
     "countdown.minutes": "minutes",
     "countdown.seconds": "seconds",
+    "countdown.aria_template":
+      "{days} {daysLabel}, {hours} {hoursLabel}, {minutes} {minutesLabel} remaining",
     "hero.post_event": "The event has ended!",
     "hero.cta.replays": "Watch Replays",
     "keynumbers.heading": "The Event in Numbers",
@@ -190,6 +199,10 @@ export const ui = {
     "speakers.no_talks": "No talks announced yet.",
     "speakers.not_found":
       "Speaker not found. Return to the speakers page.",
+    "talks.track.cloud-infra": "Cloud & Infra",
+    "talks.track.devops-platform": "DevOps & Platform",
+    "talks.track.security": "Security",
+    "talks.track.community": "Community",
     "venue.heading": "Venue",
     "venue.rail_label": "Venue & practical info",
     "venue.event_date": "June 3, 2027",
@@ -269,6 +282,7 @@ export const ui = {
     "schedule.agenda.title": "Your personal agenda",
     "schedule.agenda.empty":
       "No sessions bookmarked yet. Click the bookmark icon on a session to add it.",
+    "schedule.agenda.remove": "Remove",
     "schedule.export_all": "Export full schedule (.ics)",
     "schedule.export_agenda": "Export my agenda (.ics)",
     "schedule.close": "Close",
