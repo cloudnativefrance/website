@@ -1,0 +1,55 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import TeamGroupSection from "@/components/team/TeamGroupSection.astro";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const all = await getCollection("team");
+
+const GROUP_ORDER = ["core", "program-committee", "volunteers"] as const;
+const byGroup = Object.fromEntries(
+  GROUP_ORDER.map((g) => [g, all.filter((m) => m.data.group === g)]),
+) as Record<(typeof GROUP_ORDER)[number], CollectionEntry<"team">[]>;
+
+// Enum-value → i18n-key mapping (D-09: key uses underscore, enum uses hyphen).
+const groupTitles = {
+  core: t("team.group.core"),
+  "program-committee": t("team.group.program_committee"),
+  volunteers: t("team.group.volunteers"),
+} as const;
+
+const hasAnyMember = all.length > 0;
+---
+
+<Layout title={t("team.page.title")} lang={lang}>
+  <main class="mx-auto max-w-7xl px-4 md:px-6 py-24">
+    <header class="text-center">
+      <h1 class="text-4xl font-bold text-foreground">{t("team.page.title")}</h1>
+      <p class="mt-4 text-base text-muted-foreground max-w-2xl mx-auto">
+        {t("team.page.intro")}
+      </p>
+    </header>
+
+    {
+      hasAnyMember ? (
+        GROUP_ORDER.map((g) =>
+          byGroup[g].length > 0 ? (
+            <TeamGroupSection
+              group={g}
+              members={byGroup[g]}
+              lang={lang}
+              title={groupTitles[g]}
+            />
+          ) : null,
+        )
+      ) : (
+        <p class="mt-16 text-center text-muted-foreground">
+          {t("team.page.empty")}
+        </p>
+      )
+    }
+  </main>
+</Layout>
