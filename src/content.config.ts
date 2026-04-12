@@ -19,8 +19,12 @@ const speakers = defineCollection({
     company: z.string().optional(),
     role: z.string().optional(),
     photo: z.string().optional(),
-    bio: z.string(),
+    bio: z.string().optional(),
     social: socialSchema,
+    keynote: z.boolean().optional(),
+    talkTitle: z.string().optional(),
+    talkTrack: z.string().optional(),
+    talkDuration: z.number().optional(),
   }),
 });
 
