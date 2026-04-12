@@ -9,12 +9,6 @@ import logo from "@/assets/logos/dark/logo.svg";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-
-const stats = [
-  { value: t("hero.stats.participants"), label: t("hero.stats.participants_label") },
-  { value: t("hero.stats.partners"),     label: t("hero.stats.partners_label") },
-  { value: t("hero.stats.talks"),        label: t("hero.stats.talks_label") },
-];
 ---
 
 <section
@@ -51,19 +45,6 @@ const stats = [
     <p class="max-w-[720px] text-balance text-lg md:text-xl text-foreground" style="line-height:1.55;">
       {t("hero.description")}
     </p>
-
-    <ul class="flex flex-wrap items-center justify-center gap-3 md:gap-4" role="list">
-      {stats.map(({ value, label }) => (
-        <li class="rounded-lg border border-white/10 bg-card/60 px-5 py-3 text-center backdrop-blur-sm">
-          <div class="text-2xl font-bold text-primary leading-none" style="letter-spacing:-0.02em;">
-            {value}
-          </div>
-          <div class="mt-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            {label}
-          </div>
-        </li>
-      ))}
-    </ul>
 
     <CountdownTimer client:load lang={lang} />
 
