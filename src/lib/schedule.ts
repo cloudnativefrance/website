@@ -3,6 +3,7 @@ import { join } from "node:path";
 
 export type SessionFormat = "keynote" | "talk" | "lightning" | "workshop";
 export type SessionStatus = "confirmed" | "tentative" | "cancelled" | "hidden";
+export type SessionLevel = "beginner" | "intermediate" | "advanced" | "";
 
 export interface SessionRow {
   id: string;
@@ -11,6 +12,8 @@ export interface SessionRow {
   speakers: string[];
   /** Optional thematic track (e.g. 'FinOps'). Free text; empty when not classified. */
   track: string;
+  /** Target audience proficiency. Empty when unclassified. */
+  level: SessionLevel;
   /** Physical room — Monet / Debussy / Dumas / Piaf / Ravel. */
   room: string;
   format: SessionFormat;
@@ -106,6 +109,7 @@ export function loadSessions(): SessionRow[] {
   const iTitle = idx("title");
   const iSpeakers = idx("speakers");
   const iTrack = idx("track");
+  const iLevel = idx("level");
   const iRoom = idx("room");
   const iFormat = idx("format");
   const iStart = idx("start_time");
@@ -124,6 +128,7 @@ export function loadSessions(): SessionRow[] {
         .map((s) => s.trim())
         .filter(Boolean),
       track: r[iTrack] ?? "",
+      level: iLevel >= 0 ? ((r[iLevel] as SessionLevel) || "") : "",
       room: r[iRoom] ?? "",
       format: ((r[iFormat] as SessionFormat) || "talk"),
       startTime: r[iStart] ?? "",
@@ -151,6 +156,21 @@ export function listFormats(sessions: SessionRow[]): SessionFormat[] {
   const set = new Set<SessionFormat>();
   for (const s of sessions) set.add(s.format);
   return Array.from(set).sort() as SessionFormat[];
+}
+
+/** Unique sorted thematic-track list (excludes empty values). */
+export function listTracks(sessions: SessionRow[]): string[] {
+  const set = new Set<string>();
+  for (const s of sessions) if (s.track) set.add(s.track);
+  return Array.from(set).sort();
+}
+
+/** Unique sorted level list (excludes empty values). */
+export function listLevels(sessions: SessionRow[]): SessionLevel[] {
+  const set = new Set<SessionLevel>();
+  for (const s of sessions) if (s.level) set.add(s.level);
+  const order: SessionLevel[] = ["beginner", "intermediate", "advanced"];
+  return order.filter((l) => set.has(l));
 }
 
 /** Format an ISO time to a short HH:mm label (local time of the ISO offset). */

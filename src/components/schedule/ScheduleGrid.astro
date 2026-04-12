@@ -1,6 +1,6 @@
 ---
 import type { SessionRow } from "@/lib/schedule";
-import { endTime, formatTime, listFormats, listRooms } from "@/lib/schedule";
+import { endTime, formatTime, listFormats, listLevels, listRooms, listTracks } from "@/lib/schedule";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations, getLocalePath } from "@/i18n/utils";
 
@@ -16,6 +16,8 @@ const t = useTranslations(lang);
 
 const rooms = listRooms(sessions);
 const formats = listFormats(sessions);
+const tracks = listTracks(sessions);
+const levels = listLevels(sessions);
 
 // Compute schedule window
 const times = sessions
@@ -122,6 +124,52 @@ const CSS_VARS = {
             {t(`schedule.format.${fmt}` as any)}
           </button>
         ))}
+        {tracks.length > 0 && (
+          <>
+            <span class="mx-1 h-5 w-px bg-white/10" aria-hidden="true"></span>
+            <button
+              type="button"
+              class="schedule-filter chip chip--track is-active"
+              data-filter="track"
+              data-value="__all__"
+            >
+              {t("schedule.filter.all_tracks")}
+            </button>
+            {tracks.map((tr) => (
+              <button
+                type="button"
+                class="schedule-filter chip chip--track"
+                data-filter="track"
+                data-value={tr}
+              >
+                {tr}
+              </button>
+            ))}
+          </>
+        )}
+        {levels.length > 0 && (
+          <>
+            <span class="mx-1 h-5 w-px bg-white/10" aria-hidden="true"></span>
+            <button
+              type="button"
+              class="schedule-filter chip chip--level is-active"
+              data-filter="level"
+              data-value="__all__"
+            >
+              {t("schedule.filter.all_levels")}
+            </button>
+            {levels.map((lv) => (
+              <button
+                type="button"
+                class="schedule-filter chip chip--level"
+                data-filter="level"
+                data-value={lv}
+              >
+                {t(`schedule.level.${lv}` as any)}
+              </button>
+            ))}
+          </>
+        )}
       </div>
       <div class="flex items-center gap-2">
         <button
@@ -195,9 +243,14 @@ const CSS_VARS = {
               data-session-id={s.id}
               data-room={s.room}
               data-format={s.format}
+              data-track={s.track}
+              data-level={s.level}
               data-title={s.title}
               data-start={s.startTime}
               data-duration={s.durationMin}
+              data-description={s.description}
+              data-feedback-url={s.feedbackUrl}
+              data-speakers={JSON.stringify(speakers)}
             >
               <div class="schedule-session-head">
                 <span class="schedule-time-range">{formatTime(s.startTime)} — {endTime(s)}</span>
@@ -225,6 +278,62 @@ const CSS_VARS = {
             </article>
           );
         })}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Session detail modal (hidden by default) -->
+<div
+  id="schedule-session-modal"
+  class="fixed inset-0 z-50 hidden items-center justify-center p-4 md:p-6"
+  aria-hidden="true"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="schedule-session-modal-title"
+>
+  <div
+    class="schedule-session-modal-backdrop absolute inset-0 bg-background/80 backdrop-blur-sm"
+    data-close-modal
+  ></div>
+  <div class="relative max-w-2xl w-full max-h-[85vh] overflow-auto rounded-2xl border border-border bg-card shadow-2xl">
+    <div class="flex items-start justify-between gap-3 px-6 pt-6 pb-4 border-b border-border/70">
+      <div class="flex flex-wrap items-center gap-2" id="schedule-session-modal-meta-top">
+        <!-- filled by JS: format chip, time pill, room pill, level pill -->
+      </div>
+      <button
+        type="button"
+        data-close-modal
+        class="rounded-md w-9 h-9 inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground"
+        aria-label={t("schedule.close")}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="px-6 py-5 space-y-5">
+      <h2 id="schedule-session-modal-title" class="text-2xl md:text-3xl font-bold text-foreground leading-tight" style="letter-spacing:-0.02em;"></h2>
+      <div id="schedule-session-modal-speakers" class="flex flex-wrap gap-2 text-sm"></div>
+      <div id="schedule-session-modal-tags" class="flex flex-wrap gap-2"></div>
+      <div id="schedule-session-modal-description" class="prose-muted text-base text-foreground/90 leading-relaxed"></div>
+      <div id="schedule-session-modal-actions" class="flex flex-wrap items-center gap-2 pt-2">
+        <button
+          type="button"
+          id="schedule-session-modal-bookmark"
+          class="inline-flex items-center gap-2 rounded-md border border-border bg-background/60 px-3 h-9 text-sm font-medium text-foreground hover:border-primary/60"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+          <span data-bookmark-label>{t("schedule.bookmark_toggle")}</span>
+        </button>
+        <a
+          id="schedule-session-modal-feedback"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-md border border-primary/50 bg-transparent px-3 h-9 text-sm font-medium text-primary hover:bg-primary/10 hidden"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+          {t("schedule.open_feedback")}
+        </a>
       </div>
     </div>
   </div>
@@ -421,6 +530,14 @@ const CSS_VARS = {
     line-clamp: 1;
   }
 
+  /* Modal bookmark button on-state */
+  #schedule-session-modal-bookmark.is-on {
+    color: var(--color-primary);
+    border-color: color-mix(in oklch, var(--color-primary) 50%, transparent);
+    background-color: color-mix(in oklch, var(--color-primary) 10%, transparent);
+  }
+  #schedule-session-modal-bookmark.is-on svg { fill: currentColor; }
+
   /* Mobile: single column list view */
   @media (max-width: 767px) {
     .schedule-grid-headers,
@@ -494,15 +611,19 @@ const CSS_VARS = {
       });
     });
 
-    // Filters
-    const state = { room: "__all__", format: "__all__" };
+    // Filters — room, format, track, level. Keynotes are always visible when room-filtered (they span all rooms).
+    const state = { room: "__all__", format: "__all__", track: "__all__", level: "__all__" };
     const applyFilters = () => {
       document.querySelectorAll(".schedule-session").forEach((card) => {
         const room = card.getAttribute("data-room");
         const format = card.getAttribute("data-format");
+        const track = card.getAttribute("data-track") || "";
+        const level = card.getAttribute("data-level") || "";
         const roomOk = state.room === "__all__" || room === state.room || format === "keynote";
         const formatOk = state.format === "__all__" || format === state.format;
-        card.classList.toggle("is-hidden", !(roomOk && formatOk));
+        const trackOk = state.track === "__all__" || track === state.track;
+        const levelOk = state.level === "__all__" || level === state.level;
+        card.classList.toggle("is-hidden", !(roomOk && formatOk && trackOk && levelOk));
       });
     };
     document.querySelectorAll(".schedule-filter").forEach((btn) => {
@@ -515,6 +636,151 @@ const CSS_VARS = {
         btn.classList.add("is-active");
         applyFilters();
       });
+    });
+
+    // Session detail modal
+    const modal = document.getElementById("schedule-session-modal");
+    const modalTitle = document.getElementById("schedule-session-modal-title");
+    const modalMetaTop = document.getElementById("schedule-session-modal-meta-top");
+    const modalSpeakers = document.getElementById("schedule-session-modal-speakers");
+    const modalTags = document.getElementById("schedule-session-modal-tags");
+    const modalDescription = document.getElementById("schedule-session-modal-description");
+    const modalBookmarkBtn = document.getElementById("schedule-session-modal-bookmark");
+    const modalFeedback = document.getElementById("schedule-session-modal-feedback");
+    let modalSessionId = null;
+
+    const formatPalette = {
+      keynote: { label: "KEYNOTE", cls: "bg-accent/15 text-accent" },
+      talk: { label: "TALK", cls: "bg-primary/15 text-primary" },
+      lightning: { label: "LIGHTNING", cls: "bg-[color:var(--color-tertiary)]/15 text-[color:var(--color-tertiary)]" },
+      workshop: { label: "WORKSHOP", cls: "bg-secondary text-foreground" },
+    };
+
+    function openModal(card) {
+      if (!modal) return;
+      const id = card.getAttribute("data-session-id") || "";
+      const title = card.getAttribute("data-title") || "";
+      const format = card.getAttribute("data-format") || "talk";
+      const start = card.getAttribute("data-start") || "";
+      const duration = Number(card.getAttribute("data-duration") || 0);
+      const room = card.getAttribute("data-room") || "";
+      const track = card.getAttribute("data-track") || "";
+      const level = card.getAttribute("data-level") || "";
+      const description = card.getAttribute("data-description") || "";
+      const feedbackUrl = card.getAttribute("data-feedback-url") || "";
+      let speakers = [];
+      try { speakers = JSON.parse(card.getAttribute("data-speakers") || "[]"); } catch {}
+
+      modalSessionId = id;
+      if (modalTitle) modalTitle.textContent = title;
+
+      // Top meta row: format chip + time + room + track + level
+      if (modalMetaTop) {
+        const fmt = formatPalette[format] || formatPalette.talk;
+        const timeRange = start.slice(11, 16) + " — " + new Date(new Date(start).getTime() + duration * 60000).toISOString().slice(11, 16);
+        const parts = [];
+        parts.push(`<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-widest uppercase ${fmt.cls}">${fmt.label}</span>`);
+        parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-foreground">${timeRange} · ${duration} min</span>`);
+        if (room) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-foreground">${room}</span>`);
+        if (track) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-foreground">${track}</span>`);
+        if (level) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-muted-foreground uppercase tracking-widest">${level}</span>`);
+        modalMetaTop.innerHTML = parts.join("");
+      }
+
+      // Speakers — render as clickable pills when we have a href, else plain pills
+      if (modalSpeakers) {
+        modalSpeakers.innerHTML = speakers.length === 0 ? "" : speakers.map((sp) => {
+          const safeLabel = String(sp.label || "").replace(/</g, "&lt;");
+          const cls = "inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-3 py-1 text-sm text-foreground hover:border-primary/60";
+          return sp.href
+            ? `<a href="${sp.href}" class="${cls} text-primary">${safeLabel} <span aria-hidden="true">→</span></a>`
+            : `<span class="${cls} text-muted-foreground">${safeLabel}</span>`;
+        }).join("");
+      }
+
+      // Tags (not in data-* currently — skip)
+      if (modalTags) modalTags.innerHTML = "";
+
+      // Description
+      if (modalDescription) {
+        modalDescription.textContent = description || "";
+        modalDescription.classList.toggle("hidden", !description);
+      }
+
+      // Bookmark toggle reflects current state
+      if (modalBookmarkBtn) {
+        modalBookmarkBtn.classList.toggle("is-on", bookmarks.has(id));
+      }
+
+      if (modalFeedback) {
+        if (feedbackUrl) {
+          modalFeedback.setAttribute("href", feedbackUrl);
+          modalFeedback.classList.remove("hidden");
+        } else {
+          modalFeedback.classList.add("hidden");
+        }
+      }
+
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("overflow-hidden");
+    }
+
+    function closeModal() {
+      if (!modal) return;
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("overflow-hidden");
+      modalSessionId = null;
+    }
+
+    // Open modal on card click (but not when clicking the inline bookmark icon)
+    document.querySelectorAll(".schedule-session").forEach((card) => {
+      card.addEventListener("click", (ev) => {
+        const target = ev.target;
+        if (target instanceof Element) {
+          if (target.closest("[data-bookmark]")) return;
+          if (target.closest("a")) return;
+        }
+        openModal(card);
+      });
+      card.setAttribute("tabindex", "0");
+      card.setAttribute("role", "button");
+      card.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" || ev.key === " ") {
+          ev.preventDefault();
+          openModal(card);
+        }
+      });
+    });
+
+    // Close on backdrop / X click, Escape key
+    modal?.querySelectorAll("[data-close-modal]").forEach((el) => {
+      el.addEventListener("click", closeModal);
+    });
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape" && modal && !modal.classList.contains("hidden")) closeModal();
+    });
+
+    // Bookmark button inside modal
+    modalBookmarkBtn?.addEventListener("click", () => {
+      if (!modalSessionId) return;
+      const id = modalSessionId;
+      if (bookmarks.has(id)) {
+        bookmarks.delete(id);
+        modalBookmarkBtn.classList.remove("is-on");
+      } else {
+        bookmarks.add(id);
+        modalBookmarkBtn.classList.add("is-on");
+      }
+      setBookmarks(bookmarks);
+      updateCount();
+      // Sync the inline bookmark too
+      const inline = document.querySelector(`[data-bookmark="${id}"]`);
+      inline?.classList.toggle("is-on", bookmarks.has(id));
+      refreshAgenda();
     });
 
     // Agenda drawer
