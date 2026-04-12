@@ -7,11 +7,11 @@ import { useTranslations, getLocalePath } from "@/i18n/utils";
 interface Props {
   sessions: SessionRow[];
   lang: Locale;
-  /** slug set of speakers available in content collection for the current locale */
-  speakerSlugs: Set<string>;
+  /** Map of slug → display name for resolving speaker references in session cards. */
+  speakerNames: Map<string, string>;
 }
 
-const { sessions, lang, speakerSlugs } = Astro.props;
+const { sessions, lang, speakerNames } = Astro.props;
 const t = useTranslations(lang);
 
 const rooms = listRooms(sessions);
@@ -50,10 +50,12 @@ for (let m = GRID_START; m <= GRID_END; m += 30) {
 }
 
 function sessionSpeakerLinks(s: SessionRow) {
-  // speaker refs: if slug matches content collection, link; else plain text
+  // Resolve speaker refs to display names. When the slug is known, link to the
+  // profile page; otherwise the ref is already a full name so use it verbatim.
   return s.speakers.map((ref) => {
-    if (speakerSlugs.has(ref)) {
-      return { label: ref, href: getLocalePath(lang, `/speakers/${ref}`) };
+    const resolvedName = speakerNames.get(ref);
+    if (resolvedName) {
+      return { label: resolvedName, href: getLocalePath(lang, `/speakers/${ref}`) };
     }
     return { label: ref, href: null };
   });
