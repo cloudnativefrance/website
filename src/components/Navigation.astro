@@ -9,26 +9,28 @@ const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
 
 const navItems = [
-  { key: "nav.home"     as const, path: "/" },
-  { key: "nav.speakers" as const, path: "/speakers" },
-  { key: "nav.schedule" as const, path: "/" },  // dead link — Phase 7 pending (D-05)
-  { key: "nav.sponsors" as const, path: "/" },  // dead link — Phase 5 pending (D-05)
-  { key: "nav.venue"    as const, path: "/" },  // dead link — Phase 6 pending (D-05)
-  { key: "nav.team"     as const, path: "/" },  // dead link — Phase 5 pending (D-05)
+  { key: "nav.home"     as const, path: "/",         dead: false },
+  { key: "nav.speakers" as const, path: "/speakers", dead: false },
+  { key: "nav.schedule" as const, path: "/",         dead: true  }, // Phase 7 pending (D-05)
+  { key: "nav.sponsors" as const, path: "/",         dead: true  }, // Phase 5 pending (D-05)
+  { key: "nav.venue"    as const, path: "/",         dead: true  }, // Phase 6 pending (D-05)
+  { key: "nav.team"     as const, path: "/",         dead: true  }, // Phase 5 pending (D-05)
 ];
 
-const links = navItems.map(({ key, path }) => ({
-  key,
-  label: t(key),
-  href: getLocalePath(lang, path),
-}));
-
-function isActive(currentPath: string, href: string): boolean {
+function isActive(currentPath: string, href: string, dead: boolean): boolean {
+  if (dead) return false;
   if (href === "/" || href === "/en" || href === "/en/") {
     return currentPath === href || currentPath === href + "/";
   }
   return currentPath.startsWith(href);
 }
+
+const links = navItems.map(({ key, path, dead }) => ({
+  key,
+  label: t(key),
+  href: getLocalePath(lang, path),
+  active: isActive(currentPath, getLocalePath(lang, path), dead),
+}));
 
 const homeHref = getLocalePath(lang, "/");
 const ctaLabel = t("hero.cta.register");
@@ -47,15 +49,15 @@ const ctaLabel = t("hero.cta.register");
 
     <!-- Desktop links -->
     <ul class="hidden md:flex items-center gap-6" role="list">
-      {links.map(({ key, label, href }) => (
+      {links.map(({ key, label, href, active }) => (
         <li>
           <a
             href={href}
             data-nav-key={key}
-            aria-current={isActive(currentPath, href) ? "page" : undefined}
+            aria-current={active ? "page" : undefined}
             class:list={[
               "text-sm font-medium text-white transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
-              isActive(currentPath, href)
+              active
                 ? "border-b-2 border-primary"
                 : "border-b-2 border-transparent hover:border-primary/60",
             ]}
@@ -92,14 +94,14 @@ const ctaLabel = t("hero.cta.register");
   <!-- Mobile menu panel -->
   <div id="mobile-menu" class="hidden md:hidden border-t border-border bg-background/95 backdrop-blur-sm">
     <ul class="px-4 py-2" role="list">
-      {links.map(({ label, href }) => (
+      {links.map(({ label, href, active }) => (
         <li>
           <a
             href={href}
-            aria-current={isActive(currentPath, href) ? "page" : undefined}
+            aria-current={active ? "page" : undefined}
             class:list={[
               "flex items-center min-h-11 px-2 py-3 text-sm font-medium rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              isActive(currentPath, href) ? "text-primary" : "text-foreground hover:bg-muted",
+              active ? "text-primary" : "text-foreground hover:bg-muted",
             ]}
           >
             {label}
