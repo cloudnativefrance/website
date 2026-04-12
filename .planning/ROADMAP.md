@@ -221,7 +221,7 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | 3. Hero & Landing | 0/? | Not started | - |
 | 4. Speakers | 3/3 | Complete   | 2026-04-11 |
 | 5. Sponsors & Team | 0/? | Not started | - |
-| 6. Venue & Previous Editions | 0/? | Not started | - |
+| 6. Venue & Previous Editions | 1/1 | Complete   | 2026-04-12 |
 | 7. Interactive Schedule | 0/? | Not started | - |
 | 8. Event Lifecycle | 0/? | Not started | - |
 | 9. SEO, Legal & Polish | 0/? | Not started | - |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: idle
-stopped_at: Phase 12 complete — register CTA wired to external ticketing
-last_updated: "2026-04-12T07:10:00.000Z"
-last_activity: 2026-04-12 -- Phase 12 complete (Register CTAs + KCD brand docs)
+stopped_at: Phase 6 complete — venue page with map, transport, accessibility and 2026 replay
+last_updated: "2026-04-12T07:25:00.000Z"
+last_activity: 2026-04-12 -- Phase 6 complete (Lieu page, OSM map, aftermovie, Ente gallery link)
 progress:
   total_phases: 12
-  completed_phases: 6
-  total_plans: 14
-  completed_plans: 14
+  completed_phases: 7
+  total_plans: 15
+  completed_plans: 15
   percent: 100
 ---
 

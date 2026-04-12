@@ -64,16 +64,16 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Venue
 
-- [ ] **VENU-01**: Venue page with CENTQUATRE-PARIS description and embedded map
-- [ ] **VENU-02**: Transport options (metro, bus, train, parking)
-- [ ] **VENU-03**: Nearby hotels and restaurants
-- [ ] **VENU-04**: Accessibility information
+- [x] **VENU-01**: Venue page with CENTQUATRE-PARIS description and embedded map
+- [x] **VENU-02**: Transport options (metro, bus, train, parking)
+- [x] **VENU-03**: Nearby hotels and restaurants
+- [x] **VENU-04**: Accessibility information
 
 ### Event Lifecycle
 
 - [ ] **EVNT-01**: Post-event mode: countdown switches to "watch replays" with YouTube playlist link
 - [ ] **EVNT-02**: Schedule talks link to YouTube recordings when available (youtubeUrl field)
-- [ ] **EVNT-03**: Previous edition section with video recap, photo gallery link, key numbers
+- [x] **EVNT-03**: Previous edition section with video recap, photo gallery link, key numbers
 - [ ] **EVNT-04**: CFP status indicator linking to Conference Hall (open/closed/coming soon)
 
 ### SEO & Legal
@@ -157,13 +157,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TEAM-01 | Phase 5: Sponsors & Team | Pending |
 | TEAM-02 | Phase 5: Sponsors & Team | Pending |
 | TEAM-03 | Phase 5: Sponsors & Team | Pending |
-| VENU-01 | Phase 6: Venue & Previous Editions | Pending |
-| VENU-02 | Phase 6: Venue & Previous Editions | Pending |
-| VENU-03 | Phase 6: Venue & Previous Editions | Pending |
-| VENU-04 | Phase 6: Venue & Previous Editions | Pending |
+| VENU-01 | Phase 6: Venue & Previous Editions | Complete |
+| VENU-02 | Phase 6: Venue & Previous Editions | Complete |
+| VENU-03 | Phase 6: Venue & Previous Editions | Complete |
+| VENU-04 | Phase 6: Venue & Previous Editions | Complete |
 | EVNT-01 | Phase 8: Event Lifecycle | Pending |
 | EVNT-02 | Phase 8: Event Lifecycle | Pending |
-| EVNT-03 | Phase 6: Venue & Previous Editions | Pending |
+| EVNT-03 | Phase 6: Venue & Previous Editions | Complete |
 | EVNT-04 | Phase 8: Event Lifecycle | Pending |
 | META-01 | Phase 9: SEO, Legal & Polish | Pending |
 | META-02 | Phase 9: SEO, Legal & Polish | Pending |
