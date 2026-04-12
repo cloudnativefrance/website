@@ -12,7 +12,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **DSGN-01**: Design system defined in Google Stitch with colors, typography, spacing, and component patterns
 - [x] **DSGN-02**: DESIGN.md exported and committed to project root as the single source of truth for all visual decisions
 - [x] **DSGN-03**: Dark theme with bold/technical aesthetic and warm community accents (real event photos, friendly tone)
-- [ ] **DSGN-04**: Brand continuity preserved: DM Sans font, geometric shapes, CND France + KCD logos
+- [x] **DSGN-04**: Brand continuity preserved: DM Sans font, geometric shapes, CND France + KCD logos
 - [x] **DSGN-05**: Tailwind CSS 4 theme tokens derived from DESIGN.md (colors, spacing, typography, radii)
 - [x] **DSGN-06**: shadcn/ui components customized to match design system
 
@@ -30,7 +30,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **HERO-01**: Hero section with event name, date (June 3, 2027), venue (CENTQUATRE-PARIS), geometric background
 - [x] **HERO-02**: Countdown timer to event date (pre-event mode)
-- [ ] **HERO-03**: Prominent CTA button linking to external registration/ticketing
+- [x] **HERO-03**: Prominent CTA button linking to external registration/ticketing
 - [x] **HERO-04**: Key numbers section: 1700+ attendees, 50+ talks, 40+ partners
 
 ### Schedule
@@ -126,7 +126,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DSGN-01 | Phase 1: Design System & Foundation | Complete |
 | DSGN-02 | Phase 1: Design System & Foundation | Complete |
 | DSGN-03 | Phase 1: Design System & Foundation | Complete |
-| DSGN-04 | Phase 12: CTA & Brand Completion | Pending |
+| DSGN-04 | Phase 12: CTA & Brand Completion | Complete |
 | DSGN-05 | Phase 1: Design System & Foundation | Complete |
 | DSGN-06 | Phase 1: Design System & Foundation | Complete |
 | FNDN-01 | Phase 1: Design System & Foundation | Complete |
@@ -138,7 +138,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FNDN-07 | Deferred to cnd-platform repo (GitOps) | Pending |
 | HERO-01 | Phase 3: Hero & Landing | Complete |
 | HERO-02 | Phase 3: Hero & Landing | Complete |
-| HERO-03 | Phase 12: CTA & Brand Completion | Pending |
+| HERO-03 | Phase 12: CTA & Brand Completion | Complete |
 | HERO-04 | Phase 3: Hero & Landing | Complete |
 | SCHD-01 | Phase 7: Interactive Schedule | Pending |
 | SCHD-02 | Phase 7: Interactive Schedule | Pending |

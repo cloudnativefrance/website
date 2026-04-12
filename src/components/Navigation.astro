@@ -34,6 +34,7 @@ const links = navItems.map(({ key, path, dead }) => ({
 
 const homeHref = getLocalePath(lang, "/");
 const ctaLabel = t("hero.cta.register");
+const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
 ---
 
 <header
@@ -71,7 +72,9 @@ const ctaLabel = t("hero.cta.register");
     <!-- Right side -->
     <div class="flex items-center gap-3">
       <a
-        href="#"
+        href={TICKETING_URL}
+        target="_blank"
+        rel="noopener noreferrer"
         class="hidden md:inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-medium px-4 h-9 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         {ctaLabel}

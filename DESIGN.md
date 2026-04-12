@@ -356,4 +356,49 @@ For `src/styles/global.css`, wire these values into Tailwind 4's `@theme` direct
 
 ---
 
+## Logo Usage
+
+### CND France logo
+
+Three canonical variants live in `src/assets/logos/`:
+
+| Variant | Path | When to use |
+|---|---|---|
+| Full wordmark | `principal/logo.svg` (light bg) or `dark/logo.svg` (dark bg) | Hero, press kit, email signatures — any primary identification |
+| Compact mark | `principal/logo-notext.svg` / `dark/logo-notext.svg` | Nav header at mobile sizes, favicon-like contexts, space-constrained corners |
+| Print | `print/` | Print-only material — vector sources |
+
+**Sizing:** render the full wordmark at 320–400 px wide on desktop hero anchors, 160–200 px on secondary pages, 32–40 px tall in horizontal headers. Compact mark: 32 px tall for mobile nav, larger only inside brand lockups.
+
+**Clear space:** maintain a margin around the logo equal to the height of the "F" in "FRANCE" (the shortest uppercase letter in the wordmark). No text, photo, or UI element inside that margin.
+
+**Backgrounds:** `dark/` variant on the site's deep-purple Background token. `principal/` variant only on light backgrounds (press decks, invoices). Never recolor, add strokes, stretch, or rotate the logo.
+
+**Prohibited:** drop shadows, gradients, outlines, opacity below 1.0, background plates with non-DS colors, AI-generated "reimaginings".
+
+### KCD (Kubernetes Community Days) co-branding
+
+Cloud Native Days France is an official Kubernetes Community Days event. When the KCD logo appears alongside the CND France logo:
+
+**Placement:** side-by-side in a horizontal lockup, CND France on the left (primary), KCD on the right (affiliated), separated by a vertical hairline divider at 40 % white opacity over dark backgrounds, or 40 % black over light.
+
+**Relative sizing:** KCD logo's cap height should match the "C" of "Cloud" in the CND France wordmark — do NOT make KCD larger than CND France on this site. On KCD-produced material, the inverse applies.
+
+**Clear space between logos:** equal to the height of the KCD cap height.
+
+**Acceptable lockups:**
+- `[CND France] | [KCD]` — horizontal, header/footer/press
+- `[CND France]` above `Official KCD Event` text — vertical, badges/sponsor decks
+- `[CND France]` alone — always acceptable; KCD is never required on the primary site nav
+
+**Prohibited co-branding:**
+- Merging the two marks into a single combined glyph
+- Placing KCD above CND France on CND France-owned surfaces
+- Coloring the KCD logo in CND brand colors — use KCD's own palette (Kubernetes blue)
+- Using KCD without current KCD program authorisation
+
+**Source:** the KCD logo package lives in `src/assets/logos/kcd/` (TBD — file missing at time of this doc revision; replace this note when adding the asset).
+
+---
+
 *This file is the design contract. All implementation must reference these values. Do not introduce colors, fonts, or spacing values that are not defined here.*
