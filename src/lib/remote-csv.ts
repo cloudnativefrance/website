@@ -73,8 +73,10 @@ export async function fetchCsvOrFallback({
 
 /**
  * Environment-overridable URLs. Set via
- *   SCHEDULE_SESSIONS_CSV_URL, SCHEDULE_SPEAKERS_CSV_URL
- * to point at a staging sheet; unset defaults to the production publish-to-web URLs.
+ *   SCHEDULE_SESSIONS_CSV_URL, SCHEDULE_SPEAKERS_CSV_URL, SPONSORS_CSV_URL, TEAM_CSV_URL
+ * to point at a staging sheet; unset defaults to the production publish-to-web URLs
+ * (or empty string for collections whose sheet has not yet been provisioned — the
+ * loader then reads the committed local CSV directly).
  */
 export const SESSIONS_CSV_URL =
   process.env.SCHEDULE_SESSIONS_CSV_URL ||
@@ -83,3 +85,9 @@ export const SESSIONS_CSV_URL =
 export const SPEAKERS_CSV_URL =
   process.env.SCHEDULE_SPEAKERS_CSV_URL ||
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdET7nAGsbCoHlOzCICGvGHKOB6OYeqgiJPiWtXBjUCg818TFJ2-pQnEtMzyBaAsGaIQr475Q50mkM/pub?gid=124864767&single=true&output=csv";
+
+export const SPONSORS_CSV_URL =
+  process.env.SPONSORS_CSV_URL || "";
+
+export const TEAM_CSV_URL =
+  process.env.TEAM_CSV_URL || "";
