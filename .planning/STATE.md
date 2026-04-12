@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: idle
-stopped_at: Phase 7 complete — schedule page with track grid, filters, bookmarks, iCal
-last_updated: "2026-04-12T07:35:00.000Z"
-last_activity: 2026-04-12 -- Phase 7 complete (CSV loader + /programme + .ics + admin CSV/Sheets pipeline)
+status: executing
+stopped_at: Phase 10 UI-SPEC approved
+last_updated: "2026-04-12T20:49:23.353Z"
+last_activity: 2026-04-12 -- Phase 9 execution started
 progress:
   total_phases: 12
-  completed_phases: 8
-  total_plans: 16
-  completed_plans: 16
-  percent: 100
+  completed_phases: 7
+  total_plans: 25
+  completed_plans: 20
+  percent: 80
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-11)
 
 **Core value:** A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register -- all within 5 seconds of landing.
-**Current focus:** Phase 10 — site-navigation-component-wiring
+**Current focus:** Phase 9 — seo-legal-polish
 
 ## Current Position
 
-Phase: 10 (site-navigation-component-wiring) — COMPLETE
-Plan: 1 of 1 complete
-Status: Phase 10 complete — v1.0 milestone integration gaps closed
-Last activity: 2026-04-12 -- Phase 10 finished with Stitch-approved header revision
+Phase: 9 (seo-legal-polish) — EXECUTING
+Plan: 1 of 5
+Status: Executing Phase 9
+Last activity: 2026-04-12 -- Phase 9 execution started
 
 Progress: [##########] 100%
 

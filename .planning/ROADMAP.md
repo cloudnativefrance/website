@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 6: Venue & Previous Editions** - Venue details with map/transport/accessibility, plus past edition recap
 - [ ] **Phase 7: Interactive Schedule** - Full schedule with filtering, timeline view, bookmarks, iCal export, Open Feedback links
 - [ ] **Phase 8: Event Lifecycle** - Post-event replay mode, YouTube recording links, CFP status indicator
-- [ ] **Phase 9: SEO, Legal & Polish** - Meta tags, structured data, hreflang, legal pages, footer, sitemap
+- [x] **Phase 9: SEO, Legal & Polish** - Meta tags, structured data, hreflang, legal pages, footer, sitemap (completed 2026-04-12)
 
 ## Phase Details
 
@@ -163,10 +163,14 @@ Plans:
   4. hreflang tags correctly link FR and EN versions of every page
   5. Code of Conduct, privacy policy, and terms pages exist and are linked from the footer
   6. Footer displays social links (LinkedIn, YouTube, Bluesky, X), association info, and legal links on all pages
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 09-01: TBD
+- [x] 09-01-PLAN.md — Layout.astro SEO head expansion (description, OG, Twitter, canonical, hreflang) + og-default.png + seo.* i18n (META-01, META-04)
+- [x] 09-02-PLAN.md — @astrojs/sitemap integration + robots.txt (META-02)
+- [x] 09-03-PLAN.md — JSON-LD Event schema on homepage FR + EN (META-03)
+- [x] 09-04-PLAN.md — Footer component + Layout wiring + 15 footer.* i18n keys (META-07)
+- [x] 09-05-PLAN.md — LegalPageLayout + CoC/Privacy/Terms pages FR + EN + 4 legal.* i18n keys (META-05, META-06)
 
 ### Phase 10: Site Navigation & Component Wiring
 **Goal**: Visitors can navigate between all site sections, and orphaned components from earlier phases are wired into the UI
@@ -227,7 +231,7 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | 6. Venue & Previous Editions | 1/1 | Complete   | 2026-04-12 |
 | 7. Interactive Schedule | 1/1 | Complete   | 2026-04-12 |
 | 8. Event Lifecycle | 0/? | Not started | - |
-| 9. SEO, Legal & Polish | 0/? | Not started | - |
+| 9. SEO, Legal & Polish | 5/5 | Complete   | 2026-04-12 |
 | 10. Site Navigation & Component Wiring | 1/1 | Complete   | 2026-04-12 |
 | 11. Security & i18n Hardcode Fixes | 3/3 | Complete   | 2026-04-12 |
 | 12. CTA & Brand Completion | 1/1 | Complete   | 2026-04-12 |
