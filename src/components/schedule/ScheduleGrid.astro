@@ -1,0 +1,622 @@
+---
+import type { SessionRow } from "@/lib/schedule";
+import { endTime, formatTime, listFormats, listRooms } from "@/lib/schedule";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations, getLocalePath } from "@/i18n/utils";
+
+interface Props {
+  sessions: SessionRow[];
+  lang: Locale;
+  /** slug set of speakers available in content collection for the current locale */
+  speakerSlugs: Set<string>;
+}
+
+const { sessions, lang, speakerSlugs } = Astro.props;
+const t = useTranslations(lang);
+
+const rooms = listRooms(sessions);
+const formats = listFormats(sessions);
+
+// Compute schedule window
+const times = sessions
+  .map((s) => s.startTime)
+  .filter(Boolean)
+  .sort();
+const firstStart = times[0];
+const dayDateIso = firstStart ? firstStart.slice(0, 10) : "";
+
+function toMinutes(iso: string): number {
+  const m = iso.match(/T(\d{2}):(\d{2})/);
+  return m ? Number(m[1]) * 60 + Number(m[2]) : 0;
+}
+
+// Grid window: 30 min before earliest, 30 min after latest session end
+const allMinutes = sessions.flatMap((s) => {
+  const start = toMinutes(s.startTime);
+  return [start, start + s.durationMin];
+});
+const GRID_START = Math.floor((Math.min(...allMinutes, 540) - 0) / 60) * 60; // floor to hour
+const GRID_END = Math.ceil((Math.max(...allMinutes, 1140) + 0) / 60) * 60;
+const GRID_ROWS = (GRID_END - GRID_START) / 5; // 5 min per row
+
+// Time labels every 30 minutes
+const timeLabels: { label: string; row: number }[] = [];
+for (let m = GRID_START; m <= GRID_END; m += 30) {
+  const h = String(Math.floor(m / 60)).padStart(2, "0");
+  const mn = String(m % 60).padStart(2, "0");
+  timeLabels.push({ label: `${h}:${mn}`, row: (m - GRID_START) / 5 + 1 });
+}
+
+function sessionSpeakerLinks(s: SessionRow) {
+  // speaker refs: if slug matches content collection, link; else plain text
+  return s.speakers.map((ref) => {
+    if (speakerSlugs.has(ref)) {
+      return { label: ref, href: getLocalePath(lang, `/speakers/${ref}`) };
+    }
+    return { label: ref, href: null };
+  });
+}
+
+function formatChipClass(fmt: string) {
+  switch (fmt) {
+    case "keynote":
+      return "bg-accent/15 text-accent border-accent/30";
+    case "lightning":
+      return "bg-[color:var(--color-tertiary)]/15 border-[color:var(--color-tertiary)]/30";
+    case "workshop":
+      return "bg-secondary text-foreground border-border";
+    default:
+      return "bg-primary/15 text-primary border-primary/30";
+  }
+}
+
+const CSS_VARS = {
+  "--grid-rows": String(GRID_ROWS),
+  "--grid-cols": String(rooms.length),
+} as Record<string, string>;
+---
+
+<div
+  class="schedule-root"
+  data-date={dayDateIso}
+  style={`--grid-rows: ${GRID_ROWS}; --grid-cols: ${rooms.length};`}
+>
+  <!-- Filter bar -->
+  <div class="sticky top-[64px] z-20 -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8 py-3 bg-background/90 backdrop-blur-sm border-b border-white/10">
+    <div class="flex flex-wrap items-center gap-2 justify-between">
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          class="schedule-filter chip chip--room is-active"
+          data-filter="room"
+          data-value="__all__"
+        >
+          {t("schedule.filter.all_rooms")}
+        </button>
+        {rooms.map((room) => (
+          <button
+            type="button"
+            class="schedule-filter chip chip--room"
+            data-filter="room"
+            data-value={room}
+          >
+            {room}
+          </button>
+        ))}
+        <span class="mx-1 h-5 w-px bg-white/10" aria-hidden="true"></span>
+        <button
+          type="button"
+          class="schedule-filter chip chip--format is-active"
+          data-filter="format"
+          data-value="__all__"
+        >
+          {t("schedule.filter.all_formats")}
+        </button>
+        {formats.map((fmt) => (
+          <button
+            type="button"
+            class="schedule-filter chip chip--format"
+            data-filter="format"
+            data-value={fmt}
+          >
+            {t(`schedule.format.${fmt}` as any)}
+          </button>
+        ))}
+      </div>
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          id="schedule-agenda-toggle"
+          class="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 h-9 text-sm font-medium text-foreground hover:border-primary/60"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+          <span>{t("schedule.agenda.label")}</span>
+          <span id="schedule-agenda-count" class="rounded-full bg-primary/20 text-primary text-xs font-semibold px-2 py-0.5">0</span>
+        </button>
+        <button
+          type="button"
+          id="schedule-export-all"
+          class="inline-flex items-center gap-2 rounded-md border border-primary/50 bg-transparent px-3 h-9 text-sm font-medium text-primary hover:bg-primary/10"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          <span>{t("schedule.export_all")}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="schedule-grid mt-8">
+    <!-- Room header row -->
+    <div class="schedule-grid-headers">
+      <div class="schedule-time-corner"></div>
+      {rooms.map((room) => (
+        <div class="schedule-room-header">
+          <span class="text-sm font-bold uppercase tracking-wider">{room}</span>
+        </div>
+      ))}
+    </div>
+
+    <!-- Scrollable grid body -->
+    <div class="schedule-grid-body">
+      <!-- Time column -->
+      <div class="schedule-time-col">
+        {timeLabels.map(({ label, row }) => (
+          <div class="schedule-time-label" style={`grid-row: ${row} / span 6;`}>
+            {label}
+          </div>
+        ))}
+      </div>
+
+      <!-- Track cells grid -->
+      <div class="schedule-tracks">
+        <!-- Grid lines background -->
+        {timeLabels.map(({ row }) => (
+          <div class="schedule-gridline" style={`grid-row: ${row} / span 1; grid-column: 1 / -1;`}></div>
+        ))}
+
+        <!-- Session cards -->
+        {sessions.map((s) => {
+          const start = toMinutes(s.startTime);
+          const startRow = (start - GRID_START) / 5 + 1;
+          const span = Math.max(1, Math.round(s.durationMin / 5));
+          const isKeynote = s.format === "keynote";
+          const colStart = isKeynote
+            ? 1
+            : (rooms.indexOf(s.room) ?? 0) + 1;
+          const colSpan = isKeynote ? rooms.length : 1;
+          const style = `grid-row: ${startRow} / span ${span}; grid-column: ${colStart} / span ${colSpan};`;
+          const speakers = sessionSpeakerLinks(s);
+          return (
+            <article
+              class={`schedule-session ${formatChipClass(s.format)}`}
+              style={style}
+              data-session-id={s.id}
+              data-room={s.room}
+              data-format={s.format}
+              data-title={s.title}
+              data-start={s.startTime}
+              data-duration={s.durationMin}
+            >
+              <div class="schedule-session-head">
+                <span class="schedule-time-range">{formatTime(s.startTime)} — {endTime(s)}</span>
+                <button
+                  type="button"
+                  class="schedule-bookmark"
+                  aria-label={t("schedule.bookmark_toggle")}
+                  data-bookmark={s.id}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+                </button>
+              </div>
+              <h3 class="schedule-session-title">{s.title}</h3>
+              {speakers.length > 0 && (
+                <p class="schedule-session-speakers">
+                  {speakers.slice(0, 2).map((sp, i) => (
+                    <>
+                      {i > 0 && <span>, </span>}
+                      {sp.href ? <a href={sp.href} class="hover:underline">{sp.label}</a> : <span>{sp.label}</span>}
+                    </>
+                  ))}
+                  {speakers.length > 2 && <span> +{speakers.length - 2}</span>}
+                </p>
+              )}
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Agenda drawer (hidden by default) -->
+<aside
+  id="schedule-agenda-drawer"
+  class="fixed right-0 top-0 bottom-0 w-full sm:w-96 max-w-full bg-card border-l border-border z-50 shadow-2xl translate-x-full transition-transform duration-200"
+  aria-hidden="true"
+  role="dialog"
+  aria-label={t("schedule.agenda.label")}
+>
+  <div class="flex items-center justify-between px-5 py-4 border-b border-border">
+    <h2 class="text-lg font-bold">{t("schedule.agenda.title")}</h2>
+    <button type="button" id="schedule-agenda-close" class="rounded-md w-9 h-9 inline-flex items-center justify-center hover:bg-muted" aria-label={t("schedule.close")}>
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div id="schedule-agenda-list" class="flex-1 overflow-auto p-4 space-y-2">
+    <p class="text-sm text-muted-foreground">{t("schedule.agenda.empty")}</p>
+  </div>
+  <div class="p-4 border-t border-border">
+    <button type="button" id="schedule-export-agenda" class="w-full inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground px-4 h-10 text-sm font-semibold hover:opacity-90">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+      {t("schedule.export_agenda")}
+    </button>
+  </div>
+</aside>
+
+<style>
+  .schedule-root { --row-height: 14px; --card-pad: 8px; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-card);
+    color: var(--color-muted-foreground);
+    font-size: 13px;
+    font-weight: 500;
+    transition: color 120ms, background 120ms, border-color 120ms;
+    cursor: pointer;
+  }
+  .chip:hover { color: var(--color-foreground); }
+  .chip.is-active {
+    background-color: color-mix(in oklch, var(--color-primary) 20%, transparent);
+    color: var(--color-primary);
+    border-color: color-mix(in oklch, var(--color-primary) 40%, transparent);
+  }
+
+  .schedule-grid-headers {
+    position: sticky;
+    top: calc(64px + 56px);
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 80px repeat(var(--grid-cols), minmax(160px, 1fr));
+    gap: 4px;
+    padding: 8px 0;
+    background: color-mix(in oklch, var(--color-background) 92%, transparent);
+    backdrop-filter: blur(6px);
+  }
+  .schedule-room-header {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    text-align: center;
+    color: var(--color-foreground);
+  }
+  .schedule-time-corner { /* empty corner above time labels */ }
+
+  .schedule-grid-body {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    overflow-x: auto;
+  }
+  .schedule-time-col {
+    display: grid;
+    grid-template-rows: repeat(var(--grid-rows), var(--row-height));
+    border-right: 1px dashed color-mix(in oklch, var(--color-border) 80%, transparent);
+  }
+  .schedule-time-label {
+    font-size: 12px;
+    color: var(--color-muted-foreground);
+    padding-top: 2px;
+    padding-right: 8px;
+    text-align: right;
+  }
+  .schedule-tracks {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--grid-cols), minmax(160px, 1fr));
+    grid-template-rows: repeat(var(--grid-rows), var(--row-height));
+    gap: 4px;
+    padding-left: 4px;
+  }
+  .schedule-gridline {
+    grid-row-start: attr(style);
+    border-top: 1px dashed color-mix(in oklch, var(--color-border) 80%, transparent);
+    pointer-events: none;
+    height: 1px;
+    margin-top: 0;
+  }
+  .schedule-session {
+    border-radius: 8px;
+    border: 1px solid;
+    padding: var(--card-pad) calc(var(--card-pad) + 2px);
+    background-color: var(--color-card);
+    color: var(--color-foreground);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: border-color 150ms, transform 150ms;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+  }
+  .schedule-session:hover {
+    border-color: color-mix(in oklch, var(--color-primary) 60%, transparent);
+    transform: translateY(-1px);
+  }
+  .schedule-session-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .schedule-time-range {
+    font-size: 11px;
+    color: var(--color-muted-foreground);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .schedule-bookmark {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-muted-foreground);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+  .schedule-bookmark:hover { color: var(--color-foreground); background: color-mix(in oklch, var(--color-foreground) 8%, transparent); }
+  .schedule-bookmark.is-on { color: var(--color-primary); }
+  .schedule-bookmark.is-on svg { fill: currentColor; }
+  .schedule-session-title {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .schedule-session-speakers {
+    font-size: 12px;
+    color: var(--color-muted-foreground);
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .schedule-session.is-hidden { display: none; }
+
+  /* Mobile: single column list view */
+  @media (max-width: 767px) {
+    .schedule-grid-headers,
+    .schedule-grid-body > .schedule-time-col { display: none; }
+    .schedule-grid-body { grid-template-columns: 1fr; }
+    .schedule-tracks {
+      display: flex;
+      flex-direction: column;
+      grid-template-rows: none;
+      gap: 8px;
+    }
+    .schedule-gridline { display: none; }
+    .schedule-session {
+      grid-row: auto !important;
+      grid-column: auto !important;
+      border-left-width: 3px;
+    }
+    .schedule-session::before {
+      content: attr(data-room);
+      display: inline-block;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-muted-foreground);
+      margin-bottom: 4px;
+    }
+  }
+</style>
+
+<script is:inline define:vars={{}}>
+  (() => {
+    const root = document.querySelector(".schedule-root");
+    if (!root) return;
+
+    const STORAGE_KEY = "cnd-agenda-bookmarks-v1";
+    const getBookmarks = () => {
+      try {
+        return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
+      } catch {
+        return new Set();
+      }
+    };
+    const setBookmarks = (set) => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
+    };
+
+    const bookmarks = getBookmarks();
+    const countEl = document.getElementById("schedule-agenda-count");
+    const updateCount = () => {
+      if (countEl) countEl.textContent = String(bookmarks.size);
+    };
+    updateCount();
+
+    // Apply initial state + hook bookmark buttons
+    document.querySelectorAll("[data-bookmark]").forEach((btn) => {
+      const id = btn.getAttribute("data-bookmark");
+      if (id && bookmarks.has(id)) btn.classList.add("is-on");
+      btn.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        if (!id) return;
+        if (bookmarks.has(id)) {
+          bookmarks.delete(id);
+          btn.classList.remove("is-on");
+        } else {
+          bookmarks.add(id);
+          btn.classList.add("is-on");
+        }
+        setBookmarks(bookmarks);
+        updateCount();
+        refreshAgenda();
+      });
+    });
+
+    // Filters
+    const state = { room: "__all__", format: "__all__" };
+    const applyFilters = () => {
+      document.querySelectorAll(".schedule-session").forEach((card) => {
+        const room = card.getAttribute("data-room");
+        const format = card.getAttribute("data-format");
+        const roomOk = state.room === "__all__" || room === state.room || format === "keynote";
+        const formatOk = state.format === "__all__" || format === state.format;
+        card.classList.toggle("is-hidden", !(roomOk && formatOk));
+      });
+    };
+    document.querySelectorAll(".schedule-filter").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const filter = btn.getAttribute("data-filter");
+        const value = btn.getAttribute("data-value");
+        if (!filter || !value) return;
+        state[filter] = value;
+        document.querySelectorAll(`[data-filter="${filter}"]`).forEach((b) => b.classList.remove("is-active"));
+        btn.classList.add("is-active");
+        applyFilters();
+      });
+    });
+
+    // Agenda drawer
+    const drawer = document.getElementById("schedule-agenda-drawer");
+    const agendaList = document.getElementById("schedule-agenda-list");
+    const emptyLabel = document.documentElement.getAttribute("data-schedule-empty") || "";
+    const openDrawer = () => {
+      if (!drawer) return;
+      drawer.classList.remove("translate-x-full");
+      drawer.setAttribute("aria-hidden", "false");
+    };
+    const closeDrawer = () => {
+      if (!drawer) return;
+      drawer.classList.add("translate-x-full");
+      drawer.setAttribute("aria-hidden", "true");
+    };
+    document.getElementById("schedule-agenda-toggle")?.addEventListener("click", () => {
+      refreshAgenda();
+      openDrawer();
+    });
+    document.getElementById("schedule-agenda-close")?.addEventListener("click", closeDrawer);
+
+    function refreshAgenda() {
+      if (!agendaList) return;
+      agendaList.innerHTML = "";
+      if (bookmarks.size === 0) {
+        const p = document.createElement("p");
+        p.className = "text-sm text-muted-foreground";
+        p.textContent = emptyLabel || "Votre agenda est vide.";
+        agendaList.appendChild(p);
+        return;
+      }
+      const picked = [];
+      bookmarks.forEach((id) => {
+        const card = document.querySelector(`.schedule-session[data-session-id="${id}"]`);
+        if (card) picked.push(card);
+      });
+      picked.sort((a, b) => (a.getAttribute("data-start") || "").localeCompare(b.getAttribute("data-start") || ""));
+      picked.forEach((card) => {
+        const id = card.getAttribute("data-session-id");
+        const title = card.getAttribute("data-title") || "";
+        const start = card.getAttribute("data-start") || "";
+        const timeLabel = start.slice(11, 16);
+        const room = card.getAttribute("data-room") || "";
+        const item = document.createElement("div");
+        item.className = "flex items-start justify-between gap-3 rounded-md border border-border bg-background/40 p-3";
+        item.innerHTML = `
+          <div class="min-w-0">
+            <div class="text-xs text-muted-foreground">${timeLabel} · ${room}</div>
+            <div class="text-sm font-semibold text-foreground truncate">${title}</div>
+          </div>
+          <button type="button" class="agenda-remove shrink-0 text-muted-foreground hover:text-foreground" aria-label="Remove">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+          </button>
+        `;
+        item.querySelector(".agenda-remove")?.addEventListener("click", () => {
+          if (!id) return;
+          bookmarks.delete(id);
+          setBookmarks(bookmarks);
+          updateCount();
+          const trigger = document.querySelector(`[data-bookmark="${id}"]`);
+          trigger?.classList.remove("is-on");
+          refreshAgenda();
+        });
+        agendaList.appendChild(item);
+      });
+    }
+
+    // iCal export
+    function pad(n) { return String(n).padStart(2, "0"); }
+    function icsDate(iso) {
+      const d = new Date(iso);
+      return `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
+    }
+    function icsEscape(s) {
+      return String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+    }
+    function buildIcs(ids) {
+      const events = [];
+      ids.forEach((id) => {
+        const card = document.querySelector(`.schedule-session[data-session-id="${id}"]`);
+        if (!card) return;
+        const start = card.getAttribute("data-start") || "";
+        const duration = Number(card.getAttribute("data-duration") || 0);
+        const end = new Date(new Date(start).getTime() + duration * 60000).toISOString();
+        const title = card.getAttribute("data-title") || "";
+        const room = card.getAttribute("data-room") || "";
+        events.push([
+          "BEGIN:VEVENT",
+          `UID:${id}@cloudnativedays.fr`,
+          `DTSTAMP:${icsDate(new Date().toISOString())}`,
+          `DTSTART:${icsDate(start)}`,
+          `DTEND:${icsDate(end)}`,
+          `SUMMARY:${icsEscape(title)}`,
+          `LOCATION:${icsEscape(room + " / CENTQUATRE-PARIS")}`,
+          "END:VEVENT",
+        ].join("\r\n"));
+      });
+      return [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Cloud Native Days France 2027//Schedule//FR",
+        "CALSCALE:GREGORIAN",
+        "METHOD:PUBLISH",
+        ...events,
+        "END:VCALENDAR",
+      ].join("\r\n");
+    }
+    function download(filename, contents) {
+      const blob = new Blob([contents], { type: "text/calendar;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById("schedule-export-all")?.addEventListener("click", () => {
+      // Link straight to the static /programme.ics build endpoint
+      window.location.href = "/programme.ics";
+    });
+    document.getElementById("schedule-export-agenda")?.addEventListener("click", () => {
+      if (bookmarks.size === 0) return;
+      download("cnd-france-2027-agenda.ics", buildIcs([...bookmarks]));
+    });
+  })();
+</script>

@@ -35,12 +35,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Schedule
 
-- [ ] **SCHD-01**: Schedule page displaying all talks with time, title, speaker, track, room
-- [ ] **SCHD-02**: Filter talks by track/tag
-- [ ] **SCHD-03**: Visual timeline view showing parallel tracks side by side
-- [ ] **SCHD-04**: Bookmark talks to personal agenda (localStorage, no login)
-- [ ] **SCHD-05**: Export bookmarked talks as iCal (.ics) file
-- [ ] **SCHD-06**: Mobile-friendly schedule view (stacked tracks, swipeable or tabbed)
+- [x] **SCHD-01**: Schedule page displaying all talks with time, title, speaker, track, room
+- [x] **SCHD-02**: Filter talks by track/tag
+- [x] **SCHD-03**: Visual timeline view showing parallel tracks side by side
+- [x] **SCHD-04**: Bookmark talks to personal agenda (localStorage, no login)
+- [x] **SCHD-05**: Export bookmarked talks as iCal (.ics) file
+- [x] **SCHD-06**: Mobile-friendly schedule view (stacked tracks, swipeable or tabbed)
 - [ ] **SCHD-07**: Link from each talk to its Open Feedback page (deep link by talk ID)
 
 ### Speakers

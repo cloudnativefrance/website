@@ -11,8 +11,7 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
 const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
-// Schedule route unavailable until Phase 7 ships /programme — hide the CTA until then.
-const SCHEDULE_URL: string | null = null;
+const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
 ---
 
 <section

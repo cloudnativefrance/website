@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: idle
-stopped_at: Phase 6 complete — venue page with map, transport, accessibility and 2026 replay
-last_updated: "2026-04-12T07:25:00.000Z"
-last_activity: 2026-04-12 -- Phase 6 complete (Lieu page, OSM map, aftermovie, Ente gallery link)
+stopped_at: Phase 7 complete — schedule page with track grid, filters, bookmarks, iCal
+last_updated: "2026-04-12T07:35:00.000Z"
+last_activity: 2026-04-12 -- Phase 7 complete (CSV loader + /programme + .ics + admin CSV/Sheets pipeline)
 progress:
   total_phases: 12
-  completed_phases: 7
-  total_plans: 15
-  completed_plans: 15
+  completed_phases: 8
+  total_plans: 16
+  completed_plans: 16
   percent: 100
 ---
 
