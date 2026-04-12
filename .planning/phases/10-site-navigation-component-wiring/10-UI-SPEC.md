@@ -51,14 +51,14 @@ Tailwind 4 base unit 4px. DESIGN.md-defined scale. All values are multiples of 4
 
 ## Typography
 
-Subset of DESIGN.md type scale used in this phase. Declared 4 sizes, 2 primary weights (500 medium + 700 bold for CTA only, optional).
+Subset of DESIGN.md type scale used in this phase. Declared 2 sizes, 2 primary weights (500 Medium + 600 SemiBold).
 
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Nav link (desktop + mobile) | 14px (`text-sm`) | 500 (Medium) | 1.5 |
 | CTA button label (nav) | 14px (`text-sm`) | 500 (Medium) | 1.5 |
 | TranslationNotice heading | 16px (`text-base`) | 600 (SemiBold) | 1.5 |
-| TranslationNotice body | 14px (`text-sm`) | 400 (Regular) | 1.5 |
+| TranslationNotice body | 14px (`text-sm`) | 500 (Medium) | 1.5 |
 
 **Letter spacing:** default (0) for all nav elements. No uppercase treatment.
 
