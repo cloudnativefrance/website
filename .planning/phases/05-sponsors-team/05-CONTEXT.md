@@ -46,11 +46,24 @@ source: /gsd-discuss-phase 5 (interactive)
 - Matches FR nav labels already shipped in Phase 10 (`"Partenaires"`, `"Equipe"`). Matches the `/programme` vs `/en/programme` precedent from Phase 7.
 - Update `src/components/Navigation.astro:15,17` — change `path: "/"` + `dead: true` to the real paths and remove the `dead` flag.
 
-### D-02 — Data scope (placeholders now, real later)
-- Keep existing placeholder YAML (`src/content/sponsors/sponsors.yaml` = 2 entries, `src/content/team/team.yaml` = 2 entries).
-- **Expand placeholders** during planning only as needed to exercise every visual state: at minimum, add one entry per sponsor tier (Platinum, Gold, Silver, Community) and one entry per team group (core, program-committee, volunteers). Stub content must be obviously-placeholder (e.g., "Acme Cloud", "Jane Doe") so it can't accidentally ship to prod.
-- Real data replacement is a single YAML commit; no code change required.
-- Flag `src/content/sponsors/sponsors.yaml` and `src/content/team/team.yaml` with a top-of-file comment `# Placeholder data — replace before v1.0 launch`.
+### D-02 — Data source: CSV with Google Sheets admin pipeline (matches schedule/speakers pattern)
+- **Migrate sponsors + team from YAML to CSV** to match the Phase 7 schedule + speakers workflow. Organizers edit a Google Sheet; a CSV export lands in-repo; the site builds from CSV.
+- New files (replace existing YAML):
+  - `src/content/sponsors/sponsors.csv` (replaces `sponsors.yaml`)
+  - `src/content/team/team.csv` (replaces `team.yaml`)
+- Environment variables for remote Sheets URLs, mirroring `SCHEDULE_SESSIONS_CSV_URL` pattern from `src/lib/remote-csv.ts`:
+  - `SPONSORS_CSV_URL` — optional remote Google Sheets CSV export URL; falls back to `src/content/sponsors/sponsors.csv` if unset or fetch fails.
+  - `TEAM_CSV_URL` — same treatment.
+  - Add both to `src/lib/remote-csv.ts` alongside existing `SESSIONS_CSV_URL` / `SPEAKERS_CSV_URL` exports.
+- **Schema changes required** (Zod schemas in `src/content.config.ts`): CSV is flat, no nested objects. Flatten bilingual + nested social fields:
+  - Sponsors: `id, name, tier, logo, url, description_fr, description_en` (was `description: {fr, en}` nested object → two flat columns).
+  - Team: `id, name, role_fr, role_en, group, photo, social_linkedin, social_github, social_bluesky, social_twitter, social_website` (flatten `role: {fr, en}` and `social: {...}` into columns; all social_* optional empty-string → undefined).
+  - Page components read flattened fields and reconstruct bilingual display via `sponsor.description_fr` / `sponsor.description_en` selected by `lang`.
+- Use the existing `csvLoader` + `fetchCsvOrFallback` helpers from `src/content.config.ts:23-81` and `src/lib/remote-csv.ts` — do NOT reinvent CSV parsing.
+- **Expand placeholders** during planning only as needed to exercise every visual state: at minimum one CSV row per sponsor tier (Platinum/Gold/Silver/Community) and one row per team group (core/program-committee/volunteers). Rows must be obviously-placeholder ("Acme Cloud", "Jane Doe") so they can't accidentally ship to prod.
+- Real data replacement flow: organizer edits Google Sheet → CI or pre-commit dumps latest CSV into repo → merged via normal PR. No code change required for content updates.
+- Flag both CSV files with a header comment row `# Placeholder data — replace before v1.0 launch` (or equivalent within the CSV format — a first row with `# ...` that the parser skips, same convention as schedule CSVs if one exists; otherwise a sibling README.md in the content directory).
+- **Delete** the existing `src/content/sponsors/sponsors.yaml` and `src/content/team/team.yaml` files as part of this migration.
 
 ### D-03 — Sponsor tier visual hierarchy: size-only
 - All 4 tiers use the **same sponsor-card treatment**; only logo size and grid density differ.
@@ -113,9 +126,9 @@ source: /gsd-discuss-phase 5 (interactive)
 - Use `getLocalePath(lang, ...)` to resolve EN mirrors (matches existing nav items).
 
 ### D-11 — Sorting within groups/tiers
-- **Sponsors within a tier:** preserve YAML order (organizers can manually arrange featured sponsors first; this is a deliberate editorial tool — do NOT auto-sort alphabetically).
-- **Team within a group:** preserve YAML order for the same reason (e.g., Conference Director first within Core).
-- If YAML ordering causes confusion later, a separate phase can introduce a `displayOrder` field.
+- **Sponsors within a tier:** preserve CSV row order (organizers manually arrange featured sponsors first by ordering rows in the Google Sheet; this is a deliberate editorial tool — do NOT auto-sort alphabetically).
+- **Team within a group:** preserve CSV row order for the same reason (e.g., Conference Director as the first row within the `core` group).
+- If row ordering causes confusion later, a separate phase can introduce a `display_order` column.
 
 ### Claude's Discretion (implementation details)
 - Exact Tailwind spacing/token choices for grid gaps, card padding, logo-max-width constraints — derive from design tokens during Stitch review.
@@ -132,10 +145,16 @@ source: /gsd-discuss-phase 5 (interactive)
 
 **Downstream agents (researcher, planner, executor) MUST read these before acting.**
 
-### Content schemas (locked in Phase 2)
-- `src/content.config.ts` — `sponsors` + `team` collection definitions and Zod schemas. Do not modify schemas in Phase 5; only add data.
-- `src/content/sponsors/sponsors.yaml` — current placeholder data (tier enum: `platinum | gold | silver | community`).
-- `src/content/team/team.yaml` — current placeholder data (group enum: `core | program-committee | volunteers`).
+### Content schemas (Phase 2 schemas exist but MUST be migrated to CSV in this phase — see D-02)
+- `src/content.config.ts` — contains existing `sponsors` + `team` collection defs using `file()` YAML loader. **Replace with `csvLoader({url, fallback, label})` pattern** matching the `sessions` / `speakers` collections already defined at lines 52-95. Zod schemas must be flattened (no nested objects) to match CSV row shape.
+- `src/content/sponsors/sponsors.yaml` — **DELETE** in this phase; replaced by `src/content/sponsors/sponsors.csv`.
+- `src/content/team/team.yaml` — **DELETE** in this phase; replaced by `src/content/team/team.csv`.
+
+### CSV pipeline (authoritative reference pattern from Phase 7)
+- `src/lib/remote-csv.ts` — `fetchCsvOrFallback()` helper + existing env-var exports (`SESSIONS_CSV_URL`, `SPEAKERS_CSV_URL`). Extend with `SPONSORS_CSV_URL` and `TEAM_CSV_URL`.
+- `src/content.config.ts:23-81` — the `csvLoader({url, fallback, label})` function + `parseCsv()` RFC-4180 parser. Reuse as-is; do NOT duplicate.
+- `src/content/schedule/sessions.csv` and `src/content/schedule/speakers.csv` — reference CSV files showing header-row + data-row format to mirror for sponsors.csv and team.csv.
+- `src/lib/schedule.ts` — pattern for consuming a CSV-backed collection and reconstructing locale-dependent display.
 
 ### Reusable components (don't rebuild)
 - `src/components/speakers/SpeakerAvatar.astro` — initials fallback pattern; reuse inside `TeamMemberCard`.
@@ -180,7 +199,7 @@ source: /gsd-discuss-phase 5 (interactive)
 <deferred>
 ## Deferred Ideas (not this phase — capture for later)
 
-- **Real sponsor + team data population** — separate content-ops commit after this phase ships.
+- **Real sponsor + team data population** — handled by organizers editing the Google Sheets backing the `SPONSORS_CSV_URL` / `TEAM_CSV_URL` env vars. No code change required; CI re-exports CSV into `src/content/{sponsors,team}/*.csv` on each deploy.
 - **Sponsor prospectus page** (`/partenaires/offre`, PDF download, tier pricing) — if organizers want lead-gen, a future phase.
 - **Individual team member profile pages** — the social links row is enough for v1.0; individual pages would be a later phase.
 - **Sponsor filter/search** — if the roster grows past ~30, revisit. Not needed for 2027.
@@ -195,10 +214,11 @@ source: /gsd-discuss-phase 5 (interactive)
 
 ## Next Steps
 
-1. **`/gsd-ui-phase 5`** — Generate UI-SPEC.md design contract, go to Stitch, user validates both page designs.
-2. **`/gsd-plan-phase 5`** — Planner reads this CONTEXT + UI-SPEC + research → produces PLAN.md files.
-3. **`/gsd-execute-phase 5`** — Ship it.
-4. (Later) Content-ops commit to replace placeholder YAML with real roster.
+1. ✅ ~~`/gsd-ui-phase 5`~~ — UI-SPEC.md + Stitch mockups generated (screen IDs `56d58c5c7cdd425c8463688934a6898d` sponsors / `686bb49cfdac48118de1b30b245d6e30` team). Awaiting user validation in Stitch.
+2. **User validates Stitch mockups** for both pages.
+3. **`/gsd-plan-phase 5`** — Planner reads this CONTEXT + UI-SPEC → produces PLAN.md files. Expected structure: one plan for the CSV/schema migration (data layer), one plan per page (sponsors + team components + routes), one plan for nav wiring.
+4. **`/gsd-execute-phase 5`** — Ship it.
+5. (Later) Organizers populate the Google Sheets backing `SPONSORS_CSV_URL` / `TEAM_CSV_URL`; no code change required.
 
 ---
 
