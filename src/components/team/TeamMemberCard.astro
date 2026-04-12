@@ -1,0 +1,43 @@
+---
+import SpeakerAvatar from "@/components/speakers/SpeakerAvatar.astro";
+import SocialLinks from "@/components/speakers/SocialLinks.astro";
+import type { CollectionEntry } from "astro:content";
+import type { Locale } from "@/i18n/ui";
+
+interface Props {
+  member: CollectionEntry<"team">;
+  lang: Locale;
+}
+
+const { member, lang } = Astro.props;
+
+const role = lang === "fr" ? member.data.role_fr : member.data.role_en;
+
+// Reshape flat social_* fields into the nested object SocialLinks expects.
+const social = {
+  linkedin: member.data.social_linkedin,
+  github: member.data.social_github,
+  bluesky: member.data.social_bluesky,
+  twitter: member.data.social_twitter,
+  website: member.data.social_website,
+};
+---
+
+<article
+  class="bg-card border border-border rounded-lg p-6 flex flex-col items-center text-center"
+>
+  <!--
+    Override SpeakerAvatar's default w-16 h-16 via the `class` prop.
+    tailwind-merge in cn() dedupes to the 112px (w-28 h-28) size required by UI-SPEC.
+  -->
+  <SpeakerAvatar
+    name={member.data.name}
+    photo={member.data.photo}
+    class="w-28 h-28"
+  />
+  <h3 class="mt-4 text-lg font-semibold text-foreground">{member.data.name}</h3>
+  <p class="mt-1 text-sm text-muted-foreground line-clamp-1">{role}</p>
+  <div class="mt-3">
+    <SocialLinks social={social} />
+  </div>
+</article>
