@@ -8,7 +8,7 @@ import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const sessions = await loadSessions();
-const speakerEntries = await getSpeakersByLocale("fr");
+const speakerEntries = await getSpeakersByLocale(lang);
 const speakerNames = new Map(speakerEntries.map((s) => [getSlug(s.id), s.data.name]));
 ---
 
@@ -35,7 +35,7 @@ const speakerNames = new Map(speakerEntries.map((s) => [getSlug(s.id), s.data.na
     </section>
 
     <section class="max-w-7xl mx-auto pb-20">
-      <ScheduleGrid sessions={sessions} lang="fr" speakerNames={speakerNames} />
+      <ScheduleGrid sessions={sessions} lang={lang} speakerNames={speakerNames} />
     </section>
   </main>
 </Layout>
