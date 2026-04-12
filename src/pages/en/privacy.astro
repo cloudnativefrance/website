@@ -1,0 +1,55 @@
+---
+import LegalPageLayout from "@/layouts/LegalPageLayout.astro";
+import { useTranslations } from "@/i18n/utils";
+
+const t = useTranslations("en");
+const title = t("legal.privacy.title");
+const description = "Cloud Native Days France privacy policy. No personal data collected.";
+const lastUpdated = "2026-04-12";
+---
+<LegalPageLayout title={title} description={description} lastUpdated={lastUpdated} lang="en">
+  <p class="text-base leading-relaxed mt-4">
+    <strong>This site collects no personal data during your visit.</strong>
+    It is a static site hosted on Cloud Native France's infrastructure.
+    No cookies are set by our domain, and no analytics service is used.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Data Controller</h2>
+  <p class="text-base leading-relaxed mt-4">
+    Cloud Native France, a French loi 1901 non-profit association.<br />
+    Address: <strong>TODO — association postal address to be filled in</strong>.<br />
+    Contact: <a href="mailto:TODO-privacy@cloudnativedays.fr" class="text-primary hover:underline">TODO-privacy@cloudnativedays.fr</a>.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Third-party services</h2>
+  <p class="text-base leading-relaxed mt-4">
+    This site embeds a few third-party services that may set their own cookies or collect data under their own terms:
+  </p>
+  <ul class="list-disc ml-6 mt-4 space-y-2">
+    <li>
+      <strong>Google Fonts</strong> (DM Sans) — the font is served via the Astro Font integration.
+      Policy: <a href="https://policies.google.com/privacy" class="text-primary hover:underline">https://policies.google.com/privacy</a>.
+    </li>
+    <li>
+      <strong>YouTube (youtube-nocookie.com)</strong> — the cookie-free variant used to embed the retrospective video on the Venue page.
+      Policy: <a href="https://policies.google.com/privacy" class="text-primary hover:underline">https://policies.google.com/privacy</a>.
+    </li>
+    <li>
+      <strong>OpenStreetMap</strong> — venue map embedded via iframe.
+      Policy: <a href="https://osmfoundation.org/wiki/Privacy_Policy" class="text-primary hover:underline">https://osmfoundation.org/wiki/Privacy_Policy</a>.
+    </li>
+    <li>
+      <strong>Google Sheets (build-time fetch)</strong> — sponsor, team and schedule lists are fetched from Google Sheets when the site is compiled. No user data is transmitted to Google during your visit.
+    </li>
+  </ul>
+
+  <h2 class="text-2xl font-semibold mt-8">Your rights</h2>
+  <p class="text-base leading-relaxed mt-4">
+    Under the GDPR and the French "Informatique et Libertés" law, you have rights of access, rectification, erasure, restriction and objection regarding your personal data. Since our site collects no personal data, these rights have no direct object here. You may nonetheless send any request or complaint to the contact address above, or directly to the French data-protection authority, the <a href="https://www.cnil.fr/en/home" class="text-primary hover:underline">CNIL</a>.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Changes</h2>
+  <p class="text-base leading-relaxed mt-4">
+    This policy may be updated. The last-updated date is indicated at the top of this page.
+  </p>
+</LegalPageLayout>

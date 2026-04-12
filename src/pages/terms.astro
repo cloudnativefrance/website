@@ -1,0 +1,42 @@
+---
+import LegalPageLayout from "@/layouts/LegalPageLayout.astro";
+import { useTranslations } from "@/i18n/utils";
+
+const t = useTranslations("fr");
+const title = t("legal.terms.title");
+const description = "Mentions légales et conditions d'utilisation du site Cloud Native Days France.";
+const lastUpdated = "2026-04-12";
+---
+<LegalPageLayout title={title} description={description} lastUpdated={lastUpdated} lang="fr">
+  <h2 class="text-2xl font-semibold mt-8">Éditeur du site</h2>
+  <p class="text-base leading-relaxed mt-4">
+    Cloud Native France, association loi 1901.<br />
+    Adresse : <strong>TODO — adresse postale à compléter</strong>.<br />
+    Directeur de la publication : <strong>TODO — nom du président de l'association</strong>.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Hébergement</h2>
+  <p class="text-base leading-relaxed mt-4">
+    Le site est auto-hébergé sur l'infrastructure Kubernetes de l'association. <strong>TODO — coordonnées d'hébergement à préciser si nécessaire</strong>.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Propriété intellectuelle</h2>
+  <p class="text-base leading-relaxed mt-4">
+    L'ensemble du contenu de ce site (textes, images, logos, design) est la propriété de Cloud Native France ou de ses partenaires et est protégé par les lois en vigueur sur la propriété intellectuelle. Toute reproduction, même partielle, est soumise à autorisation préalable.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Billetterie et conditions de participation</h2>
+  <p class="text-base leading-relaxed mt-4">
+    La vente des billets pour l'événement est assurée par un prestataire tiers. Les conditions de vente et de participation sont disponibles sur la plateforme de billetterie : <a href="https://tickets.cloudnativedays.fr/" class="text-primary hover:underline">https://tickets.cloudnativedays.fr/</a>.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Responsabilité</h2>
+  <p class="text-base leading-relaxed mt-4">
+    Le site est fourni « en l'état ». L'association s'efforce de fournir des informations à jour mais ne garantit ni l'exactitude, ni l'exhaustivité, ni l'absence d'erreurs des contenus publiés.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Droit applicable</h2>
+  <p class="text-base leading-relaxed mt-4">
+    Les présentes mentions légales sont régies par le droit français. Tout litige relèvera de la compétence des tribunaux français.
+  </p>
+</LegalPageLayout>

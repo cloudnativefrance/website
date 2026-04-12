@@ -1,0 +1,42 @@
+---
+import LegalPageLayout from "@/layouts/LegalPageLayout.astro";
+import { useTranslations } from "@/i18n/utils";
+
+const t = useTranslations("en");
+const title = t("legal.terms.title");
+const description = "Terms of service and legal notices for the Cloud Native Days France website.";
+const lastUpdated = "2026-04-12";
+---
+<LegalPageLayout title={title} description={description} lastUpdated={lastUpdated} lang="en">
+  <h2 class="text-2xl font-semibold mt-8">Publisher</h2>
+  <p class="text-base leading-relaxed mt-4">
+    Cloud Native France, a French loi 1901 non-profit association.<br />
+    Address: <strong>TODO — postal address to be filled in</strong>.<br />
+    Publication director: <strong>TODO — name of the association's president</strong>.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Hosting</h2>
+  <p class="text-base leading-relaxed mt-4">
+    The site is self-hosted on the association's Kubernetes infrastructure. <strong>TODO — hosting details to be specified if required</strong>.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Intellectual Property</h2>
+  <p class="text-base leading-relaxed mt-4">
+    All content on this site (text, images, logos, design) is the property of Cloud Native France or its partners and is protected under applicable intellectual property laws. Any reproduction, even partial, is subject to prior authorization.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Ticketing and participation terms</h2>
+  <p class="text-base leading-relaxed mt-4">
+    Ticket sales for the event are handled by a third-party provider. Sale and participation terms are available on the ticketing platform: <a href="https://tickets.cloudnativedays.fr/" class="text-primary hover:underline">https://tickets.cloudnativedays.fr/</a>.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Liability</h2>
+  <p class="text-base leading-relaxed mt-4">
+    The site is provided "as is". The association strives to provide up-to-date information but does not guarantee the accuracy, completeness, or error-free nature of published content.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Governing law</h2>
+  <p class="text-base leading-relaxed mt-4">
+    These legal notices are governed by French law. Any dispute shall fall under the jurisdiction of French courts.
+  </p>
+</LegalPageLayout>
