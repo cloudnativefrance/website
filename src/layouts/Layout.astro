@@ -1,9 +1,10 @@
 ---
 import { Font } from "astro:assets";
 import "../styles/global.css";
-import LanguageToggle from "@/components/LanguageToggle.astro";
+import Navigation from "@/components/Navigation.astro";
+import TranslationNotice from "@/components/TranslationNotice.astro";
+import { defaultLang, type Locale } from "@/i18n/ui";
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
-import type { Locale } from "@/i18n/ui";
 
 interface Props {
   title?: string;
@@ -25,6 +26,7 @@ const {
 
 const resolvedLang = (lang ?? getLangFromUrl(Astro.url)) as Locale;
 const t = useTranslations(resolvedLang);
+const showTranslationNotice = resolvedLang !== defaultLang;
 
 // Same-origin OG image allowlist (threat T-09-01): accept only leading-slash
 // paths or absolute URLs starting with Astro.site. Anything else falls back.
@@ -92,9 +94,8 @@ const ogImageAlt = t("seo.og_image_alt");
     <Font cssVariable="--font-dm-sans" preload />
   </head>
   <body class="bg-background text-foreground font-sans antialiased min-h-screen">
-    <header class="sticky top-0 z-50 flex items-center justify-end px-4 py-3 backdrop-blur-sm bg-background/90">
-      <LanguageToggle />
-    </header>
+    <Navigation />
+    {showTranslationNotice && <TranslationNotice />}
     <slot />
   </body>
 </html>
