@@ -22,14 +22,6 @@ const trackColors: Record<string, string> = {
   "community": "bg-chart-4/15 text-chart-4",
 };
 
-const trackNames: Record<string, string> = {
-  "cloud-infra": "Cloud & Infra",
-  "devops-platform": "DevOps & Platform",
-  "security": "Security",
-  "community": "Community",
-};
-
-const capitalizedFormat = format.charAt(0).toUpperCase() + format.slice(1);
 ---
 
 <div
@@ -46,10 +38,10 @@ const capitalizedFormat = format.charAt(0).toUpperCase() + format.slice(1);
         trackColors[track],
       )}
     >
-      {trackNames[track]}
+      {t(`talks.track.${track}` as any)}
     </span>
     <span class="text-sm text-muted-foreground">
-      {capitalizedFormat} - {duration}min
+      {t(`schedule.format.${format}` as any)} - {duration}min
     </span>
   </div>
   {coSpeakers.length > 0 && (

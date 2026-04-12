@@ -7,7 +7,7 @@ import {
   getTalksForSpeaker,
   getCoSpeakersForTalk,
 } from "@/lib/speakers";
-import { useTranslations, getLocalePath } from "@/i18n/utils";
+import { useTranslations, getLocalePath, getLangFromUrl } from "@/i18n/utils";
 
 export async function getStaticPaths() {
   const speakers = await getAllSpeakers();
@@ -18,10 +18,10 @@ export async function getStaticPaths() {
 }
 
 const { speaker } = Astro.props;
-const lang: "en" = "en";
+const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const slug = getSlug(speaker.id);
-const talks = await getTalksForSpeaker("en", slug);
+const talks = await getTalksForSpeaker(lang, slug);
 
 const allSpeakers = await getAllSpeakers();
 const speakerNameBySlug = new Map(allSpeakers.map((s) => [getSlug(s.id), s.data.name]));
@@ -67,6 +67,7 @@ const social = {
                   <li>
                     <a
                       href={`${getLocalePath(lang, "/programme")}#session-${talk.id}`}
+                      aria-label={t("speakers.schedule_link")}
                       class="group block rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <h3 class="text-base font-bold text-foreground group-hover:text-primary">
@@ -74,7 +75,7 @@ const social = {
                         <span aria-hidden="true" class="inline-block ml-1 text-primary opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                       </h3>
                       <p class="mt-1 text-sm text-muted-foreground">
-                        {talk.format.charAt(0).toUpperCase() + talk.format.slice(1)} · {talk.durationMin} min
+                        {t(`schedule.format.${talk.format}` as any)} · {talk.durationMin} min
                         {talk.room && <span> · {talk.room}</span>}
                         {talk.track && <span> · {talk.track}</span>}
                       </p>
