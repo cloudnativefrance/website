@@ -98,10 +98,13 @@ Plans:
   3. Team page displays 10-20 members with photo, name, role, and social links
   4. Team members are visually grouped by function (core, program committee, volunteers)
   5. Both sponsor and team data are managed via YAML content collections validated by Zod
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md — Migrate sponsors + team to CSV data pipeline with flat Zod schemas (SPNS-03, TEAM-03)
+- [ ] 05-02-PLAN.md — Sponsors page (FR /partenaires + EN /en/sponsors) with tiered grids + accent CTA (SPNS-01, SPNS-02)
+- [ ] 05-03-PLAN.md — Team page (FR /equipe + EN /en/team) with grouped sections + SpeakerAvatar reuse (TEAM-01, TEAM-02)
+- [ ] 05-04-PLAN.md — Flip nav dead-links + phase integration verification (D-10)
 
 ### Phase 6: Venue & Previous Editions
 **Goal**: Attendees can plan their trip and past attendees can relive last year's edition
