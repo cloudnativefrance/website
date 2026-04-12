@@ -170,6 +170,10 @@ export const ui = {
     "team.group.core": "Équipe principale",
     "team.group.program_committee": "Comité de programme",
     "team.group.volunteers": "Bénévoles",
+    "legal.coc.title": "Code de conduite",
+    "legal.privacy.title": "Politique de confidentialité",
+    "legal.terms.title": "Mentions légales",
+    "legal.last_updated": "Dernière mise à jour : {date}",
   },
   en: {
     "nav.home": "Home",
@@ -336,5 +340,9 @@ export const ui = {
     "team.group.core": "Core Team",
     "team.group.program_committee": "Program Committee",
     "team.group.volunteers": "Volunteers",
+    "legal.coc.title": "Code of Conduct",
+    "legal.privacy.title": "Privacy Policy",
+    "legal.terms.title": "Terms of Service",
+    "legal.last_updated": "Last updated: {date}",
   },
 } as const;
