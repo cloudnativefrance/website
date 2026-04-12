@@ -1,5 +1,4 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { fetchCsvOrFallback, SESSIONS_CSV_URL } from "./remote-csv";
 
 export type SessionFormat = "keynote" | "talk" | "lightning" | "workshop";
 export type SessionStatus = "confirmed" | "tentative" | "cancelled" | "hidden";
@@ -100,14 +99,17 @@ function parseCsv(text: string): string[][] {
   return rows;
 }
 
-/** Resolve the absolute path of the bootstrap CSV (repo-committed fallback). */
-function getCsvPath(): string {
-  return join(process.cwd(), "src/content/schedule/sessions.csv");
-}
-
-/** Load all sessions from the committed CSV. */
-export function loadSessions(): SessionRow[] {
-  const raw = readFileSync(getCsvPath(), "utf8");
+/**
+ * Load all sessions. Fetches the published Google Sheet at build time and
+ * falls back to the repo-committed CSV on network failure. Result is cached
+ * for the process lifetime (see src/lib/remote-csv.ts).
+ */
+export async function loadSessions(): Promise<SessionRow[]> {
+  const raw = await fetchCsvOrFallback({
+    url: SESSIONS_CSV_URL,
+    fallbackRelPath: "src/content/schedule/sessions.csv",
+    label: "sessions.csv",
+  });
   const rows = parseCsv(raw);
   if (rows.length === 0) return [];
 

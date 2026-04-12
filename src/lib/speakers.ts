@@ -25,12 +25,12 @@ export async function getSpeakersByLocale(_locale: Locale) {
 
 /** Get all sessions for a locale (currently locale-agnostic — sessions.csv holds one copy). */
 export async function getTalksByLocale(_locale: Locale): Promise<SessionRow[]> {
-  return loadSessions();
+  return await loadSessions();
 }
 
 /** Return the sessions that feature a given speaker slug (primary or co-speaker). */
 export async function getTalksForSpeaker(_locale: Locale, speakerSlug: string): Promise<SessionRow[]> {
-  const sessions = loadSessions();
+  const sessions = await loadSessions();
   return sessions.filter((s) => s.speakers.includes(speakerSlug));
 }
 

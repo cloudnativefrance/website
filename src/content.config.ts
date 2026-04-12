@@ -1,8 +1,7 @@
 import { defineCollection } from "astro:content";
 import { file } from "astro/loaders";
 import { z } from "astro/zod";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { fetchCsvOrFallback, SPEAKERS_CSV_URL } from "./lib/remote-csv";
 
 /**
  * Minimal CSV parser — handles RFC-4180 quoted fields with escaped `""`.
@@ -44,15 +43,17 @@ function parseCsv(text: string): string[][] {
 /**
  * Custom CSV loader for Astro content collections.
  * The CSV's `slug` column becomes the entry id.
+ * Fetches the published Google Sheet at build time; falls back to the
+ * repo-committed CSV when the remote is unreachable.
  */
-function csvLoader(relPath: string) {
+function csvLoader({ url, fallback, label }: { url?: string; fallback: string; label: string }) {
   return {
-    name: `csv:${relPath}`,
+    name: `csv:${label}`,
     load: async ({ store, parseData }: {
       store: { set: (entry: { id: string; data: unknown }) => void; clear: () => void };
       parseData: (opts: { id: string; data: unknown }) => Promise<unknown>;
     }) => {
-      const raw = readFileSync(join(process.cwd(), relPath), "utf8");
+      const raw = await fetchCsvOrFallback({ url, fallbackRelPath: fallback, label });
       const rows = parseCsv(raw);
       if (rows.length === 0) return;
       const [header, ...body] = rows;
@@ -64,9 +65,12 @@ function csvLoader(relPath: string) {
         keys.forEach((k, i) => { obj[k] = (row[i] ?? "").trim(); });
         const id = obj.slug || obj.id;
         if (!id) continue;
-        // Coerce booleans where relevant
+        // Coerce booleans where relevant — Sheets emits 'TRUE' uppercase.
         const data: Record<string, unknown> = { ...obj };
-        if ("keynote" in obj) data.keynote = obj.keynote === "true" || obj.keynote === "1";
+        if ("keynote" in obj) {
+          const v = String(obj.keynote || "").toLowerCase();
+          data.keynote = v === "true" || v === "1" || v === "yes";
+        }
         const parsed = await parseData({ id, data });
         store.set({ id, data: parsed });
       }
@@ -77,7 +81,11 @@ function csvLoader(relPath: string) {
 const socialUrl = z.string().url().optional().or(z.literal("").transform(() => undefined));
 
 const speakers = defineCollection({
-  loader: csvLoader("src/content/schedule/speakers.csv"),
+  loader: csvLoader({
+    url: SPEAKERS_CSV_URL,
+    fallback: "src/content/schedule/speakers.csv",
+    label: "speakers.csv",
+  }),
   schema: z.object({
     slug: z.string(),
     name: z.string(),
