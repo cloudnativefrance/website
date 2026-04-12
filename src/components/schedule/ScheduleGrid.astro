@@ -187,9 +187,10 @@ const CSS_VARS = {
           const colSpan = isKeynote ? rooms.length : 1;
           const style = `grid-row: ${startRow} / span ${span}; grid-column: ${colStart} / span ${colSpan};`;
           const speakers = sessionSpeakerLinks(s);
+          const isCompact = s.durationMin <= 15;
           return (
             <article
-              class={`schedule-session ${formatChipClass(s.format)}`}
+              class={`schedule-session ${formatChipClass(s.format)} ${isCompact ? "is-compact" : ""}`}
               style={style}
               data-session-id={s.id}
               data-room={s.room}
@@ -255,7 +256,7 @@ const CSS_VARS = {
 </aside>
 
 <style>
-  .schedule-root { --row-height: 14px; --card-pad: 8px; }
+  .schedule-root { --row-height: 22px; --card-pad: 8px; }
 
   .chip {
     display: inline-flex;
@@ -395,6 +396,30 @@ const CSS_VARS = {
     overflow: hidden;
   }
   .schedule-session.is-hidden { display: none; }
+
+  /* Compact variant for lightning / sub-15-min sessions: drop the metadata
+     header, trim padding, keep only time + tight title so the card stays
+     readable even in 2-row (10-min) height. */
+  .schedule-session.is-compact {
+    padding: 4px 8px;
+    gap: 2px;
+  }
+  .schedule-session.is-compact .schedule-session-head {
+    font-size: 10px;
+  }
+  .schedule-session.is-compact .schedule-time-range { font-size: 10px; }
+  .schedule-session.is-compact .schedule-bookmark { width: 18px; height: 18px; }
+  .schedule-session.is-compact .schedule-bookmark svg { width: 12px; height: 12px; }
+  .schedule-session.is-compact .schedule-session-title {
+    font-size: 12px;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+  .schedule-session.is-compact .schedule-session-speakers {
+    font-size: 11px;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
 
   /* Mobile: single column list view */
   @media (max-width: 767px) {
