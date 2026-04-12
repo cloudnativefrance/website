@@ -2,6 +2,7 @@
 import { Font } from "astro:assets";
 import "../styles/global.css";
 import Navigation from "@/components/Navigation.astro";
+import Footer from "@/components/Footer.astro";
 import TranslationNotice from "@/components/TranslationNotice.astro";
 import { defaultLang, type Locale } from "@/i18n/ui";
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
@@ -97,5 +98,6 @@ const ogImageAlt = t("seo.og_image_alt");
     <Navigation />
     {showTranslationNotice && <TranslationNotice />}
     <slot />
+    <Footer />
   </body>
 </html>
