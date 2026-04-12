@@ -1,0 +1,6 @@
+id,name,role_fr,role_en,group,photo,social_linkedin,social_github,social_bluesky,social_twitter,social_website
+alice-martin,Alice Martin,Directrice de conférence,Conference Director,core,/team/alice-martin.jpg,https://linkedin.com/in/alicemartin,https://github.com/alicemartin,,,
+bob-dupont,Bob Dupont,Responsable programme,Program Chair,core,/team/bob-dupont.jpg,https://linkedin.com/in/bobdupont,,,,
+chloe-leroy,Chloé Leroy,Responsable sponsors,Sponsor Lead,program-committee,,https://linkedin.com/in/chloeleroy,,https://bsky.app/profile/chloeleroy.bsky.social,,
+dan-fischer,Dan Fischer,Membre comité,Committee Member,program-committee,/team/dan-fischer.jpg,,https://github.com/danfischer,,,https://danfischer.example.com
+erin-garcia,Erin Garcia,Bénévole,Volunteer,volunteers,,,,,,
