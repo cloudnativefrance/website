@@ -250,6 +250,10 @@ const CSS_VARS = {
               data-duration={s.durationMin}
               data-description={s.description}
               data-feedback-url={s.feedbackUrl}
+              data-slides-url={s.slidesUrl}
+              data-recording-url={s.recordingUrl}
+              data-cover-image={s.coverImageUrl}
+              data-language={s.language}
               data-speakers={JSON.stringify(speakers)}
             >
               <div class="schedule-session-head">
@@ -310,6 +314,11 @@ const CSS_VARS = {
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
       </button>
     </div>
+    <img
+      id="schedule-session-modal-cover"
+      alt=""
+      class="hidden w-full aspect-[16/7] object-cover border-b border-border/70"
+    />
     <div class="px-6 py-5 space-y-5">
       <h2 id="schedule-session-modal-title" class="text-2xl md:text-3xl font-bold text-foreground leading-tight" style="letter-spacing:-0.02em;"></h2>
       <div id="schedule-session-modal-speakers" class="flex flex-wrap gap-2 text-sm"></div>
@@ -333,6 +342,26 @@ const CSS_VARS = {
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
           {t("schedule.open_feedback")}
+        </a>
+        <a
+          id="schedule-session-modal-slides"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-md border border-border bg-background/60 px-3 h-9 text-sm font-medium text-foreground hover:border-primary/60 hidden"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 18v3"/></svg>
+          {t("schedule.open_slides")}
+        </a>
+        <a
+          id="schedule-session-modal-recording"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-md border border-border bg-background/60 px-3 h-9 text-sm font-medium text-foreground hover:border-primary/60 hidden"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          {t("schedule.open_recording")}
         </a>
       </div>
     </div>
@@ -647,6 +676,9 @@ const CSS_VARS = {
     const modalDescription = document.getElementById("schedule-session-modal-description");
     const modalBookmarkBtn = document.getElementById("schedule-session-modal-bookmark");
     const modalFeedback = document.getElementById("schedule-session-modal-feedback");
+    const modalSlides = document.getElementById("schedule-session-modal-slides");
+    const modalRecording = document.getElementById("schedule-session-modal-recording");
+    const modalCover = document.getElementById("schedule-session-modal-cover");
     let modalSessionId = null;
 
     const formatPalette = {
@@ -668,6 +700,10 @@ const CSS_VARS = {
       const level = card.getAttribute("data-level") || "";
       const description = card.getAttribute("data-description") || "";
       const feedbackUrl = card.getAttribute("data-feedback-url") || "";
+      const slidesUrl = card.getAttribute("data-slides-url") || "";
+      const recordingUrl = card.getAttribute("data-recording-url") || "";
+      const coverImage = card.getAttribute("data-cover-image") || "";
+      const language = card.getAttribute("data-language") || "";
       let speakers = [];
       try { speakers = JSON.parse(card.getAttribute("data-speakers") || "[]"); } catch {}
 
@@ -684,7 +720,20 @@ const CSS_VARS = {
         if (room) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-foreground">${room}</span>`);
         if (track) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-foreground">${track}</span>`);
         if (level) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-muted-foreground uppercase tracking-widest">${level}</span>`);
+        if (language) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-muted-foreground uppercase tracking-widest">${language}</span>`);
         modalMetaTop.innerHTML = parts.join("");
+      }
+
+      // Cover image — optional hero at the top of the modal
+      if (modalCover) {
+        if (coverImage) {
+          modalCover.setAttribute("src", coverImage);
+          modalCover.setAttribute("alt", title);
+          modalCover.classList.remove("hidden");
+        } else {
+          modalCover.classList.add("hidden");
+          modalCover.removeAttribute("src");
+        }
       }
 
       // Speakers — render as clickable pills when we have a href, else plain pills
@@ -718,6 +767,22 @@ const CSS_VARS = {
           modalFeedback.classList.remove("hidden");
         } else {
           modalFeedback.classList.add("hidden");
+        }
+      }
+      if (modalSlides) {
+        if (slidesUrl) {
+          modalSlides.setAttribute("href", slidesUrl);
+          modalSlides.classList.remove("hidden");
+        } else {
+          modalSlides.classList.add("hidden");
+        }
+      }
+      if (modalRecording) {
+        if (recordingUrl) {
+          modalRecording.setAttribute("href", recordingUrl);
+          modalRecording.classList.remove("hidden");
+        } else {
+          modalRecording.classList.add("hidden");
         }
       }
 

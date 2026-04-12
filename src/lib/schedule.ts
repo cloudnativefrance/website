@@ -4,11 +4,12 @@ import { join } from "node:path";
 export type SessionFormat = "keynote" | "talk" | "lightning" | "workshop";
 export type SessionStatus = "confirmed" | "tentative" | "cancelled" | "hidden";
 export type SessionLevel = "beginner" | "intermediate" | "advanced" | "";
+export type SessionLanguage = "fr" | "en" | "";
 
 export interface SessionRow {
   id: string;
   title: string;
-  /** Array of speaker refs — either a slug matching src/content/speakers/*.md, or a full name if we don't have a profile. */
+  /** Array of speaker slug references (every speaker has a row in speakers.csv). */
   speakers: string[];
   /** Optional thematic track (e.g. 'FinOps'). Free text; empty when not classified. */
   track: string;
@@ -22,6 +23,14 @@ export interface SessionRow {
   durationMin: number;
   tags: string[];
   feedbackUrl: string;
+  /** Post-event: public slides deck URL. */
+  slidesUrl: string;
+  /** Post-event: YouTube / Vimeo recording. */
+  recordingUrl: string;
+  /** Session-level hero image shown in the detail modal. */
+  coverImageUrl: string;
+  /** Spoken language of the session. `fr` / `en` / '' when unknown. */
+  language: SessionLanguage;
   status: SessionStatus;
   description: string;
 }
@@ -116,6 +125,10 @@ export function loadSessions(): SessionRow[] {
   const iDuration = idx("duration_min");
   const iTags = idx("tags");
   const iFeedback = idx("feedback_url");
+  const iSlides = idx("slides_url");
+  const iRecording = idx("recording_url");
+  const iCover = idx("cover_image_url");
+  const iLanguage = idx("language");
   const iStatus = idx("status");
   const iDescription = idx("description");
 
@@ -138,6 +151,10 @@ export function loadSessions(): SessionRow[] {
         .map((s) => s.trim())
         .filter(Boolean),
       feedbackUrl: r[iFeedback] ?? "",
+      slidesUrl: iSlides >= 0 ? (r[iSlides] ?? "") : "",
+      recordingUrl: iRecording >= 0 ? (r[iRecording] ?? "") : "",
+      coverImageUrl: iCover >= 0 ? (r[iCover] ?? "") : "",
+      language: iLanguage >= 0 ? ((r[iLanguage] as SessionLanguage) || "") : "",
       status: ((r[iStatus] as SessionStatus) || "confirmed"),
       description: r[iDescription] ?? "",
     }))
