@@ -1,52 +1,490 @@
 id,title,speakers,track,level,room,format,start_time,duration_min,tags,feedback_url,slides_url,recording_url,cover_image_url,language,status,description
-GJ89TV,Keynote d'ouverture Cloud Native Days France 2026!,petazzoni,,,Monet,keynote,2026-02-03T09:00:00+01:00,75,,,,,,,confirmed,
-9H9WKR,"Stop the Fight : doper et unifier HPA, VPA et KEDA avec des métriques avancées",vermande,,,Monet,talk,2026-02-03T10:30:00+01:00,45,,,,,,,confirmed,
-GAVG3X,REX SNCF - Des Rails aux Nuages : Comment Kubernetes à l'Edge Révolutionne les Systèmes Embarqués des TGV,yann-rotilio,,,Dumas,lightning,2026-02-03T10:30:00+01:00,10,,,,,,,confirmed,
-S3SPP8,"REX Ledger - Le réseau multi-cluster, enfin simplifié : Guide pratique de Cilium ClusterMesh","arthur-outhenin-chalandre,quentin-swiech",,,Piaf,talk,2026-02-03T10:30:00+01:00,30,,,,,,,confirmed,
-YP37WS,REX Decathlon - Ne plus avoir peur du vendredi aprem' et déployer sereinement avec Flagger,"maxime-veroone,johan-lore",,,Debussy,talk,2026-02-03T10:30:00+01:00,30,,,,,,,confirmed,
-MYY7CK,GitHub Actions : une bombe à retardement pour la supply chain security,thierry-abalea,,,Dumas,lightning,2026-02-03T10:45:00+01:00,10,,,,,,,confirmed,
-VXYTMH,kro : La révolution déclarative qui simplifie les déploiements Kubernetes,sebastien-allamand,,,Dumas,lightning,2026-02-03T11:00:00+01:00,10,,,,,,,confirmed,
-3YBWHD,Scaler vos charges de travail GPU avec Karpenter et Argo Workflows,saboni,,,Debussy,talk,2026-02-03T11:15:00+01:00,45,,,,,,,confirmed,
-LGDNMM,REX DINUM - Les ingrédients multitenancy et authentification pour une distribution k8s open-source française,piard,,,Piaf,talk,2026-02-03T11:15:00+01:00,45,,,,,,,confirmed,
-CPRAUN,Admission Control 2.0 : des Webhooks aux politiques intégrées,yousri-kouki,,,Dumas,talk,2026-02-03T11:30:00+01:00,30,,,,,,,confirmed,
-DHAXQN,REX SNCF - Smells like Cloud Kubernetes : Notre Kube managé on-premise,"matthieu-strohl,etienne-germain,yann-rotilio",,,Monet,talk,2026-02-03T11:30:00+01:00,30,,,,,,,confirmed,
-8HZM98,"Cluster IA Air-Gapped : Concevoir, Sécuriser et  Déployer une Plateforme Souveraine","stephane-robert,christophe-morvan",,,Piaf,lightning,2026-02-03T12:00:00+01:00,10,,,,,,,confirmed,
-TFRCKA,La résilience Cloud Native avec la solution open source Plakar,gilles-chehade,,,Debussy,lightning,2026-02-03T12:00:00+01:00,10,,,,,,,confirmed,
-XAVSDH,K3s: Etat des lieux en 2026,paul-gonin,,,Dumas,lightning,2026-02-03T12:00:00+01:00,10,,,,,,,confirmed,
-7VNVJF,La famille k0s : une boîte à outils pour simplifier la gestion multi-cluster de Kubernetes,luc-juggery,,,Piaf,lightning,2026-02-03T13:00:00+01:00,10,,,,,,,confirmed,
-KXNTHT,Au-delà du Chaos du Multi-Cloud : L'Architecture Universal Mesh,baptiste-assmann,,,Dumas,lightning,2026-02-03T13:00:00+01:00,10,,,,,,,confirmed,
-XPQKLT,Le jour où nous avons cassé Kubernetes... et comment nous l’avons réparé !,christophe-jauffret,,,Debussy,lightning,2026-02-03T13:00:00+01:00,10,,,,,,,confirmed,
-ADHUPC,"Du bruit à l’essentiel : comment la sécurité cloud-native boostée par le contexte runtime permet aux équipes Dev, DevOps et SRE d’aller plus vite !",dimitris-vassilopoulos,,,Dumas,lightning,2026-02-03T13:15:00+01:00,10,,,,,,,confirmed,
-F8GHUH,Attestation à distance d’un cluster Kubernetes ou comment protéger la bergerie des loups numériques,"timothee-ravier,alice-frosi",,,Debussy,talk,2026-02-03T13:15:00+01:00,30,,,,,,,confirmed,
-JYFTD8,REX INSEE - De l’expérimentation à la mise en production de modèles d’IA : le MLOps dans une administration,"hugo-simon,nathan-randriamanana",,,Monet,talk,2026-02-03T13:15:00+01:00,45,,,,,,,confirmed,
-YAJWJ8,REX Air France-KLM - Des chaînes applicatives aux chaînes OPS : Voyage vers le Cloud à bord d'Air France-KLM,"caroline-de-vasson,amine-alaoui-echerif",,,Piaf,talk,2026-02-03T13:15:00+01:00,30,,,,,,,confirmed,
-MYVQPA,REX Mirakl - Déployer nos modèles : c'est simple avec KServe !,"alexandre-nguyen,yannick-lambruschi",,,Dumas,talk,2026-02-03T13:30:00+01:00,30,,,,,,,confirmed,
-UHX83U,OS immuables pour K8s : Étendre vos systèmes avec systemd-sysext !,mathieu-tortuyaux,,,Debussy,lightning,2026-02-03T13:45:00+01:00,10,,,,,,,confirmed,
-UKTSYQ,Sécuriser vos déploiements : quand kube-image-keeper sauve la prod !,paul-laffitte,,,Piaf,lightning,2026-02-03T13:45:00+01:00,10,,,,,,,confirmed,
-MET3BH,Challenge : 0 CVE (ou presque) sur une appli Cloud Native en 10mn,mouhamad-koreissi,,,Debussy,lightning,2026-02-03T14:15:00+01:00,10,,,,,,,confirmed,
-SUTE9N,Formation à l'échelle: 100 000 sessions de labs réseau & sécurité cloud-native,raphael-pinson,,,Dumas,talk,2026-02-03T14:15:00+01:00,45,,,,,,,confirmed,
-V7UJ7V,REX Sellsy - Migrer 50 000 BDDs sans coupure vers PostgreSQL et K8s : mission impossible ?,"quentin-loupot,alexandre-buisine",,,Monet,talk,2026-02-03T14:15:00+01:00,45,,,,,,,confirmed,
-V8RJVD,Kagent sur Kubernetes : comment l'IA agentique vous rend 10 fois plus efficaces,amine-ait-aazizi,,,Piaf,lightning,2026-02-03T14:15:00+01:00,10,,,,,,,confirmed,
-8QBHMU,Inside Cilium: Deep Dive sur DSR (Direct Server Return),alexis-la-goutte,,,Piaf,lightning,2026-02-03T14:30:00+01:00,10,,,,,,,confirmed,
-JLS39P,Mobilité des workloads Kubernetes: relever les défis et maîtriser la protection de vos données,clarence-pouthier,,,Debussy,lightning,2026-02-03T14:30:00+01:00,10,,,,,,,confirmed,
-TLLFGW,REX CA-GIP - Construire la Plus Grande Plateforme Grafana On-Premise d'Europe,maxime-calves,,,Piaf,lightning,2026-02-03T14:45:00+01:00,10,,,,,,,confirmed,
-VX9YTU,Simplifier les workloads stateful sur Kubernetes,"vincent-jamois,steeve-delmotte",,,Debussy,lightning,2026-02-03T14:45:00+01:00,10,,,,,,,confirmed,
-9VAVVC,Du chaos à la clarté : booster votre pipeline de logs avec VictoriaLogs et LogsQL,diana-todea,,,Monet,talk,2026-02-03T15:15:00+01:00,30,,,,,,,confirmed,
-QF9THU,Sous le capot de Cluster API: concevoir et implémenter un provider d'infrastructure,tomy-guichard,,,Piaf,talk,2026-02-03T15:15:00+01:00,30,,,,,,,confirmed,
-SH77P9,REX Numberly - Automatiser la gestion des identifiants DB dans k8s avec Vault et vault-db-injector,"solvik-blum,guillaume-legrain",,,Debussy,talk,2026-02-03T15:15:00+01:00,30,,,,,,,confirmed,
-XDKUAV,"SRE sous pression : santé mentale, charge invisible et fatigue du “héros de la prod”",luckas-bosch,,,Dumas,talk,2026-02-03T15:15:00+01:00,30,,,,,,,confirmed,
-3HGPVS,REX bpifrance - FinOps en action – De la visibilité au chargeback : les clés d’une démarche réussie,hela-ben-farhat,,,Dumas,talk,2026-02-03T16:00:00+01:00,30,,,,,,,confirmed,
-9DKYFA,Chaos Engineering Escape Game : sauvez le cluster avant qu’il ne s’effondre !,herve-leclerc,,,Debussy,talk,2026-02-03T16:00:00+01:00,30,,,,,,,confirmed,
-DEPCLW,Sécuriser la PKI de vos clusters Kubernetes avec ClusterAPI et OpenBao,"victor-coutellier,mohammad-amla",,,Piaf,talk,2026-02-03T16:00:00+01:00,30,,,,,,,confirmed,
-Z9PASN,REX Mistral AI - Construire un fournisseur cloud de zero: ClusterAPI dans le datacenter,"leonard-suslian,antoine-roy",,,Monet,talk,2026-02-03T16:00:00+01:00,45,,,,,,,confirmed,
-8E8DDS,Même Chuck Norris utilise Topomatik !,alexandre-buisine,,,Debussy,lightning,2026-02-03T16:30:00+01:00,10,,,,,,,confirmed,
-8HRTH8,Tokyo Drift Containers : Immuabilité au service de la sécurité Cloud Native,dan-maher,,,Piaf,lightning,2026-02-03T16:30:00+01:00,10,,,,,,,confirmed,
-W3RGND,Kubernetes sous surveillance : déployez Uptime Kuma en un clin d’œil,williams-ahile,,,Dumas,lightning,2026-02-03T16:30:00+01:00,10,,,,,,,confirmed,
-D8C7VQ,REX Winamax - De zéro à des milliards de traces : le tracing distribué à grande échelle,"maffert-anthony,nicolas-fidel",,,Piaf,talk,2026-02-03T17:00:00+01:00,30,,,,,,,confirmed,
-DW3UCQ,Questions pour un conteneur - édition Supply Chain,"vache,sherine-khoury",,,Monet,talk,2026-02-03T17:00:00+01:00,45,,,,,,,confirmed,
-HQTL3Q,Kyverno au service de l’IA : sécuriser les actions des agents dans Kubernetes,chmielowski,,,Dumas,talk,2026-02-03T17:00:00+01:00,45,,,,,,,confirmed,
-PHADGY,"REX Renault - Kubernetes as a Service : sécurité, innovation et self-service à grande échelle","vincent-ledan,ismail-kaboubi",,,Debussy,talk,2026-02-03T17:00:00+01:00,30,,,,,,,confirmed,
-PPFQLC,"Docker Bake, élégance et standardisation pour le build de vos images Docker",mazlum-tosun,,,Debussy,talk,2026-02-03T17:45:00+01:00,45,,,,,,,confirmed,
-TGL9BQ,REX Ubisoft - Quand et comment partager un cluster : retour d'expérience sur Capsule chez Ubisoft,"behar,corentin-closs",,,Piaf,talk,2026-02-03T17:45:00+01:00,45,,,,,,,confirmed,
-7LNQZA,Passons au cloud-native durable,rexed,,,Dumas,talk,2026-02-03T18:00:00+01:00,30,,,,,,,confirmed,
-HFFT3Q,REX Skello - Data Platform Engineering : Comment rendre les équipes métier vraiment autonomes grâce à Kubernetes et Airflow,edgar-halbert,,,Monet,talk,2026-02-03T18:00:00+01:00,30,,,,,,,confirmed,
+GJ89TV,Keynote d'ouverture Cloud Native Days France 2026!,petazzoni,Autres sujets et crazy stuff,,Monet,keynote,2026-02-03T09:00:00+01:00,75,,,,,,fr,confirmed,"Maître de cérémonie : Jérôme Petazzoni (co-créateur de Docker, Enix).
+
+* **10 PB/s sans exploser le budget : Comment le CERN scale son infrastructure avec le cloud native et l'IA**
+    * _Ricardo Rocha est Président du Technical Advisory Board (TAB) de la CNCF et Responsable de l'infrastructure au CERN_
+
+    La prochaine mise à niveau du Grand collisionneur de hadrons (LHC) multiplie par 10 les débits de données du CERN, atteignant **10 PB/s**. Le défi ? Le budget informatique, lui, reste identique.
+
+    Face à cette contrainte, le CERN a conçu une infrastructure cloud native nouvelle génération qui repense totalement l'utilisation des ressources. Au cœur du système : un partage intelligent des GPU et accélérateurs, des pipelines MLOps pour l'**inférence IA en temps réel** sur les détecteurs, et des workflows hybrides supportant aussi bien les environnements interactifs traditionnels (oui, même SSH !) que le traitement batch massif.
+
+    Cette session dévoilera les choix d'architecture qui permettent de tenir ce pari impossible :
+    * Comment **optimiser l'utilisation des accélérateurs** pour réduire drastiquement les coûts.
+    * Comment déployer des modèles IA à 100 mètres sous terre pour filtrer des pétaoctets de données par seconde.
+    * Comment intégrer dès la conception des critères de durabilité et de conscience carbone.
+
+    Avec démos à l'appui, vous découvrirez des stratégies concrètes applicables à vos propres infrastructures, quelle que soit leur échelle. Car si ces techniques fonctionnent au CERN, elles fonctionneront chez vous.
+
+* **(DINUM/DGFIP) Cloud de l'État : comment la collaboration interministérielle produit un socle Kubernetes open-source**
+    * _Julien Dauphant (Directeur de produits Cloud/DINUM)_
+    * _Renaud Fleury (Product Owner Socle Kubernetes/DGFIP)_
+
+* **Intervention de notre sponsor platinum Scaleway (3min)**
+    * _Jean-Baptiste Kempf_ (CTO Scaleway)
+
+* **Table Ronde (30min) : « Quels savoir-faire et technologies les équipes de développement doivent-elles acquérir pour l'ère Cloud Native ? »**. Par des membres actifs et reconnus dans la communauté Cloud Native / Open Source francophone :
+    * _Shérine Khoury_
+    * _Laurent Bernaille_
+    * _Denis Germain_
+    * _Victor Boissière_
+    * _Sébastien Blanc_
+
+* **Intervention de notre sponsor platinum Numspot (3min)**
+    * _Gaspard Plantrou_ (CPO Numspot)
+
+* **(TOSIT) Comment nos communs numériques (Open source, Communauté, Gouvernance/fondation) peuvent permettre un cloud résilient / moins dépendant technologiquement ?**
+    * _Florian Caringi (Manager Data Ai Platform & architecture / VP TOSIT)_"
+9H9WKR,"Stop the Fight : doper et unifier HPA, VPA et KEDA avec des métriques avancées",vermande,Infrastructure et opérations,,Monet,talk,2026-02-03T10:30:00+01:00,45,,,,,,fr,confirmed,"On a tous déjà vu ça : **HPA** scale à l’horizontale, **VPA** ajuste les ressources, et **KEDA** vide la file… résultat : un combat permanent qui épuise les ressources et rend les clusters instables.
+Et si l’on pouvait enfin mettre fin à cette guerre pour obtenir un scaling fluide, prévisible et intelligent ?
+Dans cette session, nous verrons comment une **observabilité unifiée** et des **métriques métier pertinentes** peuvent transformer ce manque de cohésion en une orchestration plus harmonieuse.
+Pas seulement de la théorie : une **démo live** mettra vos certitudes à l’épreuve avec une application *meme-generator* façon Rube Goldberg, un test de charge qui fera exploser vos autoscalers… puis la preuve qu’ils peuvent enfin travailler ensemble sans s’affronter."
+GAVG3X,REX SNCF - Des Rails aux Nuages : Comment Kubernetes à l'Edge Révolutionne les Systèmes Embarqués des TGV,yann-rotilio,Autres sujets et crazy stuff,,Dumas,lightning,2026-02-03T10:30:00+01:00,10,,,,,,fr,confirmed,"Kubernetes à 🚅 **grande vitesse** 🚅 : retour d'expérience sur la transformation de **SI embarqués** dans notre flotte TGV.
+
+Face aux défis historiques de **maintenabilité** et d'**évolutivité** des systèmes embarqués ferroviaires, face à des besoins de connectivités croissants et de plus en plus urgents, le chantier présenté à permis de déployer une solution **innovante** permettant de gérer efficacement des dizaines d'applications nécessaires à la navigation sur notre flotte de **400 TGV**.
+
+Découvrez comment notre **architecture hybride** connecte les clusters edge embarqués à notre infrastructure cloud centrale, offrant ainsi une **agilité** et une **évolutivité** sans précédent. Notre approche **sécurisée** par chiffrement des communications établit un nouveau standard pour l'industrie ferroviaire, conjuguant la puissance du cloud aux exigences d'un environnement industriel embarqué et reglémenté.
+
+En 10 minutes ⏱️, nous partagerons les étapes clés de ce projet, livré **à l'heure**, les obstacles surmontés et les bénéfices concrets pour nos opérations et nos voyageurs. Une vision d'avenir où l'infrastructure IT devient un véritable accélérateur de l'innovation ferroviaire."
+S3SPP8,"REX Ledger - Le réseau multi-cluster, enfin simplifié : Guide pratique de Cilium ClusterMesh","arthur-outhenin-chalandre,quentin-swiech",Réseau et sécurité,,Piaf,talk,2026-02-03T10:30:00+01:00,30,,,,,,fr,confirmed,"Offrir une expérience réseau unifiée et performante sur plusieurs clusters, sans complexité opérationnelle. C'est le défi qu'a relevé S3NS, le cloud de confiance français par Thalès et Google Cloud, en bâtissant sa plateforme multi-AZ sur **Cilium ClusterMesh**.
+
+Cette session s'appuie sur leur retour d'expérience pour vous offrir **un guide complet de Cilium ClusterMesh**, la solution de réseau Kubernetes multi-cluster propulsée par eBPF.
+
+Au programme, une exploration des fonctionnalités clés :
+* Network policies multi-clusters
+* Load balancing transparent des services et intégration DNS (avec MCS-API ou des annotations sur les Services)
+* Intégration transparente avec Cilium Ingress et GatewayAPI, ainsi qu'avec des controllers tiers grâce à la synchronisation EndpointSlice
+* Scaling de plusieurs centaines de clusters pouvant être déployé à travers le monde
+
+L'objectif : vous fournir un modèle complet et directement applicable en **GitOps avec FluxCD pour déployer et gérer Cilium ClusterMesh** sur vos environnements."
+YP37WS,REX Decathlon - Ne plus avoir peur du vendredi aprem' et déployer sereinement avec Flagger,"maxime-veroone,johan-lore",Infrastructure et opérations,,Debussy,talk,2026-02-03T10:30:00+01:00,30,,,,,,fr,confirmed,"Un déploiement raté sur une plateforme e-commerce peut avoir des conséquences financières immédiates. Chez Decathlon, avec des dizaines de services déployés plusieurs fois par jour, le risque d'incident lié à une erreur humaine ou une régression est omniprésent.
+
+Dans ce retour d'expérience, nous verrons comment Flagger a permis de faire rimer vélocité avec sérénité. En automatisant les stratégies de déploiement progressifs, nous avons sécurisé les changements : les incidents sont devenus moins impactants et les développeurs, plus confiants. 
+
+Vous découvrirez nos réussites, mais aussi les challenges rencontrés au fil de la mise en place.
+Vous repartirez avec une méthode et des exemples concrets pour implémenter le déploiement progressif, quelle que soit la configuration de vos clusters."
+MYY7CK,GitHub Actions : une bombe à retardement pour la supply chain security,thierry-abalea,Réseau et sécurité,,Dumas,lightning,2026-02-03T10:45:00+01:00,10,,,,,,fr,confirmed,"GitHub Actions est devenu incontournable pour le CI/CD, mais reste insecure by default. En 2025, plusieurs supply chain attacks (tj-actions, s1ngularity, GhostAction, Shai-Hulud) ont exfiltré des secrets, prouvant que les attaquants ciblent massivement la CI. Les bonnes pratiques classiques (pin d’actions, limiter les secrets) sont loin d’être suffisantes. 
+
+Ce talk montre comment ces attaques fonctionnent, pourquoi le modèle de sécurité actuel de GitHub est inadapté et surtout quelles défenses concrètes adopter : scoped secrets avec règles d’approbation, permissions minimales sur le GITHUB_TOKEN, egress controls, durcissement des runners et outils de protection runtime."
+VXYTMH,kro : La révolution déclarative qui simplifie les déploiements Kubernetes,sebastien-allamand,Infrastructure et opérations,,Dumas,lightning,2026-02-03T11:00:00+01:00,10,,,,,,fr,confirmed,"Fatigué de jongler avec des dizaines de fichiers YAML pour déployer vos applications sur Kubernetes ? Découvrez KRO (Kube Resource Orchestrator), le nouveau projet open source qui révolutionne la gestion des ressources Kubernetes. En 10 minutes, plongez dans cette solution innovante née de la collaboration de la communauté cloud-native, qui permet de définir des modèles d'applications réutilisables via un concept unique : la ResourceGraphDefinition.
+
+À travers des exemples concrets et une démo live, vous découvrirez comment KRO peut drastiquement simplifier vos déploiements tout en maintenant la flexibilité et la puissance de Kubernetes. Vous verrez aussi comment contribuer à ce projet en pleine croissance et rejoindre une communauté dynamique d'utilisateurs et de développeurs.
+
+Une session éclair essentielle pour les développeurs et les équipes DevOps qui veulent simplifier leur vie avec Kubernetes, construire des abstractions puissantes, et participer à l'évolution d'un outil open source prometteur !"
+3YBWHD,Scaler vos charges de travail GPU avec Karpenter et Argo Workflows,saboni,IA et Data,,Debussy,talk,2026-02-03T11:15:00+01:00,45,,,,,,fr,confirmed,"Distribuer des workloads ML sur Kubernetes tourne vite au casse-tête dès que les usages se multiplient : l’inférence batch n’a pas les mêmes contraintes que l’expérimentation ou l’évaluation :
+
+- Comment attribuer les bons GPU à chaque usage ?
+- Comment scaler différemment les charges de travail, nécessitant du hardware spécifique ?
+- Comment s'assurer du scale à 0 lorsqu’aucun GPU n’est utilisé dans le cluster ?
+
+Dans ce talk, nous montrerons comment marier Argo Workflows (pour l'orchestration) et Karpenter — gestionnaire d'autoscaling open-source d’AWS, désormais supporté par la plupart des cloud providers mainstream, pour gérer des traitements ML batch sur Kubernetes. Nous décortiquerons les pièges de la gestion de flotte GPU (disponibilité, affinités/taints, coûts, interruptions Spot, ...) et comment Karpenter y répond : provisionning dynamique, contraintes d'affinité explicites, etc, dans le contexte de traitements batch avec Argo Workflows."
+LGDNMM,REX DINUM - Les ingrédients multitenancy et authentification pour une distribution k8s open-source française,piard,Autres sujets et crazy stuff,,Piaf,talk,2026-02-03T11:15:00+01:00,45,,,,,,fr,confirmed,"Créer un cluster Kubernetes est devenu de plus en plus simple au fil du temps. Mais une fois celui-ci créé, Kubernetes nous laisse libre de l'organisation interne.
+Trop libre ? Comment organiser ce cluster entre vos différentes équipes ?
+Comment faire du **namespace as a service** pour rendre les déploiements plus isolés ?
+Comment bien gérer la **répartition des ressources** entre chaque bénéficiaire ?
+Comment offrir à chaque utilisateur un **confort d'authentification** et une **sécurité accrue** ?
+Ce talk parlera de ces deux sujets (Multitenancy et authentification) à travers l'implémentation qui a été faite pour la solution **Kubo**, distribution cloud open-source souveraine française interministérielle, mise en production en 2026.
+
+Les solutions exposées sont applicables pour tout cluster Kubernetes. Vous pourrez donc faire de même dans votre cluster juste après la conférence."
+CPRAUN,Admission Control 2.0 : des Webhooks aux politiques intégrées,yousri-kouki,Réseau et sécurité,,Dumas,talk,2026-02-03T11:30:00+01:00,30,,,,,,fr,confirmed,"Et si vous pouviez implémenter de la validation de ressources Kubernetes sans écrire une seule ligne de code, sans déployer de serveur webhook et sans risquer la disponibilité de votre API server ?
+
+Les webhooks d'admission, bien que puissants, sont complexes à développer, coûteux à maintenir et représentent un point de risque pour la stabilité du cluster. La donne change avec Kubernetes 1.30 et l'arrivée en GA des Validating Admission Policies !
+
+Cette session est la séance de rattrapage pour comprendre et adopter cette fonctionnalité révolutionnaire. Nous ferons le bilan des douleurs liées aux webhooks traditionnels avant de plonger dans le monde déclaratif des politiques basées sur le Common Expression Language (CEL).
+
+Au programme de cette présentation :
+- Le Bilan Douloureux : Pourquoi les webhooks sont un frein à la simplicité et à la fiabilité.
+- La Révolution CEL : Décryptage des Validating Admission Policies, natives et intégrées à l'API server.
+- Du Alpha au GA : Retour sur l'évolution de la feature de la 1.26 à la 1.30.
+- Live Migration : Démonstration concrète de la transformation d'un webhook custom en une policy déclarative simple et lisible.
+- Bonnes Pratiques : Comment commencer, quels cas d'usage privilégier et quand garder un webhook.
+
+Rejoignez-nous pour découvrir comment simplifier, fiabiliser et sécuriser la gouvernance de vos clusters Kubernetes une bonne fois pour toutes !"
+DHAXQN,REX SNCF - Smells like Cloud Kubernetes : Notre Kube managé on-premise,"matthieu-strohl,etienne-germain,yann-rotilio",Infrastructure et opérations,,Monet,talk,2026-02-03T11:30:00+01:00,30,,,,,,fr,confirmed,"Déployer des clusters aussi simplement on-premise que dans le cloud à la  SNCF 🚂c'est pas gagné d'avance. 
+
+Nos offres AKS, EKS couvrent la plupart de nos besoins, mais comment faire la même chose sans quitter nos datacenters ? Recréer l'expérience d'un Kubernetes managé en interne, c'est un sacré chantier. 
+
+L'objectif : offrir autoscaling , autohealing , gestion des nodepools , exposition, stockage, upgrades et tout le reste — automatisé et avec le moins d'exploitation possible.
+
+Dans ce REX, on partage notre parcours sans filtre : les solutions testées, les impasses, les ratés… et comment on y est arrivés avec :
+
+- *OpenStack* : l'infrastructure qui fait tout
+- *Talos Linux* : un OS minimaliste et sécurisé 
+- *Cluster API* : le chef d'orchestre des clusters 
+- *ArgoCD* : l'automate GitOps 
+
+
+Aujourd'hui, on crée et gère un cluster complet avec un seul fichier YAML , du GitOps, et un cluster de management pour les gouverner tous."
+8HZM98,"Cluster IA Air-Gapped : Concevoir, Sécuriser et  Déployer une Plateforme Souveraine","stephane-robert,christophe-morvan",Infrastructure et opérations,,Piaf,lightning,2026-02-03T12:00:00+01:00,10,,,,,,fr,confirmed,"Construire un cluster **IA** totalement isolé : **sans Internet**, sans registry externe, sans dépendances cloud ...mission impossible ?
+
+Dans cette présentation, nous partagerons comment nous avons conçu une stack **air-gapped** complète avec **Talos** Linux, **GPU** NVIDIA, image-cache, **PKI** locale et **registry** interne.
+
+Retour sur les **défis réels** rencontrés, ce qui a cassé, ce qui a tenu, et comment transformer un cauchemar d’ingénierie en système opérationnel ultra sécurisé."
+TFRCKA,La résilience Cloud Native avec la solution open source Plakar,gilles-chehade,Infrastructure et opérations,,Debussy,lightning,2026-02-03T12:00:00+01:00,10,,,,,,fr,confirmed,"**Backup Anything. Store Anywhere. Restore Everywhere.**
+
+C'est la promesse de **[Plakar](https://www.plakar.io/)**, la couche de résilience Open Source pour les infrastructures modernes.
+Cette session explore comment Kloset, le moteur de stockage au cœur du système, rend cette universalité techniquement possible en s'affranchissant des contraintes de l'infrastructure sous-jacente."
+XAVSDH,K3s: Etat des lieux en 2026,paul-gonin,Infrastructure et opérations,,Dumas,lightning,2026-02-03T12:00:00+01:00,10,,,,,,fr,confirmed,"**K3s**, le « Kubernetes universel » (Anywhere Kubernetes), a prouvé qu'il n'est pas nécessaire d'être lourd pour être puissant. Des environnements **edge** aux ressources contraintes jusqu'aux postes de développement, et de plus en plus au sein des datacenters, K3s atteint aujourd'hui des niveaux d'adoption massifs avec des centaines de millions de téléchargements. En 2026, la mission du projet reste claire : fournir une **distribution Kubernetes certifiée** et prête pour la production, capable de tourner absolument partout.
+
+Si la philosophie de K3s reste inchangée, le projet a franchi plusieurs étapes architecturales majeures, incluant l'**adoption transparente de containerd 2.0 et de Traefik v3**, un durcissement critique de la sécurité, ainsi que des optimisations opérationnelles et de performance réduisant encore l'empreinte du binaire tout en améliorant sa robustesse.
+K3s bénéficie également d'**améliorations fonctionnelles significatives** avec l'arrivée du registre embarqué (basé sur Spegel), une attention renouvelée portée à Kine (l'etcdshim pour SQLite, Postgres, MySQL/MariaDB & NATS), le support de Tailscale/Headscale, ainsi qu'un provider Cluster API. Enfin, K3k (Kubernetes in Kubernetes) pour les clusters virtuels légers a atteint sa maturité !
+
+Pour l'avenir, d'importants jalons et **défis nous attendent en 2026** et au-delà. L'un de nos principaux objectifs sera d'atteindre le niveau Incubation à la CNCF afin de faire grandir la communauté autour du projet. Sur le plan technique, l'évolution vers la Gateway API sera certainement l'un des sujets centraux des mois à venir.
+Rejoignez-nous pour découvrir comment K3s continue de briser les barrières, faisant de Kubernetes le système d'exploitation standard pour toute infrastructure."
+7VNVJF,La famille k0s : une boîte à outils pour simplifier la gestion multi-cluster de Kubernetes,luc-juggery,Infrastructure et opérations,,Piaf,lightning,2026-02-03T13:00:00+01:00,10,,,,,,fr,confirmed,"Gérer plusieurs clusters est un vrai défi. La famille k0s aborde ce problème à la racine, avec k0s, une distribution Kubernetes légère qui constitue la base d’un écosystème.
+
+La force de k0s réside dans les outils qui l’entourent. k0sctl permet de gérer le cycle de vie des clusters. k0smotron permet d’exécuter des control planes Kubernetes directement dans des Pods. Et k0rdent fournit les briques nécessaires pour construire des IDP basées sur Kubernetes.
+
+Dans cette présentation, nous verrons comment la famille k0s a évolué pour devenir une véritable boîte à outils dédiée à la gestion multi-cluster de Kubernetes. Nous passerons en revue chaque composant et partagerons des exemples pratiques que vous pourrez reproduire vous-même."
+KXNTHT,Au-delà du Chaos du Multi-Cloud : L'Architecture Universal Mesh,baptiste-assmann,Réseau et sécurité,,Dumas,lightning,2026-02-03T13:00:00+01:00,10,,,,,,fr,confirmed,"La croissance des entreprises impacte la manière dont les applications sont déployées : support
+de plusieurs régions, clouds privés, clouds publics ou encore clusters Kubernetes. Il en résulte
+une infrastructure fragmentée et peu sécurisée. Cette complexité vous oblige à gérer des
+politiques distinctes pour le trafic public et privé, générant de la complexité en matière de
+gestion et de sécurité.
+
+Dans cette courte session, nous allons lever le voile sur ce que nous appelons ""Universal
+Mesh"". Ce modèle architectural crée une couche de connectivité unifiée qui simplifie la gestion,
+la gouvernance et l'observabilité de vos environnements hybrides. Nous explorerons ensemble
+comment obtenir une maîtrise complète sur tous les types de trafic: depuis l'extérieur jusqu’aux
+services internes, sans modifier les fondamentaux de votre réseau.
+
+Rejoignez-nous pour apprendre à gérer et sécuriser vos applications de manière cohérente tout
+en appliquant une politique zero-trust en interne. Découvrez comment maîtriser vos flux
+applicatifs de manière centralisée et enfin transformer vos déploiements multi-cloud en une
+plateforme cohérente unifiée."
+XPQKLT,Le jour où nous avons cassé Kubernetes... et comment nous l’avons réparé !,christophe-jauffret,Infrastructure et opérations,,Debussy,lightning,2026-02-03T13:00:00+01:00,10,,,,,,fr,confirmed,"Nous avions un objectif simple : faire passer notre distribution Kubernetes à plus de 1000 nœuds et construire une stack d’observabilité capable de tenir la charge.
+Qu’est-ce qui pourrait mal tourner ? (Spoiler : beaucoup de choses.)
+
+Dans cette session, nous partagerons comment un simple test de montée en charge s’est transformé en un véritable moment de panique, avec des composants qui plantent, des métriques qui disparaissent. Nous partagerons également avec vous des leçons, astuces et bonnes pratiques que vous pourrez mettre en œuvre directement dans vos propres environnements."
+ADHUPC,"Du bruit à l’essentiel : comment la sécurité cloud-native boostée par le contexte runtime permet aux équipes Dev, DevOps et SRE d’aller plus vite !",dimitris-vassilopoulos,Réseau et sécurité,,Dumas,lightning,2026-02-03T13:15:00+01:00,10,,,,,,fr,confirmed,"** Note : ce talk sera exceptionnellement donné en anglais.
+
+La sécurité cloud-native ne devrait pas ralentir les équipes de développement, DevOps ou SRE. Pourtant, les approches traditionnelles génèrent souvent **trop de bruit, des cycles de triage longs et de la friction dans la livraison**. 
+
+Dans cette présentation, Dimitris Vassilopoulos montre comment une approche cloud-native orientée runtime permet aux équipes de se concentrer sur ce qui compte réellement. 
+En combinant le contexte **runtime**, la visibilité sur les **flux applicatifs** et des analyses **assistées par l’IA** dans des environnements Kubernetes et multi-cloud, les équipes peuvent prioriser les vrais risques, corriger plus vite et réduire la charge opérationnelle.
+
+Résultat : des déploiements plus rapides, un temps de résolution réduit et une sécurité qui soutient, plutôt qu’elle ne freine la productivité des équipes d’ingénierie."
+F8GHUH,Attestation à distance d’un cluster Kubernetes ou comment protéger la bergerie des loups numériques,"timothee-ravier,alice-frosi",Réseau et sécurité,,Debussy,talk,2026-02-03T13:15:00+01:00,30,,,,,,fr,confirmed,"Imaginons un cluster Kubernetes confidentiel comme une bergerie : pour pouvoir y entrer, il faut montrer pâte blanche. Dans cette présentation, nous montrerons comment nous utilisons l’attestation à distance pour vérifier quel nœud a accès à un cluster Kubernetes. L’opérateur “cluster confidentiel” se charge de vérifier que les nœuds du cluster utilisent une version autorisée du système d’exploitation, tel un berger vérifiant qu’aucun loup, même déguisé, ne rentre dans la bergerie.
+
+Nous montrerons comment combiner un serveur d’attestation à distance (Trustee), les fonctionnalités d’informatique confidentielle (Confidential Computing) des processeurs x86_64 et les TPMs pour vérifier les composants de la chaîne de démarrage d’un nœud Kubernetes. Nous présenterons l’opérateur qui se charge de configurer Trustee et de mettre à jour continuellement les politiques de contrôle d’accès ainsi que les valeurs considérées comme valides (valeurs de référence) pour le système d’exploitation des nœuds du cluster.
+
+D’un seul nœud à un cluster complet, nous présenterons comment tirer au mieux parti des capacités d’informatique confidentielle des processeurs x86_64 pour sécuriser une infrastructure dans le cloud ou un déploiement “Bare Metal”. Ainsi aucun loup ne dévorera nos moutons et le berger pourra dormir tranquille."
+JYFTD8,REX INSEE - De l’expérimentation à la mise en production de modèles d’IA : le MLOps dans une administration,"hugo-simon,nathan-randriamanana",IA et Data,,Monet,talk,2026-02-03T13:15:00+01:00,45,,,,,,fr,confirmed,"À l’INSEE, nous utilisons des méthodes statistiques variées pour mieux comprendre et analyser les données. Comme ces méthodes partagent beaucoup de points communs avec le machine learning, il nous a semblé naturel d’explorer ces techniques. Nous avons ainsi commencé à les tester pour automatiser certaines tâches, comme la codification des professions (code PCS) ou encore des activités des entreprises (code NAF).
+La mise en production s’est heurtée à un obstacle bien connu : un fort cloisonnement entre les équipes métiers et la DSI, avec des cultures, des outils et des priorités différentes. C'est dans ce contexte que le **MLOps**, la rencontre entre le DevOps et le Machine learning s'impose comme un paradigme incontournable afin de rapprocher data scientists et développeurs. 
+
+Cette présentation proposera une vision croisée métier et technique, avec l’intervention conjointe d’un data scientist et d’un architecte. Du recueil du besoin à l’automatisation de bout en bout sur Kubernetes (entraînement, packaging, monitoring), en passant par la gouvernance du code et des modèles, nous partagerons comment nous avons franchi le cap du prototype à la production. Nous aborderons notamment : 
+
+- **Organisation et culture** : comment instaurer un langage commun, former et aligner les équipes dans une administration.
+- **Fondations techniques** : de la plateforme de R&D à l'automatisation de l'entraînement, en passant par la gouvernance des modèles et du code. 
+- **Mise à disposition des modèles dans une architecture multicluster** : la maîtrise des flux est essentielle pour assurer sécurité et performance.
+- **Pattern de déploiements** : méthodes et bonnes pratiques pour livrer des modèles de manière fiable et sécurisée. 
+
+A travers cette intervention, les participantes et participants repartiront avec :
+- une compréhension claire des enjeux du MLOps et de sa valeur ajoutée dans un contexte réel,
+- des bonnes pratiques et des outils cloud-native transposables,
+- des pistes concrètes pour évaluer la maturité MLOps de leur propre organisation.
+
+En somme, un retour d’expérience sur la transformation de prototypes isolés en une chaîne MLOps industrielle, sécurisée et pérenne, portée par des outils standards et cloud native."
+YAJWJ8,REX Air France-KLM - Des chaînes applicatives aux chaînes OPS : Voyage vers le Cloud à bord d'Air France-KLM,"caroline-de-vasson,amine-alaoui-echerif",Infrastructure et opérations,,Piaf,talk,2026-02-03T13:15:00+01:00,30,,,,,,fr,confirmed,"Chez **Air France-KLM**, nous pilotons **plus de 250 équipes produit** et **2500 applications** en production. Nous avons relevé ce défi dans un environnement marqué par une forte hétérogénéité technologique, fruit d’une longue histoire IT… et d’une volonté forte d’homogénéisation des processus entre deux compagnies.
+Cette transition ne s'est pas opérée à partir d'une feuille blanche, car le groupe avait déjà initié des démarches innovantes à l’époque :
+ * **2007** : mise en place d’une forge d’intégration continue pour les applications n-tiers.
+ * **2015** : premiers environnements PaaS et CaaS on-premise.
+
+Ces initiatives ont posé des bases solides, mais ont aussi révélé leurs limites : maturités hétérogènes et processus de provisioning silotés.
+Depuis **quatre ans**, les équipes Air France-KLM, DEV et OPS, ont mené une transformation progressive pour élargir notre CI/CD applicatif vers une approche **Cloud Native** intégrant également l’infrastructure et la sécurite. Objectif : **fluidifier les déploiements, industrialiser les pratiques, simplifier la gestion à grande échelle et ainsi donner plus d’autonomie aux équipes de développement.**
+Pour répondre à cela, nous avons conçu une plateforme centrée sur le **self-service**, l’**automatisation** et la **sécurité**, reposant sur des standards de l’industrie tels que :
+ * Infrastructure as Code (GitHub Action, Terraform)
+ * Pipelines centralisés
+
+Ce nouvel écosystème nous permet aujourd’hui d’accélérer les déploiements tout en automatisant le cycle de vie complet des infrastructures.
+Toutefois, cette autonomie a un prix : la responsabilisation des équipes des développeurs sur la gestion de leur infrastructure. Car si cette approche accroît l’efficacité, elle ajoute aussi une charge supplémentaire à des équipes dont ce n’est pas le métier premier. Ce point, rarement abordé et pouvant engendrer des tensions, a été au cœur de nos arbitrages.
+Ce talk, présenté à deux voix **DEV** et **OPS**, vous embarque pour un vol sans escale vers une migration Cloud à grande échelle. Ce retour d’expérience vise à **inspirer** les organisations confrontées à des défis similaires, en montrant qu’une transformation Cloud réussie repose autant sur la **technologie** que sur l’**humain**. Concrètement, les participants découvriront comment standardiser les pipelines **à l’échelle**, mettre en place une plateforme **PaaS/CaaS self-service sécurisée et centralisée**, tout en renforçant l’**autonomie des développeurs**. Veuillez attacher vos ceintures : turbulences organisationnelles et zones de responsabilité accrue sont à prévoir."
+MYVQPA,REX Mirakl - Déployer nos modèles : c'est simple avec KServe !,"alexandre-nguyen,yannick-lambruschi",IA et Data,,Dumas,talk,2026-02-03T13:30:00+01:00,30,,,,,,fr,confirmed,"On pense souvent que mettre des modèles en production est réservé aux entreprises disposant de moyens considérables, mais avec KServe, c’est désormais à la portée de tous.
+
+En l’espace de plusieurs mois, nous avons mis en production une plateforme d'inférence capable de gérer aussi bien des modèles génératifs que prédictifs. Pas besoin d’une armée d’ingénieurs ni de recette magique : juste des outils adaptés, de la persévérance et beaucoup d’apprentissage.
+
+Alors si vous hésitez à mettre en place une plateforme d'inférence, voici comment KServe nous a permis de standardiser le déploiement de modèles au sein de notre entreprise."
+UHX83U,OS immuables pour K8s : Étendre vos systèmes avec systemd-sysext !,mathieu-tortuyaux,Réseau et sécurité,,Debussy,lightning,2026-02-03T13:45:00+01:00,10,,,,,,fr,confirmed,"Certains systèmes d'exploitation Linux sont dits ""immuables"" (Flatcar, Fedora CoreOS, Talos OS, etc.) et par définition ne peuvent être alterés. Pour modifier ces systèmes, il est possible de maintenir soi-même une image apportant les modifications, de demander aux mainteneurs d'ajouter ces modifications ou encore d'utiliser une image conteneurisée mais cette approche à ses limites (Ex: ajouter un nouveau container runtime).
+systemd-sysext est une solution qui fait partie intégrante de systemd et qui permet de modifier un système tout en conservant son caractère immuable.
+Dans cette présentation, vous apprendrez ce qu'est une image systemd-sysext, comment la construire et comment l'utiliser sur des systèmes immuables (ou non !)."
+UKTSYQ,Sécuriser vos déploiements : quand kube-image-keeper sauve la prod !,paul-laffitte,Infrastructure et opérations,,Piaf,lightning,2026-02-03T13:45:00+01:00,10,,,,,,fr,confirmed,"Pour déployer des applications conteneurisées sur Kubernetes, il est nécessaire de **récupérer des images de conteneurs stockées dans des registries** privées ou publiques. 
+
+Par défaut, ces registries peuvent être des **single point of failure** et donc impliquer des risques sur la production en cas d’indisponibilité ou d’inaccessibilité des images : impossibilité de déployer des applications, empêcher un rollback applicatif rapide pourtant critique pour le service, etc.
+
+Dans cette présentation, nous vous présenterons notre **outil open source** kube-image-keeper (kuik) qui se déploie au sein des clusters Kubernetes pour prévenir ou éviter ces problèmes.
+
+Suite à une refonte complète, cette v2 de l’outil embarque désormais trois grandes fonctionnalités de gestion des images de conteneurs : 
+
+- Le **routing** : permet de **pull les images des pods depuis différentes registries** en fonction de leurs disponibilités et de l’état de santé de ces derniers ;
+
+- Le **mirroring** : permet de **copier des images vers une liste de registries prédéfinies**, par exemple sur un cache local au cluster servant de backup en cas d’indisponibilité ;
+
+- Le **monitoring** : permet de **vérifier la disponibilité upstream d’images** et de présenter ces informations dans un **dashboard Grafana**.
+
+Au delà de la présentation de ces fonctionnalités, nous détaillerons des **scénarios concrets d’utilisation** où kuik peut **“sauver votre production”** ainsi que les **bonnes pratiques** pour bien l'utiliser dans vos clusters Kubernetes."
+MET3BH,Challenge : 0 CVE (ou presque) sur une appli Cloud Native en 10mn,mouhamad-koreissi,Réseau et sécurité,,Debussy,lightning,2026-02-03T14:15:00+01:00,10,,,,,,fr,confirmed,"Venez relever avec moi le défi de passer à **0 CVE (ou presque)  en 10 minutes** sur une stack Nginx, Python, PostgreSQL, et Redis.
+Le challenge ? Migrer les images officielles sur des images en libre service **Chainguard Distroless** sans CVE, ou avec peu de CVE, en 10 minutes. 
+
+En direct, vous verrez comment vos applications peuvent devenir **secure by design** sans effort… Plus besoin de passer un temps fou à patcher, ou à attendre les releases incluant les patches de remédiation. Start Left avec des images sécurisées. La sécurité n’est plus un frein, ni un parcours du combattant."
+SUTE9N,Formation à l'échelle: 100 000 sessions de labs réseau & sécurité cloud-native,raphael-pinson,Developer Experience,,Dumas,talk,2026-02-03T14:15:00+01:00,45,,,,,,fr,confirmed,"Comment rendre l’apprentissage du réseau et de la sécurité cloud-native à la fois accessible, automatisé et durable à grande échelle ?  
+Cette session présente comment nous avons conçu une plateforme de **labs interactifs** ayant permis de dépasser les **100 000 sessions pratiques** autour de **Cilium** et **Tetragon**, en s’appuyant sur **Kind**, **Containerlab**, des workflows **GitOps**, et une distribution via **Instruqt**.  
+
+Les **labs automatisés** ne sont plus seulement un outil pédagogique : ce sont de véritables **artifacts produit**, partagés entre les équipes DevRel, ingénierie, marketing et support.  
+
+Ils servent à :  
+- **Former** ingénieurs, clients et partenaires  
+- **Onboarder** les nouveaux arrivants  
+- **Présenter** des démos cohérentes  
+- **Tester** et valider de nouvelles fonctionnalités  
+- **Éduquer** la communauté et soutenir la communication produit  
+
+Nous verrons aussi comment l’**intelligence artificielle** aide à aller plus loin : génération de scénarios, analyse des parcours utilisateurs, détection automatique des erreurs ou points de friction, et amélioration continue du contenu.  
+
+Vous repartirez avec des pistes concrètes pour :  
+- Concevoir des labs éphémères et reproductibles autour de vos produits  
+- Automatiser leur création, leurs tests et leur déploiement  
+- Exploiter les feedbacks et la télémétrie pour améliorer la qualité  
+- Intégrer la gamification (badges, progression, scoring) pour stimuler l’engagement  
+- Traiter vos labs comme des **artifacts cross-équipe** qui renforcent le produit lui-même  
+
+Une session idéale pour les **équipes DevRel**, **ingénieurs plateforme et réseau**, **formateurs techniques**, et toute organisation cherchant à **industrialiser la formation et la démonstration cloud-native**.  
+Une connaissance de **Kubernetes** et des **workflows Git** est recommandée."
+V7UJ7V,REX Sellsy - Migrer 50 000 BDDs sans coupure vers PostgreSQL et K8s : mission impossible ?,"quentin-loupot,alexandre-buisine",IA et Data,,Monet,talk,2026-02-03T14:15:00+01:00,45,,,,,,fr,confirmed,"L’architecture de BDD de notre service SaaS reposait sur un **cluster MariaDB vieillissant et centralisé**, où l’ensemble des données de nos clients cohabitait dans une **seule base de données monolithique**. Cette approche, bien que fonctionnelle à l’origine, montrait ses limites avec la croissance de notre activité : difficultés de scalabilité, maintenance complexe, dépendance à une infrastructure rigide et risques accrus lors des mises à jour ou incidents.
+
+Face à ces défis, nous avons décidé d’opérer une transformation radicale : **passer à un modèle distribué**, basé sur **PostgreSQL** et orchestré via **CNPG** et **Kubernetes**.  L’objectif ? Fragmenter cet énorme monolithe en **50 000 bases de données réparties sur 50 clusters PostgreSQL**, chacun étant autonome et résilient. Et pour ne pas impacter nos clients, nous devions bien entendu **migrer le tout sans coupure de service**… !
+
+Dans cette présentation, Sellsy et Enix partagent les **choix d’architecture** et les **décisions clés** qui ont façonné ce projet ambitieux. Nous reviendrons sur les **problèmes techniques et organisationnels rencontrés**, ainsi que sur les solutions mises en place pour les surmonter. 
+
+Nous plongerons également au cœur de nos BDDs PostgreSQL/CNPG avec un dashboard créé pour l’occasion pour **identifier et corriger les problèmes de performance**. 
+
+Vous découvrirez également l’**impact budgétaire d’une telle migration**, les **gains de performance mesurés** et les **résultats concrets** obtenus."
+V8RJVD,Kagent sur Kubernetes : comment l'IA agentique vous rend 10 fois plus efficaces,amine-ait-aazizi,IA et Data,,Piaf,lightning,2026-02-03T14:15:00+01:00,10,,,,,,fr,confirmed,"l'IA transforme les opérations Kubernetes avec Kagent - un projet CNCF qui apporte la puissance des agents IA directement dans vos clusters Kubernetes. 
+
+Durant cette session, nous allons découvrir comment les agents IA déployés par Kagent permettent d’automatiser la configuration et la résolution d'incidents, d'orchestrer de workflows multi-agents pour des opérations complexes, tout en s’intégrant nativement à l’écosystème Kubernetes (outils comme Prometheus, Grafana, Argo, Istio …)
+
+Participez à cette session pour accélérer l’adoption de l’IA et déployer vos premiers agents IA sur vos clusters Kubernetes, tout en exploitant pleinement vos compétences et pratiques existantes."
+8QBHMU,Inside Cilium: Deep Dive sur DSR (Direct Server Return),alexis-la-goutte,Réseau et sécurité,,Piaf,lightning,2026-02-03T14:30:00+01:00,10,,,,,,fr,confirmed,"Kubernetes simplifie le déploiement, mais le réseau reste un goulot d’étranglement. Avec eBPF, Cilium casse les limites de kube-proxy et implémente le Direct Server Return (DSR) : une technique héritée des load-balancers qui permet aux pods de renvoyer directement les réponses aux clients, réduisant latence et consommation CPU.
+
+Dans ce lightning talk, découvrez comment Cilium rend le DSR accessible à Kubernetes et comment le visualiser grâce à **Hubble** & **Wireshark**
+
+**Objectifs**
+
+* Expliquer le concept de DSR simplement.
+* Montrer comment mettre cela en place facilement avec Cilium (et les différentes mode de Dispatch)
+* Visualisation avec Hubble et Wireshark"
+JLS39P,Mobilité des workloads Kubernetes: relever les défis et maîtriser la protection de vos données,clarence-pouthier,Infrastructure et opérations,,Debussy,lightning,2026-02-03T14:30:00+01:00,10,,,,,,fr,confirmed,"Dans l’univers cloud-native, la **mobilité des workloads Kubernetes** n’est plus une option : elle est le socle de la flexibilité, de la portabilité et de la résilience des applications.
+ 
+En 10 minutes, plongez au cœur des problématiques techniques et des stratégies éprouvées pour répondre concrètement aux attentes de vos équipes :
+
+* Défis réels de la mobilité Kubernetes : Pourquoi le déplacement des workloads (clusters, régions, clouds) est un casse-tête, et quels sont les enjeux pour la sécurité et la disponibilité.
+* **Principes techniques incontournables** : Cohérence des données, orchestration, ce qu’il faut absolument maîtriser.
+* **Cas d’usage pragmatiques** : Migration multi-cloud, reprise après sinistre… des exemples concrets issus du terrain.
+
+Ce que vous allez retirer de cette session Veeam Kasten: Une vision technique, claire et objective.
+Vous repartirez avec des clés pour **évaluer vos besoins, challenger vos pratiques actuelles** et intégrer durablement la résilience dans vos architectures Kubernetes."
+TLLFGW,REX CA-GIP - Construire la Plus Grande Plateforme Grafana On-Premise d'Europe,maxime-calves,Developer Experience,,Piaf,lightning,2026-02-03T14:45:00+01:00,10,,,,,,fr,confirmed,"## Résumé 
+
+Imaginez construire la **plus grande plateforme** Grafana **On-Premise d'Europe**, hébergée sur Kubernetes et déployée via ArgoCD, et voir son succès fulgurant : de **seulement une dizaine d'utilisateurs** en 2022 à plus de **6 000 aujourd'hui**, avec un impressionnant **2 000 utilisateurs actifs mensuellement**. 
+
+Découvrez comment nous avons relevé les défis, innové avec un portail Self-Service qui **offre un accès en moins de 10 secondes à un espace Grafana** et transformé notre vision en réalité. Découvrez notre histoire inspirante, parcourez les technologies innovantes qui ont fait avancer notre plateforme. 
+
+
+### Objectifs d'apprentissage :
+
+ - Comprendre les étapes clés pour **construire une plateforme Grafana On-Premise sur Kubernetes**.
+ - Apprendre comment gérer la **croissance exponentielle des utilisateurs** et des **ressources avec ArgoCD et Helm**.
+ - Explorer les meilleures pratiques pour **l'automatisation et la gestion des déploiements**.
+
+#### Public cible :
+Développeurs, ingénieurs DevOps, responsables techniques, chefs de projet, et toute personne intéressée par la gestion de plateformes à grande échelle et les solutions d'automatisation."
+VX9YTU,Simplifier les workloads stateful sur Kubernetes,"vincent-jamois,steeve-delmotte",Infrastructure et opérations,,Debussy,lightning,2026-02-03T14:45:00+01:00,10,,,,,,fr,confirmed,"Kubernetes a été initialement conçu pour les applications stateless, mais les architectures modernes nécessitent persistance des données et résilience pour les applications stratégiques.
+Cette session explorera les **modèles éprouvés pour l'exécution d'applications stateful** dans des environnements Kubernetes. 
+
+Nous aborderons les concepts essentiels pour **garantir une gestion des données** de niveau Entreprise sur Kubernetes : stockage persistent, **meilleures pratiques** en matière de résilience et de réplication, y compris la gestion du failover inter-clusters ou multi-régions."
+9VAVVC,Du chaos à la clarté : booster votre pipeline de logs avec VictoriaLogs et LogsQL,diana-todea,Infrastructure et opérations,,Monet,talk,2026-02-03T15:15:00+01:00,30,,,,,,fr,confirmed,"Les logs sont partout, mais leur gestion et leur analyse ne devraient pas engloutir tout votre budget d’infrastructure ni mettre à mal votre sérénité. Cette présentation introduit VictoriaLogs : une base de données de logs rapide, open source et qui ne requiert pas de configuration, conçue spécialement pour les développeurs et SREs.
+
+Nous verrons comment VictoriaLogs combine recherche full-text puissante, suivi en direct (live tailing) et ingestion compatible avec le backfill, tout en consommant jusqu’à 30 fois moins de RAM et 15 fois moins de disque que les systèmes de logs traditionnels. 
+
+La session expliquera également comment LogsQL, le langage de requête de VictoriaLogs, permet une exploration instantanée des champs à forte cardinalité. 
+
+Les participants découvriront aussi comment tirer parti de l’interface web intégrée, du CLI et des outils Unix classiques pour trouver des solutions efficaces, sans courbe d’apprentissage supplémentaire. Ils verront comment visualiser les logs dans Grafana, configurer des alertes et surveiller la santé du système de logs grâce à des métriques natives compatibles avec Prometheus. 
+
+Cette session fournira les étapes pour construire un pipeline de logs rapide, scalable et indépendant des fournisseurs, basé uniquement sur des outils open source, offrant simplicité, transparence et vraies performances sans la complexité habituelle."
+QF9THU,Sous le capot de Cluster API: concevoir et implémenter un provider d'infrastructure,tomy-guichard,Infrastructure et opérations,,Piaf,talk,2026-02-03T15:15:00+01:00,30,,,,,,fr,confirmed,"À mesure que l'usage de Kubernetes s'intensifie, la gestion de **multiples clusters sur des environnements hétérogènes** (cloud, on-premise) devient un véritable défi. Et si ces clusters pouvaient être gérés comme n'importe quelle application Kubernetes : de manière **déclarative**, via des manifests YAML et des contrôleurs ?
+
+C'est l'ambition de **Cluster API**, qui transforme Kubernetes en plan de contrôle universel pour le cycle de vie des clusters. Mais cette promesse atteint ses limites lorsque l'infrastructure cible ne dispose pas de provider officiel. Dans ce cas, la seule option est de développer son propre provider d'infrastructure, sous la forme d'un **opérateur Kubernetes**.
+
+Cette session de 30 minutes s'appuie sur le **retour d'expérience** concret du développement d'un provider Cluster API pour un cloud IaaS réel, afin d'explorer les choix d'architecture, les patterns d'implémentation et les difficultés rencontrées lors de la conception d'un opérateur non trivial.
+
+Ce que vous apprendrez :
+
+* Le rôle de Cluster API dans l'écosystème Kubernetes et les **concepts clés** nécessaires pour comprendre son fonctionnement interne.
+* L'**architecture** d'un provider d'infrastructure Cluster API et les responsabilités des différents contrôleurs (Cluster, Machine).
+* Comment démarrer un provider **depuis zéro** à l'aide des outils de scaffolding officiels.
+* Les étapes essentielles pour implémenter la logique de réconciliation et interfacer Cluster API avec une infrastructure externe.
+
+Cette session s'adresse à un public intermédiaire à avancé, et souhaitant repartir avec les clés pour adapter Cluster API à leurs propres infrastructures ou contribuer à l'écosystème existant."
+SH77P9,REX Numberly - Automatiser la gestion des identifiants DB dans k8s avec Vault et vault-db-injector,"solvik-blum,guillaume-legrain",Réseau et sécurité,,Debussy,talk,2026-02-03T15:15:00+01:00,30,,,,,,fr,confirmed,"Gérer les identifiants de base de données dans Kubernetes est un casse-tête récurrent pour les équipes SRE et DevOps : comment garantir leur sécurité, assurer leur rotation, et éviter les secrets qui traînent ? 
+
+Dans ce talk, je partagerai le retour d’expérience de Numberly, où nous avons développé **vault-db-injector**, un contrôleur open-source qui automatise toute la gestion du cycle de vie des credentials PostgreSQL (et autres bases), de la création éphémère à la révocation, en passant par le renouvellement, le tout, sans modifier une seule ligne de code applicatif.
+
+Vous découvrirez :
+- Les enjeux de la rotation automatisée des credentials en environnement dynamique
+- Comment vault-db-injector injecte et renouvelle les identifiants via un mutating webhook et Vault
+- Les difficultés rencontrées (sidecar, revocation, statefulness…) et nos solutions
+- Les impacts concrets en production sur plus d'une centaine d'applications
+- Des métriques et dashboards pour monitorer la sécurité en continu
+
+Démonstration live à la clé et partage d’outils open-source prêts à l’emploi !"
+XDKUAV,"SRE sous pression : santé mentale, charge invisible et fatigue du “héros de la prod”",luckas-bosch,Autres sujets et crazy stuff,,Dumas,talk,2026-02-03T15:15:00+01:00,30,,,,,,fr,confirmed,"Un talk franc et nécessaire sur la santé mentale des ingénieurs infra et SRE : surcharge, perte de sens, pression constante, invisibilisation du travail… Et surtout, des pistes concrètes pour que ça change."
+3HGPVS,REX bpifrance - FinOps en action – De la visibilité au chargeback : les clés d’une démarche réussie,hela-ben-farhat,Infrastructure et opérations,,Dumas,talk,2026-02-03T16:00:00+01:00,30,,,,,,fr,confirmed,"Le cloud devait nous donner de la flexibilité, de la vitesse, de l’agilité. Et il l’a fait. Mais il nous a aussi amené un nouveau défi : la maîtrise de nos coûts. 
+Dans un contexte où les coûts cloud explosent, le FinOps n’est plus un sujet d’optimisation, mais un véritable levier de gouvernance et de performance.
+
+À travers ce retour d’expérience, nous partagerons les coulisses d’une démarche FinOps menée de bout en bout : cadrage, outillage, mise en place du showback/chargeback et, surtout, accompagnement culturel.
+
+L’objectif : montrer comment rendre les équipes responsables de leur consommation cloud, outiller la démarche Finops,  instaurer un dialogue entre tech et finance, et transformer la maîtrise des coûts en moteur d’efficacité collective.
+
+Un retour pragmatique, illustré de bonnes pratiques, un REX sur nos outils, les pièges à éviter et les facteurs clés de succès pour réussir sa transformation FinOps."
+9DKYFA,Chaos Engineering Escape Game : sauvez le cluster avant qu’il ne s’effondre !,herve-leclerc,Autres sujets et crazy stuff,,Debussy,talk,2026-02-03T16:00:00+01:00,30,,,,,,fr,confirmed,"Votre cluster Kubernetes vient d’être pris en otage. Pods qui disparaissent, services qui ne sont plus disponibles, réseaux qui saturent… Saurez-vous le sauver ?
+
+Dans cette session interactive, nous transformerons une démonstration de **Chaos Engineering** en un véritable **escape game en live**. 
+
+L'audience sera invitée à prendre des décisions en temps réel pour rétablir la situation ou échouer collectivement et voir le cluster tomber en flammes."
+DEPCLW,Sécuriser la PKI de vos clusters Kubernetes avec ClusterAPI et OpenBao,"victor-coutellier,mohammad-amla",Réseau et sécurité,,Piaf,talk,2026-02-03T16:00:00+01:00,30,,,,,,fr,confirmed,"ClusterAPI facilite le déploiement de clusters Kubernetes, mais qu'en est-il de la sécurité de leur PKI ? Entre les certificats de l’API server, l'ajout de nouveaux nœuds et la génération de kubeconfig, la gestion de cette dernière devient un point névralgique.
+
+Dans ce talk, plongez dans le fonctionnement de la PKI de Kubernetes et le rôle de Cluster API dans sa gestion, et découvrez comment externaliser la gestion des clés privées avec OpenBao afin qu’elles ne transitent jamais sur le réseau. Vous verrez comment intégrer cette solution à ClusterAPI afin de maintenir l’automatisation complète du cycle de vie des clusters. Une approche pratique pour concilier sécurité et agilité dans vos infrastructures Kubernetes."
+Z9PASN,REX Mistral AI - Construire un fournisseur cloud de zero: ClusterAPI dans le datacenter,"leonard-suslian,antoine-roy",Infrastructure et opérations,,Monet,talk,2026-02-03T16:00:00+01:00,45,,,,,,fr,confirmed,"Créer un nouveau fournisseur cloud présente de nombreux défis, surtout lorsque l'offre principale est ""baremetal"", sans hyperviseur. La gestion des machines et des control plane kubernetes requiers d'orchestrer de nombreux composants du datacenter, switches, serveurs, pare-feux.
+Afin de faciliter cette gestion, nous allons nous pencher sur comment ClusterAPI avec Metal3 et Kamaji nous ont aidé à poser les briques essentielles sur lesquelles nous construisons actuellement Mistral Compute.
+Notre objectif ? Fournir une expérience clé en main sur Slurm et Kubernetes parmi les meilleures du marché, en combinant performance, simplicité et scalabilité."
+8E8DDS,Même Chuck Norris utilise Topomatik !,alexandre-buisine,Infrastructure et opérations,,Debussy,lightning,2026-02-03T16:30:00+01:00,10,,,,,,fr,confirmed,"C’est une bonne idée d’**étiqueter les nœuds d’un cluster Kubernetes pour indiquer où ils se trouvent** : dans quelle région et quelle zone (quand on est en cloud public), ou encore dans quel datacenter, quel rack, ou quel hyperviseur (quand on héberge “on premises”, sur ses propres infrastructures).
+
+Cela permet d’utiliser ensuite divers mécanismes (comme le **placement par affinité**) pour s’assurer que les réplicas d’une base de données ne sont pas tous au même endroit, ou à l’inverse, de rapprocher clients et serveurs pour éviter des communications “interzones” avec une latence ou des coûts excessifs.
+
+Sur la plupart des clouds publics, le “Cloud Controller Manager” ajoute automatiquement les labels en question (topology.kubernetes.io/…). Mais **quand on fait tourner Kubernetes sur ses propres infrastructures**, il faut placer ces labels soi-même, souvent à la main... et les tenir à jour (par exemple lors d’une migration à chaud d’un nœud d’un hyperviseur à l’autre).
+
+Faire les choses à la main, ça n’est pas très Cloud Native. C’est pour ça que chez Enix nous avons développé *Topomatik* : **un outil** 🛠️**open source capable de détecter la topologie d’un cluster Kubernetes** (en s’appuyant, par exemple, sur des protocoles comme LLDP) et de **mettre automatiquement à jour les labels** correspondants de manière dynamique.
+
+Dans cette présentation, Alexandre vous montrera **pourquoi même** 🤠 **Chuck Norris** 🤠 **utilise Topomatik**. Nous explorerons ensemble des **cas d’usage concrets**, comment Topomatik améliore la robustesse de vos infrastructures Kubernetes on-premise, et nous partagerons des **conseils** et **bonnes pratiques** pour bien l’utiliser en production."
+8HRTH8,Tokyo Drift Containers : Immuabilité au service de la sécurité Cloud Native,dan-maher,Réseau et sécurité,,Piaf,lightning,2026-02-03T16:30:00+01:00,10,,,,,,fr,confirmed,"L’**immuabilité** est souvent présentée comme un pilier de la sécurité Cloud Native. Pourtant, dans tout environnement Cloud Native (qu’il s’agisse de Kubernetes ou autre), la dérive de conteneur reste fréquente : sidecar mal configuré, debug à chaud, intrusion… Cette dérive silencieuse crée un écart critique entre l’intention et la réalité du runtime.
+
+Ce talk technique explore l’immuabilité non pas comme un principe théorique, mais comme une stratégie opérationnelle applicable à tous les runtimes conformes OCI. Nous verrons comment **transformer la gestion des images en une première ligne de défense** : multi-stage builds, images Distroless, réduction de surface d’attaque et approche Shift Left.
+Nous aborderons ensuite la **détection de drift** en runtime à l’aide des outils d’observabilité et de sécurité. Enfin, nous présenterons l’approche du « **immutable rollback** » : remplacer un conteneur compromis par une instance propre plutôt que tenter de le réparer.
+
+Les participants repartiront avec des pratiques concrètes et immédiatement applicables pour renforcer la sécurité de leurs workloads Cloud Native grâce à une stratégie d’immuabilité réellement opérationnelle."
+W3RGND,Kubernetes sous surveillance : déployez Uptime Kuma en un clin d’œil,williams-ahile,Autres sujets et crazy stuff,,Dumas,lightning,2026-02-03T16:30:00+01:00,10,,,,,,fr,confirmed,"**Le monitoring** est souvent synonyme de stacks lourdes et complexes (Prometheus, Grafana, etc.). Mais pour des besoins rapides, simples ou ciblés, il existe des alternatives plus légères et tout aussi utiles.
+
+Dans cette présentation éclair, je vous montrerai comment **Uptime Kuma**, un outil **open source** accessible et auto-hébergeable, peut être déployé en un clin d’œil sur **Kubernetes** grâce à **Helm**.
+
+**Au programme** :
+🚀 **Déploiement express** avec Helm en quelques commandes.
+🛠️ **Exemple de configuration** minimaliste (values.yaml).
+🎯 **Démo live** de mise sous surveillance d’un service Kubernetes.
+
+En 10 minutes, vous découvrirez une solution simple et efficace pour compléter vos environnements Cloud Native et gagner en visibilité, sans alourdir votre stack.
+
+**Si vous avez 10 minutes, alors vous avez du monitoring**."
+D8C7VQ,REX Winamax - De zéro à des milliards de traces : le tracing distribué à grande échelle,"maffert-anthony,nicolas-fidel",Infrastructure et opérations,,Piaf,talk,2026-02-03T17:00:00+01:00,30,,,,,,fr,confirmed,"Chez Winamax, nous faisons face à un trafic massif et extrêmement fluctuant, avec des dizaines de microservices répartis entre plusieurs produits et équipes. Comprendre les interactions entre ces services est vite devenu un véritable défi, aussi bien pour les nouvelles recrues que pour les équipes expérimentées.
+
+Pour relever ce défi, nous avons déployé du tracing distribué avec OpenTelemetry. OpenTelemetry n’étant qu’une spécification accompagnée d’implémentations, il a fallu concevoir et construire toute une architecture — passer de zéro trace à une couverture très large en quelques mois.
+
+En raison de fortes contraintes sur les données liées aux utilisateurs et utilisatrices, nous avons écarté les offres SaaS (Datadog, Grafana Cloud, Sentry) et créé notre propre système d’agrégation et de stockage entièrement basé sur l’open source grace à l'OpenTelemetry Collector, Quickwit ainsi que Jaeger.“
+
+Dans ce talk, nous partagerons notre retour d’expérience :
+- Comment stocker plusieurs téraoctets de traces et les interroger efficacement ?
+- Comment faire évoluer des collecteurs OpenTelemetry face à un trafic massif et variable ?
+- Comment faciliter l’auto‑instrumentation de nos applications Node.js ?
+- Quel moteur ou architecture de stockage privilégier pour les traces ?
+- Comment concevoir une architecture résiliente aux pics extrêmes de charge (ex : soirées de Ligue des Champions) ?
+- Et surtout : comment encourager l’adoption quotidienne du tracing par les équipes de développement ?
+
+
+Bénéfices concrets :
+
+- Réduction des coûts de stockage.
+- Enquêtes d’incident et astreintes simplifiées (avec des cas où les traces ont clairement fait la différence).
+- Identification d’opportunités d’optimisation de l’infrastructure et de réduction de la facture cloud.
+
+C’est une histoire d’ingénierie à grande échelle : l’open source nous a permis de bâtir une solution robuste, scalable et adaptée à un trafic extrême, tout en générant une réelle valeur business."
+DW3UCQ,Questions pour un conteneur - édition Supply Chain,"vache,sherine-khoury",Developer Experience,,Monet,talk,2026-02-03T17:00:00+01:00,45,,,,,,fr,confirmed,"Félicitations ! Vous avez réussi à builder votre image et la pousser dans la registry! Mais êtes-vous prêts à la déployer en prod ?
+
+ 
+Votre collègue SecOps est-il tout aussi confiant que vous de la robustesse de cette image face à l'hostilité de la prod ?
+
+Comment vous lui assurez que l'image que vous avez construite est bien celle déployée ?
+
+Êtes-vous sûrs que l'image ne contient pas de vulnérabilités exploitables? que votre supply chain n'a pas été compromise entre temps ?
+
+Pas de panique !
+
+
+Dans ce talk dynamique et amusant, nous apprendrons et/ou approfondirons les notions de sécurité de la supply chain, afin de rendre vos images sécurisées.
+
+
+En alternant quiz et démos live, nous parcourrons les différents concepts, frameworks et projets CNCF et open source autour de la supply chain, tels que SBOM, SigStore, SLSA, OpenSSF, VEX, in-toto, Kyverno…!
+
+
+Prêts à relever ce défi ? Cerise sur le gâteau: quelques goodies attendent les gagnants !
+
+Soyez là ou le plus rapide pour tenter de gagner des cadeaux !"
+HQTL3Q,Kyverno au service de l’IA : sécuriser les actions des agents dans Kubernetes,chmielowski,IA et Data,,Dumas,talk,2026-02-03T17:00:00+01:00,45,,,,,,fr,confirmed,"Les agents IA capables d’agir sur des systèmes réels posent une nouvelle question : comment contrôler ce qu’ils ont le droit de faire ?
+Dans cette session, nous présenterons une approche innovante où Kyverno devient le moteur d’autorisation pour les requêtes provenant d’agents IA connectés via le Model Context Protocol (MCP).
+
+En combinant OIDC, le contexte Kubernetes, et des politiques déclaratives, nous pouvons valider et restreindre les actions des agents (lecture, création, ou modification de ressources) — exactement comme nous le faisons déjà pour les utilisateurs humains, cette intégration permet d’appliquer les mêmes règles de conformité, de traçabilité et de sécurité à l’ensemble du flux d’exécution, qu’il soit initié par un humain ou par une IA.
+
+Vous découvrirez comment Kyverno peut faire respecter automatiquement les bonnes pratiques de sécurité et de conformité dans les interactions entre IA et infrastructure, sans ajouter de complexité ni de composants supplémentaires."
+PHADGY,"REX Renault - Kubernetes as a Service : sécurité, innovation et self-service à grande échelle","vincent-ledan,ismail-kaboubi",Infrastructure et opérations,,Debussy,talk,2026-02-03T17:00:00+01:00,30,,,,,,fr,confirmed,"Notre nouvelle approche Kubernetes as a Service chez Renault a été conçue pour simplifier la création, la gestion et la montée en charge de clusters Kubernetes et de leurs add-ons, en adoptant une approche API-first qui place l’expérience développeur au premier plan.
+
+L’objectif est de fournir aux équipes projets des clusters dédiés ou des namespaces mutualisés à la demande, sans intervention d’une équipe infrastructure, tout en intégrant dès le départ les meilleures pratiques de FinOps, sécurité et conformité.
+
+Notre plateforme s’appuie sur une stack structurante :
+
+- Config Connector pour l’Infrastructure as Code à grande échelle, permettant un provisionnement déclaratif et GitOps des ressources et clusters.
+
+- Sveltos pour le management des add-ons à l’échelle (observabilité, outils de sécurité, services custom, Gateway API, intégration CI/CD moderne, etc.), garantissant cohérence, gouvernance et automatisation sur des dizaines de clusters.
+
+- Une API permettant d’accéder à l’ensemble des fonctionnalités de ""Kubernetes as a service"" via une interface standardisée et sécurisée. Cette API centralise la gestion des accès avec un contrôle fin des permissions, et s’intègre facilement avec des outils existants comme ServiceNow ou avec d'autres plateformes internes (Internal Developer Portal), favorisant ainsi un modèle platform as a product pleinement consommable.
+
+Nous présenterons également notre approche innovante de microsegmentation, portée par un contrôleur Kubernetes custom, qui facilite pour les développeurs la gestion du trafic principalement en Egress au niveau namespace, tout en maintenant des exigences fortes de gouvernance et de sécurité.
+
+Cette session illustrera comment Renault a construit une plateforme best-in-class, pensée comme un produit, où self-service, automatisation et gouvernance se conjuguent pour offrir agilité aux développeurs et contrôle total sur les coûts, la sécurité et la conformité."
+PPFQLC,"Docker Bake, élégance et standardisation pour le build de vos images Docker",mazlum-tosun,Developer Experience,,Debussy,talk,2026-02-03T17:45:00+01:00,45,,,,,,fr,confirmed,"Construire des images **Docker**, nous sommes nombreux à le faire avec la bonne vieille commande **docker build**. Ça marche, mais ça peut vite devenir verbeux, peu lisible, et pénible à maintenir, surtout lorsque l'on doit gérer des stratégies multi-OS, ou passer à l’échelle dans une CI.
+
+Bonne nouvelle : Docker a introduit **Docker Bake**, une façon standard, élégante et efficace de décrire vos builds avec du HCL ou du YAML. C’est propre, lisible, modulaire et surtout pensé pour l’automatisation.
+
+Dans ce talk, nous commencerons par la méthode classique : deux images, du multi-archi, un peu de lourdeur. Puis nous referons tout ça avec Docker Bake : des variables, des targets et une publication dans une registry sur le cloud. Nous poursuivrons avec un catalogue des fonctionalités de Bake.
+
+Nous verrons comment tout ça tourne en local, puis dans une CI comme **Cloud Build**, **GitHub Actions** et **Gitlab CI**.
+
+Après ce talk, vous aurez (on l’espère !) envie de remplacer vos scripts maison basés sur **docker build** par Docker Bake afin de rendre vos builds plus simples, élégants et efficaces."
+TGL9BQ,REX Ubisoft - Quand et comment partager un cluster : retour d'expérience sur Capsule chez Ubisoft,"behar,corentin-closs",Infrastructure et opérations,,Piaf,talk,2026-02-03T17:45:00+01:00,45,,,,,,fr,confirmed,"**Capsule** est un opérateur Kubernetes open-source facilitant le partage d'un cluster entre plusieurs équipes.
+
+Dans ce talk, nous **partagerons notre expérience chez Ubisoft**, après 9 ans, 6 IDPs et plusieurs centaines de clusters Kubernetes en production sur 3 public cloud providers et des infrastructures on-premise.
+
+Nous reviendrons sur les raisons et les difficultés de faire du multi-tenancy dans un cluster, analyserons différentes solutions techniques : **Kubernetes en natif**, **Capsule**, **KCP**, **vCluster**, et expliquerons pourquoi nous avons choisi Capsule.
+
+Nous parlerons également de l'**implémentation** et pourquoi nous avons développé notre propre opérateur par-dessus Capsule pour gérer nos ""workspaces"", avec bien sûr une démo.
+
+Rejoignez Corentin et Vincent pour un retour d'expérience concret, basé sur plus de 6 années de production avec des clusters partagés en centaines de namespaces."
+7LNQZA,Passons au cloud-native durable,rexed,Infrastructure et opérations,,Dumas,talk,2026-02-03T18:00:00+01:00,30,,,,,,fr,confirmed,"Au cours de cette dernière décennie, notre société se base de plus en plus sur du logiciel. Des entreprises du monde entier développent des logiciels non seulement pour améliorer la valeur pour leurs employés, mais aussi pour mieux servir leurs clients. Cependant, une part significative de ces logiciels sont hébergés dans un datacenter géré soit par l'organisation elle-même, soit par un fournisseur cloud. Malheureusement, cette tendance contribue à une consommation de 3 % de l'empreinte carbone mondiale.
+
+Récemment, un changement crucial s'est produit : la prolifération des LLM poussant les entreprises à déployer des applications plus grosses et plus gourmandes en ressources dans nos datacenters. En conséquence, l'empreinte carbone associée aux datacenter augmente de 2 % par an en raison des demandes liées à l'IA. Si nous ne parvenons pas à transformer notre culture Cloud-Native, cette trajectoire pourrait conduire à ce que les datacenter consomment 15 % de l'empreinte carbone mondiale, dépassant même l'industrie aérienne.
+
+Dans cette présentation, nous explorerons des solutions qui nous permettent d'optimiser notre environnement et de réduire les charges de travail inutiles. Pour **améliorer l'efficacité énergétique de nos clusters Kubernetes** (k8s), nous devons :
+1.	Mesurer et Comprendre l'Utilisation Actuelle : Obtenir des informations sur la façon dont notre environnement consomme les ressources.
+2.	Utiliser la Consommation d'Énergie comme KPI Global : Prioriser l'efficacité énergétique dans tous nos projets.
+3.	Eteindre les Environnements de Test Inutilisés : Éviter la consommation inutile de ressources.
+4.	Optimiser Continuellement l'Allocation des Ressources dans vos cluster k8s : Ajuster finement la taille de vos cluster.
+5.   Mesurer l'empreinte de l'utilisation des LLM locaux ou hébergés
+
+Au cours de cette session, nous présenterons également plusieurs projets CNCF dont **Kepler**, **KubeGreen** et **Vcluster**. Ensemble, façonnons un avenir plus vert pour l'ingénierie Cloud-Native ! 🌿🚀"
+HFFT3Q,REX Skello - Data Platform Engineering : Comment rendre les équipes métier vraiment autonomes grâce à Kubernetes et Airflow,edgar-halbert,Developer Experience,,Monet,talk,2026-02-03T18:00:00+01:00,30,,,,,,fr,confirmed,"Dans de nombreuses entreprises, la data devient un **bottleneck**. Les équipes métier ne peuvent pas avancer seules et attendent constamment que la data team traite leurs tickets, ce qui freine la prise de décision et la vélocité de l’entreprise.
+
+Chez **Skello**, nous avons choisi d’inverser cette dynamique. Notre mission : libérer la data team en donnant aux métiers les moyens de gérer leurs projets en **autonomie**. 
+
+Ce talk est un retour d'expérience concret sur la transformation de notre plateforme data centralisée en un **produit interne self-service**. Nous verrons comment nous avons appliqué les principes du **Platform Engineering** (GitOps, Kubernetes) pour y parvenir.
+
+Nous montrerons: 
+- Comment nos équipes métier **orchestrent** et **maintiennent** leurs propres pipelines data - du nettoyage jusqu'à la réinjection dans Salesforce - via une **simple interface YAML**
+
+- Les fondations techniques (Karpenter, Keda, ExternalSecrets) qui assurent la **scalabilité** et la **fiabilité** de notre plateforme
+
+Nous partagerons notre parcours, des principes techniques aux leçons apprises en livrant ce produit self-service",
