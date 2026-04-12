@@ -1,7 +1,9 @@
 ---
 import { Font } from "astro:assets";
 import "../styles/global.css";
-import LanguageToggle from "@/components/LanguageToggle.astro";
+import Navigation from "@/components/Navigation.astro";
+import TranslationNotice from "@/components/TranslationNotice.astro";
+import { defaultLang } from "@/i18n/ui";
 
 interface Props {
   title?: string;
@@ -10,6 +12,7 @@ interface Props {
 
 const { title = "Cloud Native Days France 2027", lang } = Astro.props;
 const resolvedLang = lang ?? Astro.currentLocale ?? "fr";
+const showTranslationNotice = resolvedLang !== defaultLang;
 ---
 <html lang={resolvedLang} class="dark">
   <head>
@@ -19,9 +22,8 @@ const resolvedLang = lang ?? Astro.currentLocale ?? "fr";
     <Font cssVariable="--font-dm-sans" preload />
   </head>
   <body class="bg-background text-foreground font-sans antialiased min-h-screen">
-    <header class="sticky top-0 z-50 flex items-center justify-end px-4 py-3 backdrop-blur-sm bg-background/90">
-      <LanguageToggle />
-    </header>
+    <Navigation />
+    {showTranslationNotice && <TranslationNotice />}
     <slot />
   </body>
 </html>
