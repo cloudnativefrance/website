@@ -36,7 +36,7 @@ const ctaLabel = t("hero.cta.register");
 
 <header
   id="site-header"
-  class="sticky top-0 z-50 backdrop-blur-sm bg-background/90 border-b border-transparent transition-[border-color] duration-200"
+  class="sticky top-0 z-50 backdrop-blur-sm bg-background/90 border-b border-transparent transition-[border-color,box-shadow] duration-200"
 >
   <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
     <!-- Logo -->
@@ -54,10 +54,10 @@ const ctaLabel = t("hero.cta.register");
             data-nav-key={key}
             aria-current={isActive(currentPath, href) ? "page" : undefined}
             class:list={[
-              "text-sm font-medium transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
+              "text-sm font-medium text-white transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
               isActive(currentPath, href)
-                ? "text-primary border-b-2 border-primary"
-                : "text-muted-foreground hover:text-foreground border-b-2 border-transparent",
+                ? "border-b-2 border-primary"
+                : "border-b-2 border-transparent hover:border-primary/60",
             ]}
           >
             {label}
@@ -131,12 +131,13 @@ const ctaLabel = t("hero.cta.register");
     document.body.classList.toggle("overflow-hidden", !!isHidden);
   });
 
-  // Scroll border effect
+  // Scroll divider + subtle shadow — visible 15% white line over deep purple bg
   const header = document.getElementById("site-header");
   if (header) {
     const onScroll = () => {
       const scrolled = window.scrollY > 0;
-      header.classList.toggle("border-border", scrolled);
+      header.classList.toggle("border-white/15", scrolled);
+      header.classList.toggle("shadow-[0_4px_12px_rgba(0,0,0,0.2)]", scrolled);
       header.classList.toggle("border-transparent", !scrolled);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
