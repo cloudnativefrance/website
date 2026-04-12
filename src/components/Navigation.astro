@@ -12,9 +12,9 @@ const navItems = [
   { key: "nav.home"     as const, path: "/",         dead: false },
   { key: "nav.speakers" as const, path: "/speakers", dead: false },
   { key: "nav.schedule" as const, path: "/programme", dead: false }, // Phase 7
-  { key: "nav.sponsors" as const, path: "/",         dead: true  }, // Phase 5 pending (D-05)
+  { key: "nav.sponsors" as const, path: "/sponsors", dead: false },
   { key: "nav.venue"    as const, path: "/venue",    dead: false }, // Phase 6
-  { key: "nav.team"     as const, path: "/",         dead: true  }, // Phase 5 pending (D-05)
+  { key: "nav.team"     as const, path: "/team",     dead: false },
 ];
 
 function isActive(currentPath: string, href: string, dead: boolean): boolean {
