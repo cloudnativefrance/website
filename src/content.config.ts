@@ -1,7 +1,11 @@
 import { defineCollection } from "astro:content";
-import { file } from "astro/loaders";
 import { z } from "astro/zod";
-import { fetchCsvOrFallback, SPEAKERS_CSV_URL } from "./lib/remote-csv";
+import {
+  fetchCsvOrFallback,
+  SPEAKERS_CSV_URL,
+  SPONSORS_CSV_URL,
+  TEAM_CSV_URL,
+} from "./lib/remote-csv";
 
 /**
  * Minimal CSV parser — handles RFC-4180 quoted fields with escaped `""`.
@@ -103,39 +107,40 @@ const speakers = defineCollection({
 });
 
 const sponsors = defineCollection({
-  loader: file("src/content/sponsors/sponsors.yaml"),
+  loader: csvLoader({
+    url: SPONSORS_CSV_URL,
+    fallback: "src/content/sponsors/sponsors.csv",
+    label: "sponsors.csv",
+  }),
   schema: z.object({
     id: z.string(),
     name: z.string(),
     tier: z.enum(["platinum", "gold", "silver", "community"]),
     logo: z.string(),
     url: z.string().url(),
-    description: z.object({
-      fr: z.string(),
-      en: z.string(),
-    }),
+    description_fr: z.string(),
+    description_en: z.string(),
   }),
 });
 
 const team = defineCollection({
-  loader: file("src/content/team/team.yaml"),
+  loader: csvLoader({
+    url: TEAM_CSV_URL,
+    fallback: "src/content/team/team.csv",
+    label: "team.csv",
+  }),
   schema: z.object({
     id: z.string(),
     name: z.string(),
-    role: z.object({
-      fr: z.string(),
-      en: z.string(),
-    }),
+    role_fr: z.string(),
+    role_en: z.string(),
     group: z.enum(["core", "program-committee", "volunteers"]),
-    photo: z.string().optional(),
-    social: z
-      .object({
-        twitter: z.string().url().optional(),
-        linkedin: z.string().url().optional(),
-        github: z.string().url().optional(),
-        bluesky: z.string().url().optional(),
-      })
-      .optional(),
+    photo: z.string().optional().or(z.literal("").transform(() => undefined)),
+    social_linkedin: socialUrl,
+    social_github: socialUrl,
+    social_bluesky: socialUrl,
+    social_twitter: socialUrl,
+    social_website: socialUrl,
   }),
 });
 
