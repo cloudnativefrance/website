@@ -1,0 +1,27 @@
+---
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+{/* TODO: verify with organizers — replace with sponsor-specific inbox when provisioned */}
+const contactEmail = "contact@cloudnativedays.fr";
+---
+
+<section class="py-24">
+  <div class="max-w-[640px] mx-auto text-center px-4">
+    <h2 class="text-2xl font-semibold text-foreground">{t("sponsors.cta.heading")}</h2>
+    <p class="text-base text-muted-foreground mt-4">{t("sponsors.cta.body")}</p>
+    <a
+      href={`mailto:${contactEmail}`}
+      class="inline-flex items-center justify-center rounded-md bg-accent text-accent-foreground text-sm font-medium px-6 py-3 mt-8 transition-opacity motion-safe:hover:-translate-y-0.5 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    >
+      {t("sponsors.cta.button")}
+    </a>
+  </div>
+</section>

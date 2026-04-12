@@ -1,0 +1,114 @@
+---
+import type { CollectionEntry } from "astro:content";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+
+interface Props {
+  sponsor: CollectionEntry<"sponsors">;
+  lang: Locale;
+  tier: "platinum" | "gold" | "silver" | "community";
+}
+
+const { sponsor, lang, tier } = Astro.props;
+const t = useTranslations(lang);
+
+/**
+ * URL allowlist — threat T-05-02 mitigation.
+ * Only http(s) URLs are rewritten into an anchor href.
+ * Pattern copied verbatim from src/components/speakers/SocialLinks.astro.
+ */
+function safeUrl(raw: string | undefined): string | null {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  try {
+    const u = new URL(trimmed);
+    if (u.protocol === "http:" || u.protocol === "https:") return u.toString();
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Logo path allowlist — threat T-05-03 mitigation.
+ * Accepts either an absolute public path (`/sponsors/foo.svg`) or an
+ * `https://` URL. Rejects `javascript:`, `data:`, `//protocol-relative`,
+ * and any path containing `..` traversal.
+ */
+function safeLogoPath(raw: string | undefined): string | null {
+  const t = (raw || "").trim();
+  if (!t) return null;
+  if (t.includes("..")) return null;
+  // Absolute public paths ("/sponsors/foo.svg") — reject protocol-relative
+  if (t.startsWith("/") && !t.startsWith("//")) return t;
+  // https absolute URLs only
+  try {
+    const u = new URL(t);
+    if (u.protocol === "https:") return u.toString();
+  } catch {
+    /* fallthrough */
+  }
+  return null;
+}
+
+const description = lang === "fr" ? sponsor.data.description_fr : sponsor.data.description_en;
+const safeHref = safeUrl(sponsor.data.url);
+const logoSrc = safeLogoPath(sponsor.data.logo);
+const ariaLabel = t("sponsors.card.aria").replace("{name}", sponsor.data.name);
+
+// Tier-specific padding
+const tierPadding: Record<Props["tier"], string> = {
+  platinum: "p-8",
+  gold: "p-6",
+  silver: "p-4",
+  community: "p-3",
+};
+
+// Tier-specific logo dimensions
+const tierLogoSize: Record<Props["tier"], string> = {
+  platinum: "max-w-[220px] max-h-20",
+  gold: "max-w-[160px] max-h-16",
+  silver: "max-w-[120px] max-h-14",
+  community: "max-w-[88px] max-h-10",
+};
+
+const baseCardClass = `bg-card border border-border rounded-lg ${tierPadding[tier]} flex flex-col items-center justify-center gap-2`;
+const linkExtrasClass =
+  "transition-all duration-200 motion-safe:hover:-translate-y-0.5 hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+---
+
+{safeHref ? (
+  <a
+    href={safeHref}
+    target="_blank"
+    rel="noopener noreferrer"
+    title={description}
+    aria-label={ariaLabel}
+    class={`${baseCardClass} ${linkExtrasClass}`}
+  >
+    {logoSrc ? (
+      <img
+        src={logoSrc}
+        alt={sponsor.data.name}
+        class={`${tierLogoSize[tier]} object-contain`}
+        loading="lazy"
+        decoding="async"
+      />
+    ) : null}
+    <span class="text-sm text-muted-foreground text-center">{sponsor.data.name}</span>
+  </a>
+) : (
+  <div class={baseCardClass} title={description}>
+    {logoSrc ? (
+      <img
+        src={logoSrc}
+        alt={sponsor.data.name}
+        class={`${tierLogoSize[tier]} object-contain`}
+        loading="lazy"
+        decoding="async"
+      />
+    ) : null}
+    <span class="text-sm text-muted-foreground text-center">{sponsor.data.name}</span>
+  </div>
+)}
