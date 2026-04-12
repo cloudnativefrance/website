@@ -4,3 +4,6 @@ kube-corp,KubeCorp,gold,/sponsors/kubecorp.svg,https://kubecorp.example.com,"Sol
 cloud-forge,CloudForge,gold,/sponsors/cloudforge.svg,https://cloudforge.example.com,"Plateforme de CI/CD cloud-native.","Cloud-native CI/CD platform."
 stack-ops,StackOps,silver,/sponsors/stackops.svg,https://stackops.example.com,"Observabilité pour les équipes plateforme.","Observability for platform teams."
 cncf-paris,CNCF Paris Meetup,community,/sponsors/cncf-paris.svg,https://cncf.io,"Communauté cloud-native de Paris.","The Paris cloud-native community."
+nebula-stack,NebulaStack,platinum,/sponsors/nebula-stack.svg,https://nebulastack.example.com,"Plateforme d'IA cloud-native pour l'entreprise.","Cloud-native AI platform for the enterprise."
+mesh-ops,MeshOps,silver,/sponsors/mesh-ops.svg,https://meshops.example.com,"Service mesh managé pour les architectures distribuées.","Managed service mesh for distributed architectures."
+kubernetes-fr,Kubernetes France,community,/sponsors/kubernetes-fr.svg,https://kubernetes.fr.example.com,"Groupe d'utilisateurs Kubernetes francophones.","French-speaking Kubernetes user group."
