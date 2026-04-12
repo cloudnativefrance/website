@@ -160,13 +160,11 @@ const CSS_VARS = {
             {formats.map((fmt) => (
               <button
                 type="button"
-                class="schedule-filter chip chip--format chip--swatch"
+                class="schedule-filter chip chip--format"
                 data-filter="format"
                 data-value={fmt}
                 aria-pressed="false"
-                style={"--swatch-color: " + formatSwatchColor(fmt)}
               >
-                <span class="chip-swatch" aria-hidden="true"></span>
                 {t(`schedule.format.${fmt}` as any)}
               </button>
             ))}
@@ -318,7 +316,7 @@ const CSS_VARS = {
             : style;
           return (
             <article
-              class={`schedule-session ${formatChipClass(s.format)} ${isCompact ? "is-compact" : ""}`}
+              class={`schedule-session ${isCompact ? "is-compact" : ""}`}
               style={cardStyle}
               data-session-id={s.id}
               data-room={s.room}
