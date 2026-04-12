@@ -1,71 +1,57 @@
-import { getCollection } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
 import type { Locale } from "@/i18n/ui";
+import { loadSessions, type SessionRow } from "./schedule";
 
-/** Extract the slug (without locale prefix) from a collection entry ID */
+/**
+ * Extract the slug from a speaker collection entry id.
+ * After the speakers.csv migration, id === slug (no locale prefix).
+ */
 export function getSlug(entryId: string): string {
-  return entryId.replace(/^(fr|en)\//, "");
+  return entryId;
 }
 
-/** Extract locale from a collection entry ID */
-export function getLocale(entryId: string): Locale {
-  return entryId.startsWith("en/") ? "en" : "fr";
+/** Get every speaker. The collection is locale-agnostic. */
+export async function getAllSpeakers() {
+  return await getCollection("speakers");
 }
 
-/** Get all speakers for a given locale */
-export async function getSpeakersByLocale(locale: Locale) {
-  const allSpeakers = await getCollection("speakers");
-  return allSpeakers.filter((s) => s.id.startsWith(`${locale}/`));
+/**
+ * Back-compat: used to return FR/EN-filtered collections.
+ * The schema is now single-source; we just return every speaker regardless of locale.
+ */
+export async function getSpeakersByLocale(_locale: Locale) {
+  return await getAllSpeakers();
 }
 
-/** Get all talks for a given locale */
-export async function getTalksByLocale(locale: Locale) {
-  const allTalks = await getCollection("talks");
-  return allTalks.filter((t) => t.id.startsWith(`${locale}/`));
+/** Get all sessions for a locale (currently locale-agnostic — sessions.csv holds one copy). */
+export async function getTalksByLocale(_locale: Locale): Promise<SessionRow[]> {
+  return loadSessions();
 }
 
-/** Get talks for a specific speaker slug (matches speaker + cospeakers) */
-export async function getTalksForSpeaker(
-  locale: Locale,
-  speakerSlug: string,
-) {
-  const talks = await getTalksByLocale(locale);
-  return talks.filter(
-    (t) =>
-      t.data.speaker === speakerSlug ||
-      t.data.cospeakers?.includes(speakerSlug),
-  );
+/** Return the sessions that feature a given speaker slug (primary or co-speaker). */
+export async function getTalksForSpeaker(_locale: Locale, speakerSlug: string): Promise<SessionRow[]> {
+  const sessions = loadSessions();
+  return sessions.filter((s) => s.speakers.includes(speakerSlug));
 }
 
-/** Get speakers sorted: keynotes first, then alphabetical by name */
-export async function getSortedSpeakers(locale: Locale) {
-  const speakers = await getSpeakersByLocale(locale);
-  const talks = await getTalksByLocale(locale);
-
-  // Build a Set of speaker slugs who have keynote talks
-  const keynoteSpeakerSlugs = new Set<string>();
-  for (const talk of talks) {
-    if (talk.data.format === "keynote") {
-      keynoteSpeakerSlugs.add(talk.data.speaker);
-      talk.data.cospeakers?.forEach((cs) => keynoteSpeakerSlugs.add(cs));
-    }
-  }
-
-  // Sort: keynotes first, then alphabetical by name
-  return speakers.sort((a, b) => {
-    const aKey = keynoteSpeakerSlugs.has(getSlug(a.id));
-    const bKey = keynoteSpeakerSlugs.has(getSlug(b.id));
+/** Sort speakers with keynote holders first, then alphabetically by name. */
+export async function getSortedSpeakers(_locale: Locale) {
+  const speakers = await getAllSpeakers();
+  return [...speakers].sort((a, b) => {
+    const aKey = !!a.data.keynote;
+    const bKey = !!b.data.keynote;
     if (aKey && !bKey) return -1;
     if (!aKey && bKey) return 1;
     return a.data.name.localeCompare(b.data.name);
   });
 }
 
-/** Get all other speaker slugs for a talk, excluding the current speaker */
+/** Other speaker slugs on the same session, excluding the current one. */
 export function getCoSpeakersForTalk(
-  talk: { data: { speaker: string; cospeakers?: string[] } },
+  session: SessionRow,
   currentSpeakerSlug: string,
 ): string[] {
-  return [talk.data.speaker, ...(talk.data.cospeakers ?? [])].filter(
-    (slug) => slug !== currentSpeakerSlug,
-  );
+  return session.speakers.filter((slug) => slug !== currentSpeakerSlug);
 }
+
+export type SpeakerEntry = CollectionEntry<"speakers">;

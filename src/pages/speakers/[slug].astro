@@ -1,20 +1,17 @@
 ---
-import { getCollection, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import SpeakerProfile from "@/components/speakers/SpeakerProfile.astro";
-import TalkCard from "@/components/speakers/TalkCard.astro";
 import {
+  getAllSpeakers,
   getSlug,
   getTalksForSpeaker,
   getCoSpeakersForTalk,
-  getSpeakersByLocale,
 } from "@/lib/speakers";
-import { useTranslations } from "@/i18n/utils";
+import { useTranslations, getLocalePath } from "@/i18n/utils";
 
 export async function getStaticPaths() {
-  const speakers = await getCollection("speakers");
-  const frSpeakers = speakers.filter((s) => s.id.startsWith("fr/"));
-  return frSpeakers.map((speaker) => ({
+  const speakers = await getAllSpeakers();
+  return speakers.map((speaker) => ({
     params: { slug: getSlug(speaker.id) },
     props: { speaker },
   }));
@@ -25,11 +22,16 @@ const lang: "fr" = "fr";
 const t = useTranslations(lang);
 const slug = getSlug(speaker.id);
 const talks = await getTalksForSpeaker("fr", slug);
-const { Content } = await render(speaker);
 
-// Resolve co-speaker names for each talk
-const allSpeakers = await getSpeakersByLocale("fr");
-const speakerMap = new Map(allSpeakers.map((s) => [getSlug(s.id), s.data.name]));
+const allSpeakers = await getAllSpeakers();
+const speakerNameBySlug = new Map(allSpeakers.map((s) => [getSlug(s.id), s.data.name]));
+const social = {
+  twitter: speaker.data.twitter,
+  linkedin: speaker.data.linkedin,
+  github: speaker.data.github,
+  bluesky: speaker.data.bluesky,
+  website: speaker.data.website,
+};
 ---
 
 <Layout title={`${speaker.data.name} | ${t("site.title")}`}>
@@ -38,13 +40,15 @@ const speakerMap = new Map(allSpeakers.map((s) => [getSlug(s.id), s.data.name]))
       name={speaker.data.name}
       company={speaker.data.company}
       role={speaker.data.role}
-      photo={speaker.data.photo}
-      social={speaker.data.social}
+      photo={speaker.data.photo_url}
+      social={social}
       lang={lang}
     >
-      <article class="prose prose-invert max-w-none">
-        <Content />
-      </article>
+      {speaker.data.bio && (
+        <article class="prose prose-invert max-w-none">
+          <p>{speaker.data.bio}</p>
+        </article>
+      )}
 
       <section slot="talks" class="mt-10">
         {talks.length > 0 ? (
@@ -52,25 +56,38 @@ const speakerMap = new Map(allSpeakers.map((s) => [getSlug(s.id), s.data.name]))
             <h2 class="text-2xl font-bold text-foreground mb-4">
               {t("speakers.talks_heading")}
             </h2>
-            <div class="flex flex-col gap-4">
+            <ul role="list" class="flex flex-col gap-3">
               {talks.map((talk) => {
-                const coSpeakerSlugs = getCoSpeakersForTalk(talk, slug);
-                const coSpeakers = coSpeakerSlugs.map((cs) => ({
+                const coSlugs = getCoSpeakersForTalk(talk, slug);
+                const coNames = coSlugs.map((cs) => ({
                   slug: cs,
-                  name: speakerMap.get(cs) ?? cs,
+                  name: speakerNameBySlug.get(cs) ?? cs,
                 }));
                 return (
-                  <TalkCard
-                    title={talk.data.title}
-                    track={talk.data.track}
-                    format={talk.data.format}
-                    duration={talk.data.duration}
-                    coSpeakers={coSpeakers}
-                    lang={lang}
-                  />
+                  <li class="rounded-lg border border-border bg-card p-4">
+                    <h3 class="text-base font-bold text-foreground">{talk.title}</h3>
+                    <p class="mt-1 text-sm text-muted-foreground">
+                      {talk.format.charAt(0).toUpperCase() + talk.format.slice(1)} · {talk.durationMin} min
+                      {talk.room && <span> · {talk.room}</span>}
+                      {talk.track && <span> · {talk.track}</span>}
+                    </p>
+                    {coNames.length > 0 && (
+                      <p class="mt-2 text-sm text-muted-foreground">
+                        {t("speakers.cospeaker_prefix")}{" "}
+                        {coNames.map((cs, i) => (
+                          <>
+                            <a href={getLocalePath(lang, `/speakers/${cs.slug}`)} class="text-primary hover:underline">
+                              {cs.name}
+                            </a>
+                            {i < coNames.length - 1 && ", "}
+                          </>
+                        ))}
+                      </p>
+                    )}
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </>
         ) : (
           <p class="text-sm text-muted-foreground mt-8">

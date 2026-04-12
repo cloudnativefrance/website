@@ -64,7 +64,7 @@ const regular = speakers
             <div class="relative rounded-full overflow-hidden h-[180px] w-[180px] md:h-[220px] md:w-[220px] bg-secondary">
               <SpeakerAvatar
                 name={keynote.data.name}
-                photo={keynote.data.photo}
+                photo={keynote.data.photo_url}
                 size="lg"
               />
             </div>
@@ -140,7 +140,7 @@ const regular = speakers
                 <div class="flex flex-col items-center">
                   <SpeakerAvatar
                     name={speaker.data.name}
-                    photo={speaker.data.photo}
+                    photo={speaker.data.photo_url}
                     size="sm"
                   />
                   <p class="mt-3 text-base font-bold text-foreground">
