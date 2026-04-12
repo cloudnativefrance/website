@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 2: Bilingual Architecture & Content Collections** - i18n routing, language toggle, Zod-validated content schemas for all data types
 - [ ] **Phase 3: Hero & Landing** - Hero section with countdown, CTA, key numbers -- the first thing visitors see
 - [x] **Phase 4: Speakers** - Speaker grid, individual pages, bilingual content, talk cross-references (completed 2026-04-11)
-- [ ] **Phase 5: Sponsors & Team** - Tiered sponsor showcase and team page with role grouping
+- [x] **Phase 5: Sponsors & Team** - Tiered sponsor showcase and team page with role grouping (completed 2026-04-12)
 - [ ] **Phase 6: Venue & Previous Editions** - Venue details with map/transport/accessibility, plus past edition recap
 - [ ] **Phase 7: Interactive Schedule** - Full schedule with filtering, timeline view, bookmarks, iCal export, Open Feedback links
 - [ ] **Phase 8: Event Lifecycle** - Post-event replay mode, YouTube recording links, CFP status indicator
@@ -102,9 +102,9 @@ Plans:
 
 Plans:
 - [x] 05-01-PLAN.md — Migrate sponsors + team to CSV data pipeline with flat Zod schemas (SPNS-03, TEAM-03)
-- [ ] 05-02-PLAN.md — Sponsors page (FR /partenaires + EN /en/sponsors) with tiered grids + accent CTA (SPNS-01, SPNS-02)
-- [ ] 05-03-PLAN.md — Team page (FR /equipe + EN /en/team) with grouped sections + SpeakerAvatar reuse (TEAM-01, TEAM-02)
-- [ ] 05-04-PLAN.md — Flip nav dead-links + phase integration verification (D-10)
+- [x] 05-02-PLAN.md — Sponsors page (FR /partenaires + EN /en/sponsors) with tiered grids + accent CTA (SPNS-01, SPNS-02)
+- [x] 05-03-PLAN.md — Team page (FR /equipe + EN /en/team) with grouped sections + SpeakerAvatar reuse (TEAM-01, TEAM-02)
+- [x] 05-04-PLAN.md — Flip nav dead-links + phase integration verification (D-10)
 
 ### Phase 6: Venue & Previous Editions
 **Goal**: Attendees can plan their trip and past attendees can relive last year's edition
@@ -223,7 +223,7 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | 2. Bilingual Architecture & Content Collections | 0/3 | Planned | - |
 | 3. Hero & Landing | 0/? | Not started | - |
 | 4. Speakers | 3/3 | Complete   | 2026-04-11 |
-| 5. Sponsors & Team | 1/4 | In Progress|  |
+| 5. Sponsors & Team | 4/4 | Complete   | 2026-04-12 |
 | 6. Venue & Previous Editions | 1/1 | Complete   | 2026-04-12 |
 | 7. Interactive Schedule | 1/1 | Complete   | 2026-04-12 |
 | 8. Event Lifecycle | 0/? | Not started | - |
