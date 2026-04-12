@@ -15,7 +15,6 @@ const speakerNames = new Map(speakerEntries.map((s) => [getSlug(s.id), s.data.na
 <Layout title={`${t("schedule.heading")} | ${t("site.title")}`}>
   <main
     class="px-4 md:px-6 lg:px-8"
-    data-schedule-empty={t("schedule.agenda.empty")}
     data-schedule-active-singular={t("schedule.filter.active_singular")}
     data-schedule-active-plural={t("schedule.filter.active_plural")}
   >
