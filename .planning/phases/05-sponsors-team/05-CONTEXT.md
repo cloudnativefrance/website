@@ -12,7 +12,7 @@ source: /gsd-discuss-phase 5 (interactive)
 
 **Requirements:** SPNS-01, SPNS-02, SPNS-03, TEAM-01, TEAM-02, TEAM-03.
 
-**Stitch-first rule applies** (per `CLAUDE.md`): Both pages (`/partenaires` and `/equipe` + EN mirrors) must be designed in Stitch and user-validated before code. After this CONTEXT.md lands, the next step is `/gsd-ui-phase 5` → user review → `/gsd-plan-phase 5`.
+**Stitch-first rule applies** (per `CLAUDE.md`): Both pages (`/sponsors` and `/team` + EN mirrors) must be designed in Stitch and user-validated before code. After this CONTEXT.md lands, the next step is `/gsd-ui-phase 5` → user review → `/gsd-plan-phase 5`.
 
 ---
 
@@ -30,7 +30,7 @@ source: /gsd-discuss-phase 5 (interactive)
 **Out of scope (deferred):**
 - Real sponsor roster — lands via a follow-up content-ops commit once organizers confirm deals.
 - Real team roster — same; schema is ready, data swap is trivial.
-- "Become a sponsor" prospectus page/flow (a single contact CTA at the end of `/partenaires` is the only sponsor-acquisition touchpoint in this phase).
+- "Become a sponsor" prospectus page/flow (a single contact CTA at the end of `/sponsors` is the only sponsor-acquisition touchpoint in this phase).
 - Individual sponsor or team profile pages (no `/[slug]` routes — sponsors link to external URLs, team members to their social profiles).
 - Dark/light logo variants, SVG sprite system (Phase 5 ships with whatever assets are in `/public/sponsors/`; asset optimization is a separate concern).
 - Interactive features (sponsor filter, search) — not in roadmap scope.
@@ -40,11 +40,13 @@ source: /gsd-discuss-phase 5 (interactive)
 <decisions>
 ## Implementation Decisions
 
-### D-01 — Routes (localized paths)
-- FR: `/partenaires` (sponsors), `/equipe` (team).
+### D-01 — Routes (symmetric English slugs)
+- FR: `/sponsors`, `/team`.
 - EN: `/en/sponsors`, `/en/team`.
-- Matches FR nav labels already shipped in Phase 10 (`"Partenaires"`, `"Equipe"`). Matches the `/programme` vs `/en/programme` precedent from Phase 7.
-- Update `src/components/Navigation.astro:15,17` — change `path: "/"` + `dead: true` to the real paths and remove the `dead` flag.
+- Rationale: matches the `/speakers` + `/en/speakers` precedent from Phase 4 and works with the existing prefix-only `getLocalePath(lang, path)` (`src/i18n/utils.ts:30-46`) — no route-translation map needed. Confirmed by user after initial draft of D-01 specified asymmetric paths (originally FR `/partenaires` + `/equipe`, EN `/en/sponsors` + `/en/team`) which would have required extending `getLocalePath` with a per-locale slug map, a subsystem not used elsewhere in the codebase.
+- **Nav-label translation is a separate concern from URL slugs**: the rendered link text is still "Partenaires" (FR) / "Partners" (EN) / "Équipe" (FR) / "Team" (EN) from the existing `nav.sponsors` / `nav.team` i18n keys. Only the href slug stays English across both locales.
+- Update `src/components/Navigation.astro:15,17` — change `path: "/"` + `dead: true` to `path: "/sponsors"` and `path: "/team"` and remove the `dead` flag.
+- File locations: `src/pages/sponsors.astro` (FR) + `src/pages/en/sponsors.astro` (EN); `src/pages/team.astro` (FR) + `src/pages/en/team.astro` (EN).
 
 ### D-02 — Data source: CSV with Google Sheets admin pipeline (matches schedule/speakers pattern)
 - **Migrate sponsors + team from YAML to CSV** to match the Phase 7 schedule + speakers workflow. Organizers edit a Google Sheet; a CSV export lands in-repo; the site builds from CSV.
@@ -83,7 +85,7 @@ source: /gsd-discuss-phase 5 (interactive)
 ### D-05 — Sponsor empty-tier handling: hide empty sections + single global CTA
 - If a tier has zero entries, do NOT render its section header or grid.
 - If a tier has 1–2 entries, render as-is (honest to sponsor state; no padding with fake content).
-- **Global sponsor CTA** at end of `/partenaires` (and `/en/sponsors`): a single block with a headline ("Devenez partenaire" / "Become a sponsor"), a 1–2 sentence pitch, and a contact affordance (mailto or link to `PROJECT.md`-defined sponsor contact).
+- **Global sponsor CTA** at end of `/sponsors` (and `/en/sponsors`): a single block with a headline ("Devenez partenaire" / "Become a sponsor"), a 1–2 sentence pitch, and a contact affordance (mailto or link to `PROJECT.md`-defined sponsor contact).
   - The actual email/URL for the CTA is Claude's discretion during planning — use whatever contact info exists in `PROJECT.md` or ROADMAP.md; if none, plan a placeholder with a `TODO` flagged in the plan's deferred-items for the user to fill in.
 
 ### D-06 — Team card: new `TeamMemberCard.astro`, compact + photo-forward
@@ -120,8 +122,8 @@ source: /gsd-discuss-phase 5 (interactive)
 - Add i18n keys `team.group.core`, `team.group.program_committee`, `team.group.volunteers` to `src/i18n/ui.ts` for both locales.
 
 ### D-10 — Nav wiring (closes existing dead links)
-- `src/components/Navigation.astro:15` — `{ key: "nav.sponsors", path: "/partenaires" /* localized via getLocalePath */, dead: false }`
-- `src/components/Navigation.astro:17` — `{ key: "nav.team", path: "/equipe", dead: false }`
+- `src/components/Navigation.astro:15` — `{ key: "nav.sponsors", path: "/sponsors" /* localized via getLocalePath */, dead: false }`
+- `src/components/Navigation.astro:17` — `{ key: "nav.team", path: "/team", dead: false }`
 - Remove the `// Phase 5 pending (D-05)` trailing comments.
 - Use `getLocalePath(lang, ...)` to resolve EN mirrors (matches existing nav items).
 
@@ -200,7 +202,7 @@ source: /gsd-discuss-phase 5 (interactive)
 ## Deferred Ideas (not this phase — capture for later)
 
 - **Real sponsor + team data population** — handled by organizers editing the Google Sheets backing the `SPONSORS_CSV_URL` / `TEAM_CSV_URL` env vars. No code change required; CI re-exports CSV into `src/content/{sponsors,team}/*.csv` on each deploy.
-- **Sponsor prospectus page** (`/partenaires/offre`, PDF download, tier pricing) — if organizers want lead-gen, a future phase.
+- **Sponsor prospectus page** (`/sponsors/offre`, PDF download, tier pricing) — if organizers want lead-gen, a future phase.
 - **Individual team member profile pages** — the social links row is enough for v1.0; individual pages would be a later phase.
 - **Sponsor filter/search** — if the roster grows past ~30, revisit. Not needed for 2027.
 - **Logo dark-mode variants** — add `logoLight` + `logoDark` to the schema if/when the site gains a light theme (currently dark-only).

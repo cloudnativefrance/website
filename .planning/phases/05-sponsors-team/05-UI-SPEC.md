@@ -6,8 +6,8 @@ shadcn_initialized: true
 preset: project-native (CSS-native @theme in src/styles/global.css, no preset string)
 created: 2026-04-12
 covers_pages:
-  - /partenaires (FR) + /en/sponsors (EN)
-  - /equipe (FR) + /en/team (EN)
+  - /sponsors (FR) + /en/sponsors (EN)
+  - /team (FR) + /en/team (EN)
 ---
 
 # Phase 5 — UI Design Contract: Sponsors & Team
@@ -101,7 +101,7 @@ Strictly sourced from `global.css` OKLCH tokens. No new palette entries.
 
 ### Accent reserved for (explicit list)
 
-- The single global sponsor CTA button at the bottom of `/partenaires` / `/en/sponsors` (label: `Devenez partenaire` / `Become a sponsor`).
+- The single global sponsor CTA button at the bottom of `/sponsors` / `/en/sponsors` (label: `Devenez partenaire` / `Become a sponsor`).
 
 That is the only accent usage on these two pages. No pink text, no pink borders, no pink badges. Tier labels, group labels, and card states stay neutral to let logos and faces carry the visual weight.
 
@@ -167,15 +167,15 @@ Pages:
 
 | Page | Path | Locale |
 |------|------|--------|
-| Sponsors (FR) | `src/pages/partenaires.astro` | fr |
+| Sponsors (FR) | `src/pages/sponsors.astro` | fr |
 | Sponsors (EN) | `src/pages/en/sponsors.astro` | en |
-| Team (FR) | `src/pages/equipe.astro` | fr |
+| Team (FR) | `src/pages/team.astro` | fr |
 | Team (EN) | `src/pages/en/team.astro` | en |
 
 Navigation wiring (Phase 10 leftover, closed here):
 
-- `src/components/Navigation.astro:15` — set `path: "/partenaires"`, `dead: false`.
-- `src/components/Navigation.astro:17` — set `path: "/equipe"`, `dead: false`.
+- `src/components/Navigation.astro:15` — set `path: "/sponsors"`, `dead: false`.
+- `src/components/Navigation.astro:17` — set `path: "/team"`, `dead: false`.
 - Both resolved to EN mirrors via `getLocalePath(lang, path)`.
 
 ---
