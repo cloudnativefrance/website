@@ -193,7 +193,7 @@ Plans:
   4. twitter field in SocialLinks is either rendered or removed from the Props type
 
 Plans:
-- [ ] 11-01: TBD
+- [x] 11-01: TBD
 
 ### Phase 12: CTA & Brand Completion
 **Goal**: Hero CTA buttons are functional and brand identity documentation is complete
@@ -226,5 +226,5 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | 8. Event Lifecycle | 0/? | Not started | - |
 | 9. SEO, Legal & Polish | 0/? | Not started | - |
 | 10. Site Navigation & Component Wiring | 1/1 | Complete   | 2026-04-12 |
-| 11. Security & i18n Hardcode Fixes | 0/? | Not started | - |
+| 11. Security & i18n Hardcode Fixes | 1/3 | In Progress|  |
 | 12. CTA & Brand Completion | 1/1 | Complete   | 2026-04-12 |
