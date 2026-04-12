@@ -176,8 +176,10 @@ Plans:
   3. TranslationNotice component is placed on relevant pages
   4. Orphaned shadcn Card/Separator components are either integrated into pages or removed
 
+**Plans**: 1 plan
+
 Plans:
-- [ ] 10-01: TBD
+- [x] 10-01-PLAN.md — Navigation.astro + Layout wiring + TranslationNotice placement + orphan retention doc (SC-01, SC-02, SC-03, SC-04)
 
 ### Phase 11: Security & i18n Hardcode Fixes
 **Goal**: All hardcoded English strings use i18n, locale detection is consistent, and the SocialLinks XSS vector is closed
@@ -223,6 +225,6 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | 7. Interactive Schedule | 0/? | Not started | - |
 | 8. Event Lifecycle | 0/? | Not started | - |
 | 9. SEO, Legal & Polish | 0/? | Not started | - |
-| 10. Site Navigation & Component Wiring | 0/? | Not started | - |
+| 10. Site Navigation & Component Wiring | 1/1 | Complete   | 2026-04-12 |
 | 11. Security & i18n Hardcode Fixes | 0/? | Not started | - |
 | 12. CTA & Brand Completion | 0/? | Not started | - |
