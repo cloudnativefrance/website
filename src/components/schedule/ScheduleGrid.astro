@@ -75,6 +75,19 @@ function formatChipClass(fmt: string) {
 }
 
 /**
+ * Resolved CSS color per format — used to paint the swatch on the Format
+ * filter chips so the chip visually matches the session card's background.
+ */
+function formatSwatchColor(fmt: string): string {
+  switch (fmt) {
+    case "keynote": return "var(--color-accent, #ff8a9e)";
+    case "lightning": return "var(--color-tertiary, #b8deff)";
+    case "workshop": return "var(--color-secondary, #251c50)";
+    default: return "var(--color-primary, #4985e8)";
+  }
+}
+
+/**
  * Deterministic per-track accent color. Hashes the track name to a hue
  * in [0, 360) and returns the resolved HSL color so we don't have to put
  * var() inside a CSS color function (which esbuild 0.27 fails to parse).
@@ -147,11 +160,13 @@ const CSS_VARS = {
             {formats.map((fmt) => (
               <button
                 type="button"
-                class="schedule-filter chip chip--format"
+                class="schedule-filter chip chip--format chip--swatch"
                 data-filter="format"
                 data-value={fmt}
                 aria-pressed="false"
+                style={"--swatch-color: " + formatSwatchColor(fmt)}
               >
+                <span class="chip-swatch" aria-hidden="true"></span>
                 {t(`schedule.format.${fmt}` as any)}
               </button>
             ))}
@@ -175,11 +190,13 @@ const CSS_VARS = {
               {tracks.map((tr) => (
                 <button
                   type="button"
-                  class="schedule-filter chip chip--track"
+                  class="schedule-filter chip chip--track chip--swatch"
                   data-filter="track"
                   data-value={tr}
                   aria-pressed="false"
+                  style={"--swatch-color: " + (trackColor(tr) || "var(--color-muted-foreground)")}
                 >
+                  <span class="chip-swatch" aria-hidden="true"></span>
                   {tr}
                 </button>
               ))}
@@ -504,6 +521,17 @@ const CSS_VARS = {
   .chip-stack {
     display: flex;
     flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip-swatch {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    background-color: var(--swatch-color, var(--color-muted-foreground));
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+  }
+  .chip--swatch {
     gap: 6px;
   }
   @media (max-width: 640px) {
