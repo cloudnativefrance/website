@@ -107,6 +107,10 @@ export const ui = {
     "schedule.subtitle":
       "50+ conferences sur 5 salles en parallele. Construisez votre agenda personnel, exportez-le en .ics.",
     "schedule.filter.toolbar": "Filtres du programme",
+    "schedule.filter.label_room": "Salle",
+    "schedule.filter.label_format": "Format",
+    "schedule.filter.label_track": "Theme",
+    "schedule.filter.label_level": "Niveau",
     "schedule.filter.row_physical": "Salle & format",
     "schedule.filter.row_content": "Theme & niveau",
     "schedule.filter.clear_all": "Reinitialiser",
@@ -237,6 +241,10 @@ export const ui = {
     "schedule.subtitle":
       "50+ talks across 5 parallel tracks. Build your personal agenda and export it as .ics.",
     "schedule.filter.toolbar": "Schedule filters",
+    "schedule.filter.label_room": "Room",
+    "schedule.filter.label_format": "Format",
+    "schedule.filter.label_track": "Theme",
+    "schedule.filter.label_level": "Level",
     "schedule.filter.row_physical": "Room & format",
     "schedule.filter.row_content": "Theme & level",
     "schedule.filter.clear_all": "Clear all",
