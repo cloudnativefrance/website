@@ -1,0 +1,145 @@
+---
+import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
+import LanguageToggle from "@/components/LanguageToggle.astro";
+import logoFull from "@/assets/logos/dark/logo.svg";
+import logoCompact from "@/assets/logos/dark/logo-notext.svg";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const currentPath = Astro.url.pathname;
+
+const navItems = [
+  { key: "nav.home"     as const, path: "/" },
+  { key: "nav.speakers" as const, path: "/speakers" },
+  { key: "nav.schedule" as const, path: "/" },  // dead link — Phase 7 pending (D-05)
+  { key: "nav.sponsors" as const, path: "/" },  // dead link — Phase 5 pending (D-05)
+  { key: "nav.venue"    as const, path: "/" },  // dead link — Phase 6 pending (D-05)
+  { key: "nav.team"     as const, path: "/" },  // dead link — Phase 5 pending (D-05)
+];
+
+const links = navItems.map(({ key, path }) => ({
+  key,
+  label: t(key),
+  href: getLocalePath(lang, path),
+}));
+
+function isActive(currentPath: string, href: string): boolean {
+  if (href === "/" || href === "/en" || href === "/en/") {
+    return currentPath === href || currentPath === href + "/";
+  }
+  return currentPath.startsWith(href);
+}
+
+const homeHref = getLocalePath(lang, "/");
+const ctaLabel = t("hero.cta.register");
+---
+
+<header
+  id="site-header"
+  class="sticky top-0 z-50 backdrop-blur-sm bg-background/90 border-b border-transparent transition-[border-color] duration-200"
+>
+  <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
+    <!-- Logo -->
+    <a href={homeHref} class="shrink-0 flex items-center" aria-label="CND France">
+      <img src={logoCompact.src} alt="CND France" class="h-8 md:hidden" />
+      <img src={logoFull.src} alt="CND France" class="hidden md:block h-8 md:h-10" />
+    </a>
+
+    <!-- Desktop links -->
+    <ul class="hidden md:flex items-center gap-6" role="list">
+      {links.map(({ key, label, href }) => (
+        <li>
+          <a
+            href={href}
+            data-nav-key={key}
+            aria-current={isActive(currentPath, href) ? "page" : undefined}
+            class:list={[
+              "text-sm font-medium transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
+              isActive(currentPath, href)
+                ? "text-primary border-b-2 border-primary"
+                : "text-muted-foreground hover:text-foreground border-b-2 border-transparent",
+            ]}
+          >
+            {label}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <!-- Right side -->
+    <div class="flex items-center gap-3">
+      <a
+        href="#"
+        class="hidden md:inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-medium px-4 h-9 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        {ctaLabel}
+      </a>
+      <LanguageToggle />
+      <button
+        id="mobile-menu-btn"
+        type="button"
+        class="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-md text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        aria-label="Menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <svg id="icon-open"  xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6"  x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg id="icon-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="hidden"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu panel -->
+  <div id="mobile-menu" class="hidden md:hidden border-t border-border bg-background/95 backdrop-blur-sm">
+    <ul class="px-4 py-2" role="list">
+      {links.map(({ label, href }) => (
+        <li>
+          <a
+            href={href}
+            aria-current={isActive(currentPath, href) ? "page" : undefined}
+            class:list={[
+              "flex items-center min-h-11 px-2 py-3 text-sm font-medium rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              isActive(currentPath, href) ? "text-primary" : "text-foreground hover:bg-muted",
+            ]}
+          >
+            {label}
+          </a>
+        </li>
+      ))}
+      <li>
+        <a href="#" class="flex items-center justify-center min-h-11 mx-2 my-3 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium">
+          {ctaLabel}
+        </a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<script>
+  // Mobile menu toggle with body scroll lock
+  const btn = document.getElementById("mobile-menu-btn");
+  const menu = document.getElementById("mobile-menu");
+  const iconOpen = document.getElementById("icon-open");
+  const iconClose = document.getElementById("icon-close");
+
+  btn?.addEventListener("click", () => {
+    const isHidden = menu?.classList.contains("hidden");
+    menu?.classList.toggle("hidden");
+    iconOpen?.classList.toggle("hidden");
+    iconClose?.classList.toggle("hidden");
+    btn.setAttribute("aria-expanded", isHidden ? "true" : "false");
+    document.body.classList.toggle("overflow-hidden", !!isHidden);
+  });
+
+  // Scroll border effect
+  const header = document.getElementById("site-header");
+  if (header) {
+    const onScroll = () => {
+      const scrolled = window.scrollY > 0;
+      header.classList.toggle("border-border", scrolled);
+      header.classList.toggle("border-transparent", !scrolled);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+</script>
