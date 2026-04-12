@@ -101,7 +101,7 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Migrate sponsors + team to CSV data pipeline with flat Zod schemas (SPNS-03, TEAM-03)
+- [x] 05-01-PLAN.md — Migrate sponsors + team to CSV data pipeline with flat Zod schemas (SPNS-03, TEAM-03)
 - [ ] 05-02-PLAN.md — Sponsors page (FR /partenaires + EN /en/sponsors) with tiered grids + accent CTA (SPNS-01, SPNS-02)
 - [ ] 05-03-PLAN.md — Team page (FR /equipe + EN /en/team) with grouped sections + SpeakerAvatar reuse (TEAM-01, TEAM-02)
 - [ ] 05-04-PLAN.md — Flip nav dead-links + phase integration verification (D-10)
@@ -223,7 +223,7 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | 2. Bilingual Architecture & Content Collections | 0/3 | Planned | - |
 | 3. Hero & Landing | 0/? | Not started | - |
 | 4. Speakers | 3/3 | Complete   | 2026-04-11 |
-| 5. Sponsors & Team | 0/? | Not started | - |
+| 5. Sponsors & Team | 1/4 | In Progress|  |
 | 6. Venue & Previous Editions | 1/1 | Complete   | 2026-04-12 |
 | 7. Interactive Schedule | 1/1 | Complete   | 2026-04-12 |
 | 8. Event Lifecycle | 0/? | Not started | - |

@@ -58,6 +58,20 @@ export const ui = {
     "speakers.no_talks": "Aucun talk annonce pour le moment.",
     "speakers.not_found":
       "Speaker introuvable. Retournez a la liste des speakers.",
+    "sponsors.page.title": "Nos partenaires",
+    "sponsors.page.intro":
+      "Merci aux organisations qui rendent Cloud Native Days France possible.",
+    "sponsors.page.empty":
+      "La liste des partenaires sera annoncée prochainement.",
+    "sponsors.tier.platinum": "Platinum",
+    "sponsors.tier.gold": "Gold",
+    "sponsors.tier.silver": "Silver",
+    "sponsors.tier.community": "Community",
+    "sponsors.cta.heading": "Devenez partenaire",
+    "sponsors.cta.body":
+      "Associez votre marque à l'événement cloud-native francophone de référence. Contactez l'équipe pour recevoir le dossier partenaires.",
+    "sponsors.cta.button": "Nous contacter",
+    "sponsors.card.aria": "Visiter le site de {name} (nouvelle fenêtre)",
     "talks.track.cloud-infra": "Cloud & Infra",
     "talks.track.devops-platform": "DevOps & Platform",
     "talks.track.security": "Security",
@@ -145,6 +159,12 @@ export const ui = {
     "schedule.export_all": "Exporter le programme (.ics)",
     "schedule.export_agenda": "Exporter mon agenda (.ics)",
     "schedule.close": "Fermer",
+    "team.page.title": "L'équipe",
+    "team.page.intro": "Les bénévoles qui organisent Cloud Native Days France.",
+    "team.page.empty": "L'équipe sera annoncée prochainement.",
+    "team.group.core": "Équipe principale",
+    "team.group.program_committee": "Comité de programme",
+    "team.group.volunteers": "Bénévoles",
   },
   en: {
     "nav.home": "Home",
@@ -199,6 +219,20 @@ export const ui = {
     "speakers.no_talks": "No talks announced yet.",
     "speakers.not_found":
       "Speaker not found. Return to the speakers page.",
+    "sponsors.page.title": "Our sponsors",
+    "sponsors.page.intro":
+      "Thank you to the organizations making Cloud Native Days France possible.",
+    "sponsors.page.empty":
+      "The sponsor list will be announced soon.",
+    "sponsors.tier.platinum": "Platinum",
+    "sponsors.tier.gold": "Gold",
+    "sponsors.tier.silver": "Silver",
+    "sponsors.tier.community": "Community",
+    "sponsors.cta.heading": "Become a sponsor",
+    "sponsors.cta.body":
+      "Align your brand with the leading French-speaking cloud-native event. Get in touch to receive the sponsorship prospectus.",
+    "sponsors.cta.button": "Contact us",
+    "sponsors.card.aria": "Visit {name}'s website (opens in a new window)",
     "talks.track.cloud-infra": "Cloud & Infra",
     "talks.track.devops-platform": "DevOps & Platform",
     "talks.track.security": "Security",
@@ -286,5 +320,11 @@ export const ui = {
     "schedule.export_all": "Export full schedule (.ics)",
     "schedule.export_agenda": "Export my agenda (.ics)",
     "schedule.close": "Close",
+    "team.page.title": "The team",
+    "team.page.intro": "The volunteers organizing Cloud Native Days France.",
+    "team.page.empty": "The team will be announced soon.",
+    "team.group.core": "Core Team",
+    "team.group.program_committee": "Program Committee",
+    "team.group.volunteers": "Volunteers",
   },
 } as const;
