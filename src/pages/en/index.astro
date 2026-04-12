@@ -3,12 +3,21 @@ import Layout from "../../layouts/Layout.astro";
 import HeroSection from "@/components/hero/HeroSection.astro";
 import KeyNumbers from "@/components/hero/KeyNumbers";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { eventSchemaJson } from "@/lib/event-schema";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+const description = t("seo.default_description");
+const siteUrl = Astro.site ? Astro.site.toString() : "https://cloudnativedays.fr/";
+const schemaJson = eventSchemaJson({ lang, siteUrl, description });
 ---
 
-<Layout title={t("site.title")}>
+<Layout
+  title={t("site.title")}
+  description={description}
+  ogType="event"
+>
+  <script type="application/ld+json" set:html={schemaJson} />
   <main>
     <HeroSection />
     <KeyNumbers client:idle lang={lang} />
