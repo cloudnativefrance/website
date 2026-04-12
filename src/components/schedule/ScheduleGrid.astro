@@ -325,7 +325,7 @@ const CSS_VARS = {
       <h2 id="schedule-session-modal-title" class="text-2xl md:text-3xl font-bold text-foreground leading-tight" style="letter-spacing:-0.02em;"></h2>
       <div id="schedule-session-modal-speakers" class="flex flex-wrap gap-2 text-sm"></div>
       <div id="schedule-session-modal-tags" class="flex flex-wrap gap-2"></div>
-      <div id="schedule-session-modal-description" class="prose-muted text-base text-foreground/90 leading-relaxed"></div>
+      <div id="schedule-session-modal-description" class="text-base leading-relaxed" style="color: var(--color-foreground);"></div>
       <div id="schedule-session-modal-actions" class="flex flex-wrap items-center gap-2 pt-2">
         <button
           type="button"
@@ -755,7 +755,11 @@ const CSS_VARS = {
       // Top meta row: format chip + time + room + track + level
       if (modalMetaTop) {
         const fmt = formatPalette[format] || formatPalette.talk;
-        const timeRange = start.slice(11, 16) + " — " + new Date(new Date(start).getTime() + duration * 60000).toISOString().slice(11, 16);
+        const startHm = start.slice(11, 16);
+        const [sH, sM] = startHm.split(":").map(Number);
+        const endTotal = sH * 60 + sM + duration;
+        const endHm = String(Math.floor(endTotal / 60) % 24).padStart(2, "0") + ":" + String(endTotal % 60).padStart(2, "0");
+        const timeRange = startHm + " — " + endHm;
         const parts = [];
         parts.push(`<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-widest uppercase ${fmt.cls}">${fmt.label}</span>`);
         parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-foreground">${timeRange} · ${duration} min</span>`);
@@ -771,9 +775,10 @@ const CSS_VARS = {
         if (coverImage) {
           modalCover.setAttribute("src", coverImage);
           modalCover.setAttribute("alt", title);
+          modalCover.style.display = "";
           modalCover.classList.remove("hidden");
         } else {
-          modalCover.classList.add("hidden");
+          modalCover.style.display = "none";
           modalCover.removeAttribute("src");
         }
       }
@@ -803,30 +808,21 @@ const CSS_VARS = {
         modalBookmarkBtn.classList.toggle("is-on", bookmarks.has(id));
       }
 
-      if (modalFeedback) {
-        if (feedbackUrl) {
-          modalFeedback.setAttribute("href", feedbackUrl);
-          modalFeedback.classList.remove("hidden");
+      // Use inline style.display toggles — Tailwind's .hidden utility
+      // can lose to .inline-flex depending on CSS source order.
+      const toggleLink = (el, url) => {
+        if (!el) return;
+        if (url) {
+          el.setAttribute("href", url);
+          el.style.display = "";
+          el.classList.remove("hidden");
         } else {
-          modalFeedback.classList.add("hidden");
+          el.style.display = "none";
         }
-      }
-      if (modalSlides) {
-        if (slidesUrl) {
-          modalSlides.setAttribute("href", slidesUrl);
-          modalSlides.classList.remove("hidden");
-        } else {
-          modalSlides.classList.add("hidden");
-        }
-      }
-      if (modalRecording) {
-        if (recordingUrl) {
-          modalRecording.setAttribute("href", recordingUrl);
-          modalRecording.classList.remove("hidden");
-        } else {
-          modalRecording.classList.add("hidden");
-        }
-      }
+      };
+      toggleLink(modalFeedback, feedbackUrl);
+      toggleLink(modalSlides, slidesUrl);
+      toggleLink(modalRecording, recordingUrl);
 
       modal.classList.remove("hidden");
       modal.classList.add("flex");
