@@ -170,7 +170,7 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
   const targetDate = Number(
     document.getElementById("site-header")?.dataset.targetDate,
   );
-  if (targetDate && Date.now() > targetDate) {
+  if (Number.isFinite(targetDate) && Date.now() > targetDate) {
     document
       .querySelectorAll<HTMLElement>("[data-post-event='true']")
       .forEach((el) => {

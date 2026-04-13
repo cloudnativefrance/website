@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ui, type Locale } from "@/i18n/ui";
-import { getReplaysPath } from "@/lib/cfp";
+import { getReplaysPath, TARGET_DATE } from "@/lib/cfp";
 
 interface CountdownTimerProps {
   lang: Locale;
@@ -12,8 +12,6 @@ interface TimeLeft {
   minutes: number;
   seconds: number;
 }
-
-const TARGET_DATE = new Date("2027-06-03T09:00:00+02:00").getTime();
 
 function calcTimeLeft(): TimeLeft | null {
   const diff = TARGET_DATE - Date.now();
