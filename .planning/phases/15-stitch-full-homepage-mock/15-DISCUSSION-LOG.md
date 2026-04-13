@@ -184,3 +184,20 @@
 ### 2026-04-13 — 15-01 approved (screen e23cde61c70c4b80b4e4d10fbfd9a14e)
 
 User explicitly approved Stitch screen e23cde61c70c4b80b4e4d10fbfd9a14e as the locked full-homepage visual contract for v1.1. All 10 checklist points + D-13 video addition confirmed. Iteration count: 2 (initial generation + D-13 video insertion).
+
+### 2026-04-13 — 15-02 Tasks 1+2: Variant detail screens generated
+
+- **2026 variant (desktop):** `94b59cfb77ea4a3f9ff88c5c83c2d199` — "Edition 2026 — Desktop comparison"
+- **2026 variant (mobile):** `ca4bff97fca241d6b7ba4e9892f8458c` — "Edition 2026 — Mobile comparison"
+- **2023 variant (desktop + mobile side-by-side):** `9b0c7dd494534b44a602ad22e7db9121` — "Edition 2023 Comparison (Desktop & Mobile)"
+- **Shared-shell locked:** all three screens follow D-01 vertical order (rail → h2 → stats → media → [callout]) and D-02 left-rail treatment (rotated -90deg, Muted Foreground, 0.05em tracking).
+- **Variant-specific:** 2026 has PLACEHOLDER pink badge (D-06) + video media, no callout; 2023 has mosaic photos (D-04) + featured video (D-13) + full-width KCD callout band (D-05).
+- **Iteration:** 1 (awaiting user approval).
+
+### 2026-04-13 — 15-03 Task 1: Testimonials marquee detail generated
+
+- **Marquee screen (desktop + mobile side-by-side):** `53f270cebda347c98a08d680db43dac8` — "Testimonials Marquee Comparison"
+- D-07 locked: right-to-left drift, ~40s loop, single row.
+- D-08 locked: quote-led cards (~340px desktop / ~280px mobile), opening quote glyph, Foreground quote text, small Muted attribution "Prénom N. — Rôle", no avatars.
+- D-09 locked: no visible pause button; one card shown in hover state (Primary Blue border at 50% + stronger shadow) with annotation "Marquee pauses on :hover and :focus-within. No pause button. Reduced-motion handled globally."
+- **Iteration:** 1 (awaiting user approval).
