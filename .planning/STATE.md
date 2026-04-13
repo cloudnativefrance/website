@@ -1,44 +1,35 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: milestone_complete
-stopped_at: v1.0 archived
+milestone: v1.1
+milestone_name: Past Editions Showcase
+status: defining_requirements
+stopped_at: milestone initialized — requirements next
 last_updated: "2026-04-13T00:00:00.000Z"
-last_activity: 2026-04-13 -- v1.0 milestone archived (14 phases / 33 plans / 48 of 49 requirements satisfied)
+last_activity: 2026-04-13 -- v1.1 milestone started (Past Editions Showcase)
 progress:
-  total_phases: 14
-  completed_phases: 14
-  total_plans: 33
-  completed_plans: 33
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-13 for v1.0 archival)
+See: .planning/PROJECT.md (updated 2026-04-13 for v1.1 initialization)
 
 **Core value:** A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register -- all within 5 seconds of landing.
-**Current focus:** v1.0 shipped — awaiting v1.1 milestone definition (`/gsd-new-milestone`)
+**Current focus:** v1.1 Past Editions Showcase — defining requirements
 
 ## Current Position
 
-Milestone: v1.0 — COMPLETE
-Phase: 14 of 14 — COMPLETE
-Status: milestone_complete
-Last activity: 2026-04-13 -- v1.0 milestone archived
-
-Progress: [##########] 100%
-
-## Performance Metrics
-
-**Velocity:**
-
-- Total phases completed: 14
-- Total plans completed: 33
-- Audit verdict: passed (`.planning/v1.0-MILESTONE-AUDIT.md`)
+Milestone: v1.1 — Past Editions Showcase
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-13 — Milestone v1.1 started
 
 ## Accumulated Context
 
@@ -46,11 +37,14 @@ Progress: [##########] 100%
 
 Decisions are logged in PROJECT.md Key Decisions table and the v1.0 archive at `.planning/milestones/v1.0-ROADMAP.md`.
 
-### Pending Todos
+### v1.1 Scope Decisions
 
-None — milestone closed. Use `/gsd-new-milestone` to begin v1.1.
+- Past-editions content is **static / hardcoded**, not CSV or content collection (2027 upcoming edition keeps CSV-first)
+- Testimonials are **temporary placeholder quotes** — data source deferred
+- **Stitch-first** workflow applies to every homepage change (move, new section, testimonials)
+- 2026 homepage content is placeholder until real 2026 recap arrives
 
-### Carry-Over for v1.1
+### Carry-Over from v1.0 (not in v1.1)
 
 - P1: Subjective visual UATs for 7 phases (01, 02, 03, 04, 05, 09, 11) — ~18 tests
 - P2: SPKR-01 fixture drift in `tests/build/speakers-grid.test.ts`
@@ -60,6 +54,6 @@ None — milestone closed. Use `/gsd-new-milestone` to begin v1.1.
 
 ## Session Continuity
 
-Last session: 2026-04-13 — v1.0 archival
-Stopped at: v1.0 archived
-Resume action: `/gsd-new-milestone` to begin v1.1 planning
+Last session: 2026-04-13 — v1.1 milestone initialized
+Stopped at: milestone initialized — defining requirements
+Resume action: continue `/gsd-new-milestone` through REQUIREMENTS.md + ROADMAP.md

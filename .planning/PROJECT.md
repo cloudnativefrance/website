@@ -12,16 +12,24 @@ The conference website for Cloud Native Days France, a community-driven cloud-na
 
 A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register — all within 5 seconds of landing.
 
-## Next Milestone Goals
+## Current Milestone: v1.1 Past Editions Showcase
 
-**v1.1 — TBD.** Use `/gsd-new-milestone` to begin requirements + roadmap.
+**Goal:** Tell the "where we come from" story on the homepage with dedicated past-edition sections (2026, 2023) plus an animated testimonial strip.
 
-Known carry-over candidates from v1.0:
+**Target features:**
+- Homepage "2026 edition" section — promoted out of venue tab (placeholder content kept; final 2026 recap content is deferred)
+- Homepage "2023 edition" section — new, with 10 KCD France 2023 photos, KCD 2023 logo, "Kubernetes Community Days France" branding note, Centre Georges Pompidou venue, short history blurb
+- Homepage animated testimonials — 3 temporary French quotes
+- Venue tab cleanup — remove the relocated 2026 recap block
 
-- P1: Subjective visual UATs for 7 phases (01, 02, 03, 04, 05, 09, 11) — ~18 tests
-- P2: SPKR-01 fixture drift in `tests/build/speakers-grid.test.ts`
-- P2: Zod 13 `LoaderConstraint` errors in `src/content.config.ts`
-- P2: Organizer content (CONFERENCE_HALL_URL, ticketing URL, legal TODOs, social URLs, og-default.png)
+**Scope notes:**
+- Static content only — no CSV, no content collection for past editions (2027 upcoming edition continues to use CSV loaders as v1.0)
+- Stitch-first workflow mandatory — homepage mocks designed + approved before any code
+- Testimonials data stays inline/hardcoded until real quotes arrive
+
+**Deferred from v1.0 (not in this milestone):**
+- P1: Subjective visual UATs for 7 phases (~18 tests)
+- P2: SPKR-01 fixture drift, Zod 13 `LoaderConstraint` errors, organizer content placeholders
 
 ## Requirements
 
@@ -102,4 +110,4 @@ Known carry-over candidates from v1.0:
 | Single-locale schema with FR fallback | Avoids duplicating FR content when EN is missing | Validated in v1.0 |
 
 ---
-*Last updated: 2026-04-13 — v1.0 milestone archived.*
+*Last updated: 2026-04-13 — v1.1 milestone initialized (Past Editions Showcase).*
