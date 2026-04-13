@@ -28,7 +28,7 @@ Full archive at [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md).
 **Milestone Goal:** Tell the "where we come from" story on the homepage with dedicated past-edition sections (2026, 2023), an animated testimonials strip, a global motion-reduction baseline, and a clean venue-page handoff.
 
 - [x] **Phase 15: Stitch Full-Homepage Mock** - Design-gate: full-page mock of the new homepage (Hero -> KeyNumbers -> CFP -> 2026 -> 2023 -> Testimonials), validated by user, before any code (completed 2026-04-13)
-- [ ] **Phase 16: Foundation - Assets, i18n, A11y Baseline, Shared Shell** - Pre-optimize photos, add bilingual `editions.*`/`testimonials.*` keys, ship the global `prefers-reduced-motion` reset, and build the prop-driven `PastEditionSection.astro` shell
+- [x] **Phase 16: Foundation - Assets, i18n, A11y Baseline, Shared Shell** - Pre-optimize photos, add bilingual `editions.*`/`testimonials.*` keys, ship the global `prefers-reduced-motion` reset, and build the prop-driven `PastEditionSection.astro` shell (completed 2026-04-13)
 - [ ] **Phase 17: Integrate 2026 Edition Section on Homepage** - Render `Edition2026Section` on `/` and `/en/`, verify live in both locales (gates Phase 18)
 - [ ] **Phase 18: Venue Page Cleanup** - Remove the relocated 2026 block, orphaned imports/constants/assets, deprecated `venue.prev.*` keys, and audit/redirect old anchors (gated on Phase 17 verified live)
 - [ ] **Phase 19: Integrate 2023 Edition Section + Lightbox** - 10-photo grid, KCD brand-history callout (with organizer sign-off), accessible lightbox overlay, placeholder stats with tracker
@@ -64,10 +64,10 @@ Full archive at [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md).
   4. `src/components/past-editions/PastEditionSection.astro` exists as a `.astro` file (no `client:*` directive) accepting props for rail label, heading, stats, photos, optional video, optional brand callout, and optional gallery CTA
   5. `pnpm build` and the Vitest suite pass with zero new warnings
 **Plans**: 4 plans
-  - [ ] 16-01-PLAN.md — A11y motion reset + i18n editions/testimonials keys + parity test + KCD logo assets
-  - [ ] 16-02-PLAN.md — Photo optimization pipeline + 10 KCD 2023 masters (human-gated on user-supplied originals)
-  - [ ] 16-03-PLAN.md — PastEditionSection.astro shell + renders-nowhere Vitest safeguard
-  - [ ] 16-04-PLAN.md — Zero-new-warnings build+test baseline gate + VALIDATION.md sign-off
+  - [x] 16-01-PLAN.md — A11y motion reset + i18n editions/testimonials keys + parity test + KCD logo assets
+  - [x] 16-02-PLAN.md — Photo optimization pipeline + 10 KCD 2023 masters (human-gated on user-supplied originals)
+  - [x] 16-03-PLAN.md — PastEditionSection.astro shell + renders-nowhere Vitest safeguard
+  - [x] 16-04-PLAN.md — Zero-new-warnings build+test baseline gate + VALIDATION.md sign-off
 **UI hint**: yes
 
 ### Phase 17: Integrate 2026 Edition Section on Homepage
@@ -80,7 +80,10 @@ Full archive at [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md).
   3. Heading hierarchy on the homepage is correct (single `<h1>`, `<h2>` for the section, no skipped levels) and `scroll-margin-top` lets `/#edition-2026` deep links land cleanly under the sticky nav
   4. Placeholder 2026 content is flagged in `editions-data.ts` (`placeholder: true`) with a visible dev/staging badge and a linked `2026-recap-final-content` tracker issue
   5. The legacy `venue/index.astro` 2026 block is still present and unchanged at this phase exit (cleanup deferred to Phase 18)
-**Plans**: TBD
+**Plans**: 3 plans
+  - [ ] 17-01-PLAN.md — Shell Props extension (id?, trackerUrl?) + placeholder-badge anchor + D-14 i18n keys + :target scroll-margin CSS
+  - [ ] 17-02-PLAN.md — Create src/lib/editions-data.ts + refactor venue/index.astro (byte-identical render) + editions-data Vitest
+  - [ ] 17-03-PLAN.md — Mount <PastEditionSection> on / and /en/ + 3 D-15 build tests (2026-section, heading-hierarchy, venue-unchanged) + VALIDATION.md
 **UI hint**: yes
 
 ### Phase 18: Venue Page Cleanup
@@ -130,8 +133,8 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 (and in parallel: 19, 20 a
 |-------|-----------|----------------|--------|-----------|
 | 1-14 (archived) | v1.0 | 33/33 | Shipped | 2026-04-13 |
 | 15. Stitch Full-Homepage Mock | v1.1 | 4/4 | Complete   | 2026-04-13 |
-| 16. Foundation - Assets, i18n, A11y Baseline, Shared Shell | v1.1 | 0/4    | Not started | - |
-| 17. Integrate 2026 Edition Section on Homepage | v1.1 | 0/TBD | Not started | - |
+| 16. Foundation - Assets, i18n, A11y Baseline, Shared Shell | v1.1 | 4/4 | Complete   | 2026-04-13 |
+| 17. Integrate 2026 Edition Section on Homepage | v1.1 | 0/3 | Not started | - |
 | 18. Venue Page Cleanup | v1.1 | 0/TBD | Not started | - |
 | 19. Integrate 2023 Edition Section + Lightbox | v1.1 | 0/TBD | Not started | - |
 | 20. Animated Testimonials Strip | v1.1 | 0/TBD | Not started | - |

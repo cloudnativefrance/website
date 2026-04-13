@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: Past Editions Showcase
 status: executing
 stopped_at: Phase 15 context gathered
-last_updated: "2026-04-13T20:20:28.855Z"
-last_activity: 2026-04-13 -- Phase 16 planning complete
+last_updated: "2026-04-13T21:30:18.343Z"
+last_activity: 2026-04-13 -- Phase 17 planning complete
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 8
-  completed_plans: 4
-  percent: 50
+  completed_phases: 2
+  total_plans: 11
+  completed_plans: 8
+  percent: 73
 ---
 
 # Project State
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13 for v1.1 initialization)
 
 **Core value:** A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register -- all within 5 seconds of landing.
-**Current focus:** Phase 15 — stitch-full-homepage-mock
+**Current focus:** Phase 16 — foundation-assets-i18n-a11y-baseline-shared-shell
 
 ## Current Position
 
 Milestone: v1.1 — Past Editions Showcase (Phases 15-20)
-Phase: 15 (stitch-full-homepage-mock) — EXECUTING
+Phase: 16 (foundation-assets-i18n-a11y-baseline-shared-shell) — EXECUTING
 Plan: 1 of 4
 Status: Ready to execute
-Last activity: 2026-04-13 -- Phase 16 planning complete
+Last activity: 2026-04-13 -- Phase 17 planning complete
 
 Progress: [░░░░░░░░░░] 0% (0 of 6 v1.1 phases complete)
 
