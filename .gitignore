@@ -8,3 +8,6 @@ dist/
 
 # Raw photography deliveries — optimised masters live in src/assets/photos/
 drive-download-*.zip
+
+# Phase 16: KCD 2023 photo originals (not committed; only ≤1 MB JPG masters are)
+_photo-drop/
