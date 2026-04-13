@@ -1,0 +1,137 @@
+---
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import {
+  getCfpState,
+  CFP_CLOSES,
+  CONFERENCE_HALL_URL,
+} from "@/lib/cfp";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const state = getCfpState();
+const localeTag = lang === "fr" ? "fr-FR" : "en-US";
+const deadline = new Intl.DateTimeFormat(localeTag, {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+}).format(CFP_CLOSES);
+const deadlineLine = t("cfp.deadline").replace("{date}", deadline);
+const hasRealConferenceHall = !CONFERENCE_HALL_URL.includes("TODO_EVENT_ID");
+const ariaLabelFor = (statusKey: string, descriptionKey: string) =>
+  `${t(statusKey)} — ${t(descriptionKey)}`;
+---
+
+<section id="cfp" class="relative w-full py-12 md:py-16 bg-background">
+  <div class="mx-auto max-w-[1280px] px-4 md:px-6">
+    {state === "open" && (
+      <div class="flex flex-col items-center text-center md:items-start md:text-left gap-6 max-w-2xl md:mx-0 mx-auto">
+        <span
+          class="inline-flex items-center gap-2 rounded-full bg-accent text-accent-foreground px-[10px] py-1 text-xs font-normal uppercase tracking-[0.05em]"
+          aria-label={ariaLabelFor("cfp.status.open", "cfp.description.open")}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" />
+            <path d="m21.854 2.147-10.94 10.939" />
+          </svg>
+          {t("cfp.status.open")}
+        </span>
+        <h2
+          class="text-2xl font-bold leading-[1.3] tracking-[-0.02em] text-foreground"
+        >
+          {t("cfp.heading")}
+        </h2>
+        <p class="text-base text-muted-foreground leading-[1.6] max-w-[60ch]">
+          {t("cfp.description.open")}
+        </p>
+        {hasRealConferenceHall && (
+          <a
+            href={CONFERENCE_HALL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 h-[52px] rounded-md bg-accent text-accent-foreground px-8 text-lg font-bold shadow-[0_0_20px_oklch(76.6%_0.142_10.1_/_0.25)] transition-all duration-150 hover:-translate-y-[1px]"
+          >
+            {t("cfp.cta.submit")}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </a>
+        )}
+        <p class="text-xs text-muted-foreground">{deadlineLine}</p>
+      </div>
+    )}
+
+    {state === "coming-soon" && (
+      <div class="flex flex-col items-center text-center md:items-start md:text-left gap-6 max-w-2xl md:mx-0 mx-auto">
+        <span
+          class="inline-flex items-center gap-2 rounded-full bg-secondary text-muted-foreground px-[10px] py-1 text-xs font-normal uppercase tracking-[0.05em]"
+          aria-label={ariaLabelFor(
+            "cfp.status.coming_soon",
+            "cfp.description.coming_soon"
+          )}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m3 11 18-5v12L3 14v-3z" />
+            <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
+          </svg>
+          {t("cfp.status.coming_soon")}
+        </span>
+        <h2
+          class="text-2xl font-bold leading-[1.3] tracking-[-0.02em] text-foreground"
+        >
+          {t("cfp.heading")}
+        </h2>
+        <p class="text-base text-muted-foreground leading-[1.6] max-w-[60ch]">
+          {t("cfp.description.coming_soon")}
+        </p>
+        {hasRealConferenceHall && (
+          <a
+            href={CONFERENCE_HALL_URL}
+            class="inline-flex items-center gap-2 h-[44px] rounded-md border border-border text-foreground px-6 text-base font-medium hover:bg-secondary transition-colors"
+          >
+            {t("cfp.cta.notify")}
+          </a>
+        )}
+      </div>
+    )}
+
+    {state === "closed" && (
+      <p class="text-base text-muted-foreground text-center">
+        {t("cfp.closed.note")}
+      </p>
+    )}
+  </div>
+</section>
