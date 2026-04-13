@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Sponsors & Team** - Tiered sponsor showcase and team page with role grouping (completed 2026-04-12)
 - [ ] **Phase 6: Venue & Previous Editions** - Venue details with map/transport/accessibility, plus past edition recap
 - [x] **Phase 7: Interactive Schedule** - Full schedule with filtering, timeline view, bookmarks, iCal export, Open Feedback links (completed 2026-04-13, retroactive verification)
-- [ ] **Phase 8: Event Lifecycle** - Post-event replay mode, YouTube recording links, CFP status indicator
+- [x] **Phase 8: Event Lifecycle** - Post-event replay mode, YouTube recording links, CFP status indicator (completed 2026-04-13)
 - [x] **Phase 9: SEO, Legal & Polish** - Meta tags, structured data, hreflang, legal pages, footer, sitemap (completed 2026-04-12)
 
 ## Phase Details
@@ -233,7 +233,7 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | 5. Sponsors & Team | 4/4 | Complete   | 2026-04-12 |
 | 6. Venue & Previous Editions | 1/1 | Complete   | 2026-04-12 |
 | 7. Interactive Schedule | 1/1 | Complete   | 2026-04-12 |
-| 8. Event Lifecycle | 0/? | Not started | - |
+| 8. Event Lifecycle | 4/4 | Complete   | 2026-04-13 |
 | 9. SEO, Legal & Polish | 5/5 | Complete   | 2026-04-12 |
 | 10. Site Navigation & Component Wiring | 1/1 | Complete   | 2026-04-12 |
 | 11. Security & i18n Hardcode Fixes | 3/3 | Complete   | 2026-04-12 |
