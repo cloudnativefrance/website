@@ -3,6 +3,8 @@ import Layout from "../../layouts/Layout.astro";
 import HeroSection from "@/components/hero/HeroSection.astro";
 import KeyNumbers from "@/components/hero/KeyNumbers";
 import CfpSection from "@/components/cfp/CfpSection.astro";
+import PastEditionSection from "@/components/past-editions/PastEditionSection.astro";
+import { EDITION_2026 } from "@/lib/editions-data";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { eventSchemaJson } from "@/lib/event-schema";
 
@@ -11,6 +13,29 @@ const t = useTranslations(lang);
 const description = t("seo.default_description");
 const siteUrl = Astro.site ? Astro.site.toString() : "https://cloudnativedays.fr/";
 const schemaJson = eventSchemaJson({ lang, siteUrl, description });
+
+// D-09 Phase 17: 2026-variant props wiring for PastEditionSection.
+const edition2026Props = {
+  rail: t("editions.rail.2026"),
+  heading: t("editions.2026.heading"),
+  stats: EDITION_2026.stats.map((s) => ({ value: s.value, label: t(s.labelKey) })),
+  video: {
+    youtubeId: EDITION_2026.youtubeId,
+    caption: t("editions.2026.video_caption"),
+  },
+  photos: EDITION_2026.thumbnails.map((th) => ({
+    src: th.src,
+    alt: t(th.altKey),
+    size: "small" as const,
+  })),
+  galleryCta: {
+    label: t("editions.2023.gallery_cta"),
+    href: EDITION_2026.galleryUrl,
+  },
+  placeholder: EDITION_2026.placeholder,
+  id: "edition-2026",
+  trackerUrl: EDITION_2026.trackerIssueUrl,
+};
 ---
 
 <Layout
@@ -23,5 +48,6 @@ const schemaJson = eventSchemaJson({ lang, siteUrl, description });
     <HeroSection />
     <KeyNumbers client:idle lang={lang} />
     <CfpSection />
+    <PastEditionSection {...edition2026Props} />
   </main>
 </Layout>
