@@ -13,6 +13,7 @@
  */
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 
 interface Props {
   rail: string;
@@ -23,6 +24,8 @@ interface Props {
   brandCallout?: { logo: ImageMetadata; logoAlt: string; body: string };
   galleryCta?: { label: string; href: string };
   placeholder?: boolean;
+  id?: string;           // D-08 Phase 17: optional anchor id for deep linking
+  trackerUrl?: string;   // D-13 Phase 17: when set, placeholder badge becomes a link to tracker
 }
 
 const {
@@ -34,7 +37,12 @@ const {
   brandCallout,
   galleryCta,
   placeholder = false,
+  id,
+  trackerUrl,
 } = Astro.props;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 
 /** Tailwind col-span map for mosaic sizes (D-04 Phase 15). */
 const colSpan = {
@@ -43,8 +51,19 @@ const colSpan = {
   small: "col-span-6 md:col-span-3",
 } as const;
 ---
-<section class="relative max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
-  {placeholder && (
+<section id={id} class="relative max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
+  {placeholder && trackerUrl && (
+    <a
+      href={trackerUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={t("editions.placeholder_badge_aria")}
+      class="absolute top-4 right-4 rounded-full bg-accent text-accent-foreground px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      PLACEHOLDER
+    </a>
+  )}
+  {placeholder && !trackerUrl && (
     <span
       class="absolute top-4 right-4 rounded-full bg-accent text-accent-foreground px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]"
       aria-hidden="false"
