@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Speakers** - Speaker grid, individual pages, bilingual content, talk cross-references (completed 2026-04-11)
 - [x] **Phase 5: Sponsors & Team** - Tiered sponsor showcase and team page with role grouping (completed 2026-04-12)
 - [ ] **Phase 6: Venue & Previous Editions** - Venue details with map/transport/accessibility, plus past edition recap
-- [ ] **Phase 7: Interactive Schedule** - Full schedule with filtering, timeline view, bookmarks, iCal export, Open Feedback links
+- [x] **Phase 7: Interactive Schedule** - Full schedule with filtering, timeline view, bookmarks, iCal export, Open Feedback links (completed 2026-04-13, retroactive verification)
 - [ ] **Phase 8: Event Lifecycle** - Post-event replay mode, YouTube recording links, CFP status indicator
 - [x] **Phase 9: SEO, Legal & Polish** - Meta tags, structured data, hreflang, legal pages, footer, sitemap (completed 2026-04-12)
 

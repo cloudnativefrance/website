@@ -41,7 +41,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **SCHD-04**: Bookmark talks to personal agenda (localStorage, no login)
 - [x] **SCHD-05**: Export bookmarked talks as iCal (.ics) file
 - [x] **SCHD-06**: Mobile-friendly schedule view (stacked tracks, swipeable or tabbed)
-- [ ] **SCHD-07**: Link from each talk to its Open Feedback page (deep link by talk ID)
+- [x] **SCHD-07**: Link from each talk to its Open Feedback page (deep link by talk ID)
 
 ### Speakers
 
@@ -146,7 +146,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCHD-04 | Phase 7: Interactive Schedule | Pending |
 | SCHD-05 | Phase 7: Interactive Schedule | Pending |
 | SCHD-06 | Phase 7: Interactive Schedule | Pending |
-| SCHD-07 | Phase 7: Interactive Schedule | Pending |
+| SCHD-07 | Phase 7: Interactive Schedule | Delivered |
 | SPKR-01 | Phase 4: Speakers | Complete |
 | SPKR-02 | Phase 4: Speakers | Complete |
 | SPKR-03 | Phase 4: Speakers | Complete |
