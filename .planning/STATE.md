@@ -4,8 +4,8 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 8 plans ready (4 plans, checker APPROVED)
-last_updated: "2026-04-13T07:27:38.335Z"
-last_activity: 2026-04-12 -- Phase 9 execution started
+last_updated: "2026-04-13T07:32:21.543Z"
+last_activity: 2026-04-13 -- Phase 08 execution started
 progress:
   total_phases: 12
   completed_phases: 8
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-11)
 
 **Core value:** A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register -- all within 5 seconds of landing.
-**Current focus:** Phase 9 — seo-legal-polish
+**Current focus:** Phase 08 — event-lifecycle
 
 ## Current Position
 
-Phase: 9 (seo-legal-polish) — EXECUTING
-Plan: 1 of 5
-Status: Executing Phase 9
-Last activity: 2026-04-12 -- Phase 9 execution started
+Phase: 08 (event-lifecycle) — EXECUTING
+Plan: 1 of 4
+Status: Executing Phase 08
+Last activity: 2026-04-13 -- Phase 08 execution started
 
 Progress: [##########] 100%
 

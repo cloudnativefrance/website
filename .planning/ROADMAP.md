@@ -147,10 +147,13 @@ Plans:
   1. After the event date, the countdown switches to a "watch replays" message with YouTube playlist link
   2. Individual talks in the schedule show a "watch recording" link when a youtubeUrl is set
   3. CFP status indicator on the homepage links to Conference Hall and reflects current state (open/closed/coming soon)
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 08-01: TBD
+- [x] 08-01-PLAN.md — CFP date constants module + locale-aware /replays helper + 17 new i18n keys (EVNT-04 foundations)
+- [x] 08-02-PLAN.md — Stitch-first gate: produce 6 screens (CFP 3 states + /replays populated/empty/mobile) and obtain user approval (EVNT-01, EVNT-04)
+- [x] 08-03-PLAN.md — CfpSection.astro + wire into FR + EN homepages between Key Numbers and Footer (EVNT-04)
+- [x] 08-04-PLAN.md — /replays pages (FR + EN) + RecordingCard + conditional nav link + CountdownTimer rewire + sitemap exclusion (EVNT-01, EVNT-02 regression)
 
 ### Phase 9: SEO, Legal & Polish
 **Goal**: The site is discoverable by search engines, legally compliant, and complete with all navigational elements
