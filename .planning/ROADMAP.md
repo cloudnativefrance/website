@@ -27,7 +27,7 @@ Full archive at [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md).
 
 **Milestone Goal:** Tell the "where we come from" story on the homepage with dedicated past-edition sections (2026, 2023), an animated testimonials strip, a global motion-reduction baseline, and a clean venue-page handoff.
 
-- [ ] **Phase 15: Stitch Full-Homepage Mock** - Design-gate: full-page mock of the new homepage (Hero -> KeyNumbers -> CFP -> 2026 -> 2023 -> Testimonials), validated by user, before any code
+- [x] **Phase 15: Stitch Full-Homepage Mock** - Design-gate: full-page mock of the new homepage (Hero -> KeyNumbers -> CFP -> 2026 -> 2023 -> Testimonials), validated by user, before any code (completed 2026-04-13)
 - [ ] **Phase 16: Foundation - Assets, i18n, A11y Baseline, Shared Shell** - Pre-optimize photos, add bilingual `editions.*`/`testimonials.*` keys, ship the global `prefers-reduced-motion` reset, and build the prop-driven `PastEditionSection.astro` shell
 - [ ] **Phase 17: Integrate 2026 Edition Section on Homepage** - Render `Edition2026Section` on `/` and `/en/`, verify live in both locales (gates Phase 18)
 - [ ] **Phase 18: Venue Page Cleanup** - Remove the relocated 2026 block, orphaned imports/constants/assets, deprecated `venue.prev.*` keys, and audit/redirect old anchors (gated on Phase 17 verified live)
@@ -47,10 +47,10 @@ Full archive at [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md).
   4. Testimonials strip layout (marquee direction, card style, pause affordance) is locked
   5. User has explicitly approved the mock and any open design questions are resolved
 **Plans**: 4 plans
-  - [ ] 15-01-PLAN.md - Generate full-homepage Stitch mock (all 7 sections, DS tokens only) + user approval
-  - [ ] 15-02-PLAN.md - Generate 2026 vs 2023 variant detail screens within shared shell + user approval
-  - [ ] 15-03-PLAN.md - Generate testimonials marquee detail (direction, card, pause affordance) + user approval
-  - [ ] 15-04-PLAN.md - Update DESIGN.md with locked Homepage Layout Contract (D-01..D-12)
+  - [x] 15-01-PLAN.md - Generate full-homepage Stitch mock (all 7 sections, DS tokens only) + user approval
+  - [x] 15-02-PLAN.md - Generate 2026 vs 2023 variant detail screens within shared shell + user approval
+  - [x] 15-03-PLAN.md - Generate testimonials marquee detail (direction, card, pause affordance) + user approval
+  - [x] 15-04-PLAN.md - Update DESIGN.md with locked Homepage Layout Contract (D-01..D-12)
 **UI hint**: yes
 
 ### Phase 16: Foundation - Assets, i18n, A11y Baseline, Shared Shell
@@ -125,7 +125,7 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 (and in parallel: 19, 20 a
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1-14 (archived) | v1.0 | 33/33 | Shipped | 2026-04-13 |
-| 15. Stitch Full-Homepage Mock | v1.1 | 0/4 | Planned | - |
+| 15. Stitch Full-Homepage Mock | v1.1 | 4/4 | Complete   | 2026-04-13 |
 | 16. Foundation - Assets, i18n, A11y Baseline, Shared Shell | v1.1 | 0/TBD | Not started | - |
 | 17. Integrate 2026 Edition Section on Homepage | v1.1 | 0/TBD | Not started | - |
 | 18. Venue Page Cleanup | v1.1 | 0/TBD | Not started | - |
