@@ -146,7 +146,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCHD-04 | Phase 7: Interactive Schedule | Complete |
 | SCHD-05 | Phase 7: Interactive Schedule | Complete |
 | SCHD-06 | Phase 7: Interactive Schedule | Complete |
-| SCHD-07 | Phase 7: Interactive Schedule | Delivered |
+| SCHD-07 | Phase 7: Interactive Schedule | Complete |
 | SPKR-01 | Phase 4: Speakers | Complete |
 | SPKR-02 | Phase 4: Speakers | Complete |
 | SPKR-03 | Phase 4: Speakers | Complete |
