@@ -70,18 +70,21 @@ describe("EDIT-04: PastEditionSection shell", () => {
   });
 });
 
-describe("D-09: shell is rendered nowhere in Phase 16", () => {
-  it("no src/pages/** file imports PastEditionSection", () => {
+describe("Phase 17: shell is mounted on the homepage", () => {
+  it("both / and /en/ import PastEditionSection", () => {
     const importers: string[] = [];
     for (const file of walk(PAGES_DIR)) {
       if (!/\.(astro|tsx?|jsx?|mjs|mts)$/.test(file)) continue;
       const text = readFileSync(file, "utf-8");
       if (/PastEditionSection/.test(text)) importers.push(file);
     }
+    const homepages = importers.filter((f) =>
+      /src\/pages\/(en\/)?index\.astro$/.test(f),
+    );
     expect(
-      importers,
-      `PastEditionSection referenced in pages (must be zero in Phase 16): ${importers.join(", ")}`,
-    ).toEqual([]);
+      homepages.length,
+      `Expected PastEditionSection mounted on both /, /en/; importers: ${importers.join(", ")}`,
+    ).toBe(2);
   });
 });
 

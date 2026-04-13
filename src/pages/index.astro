@@ -4,7 +4,7 @@ import HeroSection from "@/components/hero/HeroSection.astro";
 import KeyNumbers from "@/components/hero/KeyNumbers";
 import CfpSection from "@/components/cfp/CfpSection.astro";
 import PastEditionSection from "@/components/past-editions/PastEditionSection.astro";
-import { EDITION_2026 } from "@/lib/editions-data";
+import { EDITION_2026, EDITION_2023 } from "@/lib/editions-data";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { eventSchemaJson } from "@/lib/event-schema";
 
@@ -14,7 +14,7 @@ const description = t("seo.default_description");
 const siteUrl = Astro.site ? Astro.site.toString() : "https://cloudnativedays.fr/";
 const schemaJson = eventSchemaJson({ lang, siteUrl, description });
 
-// D-09 Phase 17: 2026-variant props wiring for PastEditionSection.
+// 2026-variant props — real recap content (ported from venue/index.astro)
 const edition2026Props = {
   rail: t("editions.rail.2026"),
   heading: t("editions.2026.heading"),
@@ -26,15 +26,41 @@ const edition2026Props = {
   photos: EDITION_2026.thumbnails.map((th) => ({
     src: th.src,
     alt: t(th.altKey),
-    size: "small" as const,
+    size: th.size,
   })),
   galleryCta: {
-    label: t("editions.2023.gallery_cta"),
+    label: t("editions.2026.gallery_cta") || t("editions.2023.gallery_cta"),
     href: EDITION_2026.galleryUrl,
   },
   placeholder: EDITION_2026.placeholder,
   id: "edition-2026",
-  trackerUrl: EDITION_2026.trackerIssueUrl,
+};
+
+// 2023-variant props — real KCD France 2023 content (10-photo mosaic + playlist)
+const edition2023Props = {
+  rail: t("editions.rail.2023"),
+  heading: t("editions.2023.heading"),
+  stats: EDITION_2023.stats.map((s) => ({ value: s.value, label: t(s.labelKey) })),
+  video: {
+    youtubeId: EDITION_2023.youtubeId,
+    caption: t("editions.2023.video_caption"),
+    playlistCta: {
+      label: t("editions.2023.video_cta"),
+      href: EDITION_2023.playlistUrl,
+    },
+  },
+  photos: EDITION_2023.thumbnails.map((th) => ({
+    src: th.src,
+    alt: t(th.altKey),
+    size: th.size,
+  })),
+  brandCallout: {
+    logo: EDITION_2023.brandLogo,
+    logoAlt: "Kubernetes Community Days France 2023",
+    body: t("editions.2023.brand_note"),
+  },
+  placeholder: EDITION_2023.placeholder,
+  id: "edition-2023",
 };
 ---
 
@@ -49,5 +75,6 @@ const edition2026Props = {
     <KeyNumbers client:idle lang={lang} />
     <CfpSection />
     <PastEditionSection {...edition2026Props} />
+    <PastEditionSection {...edition2023Props} />
   </main>
 </Layout>

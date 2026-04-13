@@ -96,9 +96,9 @@ const colSpan = {
 
   {/* photo mosaic (optional) */}
   {photos && photos.length > 0 && (
-    <div class="mt-12 grid grid-cols-12 gap-3 md:gap-4">
+    <div class="mt-12 grid grid-cols-12 gap-3 md:gap-4 [grid-auto-rows:12rem] md:[grid-auto-rows:14rem]">
       {photos.map((p) => (
-        <figure class={`${colSpan[p.size ?? "small"]} overflow-hidden rounded-md bg-card`}>
+        <figure class={`${colSpan[p.size ?? "small"]} row-span-1 overflow-hidden rounded-md bg-card border border-border`}>
           <Image
             src={p.src}
             alt={p.alt}
@@ -113,7 +113,7 @@ const colSpan = {
 
   {/* featured video (optional) */}
   {video && (
-    <figure class="mt-12">
+    <figure class="mt-12 max-w-2xl mx-auto">
       <div class="relative aspect-video w-full overflow-hidden rounded-md bg-card">
         <iframe
           src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}`}
@@ -141,10 +141,10 @@ const colSpan = {
   {/* brand callout (optional, 2023 only for now; D-05 Phase 15) */}
   {brandCallout && (
     <aside class="mt-12 flex flex-col md:flex-row items-center gap-6 rounded-md bg-secondary text-secondary-foreground p-6 md:p-8">
-      <div class="shrink-0 w-40">
+      <div class="shrink-0 w-32 md:w-40 mx-auto md:mx-0">
         <Image src={brandCallout.logo} alt={brandCallout.logoAlt} class="w-full h-auto" />
       </div>
-      <p class="text-sm md:text-base leading-relaxed">{brandCallout.body}</p>
+      <p class="text-sm md:text-base leading-relaxed text-center md:text-left">{brandCallout.body}</p>
     </aside>
   )}
 

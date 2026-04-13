@@ -1,13 +1,18 @@
 /**
- * EDIT-01 (Phase 17, D-01/D-02/D-04/D-05).
+ * EDIT-01 / EDIT-02 / EDIT-03 (Phase 17 revised — both editions mount on homepage).
  *
- * Asserts editions-data.ts shape, placeholder flag, tracker URL, stat literals,
- * and that the 3 kcd2023 thumbnails resolve to ImageMetadata at import time.
+ * Asserts editions-data.ts shape for both EDITION_2026 (real recap ported from
+ * venue/index.astro: ambiance photos + video + stats) and EDITION_2023 (real
+ * KCD France 2023 content: 6-tile mosaic + playlist video + KCD brand callout).
  */
 import { describe, it, expect } from "vitest";
 import { EDITION_2026, EDITION_2023 } from "../../src/lib/editions-data";
 
-describe("EDIT-01: EDITION_2026 data module", () => {
+function srcString(src: unknown): string {
+  return typeof src === "string" ? src : (src as { src: string }).src;
+}
+
+describe("EDIT-01: EDITION_2026 data module (real 2026 recap)", () => {
   it("has the ported YouTube id from venue/index.astro", () => {
     expect(EDITION_2026.youtubeId).toBe("qyMGuU2-w8o");
   });
@@ -18,14 +23,8 @@ describe("EDIT-01: EDITION_2026 data module", () => {
     );
   });
 
-  it("has placeholder flag set to true (D-02)", () => {
-    expect(EDITION_2026.placeholder).toBe(true);
-  });
-
-  it("points to tracker issue #3 (D-04)", () => {
-    expect(EDITION_2026.trackerIssueUrl).toBe(
-      "https://github.com/cloudnativefrance/website/issues/3",
-    );
+  it("is NOT flagged as placeholder (real content)", () => {
+    expect(EDITION_2026.placeholder).toBe(false);
   });
 
   it("has exactly 3 stats with the ported venue literals", () => {
@@ -38,33 +37,64 @@ describe("EDIT-01: EDITION_2026 data module", () => {
     ]);
   });
 
-  it("has exactly 3 thumbnails wired to kcd2023 masters (D-05)", () => {
-    expect(EDITION_2026.thumbnails).toHaveLength(3);
-    // In vitest (non-Astro) runtime, image imports resolve to a URL string or
-    // an ImageMetadata-like object (shape depends on the Astro build phase).
-    // Either way, each thumbnail must resolve and reference the kcd2023 masters.
-    const expectedFiles = ["01.jpg", "05.jpg", "08.jpg"];
-    EDITION_2026.thumbnails.forEach((thumb, i) => {
+  it("has 4 ambiance thumbnails for the 2026 section in a 2x2 grid", () => {
+    expect(EDITION_2026.thumbnails).toHaveLength(4);
+    EDITION_2026.thumbnails.forEach((thumb) => {
       expect(thumb.src).toBeDefined();
-      const srcStr =
-        typeof thumb.src === "string"
-          ? thumb.src
-          : (thumb.src as { src: string }).src;
-      expect(srcStr).toContain("kcd2023");
-      expect(srcStr).toContain(expectedFiles[i]);
+      const s = srcString(thumb.src);
+      expect(s).toContain("ambiance");
+      expect(thumb.size).toBe("hero");
     });
-    expect(EDITION_2026.thumbnails.map((t) => t.altKey)).toEqual([
-      "editions.2026.thumbnail_alt.1",
-      "editions.2026.thumbnail_alt.2",
-      "editions.2026.thumbnail_alt.3",
-    ]);
   });
 });
 
-describe("D-03: EDITION_2023 stub", () => {
-  it("exists as a placeholder for Phase 19", () => {
-    expect(EDITION_2023).toBeDefined();
-    expect(EDITION_2023.placeholder).toBe(true);
-    expect(typeof EDITION_2023.trackerIssueUrl).toBe("string");
+describe("EDIT-02 / EDIT-03: EDITION_2023 data module (real KCD 2023 content)", () => {
+  it("wires the 2023 YouTube playlist as the featured video", () => {
+    expect(EDITION_2023.youtubeId).toBe(
+      "videoseries?list=PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h",
+    );
+    expect(EDITION_2023.playlistUrl).toBe(
+      "https://www.youtube.com/playlist?list=PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h",
+    );
+  });
+
+  it("has exactly 3 stats for the 2023 edition", () => {
+    expect(EDITION_2023.stats).toHaveLength(3);
+    expect(EDITION_2023.stats.map((s) => s.labelKey)).toEqual([
+      "editions.2023.stats.participants",
+      "editions.2023.stats.speakers",
+      "editions.2023.stats.sessions",
+    ]);
+  });
+
+  it("has 6 thumbnails wired to kcd2023 masters (homepage mosaic subset)", () => {
+    expect(EDITION_2023.thumbnails).toHaveLength(6);
+    EDITION_2023.thumbnails.forEach((thumb) => {
+      expect(thumb.src).toBeDefined();
+      const s = srcString(thumb.src);
+      expect(s).toContain("kcd2023");
+    });
+  });
+
+  it("applies a balanced size rhythm (2 hero + 2 medium + 2 small)", () => {
+    const sizes = EDITION_2023.thumbnails.map((t) => t.size);
+    const counts = sizes.reduce<Record<string, number>>((acc, s) => {
+      const key = s ?? "unspecified";
+      acc[key] = (acc[key] ?? 0) + 1;
+      return acc;
+    }, {});
+    expect(counts.hero).toBe(2);
+    expect(counts.medium).toBe(2);
+    expect(counts.small).toBe(2);
+  });
+
+  it("exposes the KCD 2023 brand logo for the callout band (EDIT-03)", () => {
+    expect(EDITION_2023.brandLogo).toBeDefined();
+    const s = srcString(EDITION_2023.brandLogo);
+    expect(s).toContain("kcd2023");
+  });
+
+  it("is NOT flagged as placeholder (real content)", () => {
+    expect(EDITION_2023.placeholder).toBe(false);
   });
 });
