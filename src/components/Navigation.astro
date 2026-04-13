@@ -1,5 +1,6 @@
 ---
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
+import { TARGET_DATE } from "@/lib/cfp";
 import LanguageToggle from "@/components/LanguageToggle.astro";
 import logoFull from "@/assets/logos/dark/logo.svg";
 import logoCompact from "@/assets/logos/dark/logo-notext.svg";
@@ -8,13 +9,19 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
 
-const navItems = [
-  { key: "nav.home"     as const, path: "/",         dead: false },
-  { key: "nav.speakers" as const, path: "/speakers", dead: false },
-  { key: "nav.schedule" as const, path: "/programme", dead: false }, // Phase 7
-  { key: "nav.sponsors" as const, path: "/sponsors", dead: false },
-  { key: "nav.venue"    as const, path: "/venue",    dead: false }, // Phase 6
-  { key: "nav.team"     as const, path: "/team",     dead: false },
+const navItems: Array<{
+  key: "nav.home" | "nav.speakers" | "nav.schedule" | "nav.replays" | "nav.sponsors" | "nav.venue" | "nav.team";
+  path: string;
+  dead: boolean;
+  postEventOnly?: boolean;
+}> = [
+  { key: "nav.home",     path: "/",          dead: false },
+  { key: "nav.speakers", path: "/speakers",  dead: false },
+  { key: "nav.schedule", path: "/programme", dead: false }, // Phase 7
+  { key: "nav.replays",  path: "/replays",   dead: false, postEventOnly: true }, // Phase 8
+  { key: "nav.sponsors", path: "/sponsors",  dead: false },
+  { key: "nav.venue",    path: "/venue",     dead: false }, // Phase 6
+  { key: "nav.team",     path: "/team",      dead: false },
 ];
 
 function isActive(currentPath: string, href: string, dead: boolean): boolean {
@@ -25,11 +32,12 @@ function isActive(currentPath: string, href: string, dead: boolean): boolean {
   return currentPath.startsWith(href);
 }
 
-const links = navItems.map(({ key, path, dead }) => ({
+const links = navItems.map(({ key, path, dead, postEventOnly }) => ({
   key,
   label: t(key),
   href: getLocalePath(lang, path),
   active: isActive(currentPath, getLocalePath(lang, path), dead),
+  postEventOnly: !!postEventOnly,
 }));
 
 const homeHref = getLocalePath(lang, "/");
@@ -39,6 +47,7 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
 
 <header
   id="site-header"
+  data-target-date={TARGET_DATE}
   class="sticky top-0 z-50 backdrop-blur-sm bg-background/90 border-b border-transparent transition-[border-color,box-shadow] duration-200"
 >
   <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
@@ -50,8 +59,11 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
 
     <!-- Desktop links -->
     <ul class="hidden md:flex items-center gap-6" role="list">
-      {links.map(({ key, label, href, active }) => (
-        <li>
+      {links.map(({ key, label, href, active, postEventOnly }) => (
+        <li
+          data-post-event={postEventOnly ? "true" : undefined}
+          class:list={[postEventOnly && "hidden"]}
+        >
           <a
             href={href}
             data-nav-key={key}
@@ -97,8 +109,11 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
   <!-- Mobile menu panel -->
   <div id="mobile-menu" class="hidden md:hidden border-t border-border bg-background/95 backdrop-blur-sm">
     <ul class="px-4 py-2" role="list">
-      {links.map(({ label, href, active }) => (
-        <li>
+      {links.map(({ label, href, active, postEventOnly }) => (
+        <li
+          data-post-event={postEventOnly ? "true" : undefined}
+          class:list={[postEventOnly && "hidden"]}
+        >
           <a
             href={href}
             aria-current={active ? "page" : undefined}
@@ -147,5 +162,19 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
+  }
+
+  // Reveal post-event-only nav entries (e.g. /replays) once TARGET_DATE has passed.
+  // TARGET_DATE is the single source of truth in src/lib/cfp.ts — read via the
+  // header's data-target-date attribute to avoid inlining a drift-prone literal.
+  const targetDate = Number(
+    document.getElementById("site-header")?.dataset.targetDate,
+  );
+  if (targetDate && Date.now() > targetDate) {
+    document
+      .querySelectorAll<HTMLElement>("[data-post-event='true']")
+      .forEach((el) => {
+        el.classList.remove("hidden");
+      });
   }
 </script>

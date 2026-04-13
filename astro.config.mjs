@@ -10,6 +10,12 @@ export default defineConfig({
   integrations: [
     react(),
     sitemap({
+      // Phase 8 / D-07: /replays is invisible pre-event. We ship static HTML
+      // and don't redeploy post-event just to add routes to the sitemap, so
+      // these routes are excluded permanently. Post-event inbound links come
+      // from CountdownTimer and the conditional nav entry.
+      filter: (page) =>
+        !/\/replays\/?$/.test(page) && !/\/en\/replays\/?$/.test(page),
       i18n: {
         defaultLocale: "fr",
         locales: { fr: "fr-FR", en: "en-US" },
