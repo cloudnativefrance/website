@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Interactive Schedule** - Full schedule with filtering, timeline view, bookmarks, iCal export, Open Feedback links (completed 2026-04-13, retroactive verification)
 - [x] **Phase 8: Event Lifecycle** - Post-event replay mode, YouTube recording links, CFP status indicator (completed 2026-04-13)
 - [x] **Phase 9: SEO, Legal & Polish** - Meta tags, structured data, hreflang, legal pages, footer, sitemap (completed 2026-04-12)
-- [ ] **Phase 13: Speaker Schema Drift Cleanup** - Resolve 33 pre-existing astro-check errors and 2 broken test suites from `talk*` field drift in speaker pages (gap closure from v1.0 audit)
+- [x] **Phase 13: Speaker Schema Drift Cleanup** - Resolve 33 pre-existing astro-check errors and 2 broken test suites from `talk*` field drift in speaker pages (gap closure from v1.0 audit) (completed 2026-04-13)
 - [ ] **Phase 14: Project Documentation** - README, repo structure guide, CSV update runbook, testing docs, CONTRIBUTING
 
 ## Phase Details
@@ -233,7 +233,7 @@ Plans:
   4. Speaker data model is coherent — either (a) legacy `talk*` fields stay on speaker records and the schema is re-aligned, OR (b) speaker pages fully migrate to session lookups (as Phase 4 partially started)
 
 Plans:
-- [ ] 13-01: TBD
+- [x] 13-01: TBD
 
 ### Phase 14: Project Documentation
 **Goal**: Onboard a new contributor in under 30 minutes — they know what the site is, how the repo is structured, how to run/test it locally, and how to update the CSV-sourced content
@@ -270,5 +270,5 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | 10. Site Navigation & Component Wiring | 1/1 | Complete   | 2026-04-12 |
 | 11. Security & i18n Hardcode Fixes | 3/3 | Complete   | 2026-04-12 |
 | 12. CTA & Brand Completion | 1/1 | Complete   | 2026-04-12 |
-| 13. Speaker Schema Drift Cleanup | 0/? | Not started | - |
+| 13. Speaker Schema Drift Cleanup | 2/2 | Complete   | 2026-04-13 |
 | 14. Project Documentation | 0/? | Not started | - |
