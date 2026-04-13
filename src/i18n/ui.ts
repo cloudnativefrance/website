@@ -211,6 +211,51 @@ export const ui = {
     "footer.social.bluesky_aria": "Bluesky Cloud Native France (nouvelle fenêtre)",
     "footer.social.twitter_aria": "X Cloud Native France (nouvelle fenêtre)",
     "footer.landmark_aria": "Pied de page",
+    "editions.rail.2026": "EDITION 2026",
+    "editions.rail.2023": "EDITION 2023",
+    "editions.2026.heading": "Edition 2026 — replay et bilan",
+    "editions.2026.video_caption":
+      "Aftermovie officiel de Cloud Native Days France 2026",
+    "editions.2026.stats.participants": "1\u00a0850+ participants",
+    "editions.2026.stats.speakers": "48 intervenants invités",
+    "editions.2026.stats.sessions": "32 conférences",
+    "editions.2026.placeholder_badge": "CONTENU PLACEHOLDER",
+    "editions.2023.heading": "Souvenirs de l'édition 2023",
+    "editions.2023.gallery_cta": "Voir la galerie complète",
+    "editions.2023.video_caption":
+      "Aftermovie de l'édition KCD France 2023",
+    "editions.2023.video_cta": "Voir la playlist YouTube 2023",
+    "editions.2023.stats.participants": "1\u00a0700+ participants",
+    "editions.2023.stats.speakers": "42 intervenants",
+    "editions.2023.stats.sessions": "24 sessions",
+    "editions.2023.brand_note":
+      "KCD 2023 — première édition francophone organisée sous l'égide de la CNCF.",
+    "testimonials.heading": "Ils en parlent mieux que nous",
+    "testimonials.pause_hint": "Survolez pour mettre en pause",
+    "testimonials.0.quote":
+      "Une journée riche en rencontres et en partages techniques de haut niveau.",
+    "testimonials.0.attribution":
+      "A. Morel — SRE, startup fictive",
+    "testimonials.1.quote":
+      "Le meilleur évènement cloud-native francophone, sans aucun pitch commercial.",
+    "testimonials.1.attribution":
+      "B. Lefèvre — Platform Engineer, organisation fictive",
+    "testimonials.2.quote":
+      "J'ai appris plus en une journée qu'en six mois de veille technique.",
+    "testimonials.2.attribution":
+      "C. Dubois — DevOps, scale-up imaginaire",
+    "testimonials.3.quote":
+      "L'ambiance hallway-track est exactement ce qu'il manque aux confs traditionnelles.",
+    "testimonials.3.attribution":
+      "D. Garnier — Architecte cloud, employeur fictif",
+    "testimonials.4.quote":
+      "Des talks pointus, des speakers accessibles, une organisation au cordeau.",
+    "testimonials.4.attribution":
+      "E. Petit — Engineering Manager, structure fictive",
+    "testimonials.5.quote":
+      "Vivement la prochaine édition pour retrouver cette communauté.",
+    "testimonials.5.attribution":
+      "F. Bernard — Tech Lead, organisation placeholder",
   },
   en: {
     "nav.home": "Home",
@@ -416,5 +461,50 @@ export const ui = {
     "footer.social.bluesky_aria": "Cloud Native France on Bluesky (new window)",
     "footer.social.twitter_aria": "Cloud Native France on X (new window)",
     "footer.landmark_aria": "Site footer",
+    "editions.rail.2026": "2026 EDITION",
+    "editions.rail.2023": "2023 EDITION",
+    "editions.2026.heading": "2026 edition — recap and replays",
+    "editions.2026.video_caption":
+      "Official aftermovie of Cloud Native Days France 2026",
+    "editions.2026.stats.participants": "1,850+ attendees",
+    "editions.2026.stats.speakers": "48 invited speakers",
+    "editions.2026.stats.sessions": "32 talks",
+    "editions.2026.placeholder_badge": "PLACEHOLDER CONTENT",
+    "editions.2023.heading": "Highlights from the 2023 edition",
+    "editions.2023.gallery_cta": "View the full gallery",
+    "editions.2023.video_caption":
+      "Aftermovie from KCD France 2023",
+    "editions.2023.video_cta": "Watch the 2023 YouTube playlist",
+    "editions.2023.stats.participants": "1,700+ attendees",
+    "editions.2023.stats.speakers": "42 speakers on stage",
+    "editions.2023.stats.sessions": "24 talks delivered",
+    "editions.2023.brand_note":
+      "KCD 2023 — first French-language edition organized under the CNCF umbrella.",
+    "testimonials.heading": "They said it better than we could",
+    "testimonials.pause_hint": "Hover to pause",
+    "testimonials.0.quote":
+      "A day packed with high-quality technical exchanges and meaningful encounters.",
+    "testimonials.0.attribution":
+      "A. Morel — SRE, placeholder startup",
+    "testimonials.1.quote":
+      "The best French-speaking cloud-native event, with zero sales pitch.",
+    "testimonials.1.attribution":
+      "B. Lefèvre — Platform Engineer, placeholder org",
+    "testimonials.2.quote":
+      "I learned more in one day than during six months of solo tech watch.",
+    "testimonials.2.attribution":
+      "C. Dubois — DevOps, placeholder scale-up",
+    "testimonials.3.quote":
+      "The hallway-track vibe is exactly what mainstream conferences are missing.",
+    "testimonials.3.attribution":
+      "D. Garnier — Cloud Architect, placeholder employer",
+    "testimonials.4.quote":
+      "Deep technical talks, approachable speakers, flawless organization.",
+    "testimonials.4.attribution":
+      "E. Petit — Engineering Manager, placeholder company",
+    "testimonials.5.quote":
+      "Already looking forward to next edition to reconnect with this community.",
+    "testimonials.5.attribution":
+      "F. Bernard — Tech Lead, placeholder organization",
   },
 } as const;
