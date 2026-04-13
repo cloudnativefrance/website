@@ -1,172 +1,119 @@
 # Project Research Summary
 
-**Project:** Cloud Native Days France Website
-**Domain:** Community-driven tech conference website (single-day, 1700+ attendees, bilingual FR/EN)
-**Researched:** 2026-04-11
+**Project:** Cloud Native Days France — Website
+**Milestone:** v1.1 Past Editions Showcase
+**Domain:** Astro content site — homepage marketing sections (past-edition recaps + testimonials)
+**Researched:** 2026-04-13
 **Confidence:** HIGH
+
+> Supersedes v1.0 SUMMARY.md. Scoped to v1.1 addition on validated stack.
 
 ## Executive Summary
 
-Cloud Native Days France needs a static, bilingual conference website built with Astro 6, React islands for interactivity, Tailwind CSS 4, and shadcn/ui components, served from Nginx on Kubernetes. This is a well-understood domain with mature tooling. The recommended approach is a zero-JS-by-default static site where React only loads for interactive features (schedule filtering, mobile nav). Content lives in Markdown/YAML files validated by Zod schemas at build time, with no CMS, no database, and no server-side runtime. The final Docker image is under 50MB.
+v1.1 is a brownfield content-and-layout addition: relocate the existing "previous edition" block from `/venue` onto the homepage, add a net-new 2023 edition section (10 photos, KCD brand-history callout, Centre Georges Pompidou venue), and introduce an animated testimonials strip with 3 placeholder FR quotes. It is a feature delivery on a fully-validated stack, not a stack decision.
 
-The stack is high-confidence and current: Astro 6 (released March 2026) with its Content Layer API, Tailwind CSS 4 via the Vite plugin, and Paraglide JS 2 for type-safe UI translations. The architecture cleanly separates build-time content resolution from client-side interactivity through Astro's islands pattern. Every external service (CFP via Conference Hall, feedback via Open Feedback, ticketing via external platform) is integrated through links, not reimplemented.
+**Approach:** Extract a shared `PastEditionSection.astro` shell, wrap in thin 2026/2023 variants. Testimonials default to pure-CSS `@keyframes` rotation with `prefers-reduced-motion` global reset (no React island unless Stitch requires JS). Photos ship through `astro:assets` `<Picture>` with AVIF/WebP/JPG fallback after ImageMagick pre-processing. Testimonials stay inline in `testimonials-data.ts`. New `editions.*` i18n namespace lands FR + EN together. **Zero new runtime dependencies.**
 
-The primary risks are: (1) React context isolation between Astro islands breaking shadcn/ui components that share state, (2) bilingual content drift where FR and EN translations fall out of sync before the conference, (3) a schedule data model too rigid for the last-minute changes that always happen at conferences, and (4) Tailwind v4 class name incompatibilities with v3-era code snippets and design exports. All four are preventable with upfront architectural decisions in Phase 1.
+**Key risks:**
+1. A11y regression — first animated component in codebase; zero existing `prefers-reduced-motion` handling.
+2. LCP/CLS — 21 MB raw JPG masters must be pre-optimized before commit.
+3. Content-gap window — venue block deleted before homepage 2026 verified.
+4. FR→EN drift — FR fallback silently hides missing EN keys.
+5. CFP CTA demotion on mobile if homepage section ordering not fixed in Stitch.
 
-## Key Findings
+## Stack
 
-### Recommended Stack
+**No new runtime dependencies.** All v1.1 needs are covered by v1.0 stack.
 
-Astro 6 is the clear choice for a greenfield static conference site. It ships zero JavaScript by default, has built-in i18n routing, and its Content Layer API with Zod 4 validation provides type-safe content collections. React 19 is used exclusively for interactive islands (schedule filter, mobile nav), keeping most pages JS-free. Tailwind CSS 4 uses the new `@tailwindcss/vite` plugin (the `@astrojs/tailwind` integration is deprecated). shadcn/ui provides accessible, Tailwind-native React components.
+New code patterns (using existing tools):
+- `astro:assets` `<Picture>` — 10-photo 2023 gallery (AVIF/WebP/JPG + responsive srcset)
+- `astro:assets` `<Image>` — KCD 2023 logo
+- `tw-animate-css` (already imported) — Tailwind 4 animation utilities
+- CSS `@keyframes` + `prefers-reduced-motion` global reset
 
-**Core technologies:**
-- **Astro 6.1.x:** Static site generator with i18n routing, Content Layer API, zero JS by default. Requires Node 22.12+.
-- **React 19 + @astrojs/react 5:** Islands-only interactivity. shadcn/ui requires React.
-- **Tailwind CSS 4 via @tailwindcss/vite:** CSS-first config, utility-first styling. Not the deprecated @astrojs/tailwind.
-- **shadcn/ui (CLI v4):** Accessible component primitives. Must live inside React islands, never called directly in .astro files.
-- **Paraglide JS 2.15.x:** Type-safe, tree-shakable UI string translations. Build fails on missing keys.
-- **Nginx (Alpine):** Serves static files in production. Multi-stage Docker build, ~30-50MB final image.
-- **pnpm 9:** Fast, strict package manager. Biome for linting/formatting.
+**Explicitly rejected:** Framer Motion, Swiper, AOS, tailwindcss-animate (legacy), yet-another-react-lightbox (deferred), shadcn carousel.
 
-### Expected Features
+## Features (Scope)
 
-**Must have (table stakes):**
-- Hero section with event name, date, venue, countdown, and ticket CTA
-- Schedule page with track/tag filtering (single-day, multi-track timeline)
-- Speaker profiles (grid + individual pages with bio, photo, social, talks)
-- Sponsor/partner showcase with tiered layout (Platinum/Gold/Silver/Community)
-- Venue page with map, transport, accessibility info
-- Bilingual FR/EN support with language toggle
-- Code of Conduct, legal/privacy pages
-- Responsive mobile-first design
-- Social links and newsletter signup
+**Must have (v1.1 MVP):**
+- Homepage "2026 edition" section — direct port of venue `previous-edition` block
+- Homepage "2023 edition" section — rail label, h2, KCD brand-history callout, 10-photo grid, gallery CTA
+- Animated testimonials strip — 3 FR placeholder quotes, responsive, reduced-motion respected
+- Venue page cleanup — remove relocated 2026 block + `venue.prev.*` keys
+- FR + EN i18n coverage under `editions.*` / `testimonials.*`
 
-**Should have (differentiators):**
-- Bookmarkable talks with localStorage personal agenda (no login needed)
-- iCal export of personal agenda
-- Visual timeline/swimlane view for parallel tracks (React island)
-- Post-event replay mode (countdown becomes "watch replays", YouTube links per talk)
-- Team page with roles and grouping
-- Previous edition section (key numbers, video recap)
-- Open Feedback deep links per talk
+**Should have:**
+- Reverse-chronological ordering (2026 first, 2023 second)
+- Subtle background-tone differentiation between editions
+- Brand-history callout as visual card (KCD logo + "originally Kubernetes Community Days France" continuity signal)
 
-**Defer indefinitely (anti-features):**
-- Built-in CFP system (use Conference Hall)
-- Built-in feedback system (use Open Feedback)
-- User accounts/authentication
-- Ticket sales/payment processing
-- CMS integration
-- Mobile app / PWA
-- Blog / news section
-- Search functionality (50 talks fit on one page, filtering suffices)
+**Deferred / out of scope:**
+- Marquee-style animation (promote only if Stitch mandates + ≥6 real quotes)
+- Click-to-zoom lightbox
+- CSV-driven testimonials
+- Per-edition routed pages
+- Counter animations, parallax, autoplay
 
-### Architecture Approach
+## Architecture
 
-Static-first Astro site with React islands, built at deploy time into pure HTML/CSS/JS, served from Nginx in a Kubernetes pod. Content collections (Markdown for speakers/talks, YAML for sponsors/schedule/team) are validated by Zod schemas and resolved at build time. Data flows one-way: content files through Zod validation, into Astro pages via `getCollection()`, pre-shaped and passed as serializable props to React islands. Two-level layout hierarchy (BaseLayout for HTML shell, PageLayout for nav/footer/main). i18n uses folder-based routing (pages in `src/pages/` for FR, `src/pages/en/` for EN) plus locale-filtered content queries.
+**Component layout:**
+- `src/components/past-editions/PastEditionSection.astro` — shared shell
+- `src/components/past-editions/Edition2026Section.astro` + `Edition2023Section.astro` — thin prop wrappers
+- `src/components/testimonials/TestimonialsStrip.astro` (preferred) — pure-CSS
+- `src/components/testimonials/testimonials-data.ts` — inline quotes
+- `src/i18n/ui.ts` — new `editions.*` + `testimonials.*` keys (FR + EN)
+- `src/assets/photos/kcd2023/` + `src/assets/logos/kcd2023/`
+- Integration: `src/pages/index.astro`, `src/pages/en/index.astro`
+- Cleanup: `src/pages/venue/index.astro` (lines 5–7, 24–26, 63–73, 216–283)
 
-**Major components:**
-1. **Content Collections** -- Schema-validated speakers, talks, sponsors, schedule, team data
-2. **Astro Pages + Layouts** -- Route generation, i18n routing, static HTML output with shared layout chain
-3. **Static Astro Components** -- Speaker cards, sponsor grids, hero, footer (zero JS)
-4. **React Islands** -- Schedule filter and mobile nav only, hydrated via `client:visible`/`client:load`
-5. **Build Pipeline** -- Multi-stage Docker: Node 22 builds, Nginx Alpine serves, deployed to K8s
+## Top 5 Pitfalls (HIGH severity)
 
-### Critical Pitfalls
+1. **21 MB raw JPG masters shipped through `astro:assets`** — LCP cliff + git bloat. Run ImageMagick recipe (long edge ≤2400 px, Q82, strip EXIF) BEFORE `git add`. Enforce `find src/assets/photos/kcd2023 -size +1M` returns nothing.
+2. **Animated testimonials without `prefers-reduced-motion` fallback** — WCAG 2.2.2 fail. Add global reset to `src/styles/global.css` BEFORE the component. Wrap animations in `@media (prefers-reduced-motion: no-preference)`. Playwright-assert computed `animation: none` under emulated reduced motion.
+3. **Venue block deleted before homepage 2026 verified in prod** — content gap. Rigid sequence: (a) land homepage 2026, verify live, (b) delete venue block in separate PR, (c) sweep i18n keys in third PR.
+4. **Missing EN translations silently masked by FR fallback** — `/en/` ships mixed-language content. Require FR + EN keys in same commit; Vitest assertion on key count parity and non-identical values.
+5. **10-photo grid without dimension reservation** — CLS regression. Always import via `astro:assets`, wrap in `aspect-[3/2] overflow-hidden`, set `sizes="(min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw"`, cap `widths={[480, 800]}`.
 
-1. **React context isolation between islands** -- Each Astro island is an independent React root. shadcn/ui components sharing context (ThemeProvider, dialogs, dropdowns) must be composed inside a single .tsx wrapper, never split across islands. The schedule filter+list+detail must be ONE island. Establish this rule in Phase 1.
+## Roadmap Phase Implications
 
-2. **Bilingual content drift** -- No build-time check ensures every FR file has an EN counterpart. Use shared YAML for structured data (both languages in one file) and build a CI validation script that diffs slug lists across locale directories. Add `translationComplete` frontmatter field for graceful degradation.
+| # | Phase | Rationale | Addresses |
+|---|---|---|---|
+| 0 | Stitch full-homepage mock | CLAUDE.md gate; resolve marquee-vs-grid, section order, brand callout layout | Stitch drift, CFP demotion |
+| 1 | Asset prep (pre-optimize photos + logo) | Biggest LCP lever; unblocks 2023 section | Pitfall 1, git bloat |
+| 2 | Shared `PastEditionSection.astro` shell | Build once; `.astro` only (no React) | Pitfall: over-hydration |
+| 3 | i18n `editions.*` + `testimonials.*` keys | FR + EN lockstep; can parallel Phase 2 | Pitfall 4 |
+| 4 | Integrate `Edition2026Section` on `/` + `/en/` | Lowest-risk section first; validates shell | Content placeholders, scroll anchors |
+| 5 | Remove 2026 block from venue page | Surgical separate commit gated on Phase 4 live | Pitfall 3, orphaned imports |
+| 6 | Integrate `Edition2023Section` (parallelizable w/ Phase 5 after Phase 2) | Content-blocked on organizer assets + brand sign-off | Pitfall 2, brand legal |
+| 7 | Delete `venue.prev.*` keys | Final cleanup after 4+5 verified | Pitfall 5, key collisions |
+| 8 | `TestimonialsStrip` (.astro + CSS, parallel from Phase 3) | Independent of 2026/2023 sequence | A11y, placeholder authenticity |
 
-3. **Schedule data model too rigid** -- Design schedule as relational YAML with ID-based cross-references (separate files for speakers, talks, rooms, time slots). Build a validation script for reference integrity. Ensure build+deploy under 3 minutes for emergency updates during conference week.
+**Critical path:** 0 → 2 → 4 → 5. Phases 6 and 8 parallelize.
 
-4. **Tailwind v4 class name incompatibilities** -- ~40% of utility classes were renamed from v3. shadcn/ui CLI v4 supports v4, but community snippets and design exports may use v3 classes. Run `npx @tailwindcss/upgrade` on all imported code. Add CI grep check for deprecated class names.
+### Research-Phase Flags
 
-5. **Over-hydration** -- Default to .astro for everything. React only for schedule filter, mobile nav, and forms with validation. If JS bundle exceeds 100KB on a content page, something is wrong.
-
-## Implications for Roadmap
-
-### Phase 1: Foundation and Design System
-**Rationale:** Everything depends on project scaffolding, Tailwind/shadcn configuration, i18n setup, content schemas, and the Docker pipeline. Getting these wrong means rework in every subsequent phase.
-**Delivers:** Working Astro 6 project with Tailwind 4, React integration, i18n routing, content collection schemas, BaseLayout/PageLayout, Docker multi-stage build, Nginx config, and design tokens from DESIGN.md.
-**Addresses:** Project scaffolding, responsive layout foundation, bilingual routing structure.
-**Avoids:** Pitfalls #1 (establish island rules), #4 (validate Tailwind v4 config), #7 (Docker layer caching from day one), #10 (flexible content schemas).
-
-### Phase 2: Static Content Pages
-**Rationale:** Depends on Phase 1 schemas and layouts. All static pages can be built in parallel since they share the same layout chain and content query patterns. This is the bulk of the site.
-**Delivers:** Homepage with hero/CTA/countdown, speaker grid and individual pages, sponsor tier showcase, venue page, Code of Conduct, legal pages, team page, header/footer/language switcher, previous edition section.
-**Addresses:** All table stakes features except schedule interactivity. Team page and previous edition (differentiators).
-**Avoids:** Pitfalls #2 (content parity validation in CI), #5 (all components are .astro, no React yet), #6 (SEO component on all pages from the start), #11 (test language switcher on every page type).
-
-### Phase 3: Interactive Schedule
-**Rationale:** Depends on Phase 2 content (talks, speakers must exist). The schedule is the most complex feature -- a React island with filtering, bookmarking, and timeline view. Deserves its own phase.
-**Delivers:** Schedule page with track/tag filtering, visual timeline view with parallel tracks, talk bookmarking (localStorage), iCal export of personal agenda, Open Feedback deep links per talk.
-**Addresses:** Schedule table stake + all schedule differentiators (bookmarks, iCal, timeline).
-**Avoids:** Pitfalls #1 (single island for entire schedule), #3 (relational data model with validation), #12 (explicit timezone labels, ISO 8601 storage).
-
-### Phase 4: Event Lifecycle and Polish
-**Rationale:** Post-event features, SEO validation, performance tuning, and accessibility audit. These are finishing touches that depend on all content and interactive features being in place.
-**Delivers:** Post-event replay mode (YouTube links per talk, countdown toggle), Conference Hall CFP status indicator, JSON-LD structured data (Event schema), Open Graph images, Lighthouse performance audit, accessibility audit, 404 pages.
-**Addresses:** Post-event replay mode, CFP integration (differentiators). SEO and performance polish.
-**Avoids:** Pitfall #8 (full route testing with curl after deploy), #6 (final hreflang/canonical validation).
-
-### Phase Ordering Rationale
-
-- Phase 1 before everything: Content schemas, i18n routing, and the island isolation rule are load-bearing architectural decisions. Every subsequent phase depends on them.
-- Phase 2 before Phase 3: The schedule React island needs talk and speaker content to exist. Building static pages first also validates the content model before adding interactivity.
-- Phase 3 isolated: The schedule is the highest-complexity, highest-risk feature. It combines React islands, client-side state (bookmarks), iCal generation, and cross-referenced data. Isolating it reduces blast radius.
-- Phase 4 last: Post-event mode and polish require the complete site. SEO and performance auditing is meaningless on an incomplete site.
-- CI/CD parallel with Phase 1: The Docker pipeline should be functional from Phase 1 so every subsequent phase can be deployed and tested.
-
-### Research Flags
-
-Phases likely needing deeper research during planning:
-- **Phase 3 (Interactive Schedule):** The schedule timeline view, bookmark persistence, and iCal export involve client-side state management across a single complex React island. Research the `ics` library API and `nanostores` for potential cross-island state if bookmarks need to appear in the header.
-
-Phases with standard patterns (skip deeper research):
-- **Phase 1 (Foundation):** All tooling is well-documented with official guides. Astro 6, Tailwind 4, Docker multi-stage builds are established patterns.
-- **Phase 2 (Static Content Pages):** Standard Astro content collections + static components. No novel patterns.
-- **Phase 4 (Event Lifecycle):** Post-event toggle is a content flag. SEO and performance are standard checklists.
+- **Phase 8:** additional research only if Stitch mandates marquee — validate Magic UI CSS pattern against Tailwind 4 + WCAG 2.2.2 pause-control.
+- **Phase 6:** additional research only if interactive photo behavior (lightbox, carousel) added — currently out of scope.
+- Phases 1, 2, 3, 4, 5, 7: standard patterns, no research-phase needed.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All technologies are current stable releases with official documentation. Astro 6, React 19, Tailwind 4, shadcn/ui CLI v4 all released and documented. |
-| Features | HIGH | Based on analysis of 6+ comparable conferences (KubeCon, Devoxx, Rejekts, Bergen, Web Summit). Table stakes are unambiguous. |
-| Architecture | HIGH | Astro islands + static build + Nginx is a well-documented, battle-tested pattern. Content collections with Zod validation are first-party Astro features. |
-| Pitfalls | HIGH | All critical pitfalls are verified via official docs, GitHub discussions, or well-documented patterns in multilingual static sites. |
+| Stack | HIGH | No new deps; all APIs verified in repo + Astro 6 docs |
+| Features | MEDIUM-HIGH | Well-codified pattern; open questions are explicit Stitch deliverables |
+| Architecture | HIGH | File paths + line numbers verified; shell+wrapper is direct fit |
+| Pitfalls | HIGH | Each tied to grep, file:line, or external standard (WCAG, MDN, Astro docs) |
 
-**Overall confidence:** HIGH
+**Overall:** HIGH on approach; MEDIUM on content readiness (2023 organizer assets + brand sign-off pending).
 
-### Gaps to Address
+## Gaps to Address in Requirements
 
-- **Paraglide JS 2 with Astro 6:** Confidence is MEDIUM. The integration works but is less battle-tested than the rest of the stack. If issues arise, fallback to a manual TypeScript dictionary (`src/i18n/ui.ts`) is straightforward and documented in the architecture research.
-- **Google Stitch design export quality:** Confidence is MEDIUM. Stitch is experimental. Plan to use its output as visual reference and design token source only, not production code.
-- **Conference Hall / Open Feedback deep link formats:** Need to verify exact URL patterns for per-talk deep linking during Phase 3 planning. These are external services with their own URL schemes.
-- **Schedule data import:** If organizers use a CFP tool (Conference Hall, Sessionize) that can export structured data, a one-time import script could save significant manual YAML authoring. Worth investigating during Phase 3 planning.
-
-## Sources
-
-### Primary (HIGH confidence)
-- [Astro 6 stable release](https://astro.build/blog/astro-6/) -- Framework choice, Content Layer API, Node 22 requirement
-- [Astro i18n Routing docs](https://docs.astro.build/en/guides/internationalization/) -- Locale routing, prefixDefaultLocale
-- [Astro Content Collections docs](https://docs.astro.build/en/guides/content-collections/) -- Schema design, glob loader
-- [Astro Islands Architecture](https://docs.astro.build/en/concepts/islands/) -- Hydration directives, island isolation
-- [Astro Docker Recipe](https://docs.astro.build/en/recipes/docker/) -- Multi-stage build pattern
-- [Tailwind CSS 4 Astro guide](https://tailwindcss.com/docs/installation/framework-guides/astro) -- @tailwindcss/vite setup
-- [Tailwind CSS v4 Upgrade Guide](https://tailwindcss.com/docs/upgrade-guide) -- Class name renames
-- [shadcn/ui Astro Installation](https://ui.shadcn.com/docs/installation/astro) -- CLI v4, React islands caveat
-- [ics npm](https://www.npmjs.com/package/ics) -- iCal generation
-
-### Secondary (MEDIUM confidence)
-- [Paraglide JS Astro guide](https://inlang.com/m/gerre34r/library-inlang-paraglideJs/astro) -- V2 integration
-- [shadcn/ui React Context in Astro Discussion](https://github.com/shadcn-ui/ui/discussions/3740) -- Island isolation confirmation
-- [Building a Bilingual Site with Astro](https://tobias-schaefer.com/blog/astro-bilingual-workflow/) -- Content duplication patterns
-- [Google Stitch Complete Guide](https://www.nxcode.io/resources/news/google-stitch-complete-guide-vibe-design-2026) -- Design export limitations
-
-### Tertiary (LOW confidence)
-- [Managing Last-Minute Session Changes](https://www.ctimeetingtech.com/how-to-manage-last-minute-session-changes-event-software/) -- Conference operations insight (not tech-specific)
+- 2023 asset sourcing timeline (photos already supplied via zip; logo supplied; history blurb + stats + Ente.io album URL pending organizer)
+- KCD/CNCF brand-history wording sign-off — gate before Phase 6 PR
+- Marquee vs static grid decision — Stitch deliverable, default to static grid
+- Final homepage section order — Stitch must keep CFP within ~2 viewport heights on 390×844
+- Real testimonial quotes — placeholders ship by design; milestone exit is "tracker issue exists"
 
 ---
-*Research completed: 2026-04-11*
-*Ready for roadmap: yes*
+*Research completed: 2026-04-13 — ready for REQUIREMENTS.md + ROADMAP.md authoring.*
