@@ -63,7 +63,11 @@ Full archive at [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md).
   3. `src/styles/global.css` contains a global `prefers-reduced-motion: reduce` reset that disables animations and transitions site-wide as the documented baseline
   4. `src/components/past-editions/PastEditionSection.astro` exists as a `.astro` file (no `client:*` directive) accepting props for rail label, heading, stats, photos, optional video, optional brand callout, and optional gallery CTA
   5. `pnpm build` and the Vitest suite pass with zero new warnings
-**Plans**: TBD
+**Plans**: 4 plans
+  - [ ] 16-01-PLAN.md — A11y motion reset + i18n editions/testimonials keys + parity test + KCD logo assets
+  - [ ] 16-02-PLAN.md — Photo optimization pipeline + 10 KCD 2023 masters (human-gated on user-supplied originals)
+  - [ ] 16-03-PLAN.md — PastEditionSection.astro shell + renders-nowhere Vitest safeguard
+  - [ ] 16-04-PLAN.md — Zero-new-warnings build+test baseline gate + VALIDATION.md sign-off
 **UI hint**: yes
 
 ### Phase 17: Integrate 2026 Edition Section on Homepage
@@ -126,7 +130,7 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 (and in parallel: 19, 20 a
 |-------|-----------|----------------|--------|-----------|
 | 1-14 (archived) | v1.0 | 33/33 | Shipped | 2026-04-13 |
 | 15. Stitch Full-Homepage Mock | v1.1 | 4/4 | Complete   | 2026-04-13 |
-| 16. Foundation - Assets, i18n, A11y Baseline, Shared Shell | v1.1 | 0/TBD | Not started | - |
+| 16. Foundation - Assets, i18n, A11y Baseline, Shared Shell | v1.1 | 0/4    | Not started | - |
 | 17. Integrate 2026 Edition Section on Homepage | v1.1 | 0/TBD | Not started | - |
 | 18. Venue Page Cleanup | v1.1 | 0/TBD | Not started | - |
 | 19. Integrate 2023 Edition Section + Lightbox | v1.1 | 0/TBD | Not started | - |
