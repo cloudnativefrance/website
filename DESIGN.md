@@ -401,4 +401,66 @@ Cloud Native Days France is an official Kubernetes Community Days event. When th
 
 ---
 
+## Homepage Layout Contract (v1.1)
+
+Locked by Phase 15 (Stitch Full-Homepage Mock). Phases 16-20 implement against this contract. Every decision below is verbatim from `.planning/phases/15-stitch-full-homepage-mock/15-CONTEXT.md` — the visual source of truth is the approved Stitch screens referenced at the bottom of this section.
+
+### Section Order (D-12, locked by EDIT-06)
+
+Reverse-chronological past editions. Top to bottom:
+
+1. Hero
+2. KeyNumbers
+3. CFP
+4. Edition 2026
+5. Edition 2023
+6. Testimonials
+7. Footer
+
+### Shared-Shell Rhythm (PastEditionSection)
+
+- **D-01 Vertical order** inside each PastEditionSection is **rail → h2 → stats → media → optional brand callout**. Stats sit high to anchor numbers near the heading; media (video for 2026, photo grid for 2023) carries visual weight in the middle; brand callout closes the section when present.
+- **D-02 Rail label** ("EDITION 2026" / "EDITION 2023") is rendered as a **vertical left rail** (rotated text running down the section's left edge) — distinctive, signals "past editions" as a recurring series across the page. Rotation `-90deg`, uppercase, tracking `0.05em`, `--color-muted-foreground`.
+
+### Vertical Gap Rhythm
+
+- **D-03 Default** vertical breathing room between top-level homepage sections is **96px desktop / 64px mobile** ("generous"). Applies between CFP and every section below it.
+- **D-11 CFP region exception — mixed rhythm** to satisfy the ~2vh mobile constraint: Hero → KeyNumbers → CFP use **48px mobile gaps** (tightened). Editions and testimonials below keep the 64px mobile / 96px desktop generous rhythm from D-03. Target: CFP section top sits within ~1688px on a 390×844 mobile mock.
+
+### 2026 Variant
+
+- **D-06 Placeholder badge** — 2026 placeholder content carries a visible "PLACEHOLDER" badge so reviewers see the dev/staging treatment that will ship in Phase 17. Badge: `--color-accent` background, `--color-accent-foreground` text, `--radius-full` pill, `--text-xs` uppercase, tracking `0.05em`, pinned top-right of the section.
+- Media: single video embed (youtube-nocookie placeholder in design), `--radius-lg`.
+- No brand callout — section closes after media.
+
+### 2023 Variant
+
+- **D-04 Mosaic photo grid** — asymmetric layout: 2 large "hero" tiles (top row) + 3 medium tiles (middle row) + 5 smaller tiles (bottom row), totaling 10 photos. Editorial feel; each tile opens the lightbox in Phase 19. NOT a uniform 2×5 grid.
+- **D-13 Featured 2023 video** — single featured video embed placed **between the photo mosaic and the KCD brand-history callout**. Source: YouTube playlist `PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h` (2023 session recordings). Homepage shows one featured thumbnail with a "Watch all 2023 sessions →" `--color-primary` link to the full playlist; individual-video lightbox handling is deferred to Phase 19.
+- **D-05 KCD brand-history callout** — sits below the featured video as a **full-width band**, closes the section as a "why this matters" moment with KCD 2023 logo + short history copy. Background: `--color-secondary` or `--color-card`. Padding: `--spacing-12` vertical. Organizer sign-off on copy required before Phase 19 ships.
+
+### Testimonials Marquee
+
+- **D-07 Direction + loop** — **right → left slow drift, ~40-second loop**. Single row. Conventional reading flow; slow enough to read a quote in passing.
+- **D-08 Card style** — **quote-led**: large quote text dominates, small attribution (name — role) underneath. No avatars (placeholder quotes only). `--color-card` background, 1px `--color-border`, `--radius-lg`, `--shadow-md`. ~320-360px desktop width / ~280px mobile. `--spacing-8` padding, `--spacing-6` gap between cards. Fade-out gradients at left/right edges using `--color-background`.
+- **D-09 Pause affordance** — marquee **pauses on hover and on keyboard focus only** — no visible pause/play button. Combined with the global `prefers-reduced-motion` reset (Phase 16), this satisfies the a11y baseline without adding chrome.
+
+### CFP Compact Band
+
+- **D-10** — CFP section is a **compact band**: headline + dates + single CTA in one tight row. No track lists. No countdown timer in this milestone.
+
+### Visual References
+
+All four approved Stitch screens live in Stitch project `14858529831105057917` with design-system asset `3926684191749761173`.
+
+| Contract | Screen ID | Plan |
+|----------|-----------|------|
+| Full homepage (mobile, includes D-13) | `e23cde61c70c4b80b4e4d10fbfd9a14e` | 15-01 |
+| 2026 variant — desktop | `94b59cfb77ea4a3f9ff88c5c83c2d199` | 15-02 |
+| 2026 variant — mobile | `ca4bff97fca241d6b7ba4e9892f8458c` | 15-02 |
+| 2023 variant — desktop + mobile | `9b0c7dd494534b44a602ad22e7db9121` | 15-02 |
+| Testimonials marquee — desktop + mobile | `53f270cebda347c98a08d680db43dac8` | 15-03 |
+
+---
+
 *This file is the design contract. All implementation must reference these values. Do not introduce colors, fonts, or spacing values that are not defined here.*
