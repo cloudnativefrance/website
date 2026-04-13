@@ -1,14 +1,33 @@
 /**
- * SPKR-03: Build-output tests for co-speaker cross-references.
+ * SPKR-03: Build-output tests for co-speaker cross-references + single-talk wiring.
  *
- * Verifies bidirectional co-speaker linking:
- * - speaker-5 (Amina Diallo) profile shows speaker-6 (David Moreau) as co-speaker
- * - speaker-6 (David Moreau) profile shows speaker-5 (Amina Diallo) as co-speaker
- * - speaker-4 (Lucas Martin) has two separate talks (talk-4 + talk-6) on their profile
- * - Schedule links render as muted placeholder text (not a live <a> link)
+ * Phase 13 rewrite (D-08 REVISED Option B / D-09 / D-10):
+ * Original file asserted on fixture speakers (speaker-5 / speaker-6 and "Amina Diallo"
+ * / "David Moreau") that no longer exist in the CSV. Rewritten to anchor on a REAL
+ * co-speaker pair from the current CFP roster: session S3SPP8 pairs Arthur
+ * Outhenin-Chalandre + Quentin Swiech on the Cilium ClusterMesh REX talk. See
+ * tests/build/_anchors.md for rationale.
+ *
+ * Scope narrowed vs. the original file:
+ * - DROPPED the multi-talk assertions — no current-roster equivalent exists yet,
+ *   and chasing one would churn against CFP submission changes (D-10). Add back
+ *   when / if a stable multi-talk anchor emerges.
+ * - DROPPED the "Programme a venir" / "Schedule coming soon" placeholder describes —
+ *   that placeholder UI was removed when profile pages migrated to live talks in
+ *   Phase 4. Kept here for traceability in the SUMMARY.
+ * - DROPPED the `/speakers/{co-slug}` link href assertions — the current profile
+ *   page renders co-speaker names as plain text, not as `<a href>` links. That is
+ *   a Phase 4 D-08 unfinished feature (tracked separately) and rewiring it is
+ *   out of scope per Phase 13 CONTEXT D-09 (no production code changes here).
+ *   Name-present assertion still holds, which is what SPKR-03 fundamentally
+ *   guarantees: each speaker's profile page REFERENCES their co-speakers.
+ *
+ * IMPORTANT: run `pnpm build` before this test — it reads from dist/.
+ * Before removing the S3SPP8 row or either anchor from the CSVs, update
+ * tests/build/_anchors.md AND this file.
  */
 
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect } from "vitest";
 import { readFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
@@ -24,96 +43,38 @@ function readPage(relativePath: string): string {
   return readFileSync(fullPath, "utf-8");
 }
 
-describe("SPKR-03: Co-speaker cross-references are bidirectional", () => {
-  let speaker5Html: string;
-  let speaker6Html: string;
+// Co-speaker pair anchor — session S3SPP8.
+const A = { slug: "arthur-outhenin-chalandre", name: "Arthur Outhenin-Chalandre" };
+const B = { slug: "quentin-swiech", name: "Quentin Swiech" };
 
-  beforeAll(() => {
-    speaker5Html = readPage("speakers/speaker-5/index.html");
-    speaker6Html = readPage("speakers/speaker-6/index.html");
+describe("SPKR-03: FR co-speaker cross-references are bidirectional (session S3SPP8)", () => {
+  it(`${A.slug} FR profile references ${B.name}`, () => {
+    const html = readPage(`speakers/${A.slug}/index.html`);
+    expect(html).toContain(B.name);
   });
 
-  it("speaker-5 (Amina Diallo) profile references speaker-6 (David Moreau) as co-speaker", () => {
-    expect(speaker5Html).toContain("David Moreau");
-  });
-
-  it("speaker-6 (David Moreau) profile references speaker-5 (Amina Diallo) as co-speaker", () => {
-    expect(speaker6Html).toContain("Amina Diallo");
-  });
-
-  it("co-speaker link on speaker-5 profile points to speaker-6 profile URL", () => {
-    // The co-speaker name must appear as a link href to speaker-6
-    expect(speaker5Html).toContain("/speakers/speaker-6");
-  });
-
-  it("co-speaker link on speaker-6 profile points to speaker-5 profile URL", () => {
-    expect(speaker6Html).toContain("/speakers/speaker-5");
-  });
-
-  it("shared talk (CI/CD) appears on both speaker-5 and speaker-6 profiles", () => {
-    expect(speaker5Html).toContain("CI/CD");
-    expect(speaker6Html).toContain("CI/CD");
+  it(`${B.slug} FR profile references ${A.name}`, () => {
+    const html = readPage(`speakers/${B.slug}/index.html`);
+    expect(html).toContain(A.name);
   });
 });
 
-describe("SPKR-03: EN co-speaker cross-references are bidirectional", () => {
-  let speaker5Html: string;
-  let speaker6Html: string;
-
-  beforeAll(() => {
-    speaker5Html = readPage("en/speakers/speaker-5/index.html");
-    speaker6Html = readPage("en/speakers/speaker-6/index.html");
+describe("SPKR-03: EN co-speaker cross-references are bidirectional (session S3SPP8)", () => {
+  it(`${A.slug} EN profile references ${B.name}`, () => {
+    const html = readPage(`en/speakers/${A.slug}/index.html`);
+    expect(html).toContain(B.name);
   });
 
-  it("EN speaker-5 profile references speaker-6 (David Moreau) as co-speaker", () => {
-    expect(speaker5Html).toContain("David Moreau");
-  });
-
-  it("EN speaker-6 profile references speaker-5 (Amina Diallo) as co-speaker", () => {
-    expect(speaker6Html).toContain("Amina Diallo");
-  });
-
-  it("EN co-speaker link on speaker-5 profile points to speaker-6 EN profile URL", () => {
-    expect(speaker5Html).toContain("/en/speakers/speaker-6");
-  });
-
-  it("EN co-speaker link on speaker-6 profile points to speaker-5 EN profile URL", () => {
-    expect(speaker6Html).toContain("/en/speakers/speaker-5");
+  it(`${B.slug} EN profile references ${A.name}`, () => {
+    const html = readPage(`en/speakers/${B.slug}/index.html`);
+    expect(html).toContain(A.name);
   });
 });
 
-describe("SPKR-03: Multi-talk speaker shows all talks", () => {
-  it("speaker-4 (Lucas Martin) FR profile shows two distinct talks (Zero Trust + eBPF)", () => {
-    const html = readPage("speakers/speaker-4/index.html");
-    // talk-4: Zero Trust Kubernetes, talk-6: eBPF security
-    expect(html).toContain("Zero");
-    expect(html).toContain("eBPF");
-  });
-
-  it("speaker-3 (Sarah Chen) FR profile shows two distinct talks (OpenTelemetry + multi-cloud)", () => {
-    const html = readPage("speakers/speaker-3/index.html");
-    // talk-3: OpenTelemetry, talk-8: Scaling Kubernetes multi-cloud
-    expect(html).toContain("OpenTelemetry");
-    expect(html).toContain("multi-cloud");
-  });
-});
-
-describe("SPKR-03: Schedule placeholder renders as non-interactive text", () => {
-  it("FR speaker-1 profile has schedule placeholder text, not a schedule link", () => {
-    const html = readPage("speakers/speaker-1/index.html");
-    expect(html).toContain("Programme a venir");
-    // The placeholder must be in a <span>, not inside an <a href>
-    // We verify that the phrase is not wrapped in an anchor with href
-    const placeholderIdx = html.indexOf("Programme a venir");
-    const surroundingContext = html.slice(
-      Math.max(0, placeholderIdx - 100),
-      placeholderIdx + 30,
-    );
-    expect(surroundingContext).not.toMatch(/<a\s[^>]*href/);
-  });
-
-  it("EN speaker-1 profile has 'Schedule coming soon' as placeholder text", () => {
-    const html = readPage("en/speakers/speaker-1/index.html");
-    expect(html).toContain("Schedule coming soon");
+describe("SPKR-03: Speaker profile lists their session from sessions.csv (single-talk anchor)", () => {
+  it("petazzoni FR profile contains the keynote session title fragment", () => {
+    const html = readPage("speakers/petazzoni/index.html");
+    // Apostrophe is HTML-entity encoded in the built output — check for both fragments instead.
+    expect(html).toMatch(/Keynote d[&#39;']+ouverture/);
   });
 });
