@@ -2,33 +2,33 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Phase 8 plans ready (4 plans, checker APPROVED)
-last_updated: "2026-04-13T07:32:21.543Z"
-last_activity: 2026-04-13 -- Phase 08 execution started
+status: milestone_complete
+stopped_at: v1.0 archived
+last_updated: "2026-04-13T00:00:00.000Z"
+last_activity: 2026-04-13 -- v1.0 milestone archived (14 phases / 33 plans / 48 of 49 requirements satisfied)
 progress:
-  total_phases: 12
-  completed_phases: 8
-  total_plans: 29
-  completed_plans: 25
-  percent: 86
+  total_phases: 14
+  completed_phases: 14
+  total_plans: 33
+  completed_plans: 33
+  percent: 100
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-11)
+See: .planning/PROJECT.md (updated 2026-04-13 for v1.0 archival)
 
 **Core value:** A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register -- all within 5 seconds of landing.
-**Current focus:** Phase 08 — event-lifecycle
+**Current focus:** v1.0 shipped — awaiting v1.1 milestone definition (`/gsd-new-milestone`)
 
 ## Current Position
 
-Phase: 08 (event-lifecycle) — EXECUTING
-Plan: 1 of 4
-Status: Executing Phase 08
-Last activity: 2026-04-13 -- Phase 08 execution started
+Milestone: v1.0 — COMPLETE
+Phase: 14 of 14 — COMPLETE
+Status: milestone_complete
+Last activity: 2026-04-13 -- v1.0 milestone archived
 
 Progress: [##########] 100%
 
@@ -36,56 +36,30 @@ Progress: [##########] 100%
 
 **Velocity:**
 
-- Total plans completed: 12
-- Average duration: -
-- Total execution time: 0 hours
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 01 | 4 | - | - |
-| 02 | 3 | - | - |
-| 03 | 2 | - | - |
-| 04 | 3 | - | - |
-
-**Recent Trend:**
-
-- Last 5 plans: -
-- Trend: -
-
-*Updated after each plan completion*
-| Phase 01-04 P04 | 9min | 2 tasks | 7 files |
-| Phase 01-design-system-foundation P03 | 45 | 2 tasks | 6 files |
-| Phase 04-speakers P03 | 2min | 1 tasks | 4 files |
+- Total phases completed: 14
+- Total plans completed: 33
+- Audit verdict: passed (`.planning/v1.0-MILESTONE-AUDIT.md`)
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- Phase 1 is a formal design gate: visual identity approved in Google Stitch before code
-- Interactive schedule isolated in Phase 7 due to highest complexity
-- Phases 4, 5, 6 can execute in parallel (all depend on Phase 2 only)
-- [Phase 01-04]: Used alpine:3.21 + nginx package instead of nginx:alpine to achieve 9.5MB image (vs 62MB)
-- [Phase 01-design-system-foundation]: Tailwind 4 CSS-native @theme replaces JS config — tokens live entirely in global.css
-- [Phase 01-design-system-foundation]: OKLCH color format used for all design tokens (perceptual uniformity, wide-gamut ready)
-- [Phase 01-design-system-foundation]: Hex mesh SVG pattern for GeoBackground — zero JS, scales infinitely, subtle at 8% opacity
-- [Phase 04-speakers]: Astro 6 uses render(entry) standalone function from astro:content instead of entry.render() method
+Decisions are logged in PROJECT.md Key Decisions table and the v1.0 archive at `.planning/milestones/v1.0-ROADMAP.md`.
 
 ### Pending Todos
 
-None yet.
+None — milestone closed. Use `/gsd-new-milestone` to begin v1.1.
 
-### Blockers/Concerns
+### Carry-Over for v1.1
 
-- Google Stitch design export quality is MEDIUM confidence (experimental tool) -- plan for manual token extraction
-- Paraglide JS 2 with Astro 6 is MEDIUM confidence -- fallback to manual i18n dictionary if needed
+- P1: Subjective visual UATs for 7 phases (01, 02, 03, 04, 05, 09, 11) — ~18 tests
+- P2: SPKR-01 fixture drift in `tests/build/speakers-grid.test.ts`
+- P2: Zod 13 `LoaderConstraint` errors in `src/content.config.ts`
+- P2: Organizer content placeholders (CONFERENCE_HALL_URL, ticketing URL, legal TODOs, social URLs, og-default.png)
+- Deferred: FNDN-07 Kubernetes manifests — owned by `cnd-platform` GitOps repo
 
 ## Session Continuity
 
-Last session: 2026-04-13T07:27:38.332Z
-Stopped at: Phase 8 plans ready (4 plans, checker APPROVED)
-Resume file: .planning/phases/08-event-lifecycle/08-01-PLAN.md
+Last session: 2026-04-13 — v1.0 archival
+Stopped at: v1.0 archived
+Resume action: `/gsd-new-milestone` to begin v1.1 planning
