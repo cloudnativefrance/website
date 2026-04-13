@@ -378,6 +378,8 @@ Three canonical variants live in `src/assets/logos/`:
 
 ### KCD (Kubernetes Community Days) co-branding
 
+> **TODO (Phase 16, D-03):** The KCD 2023 SVGs at `src/assets/logos/kcd2023/logo.svg` and `logo-dark.svg` are DS-token PLACEHOLDERS. The official asset could not be retrieved during Phase 16 execution. Replace with the official KCD 2023 SVG before Phase 19 ships (gated by I18N-03 organizer sign-off).
+
 Cloud Native Days France is an official Kubernetes Community Days event. When the KCD logo appears alongside the CND France logo:
 
 **Placement:** side-by-side in a horizontal lockup, CND France on the left (primary), KCD on the right (affiliated), separated by a vertical hairline divider at 40 % white opacity over dark backgrounds, or 40 % black over light.
