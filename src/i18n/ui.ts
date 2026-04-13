@@ -12,6 +12,7 @@ export const ui = {
     "nav.sponsors": "Partenaires",
     "nav.venue": "Lieu",
     "nav.team": "Equipe",
+    "nav.replays": "Replays",
     "site.title": "Cloud Native Days France 2027",
     "site.description": "3 juin 2027 — CENTQUATRE-PARIS",
     "seo.default_description":
@@ -44,6 +45,19 @@ export const ui = {
     "keynumbers.attendees": "Participants attendus",
     "keynumbers.talks": "Conferences",
     "keynumbers.partners": "Partenaires",
+    "cfp.heading": "Appel à conférences",
+    "cfp.status.coming_soon": "Bientôt ouvert",
+    "cfp.status.open": "CFP ouvert",
+    "cfp.status.closed": "CFP clôturé",
+    "cfp.description.coming_soon":
+      "Le CFP ouvrira prochainement. Inscrivez-vous pour être notifié·e.",
+    "cfp.description.open":
+      "Proposez votre conférence pour Cloud Native Days France 2027.",
+    "cfp.closed.note":
+      "CFP clôturé — merci à toutes les personnes ayant soumis une proposition. Rendez-vous le 3 juin 2027.",
+    "cfp.cta.notify": "Me notifier",
+    "cfp.cta.submit": "Soumettre une conférence",
+    "cfp.deadline": "Clôture le {date}",
     "speakers.heading": "Nos Speakers",
     "speakers.subtext":
       "Decouvrez les intervenants de Cloud Native Days France 2027",
@@ -164,6 +178,14 @@ export const ui = {
     "schedule.export_all": "Exporter le programme (.ics)",
     "schedule.export_agenda": "Exporter mon agenda (.ics)",
     "schedule.close": "Fermer",
+    "replays.heading": "Replays",
+    "replays.lead":
+      "Revivez les conférences de Cloud Native Days France 2027.",
+    "replays.back_to_schedule": "Retour au programme",
+    "replays.empty.heading": "Replays à venir",
+    "replays.empty.body":
+      "Les enregistrements seront publiés après l'événement.",
+    "replays.watch": "Regarder le replay",
     "team.page.title": "L'équipe",
     "team.page.intro": "Les bénévoles qui organisent Cloud Native Days France.",
     "team.page.empty": "L'équipe sera annoncée prochainement.",
@@ -197,6 +219,7 @@ export const ui = {
     "nav.sponsors": "Partners",
     "nav.venue": "Venue",
     "nav.team": "Team",
+    "nav.replays": "Replays",
     "site.title": "Cloud Native Days France 2027",
     "site.description": "June 3, 2027 — CENTQUATRE-PARIS",
     "seo.default_description":
@@ -229,6 +252,19 @@ export const ui = {
     "keynumbers.attendees": "Expected attendees",
     "keynumbers.talks": "Talks",
     "keynumbers.partners": "Partners",
+    "cfp.heading": "Call for Proposals",
+    "cfp.status.coming_soon": "Coming soon",
+    "cfp.status.open": "CFP open",
+    "cfp.status.closed": "CFP closed",
+    "cfp.description.coming_soon":
+      "The CFP will open soon. Sign up to be notified.",
+    "cfp.description.open":
+      "Submit your talk for Cloud Native Days France 2027.",
+    "cfp.closed.note":
+      "CFP closed — thanks to everyone who submitted. See you June 3, 2027.",
+    "cfp.cta.notify": "Notify me",
+    "cfp.cta.submit": "Submit a talk",
+    "cfp.deadline": "Closes {date}",
     "speakers.heading": "Our Speakers",
     "speakers.subtext":
       "Meet the speakers of Cloud Native Days France 2027",
@@ -349,6 +385,12 @@ export const ui = {
     "schedule.export_all": "Export full schedule (.ics)",
     "schedule.export_agenda": "Export my agenda (.ics)",
     "schedule.close": "Close",
+    "replays.heading": "Replays",
+    "replays.lead": "Revisit the talks from Cloud Native Days France 2027.",
+    "replays.back_to_schedule": "Back to schedule",
+    "replays.empty.heading": "Recordings coming soon",
+    "replays.empty.body": "Recordings will be published after the event.",
+    "replays.watch": "Watch replay",
     "team.page.title": "The team",
     "team.page.intro": "The volunteers organizing Cloud Native Days France.",
     "team.page.empty": "The team will be announced soon.",
