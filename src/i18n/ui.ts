@@ -220,6 +220,10 @@ export const ui = {
     "editions.2026.stats.speakers": "48 intervenants invités",
     "editions.2026.stats.sessions": "32 conférences",
     "editions.2026.placeholder_badge": "CONTENU PLACEHOLDER",
+    "editions.2026.thumbnail_alt.1": "Photo d'archive KCD 2023 — placeholder en attente du recap 2026 (ambiance conférence)",
+    "editions.2026.thumbnail_alt.2": "Photo d'archive KCD 2023 — placeholder en attente du recap 2026 (public attentif)",
+    "editions.2026.thumbnail_alt.3": "Photo d'archive KCD 2023 — placeholder en attente du recap 2026 (moment hallway-track)",
+    "editions.placeholder_badge_aria": "Contenu placeholder — voir le ticket de suivi (nouvelle fenêtre)",
     "editions.2023.heading": "Souvenirs de l'édition 2023",
     "editions.2023.gallery_cta": "Voir la galerie complète",
     "editions.2023.video_caption":
@@ -470,6 +474,10 @@ export const ui = {
     "editions.2026.stats.speakers": "48 invited speakers",
     "editions.2026.stats.sessions": "32 talks",
     "editions.2026.placeholder_badge": "PLACEHOLDER CONTENT",
+    "editions.2026.thumbnail_alt.1": "KCD 2023 archive photo — placeholder pending the 2026 recap (conference atmosphere)",
+    "editions.2026.thumbnail_alt.2": "KCD 2023 archive photo — placeholder pending the 2026 recap (engaged audience)",
+    "editions.2026.thumbnail_alt.3": "KCD 2023 archive photo — placeholder pending the 2026 recap (hallway-track moment)",
+    "editions.placeholder_badge_aria": "Placeholder content — open tracker issue (new window)",
     "editions.2023.heading": "Highlights from the 2023 edition",
     "editions.2023.gallery_cta": "View the full gallery",
     "editions.2023.video_caption":
