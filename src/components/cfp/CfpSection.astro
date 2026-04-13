@@ -17,8 +17,8 @@ const deadline = new Intl.DateTimeFormat(localeTag, {
 }).format(CFP_CLOSES);
 const deadlineLine = t("cfp.deadline").replace("{date}", deadline);
 const hasRealConferenceHall = !CONFERENCE_HALL_URL.includes("TODO_EVENT_ID");
-const ariaLabelFor = (statusKey: string, descriptionKey: string) =>
-  `${t(statusKey)} — ${t(descriptionKey)}`;
+const ariaOpen = `${t("cfp.status.open")} — ${t("cfp.description.open")}`;
+const ariaComing = `${t("cfp.status.coming_soon")} — ${t("cfp.description.coming_soon")}`;
 ---
 
 <section id="cfp" class="relative w-full py-12 md:py-16 bg-background">
@@ -27,7 +27,7 @@ const ariaLabelFor = (statusKey: string, descriptionKey: string) =>
       <div class="flex flex-col items-center text-center md:items-start md:text-left gap-6 max-w-2xl md:mx-0 mx-auto">
         <span
           class="inline-flex items-center gap-2 rounded-full bg-accent text-accent-foreground px-[10px] py-1 text-xs font-normal uppercase tracking-[0.05em]"
-          aria-label={ariaLabelFor("cfp.status.open", "cfp.description.open")}
+          aria-label={ariaOpen}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -87,10 +87,7 @@ const ariaLabelFor = (statusKey: string, descriptionKey: string) =>
       <div class="flex flex-col items-center text-center md:items-start md:text-left gap-6 max-w-2xl md:mx-0 mx-auto">
         <span
           class="inline-flex items-center gap-2 rounded-full bg-secondary text-muted-foreground px-[10px] py-1 text-xs font-normal uppercase tracking-[0.05em]"
-          aria-label={ariaLabelFor(
-            "cfp.status.coming_soon",
-            "cfp.description.coming_soon"
-          )}
+          aria-label={ariaComing}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
