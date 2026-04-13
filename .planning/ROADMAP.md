@@ -21,6 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Interactive Schedule** - Full schedule with filtering, timeline view, bookmarks, iCal export, Open Feedback links (completed 2026-04-13, retroactive verification)
 - [x] **Phase 8: Event Lifecycle** - Post-event replay mode, YouTube recording links, CFP status indicator (completed 2026-04-13)
 - [x] **Phase 9: SEO, Legal & Polish** - Meta tags, structured data, hreflang, legal pages, footer, sitemap (completed 2026-04-12)
+- [ ] **Phase 13: Speaker Schema Drift Cleanup** - Resolve 33 pre-existing astro-check errors and 2 broken test suites from `talk*` field drift in speaker pages (gap closure from v1.0 audit)
 
 ## Phase Details
 
@@ -219,6 +220,20 @@ Plans:
 Plans:
 - [ ] 12-01: TBD
 
+### Phase 13: Speaker Schema Drift Cleanup
+**Goal**: Resolve pre-existing TypeScript errors and broken tests from speaker schema drift accumulated across Phases 4-11
+**Depends on**: Phase 4
+**Requirements**: — (tech-debt cleanup, no new REQ-IDs)
+**Gap Closure:** Closes the tech_debt items tracked in phases 04/08/11 deferred-items.md
+**Success Criteria** (what must be TRUE):
+  1. `pnpm astro check` produces 0 errors for `src/pages/speakers/index.astro` (currently 33 errors on `talkTitle`/`talkTrack`/`talkDuration` fields)
+  2. `tests/build/speaker-profile.test.ts` passes all assertions (currently failing)
+  3. `tests/build/speaker-talks.test.ts` passes SPKR-03 co-speaker cross-reference tests (currently failing on undefined `session.speakers`)
+  4. Speaker data model is coherent — either (a) legacy `talk*` fields stay on speaker records and the schema is re-aligned, OR (b) speaker pages fully migrate to session lookups (as Phase 4 partially started)
+
+Plans:
+- [ ] 13-01: TBD
+
 ## Progress
 
 **Execution Order:**
@@ -238,3 +253,4 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | 10. Site Navigation & Component Wiring | 1/1 | Complete   | 2026-04-12 |
 | 11. Security & i18n Hardcode Fixes | 3/3 | Complete   | 2026-04-12 |
 | 12. CTA & Brand Completion | 1/1 | Complete   | 2026-04-12 |
+| 13. Speaker Schema Drift Cleanup | 0/? | Not started | - |
