@@ -51,7 +51,27 @@ export function getCoSpeakersForTalk(
   session: SessionRow,
   currentSpeakerSlug: string,
 ): string[] {
-  return session.speakers.filter((slug) => slug !== currentSpeakerSlug);
+  const speakers = session.speakers ?? [];
+  return speakers.filter((slug) => slug !== currentSpeakerSlug);
+}
+
+/**
+ * D-04: Pick the speaker's "primary" session for grid display.
+ * Order: keynote first, then earliest startTime (lexicographic ISO compare is correct here).
+ * Returns undefined when the speaker has no sessions (D-05 — caller renders graceful fallback).
+ */
+export function getPrimaryTalk(
+  speakerSlug: string,
+  sessions: SessionRow[],
+): SessionRow | undefined {
+  const list = sessions.filter((s) => (s.speakers ?? []).includes(speakerSlug));
+  if (list.length === 0) return undefined;
+  return [...list].sort((a, b) => {
+    const aKey = a.format === "keynote" ? 0 : 1;
+    const bKey = b.format === "keynote" ? 0 : 1;
+    if (aKey !== bKey) return aKey - bKey;
+    return a.startTime.localeCompare(b.startTime);
+  })[0];
 }
 
 export type SpeakerEntry = CollectionEntry<"speakers">;
