@@ -293,3 +293,17 @@ describe("getCoSpeakersForTalk", () => {
     expect(fromSpeaker6).toContain("speaker-5");
   });
 });
+
+describe("getCoSpeakersForTalk D-06 undefined-safety", () => {
+  it("returns [] when session.speakers is undefined (D-06)", () => {
+    const session = { id: "x", title: "t", speakers: undefined, track: "", startTime: "" } as any;
+    expect(() => getCoSpeakersForTalk(session, "anybody")).not.toThrow();
+    expect(getCoSpeakersForTalk(session, "anybody")).toEqual([]);
+  });
+
+  it("returns [] when session.speakers is null (D-06)", () => {
+    const session = { id: "x", title: "t", speakers: null, track: "", startTime: "" } as any;
+    expect(() => getCoSpeakersForTalk(session, "anybody")).not.toThrow();
+    expect(getCoSpeakersForTalk(session, "anybody")).toEqual([]);
+  });
+});
