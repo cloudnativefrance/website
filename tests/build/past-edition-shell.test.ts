@@ -28,6 +28,8 @@ const REQUIRED_PROP_NAMES = [
   "brandCallout",
   "galleryCta",
   "placeholder",
+  "id",
+  "trackerUrl",
 ];
 
 function walk(dir: string): string[] {
@@ -80,5 +82,25 @@ describe("D-09: shell is rendered nowhere in Phase 16", () => {
       importers,
       `PastEditionSection referenced in pages (must be zero in Phase 16): ${importers.join(", ")}`,
     ).toEqual([]);
+  });
+});
+
+describe("Phase 17 D-08/D-13 shell extensions", () => {
+  it("Props interface declares optional id and trackerUrl", () => {
+    const text = readFileSync(SHELL_PATH, "utf-8");
+    expect(/\bid\?:\s*string/.test(text), "Props missing `id?: string`").toBe(true);
+    expect(/\btrackerUrl\?:\s*string/.test(text), "Props missing `trackerUrl?: string`").toBe(true);
+  });
+
+  it("<section> element renders id attribute from props", () => {
+    const text = readFileSync(SHELL_PATH, "utf-8");
+    expect(/<section[^>]*\bid=\{id\}/.test(text), "Shell does not render <section id={id}>").toBe(true);
+  });
+
+  it("placeholder badge is anchor-wrapped when trackerUrl is set (D-13)", () => {
+    const text = readFileSync(SHELL_PATH, "utf-8");
+    expect(/placeholder\s*&&\s*trackerUrl/.test(text), "Missing `placeholder && trackerUrl` guard").toBe(true);
+    expect(/href=\{trackerUrl\}/.test(text), "Missing href={trackerUrl} anchor").toBe(true);
+    expect(/aria-label=\{t\(["']editions\.placeholder_badge_aria["']\)\}/.test(text), "Missing aria-label with editions.placeholder_badge_aria key").toBe(true);
   });
 });
