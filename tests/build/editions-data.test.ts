@@ -76,16 +76,9 @@ describe("EDIT-02 / EDIT-03: EDITION_2023 data module (real KCD 2023 content)", 
     });
   });
 
-  it("applies a balanced size rhythm (2 hero + 2 medium + 2 small)", () => {
+  it("uses uniform medium size for a clean 3×2 grid", () => {
     const sizes = EDITION_2023.thumbnails.map((t) => t.size);
-    const counts = sizes.reduce<Record<string, number>>((acc, s) => {
-      const key = s ?? "unspecified";
-      acc[key] = (acc[key] ?? 0) + 1;
-      return acc;
-    }, {});
-    expect(counts.hero).toBe(2);
-    expect(counts.medium).toBe(2);
-    expect(counts.small).toBe(2);
+    expect(sizes.every((s) => s === "medium")).toBe(true);
   });
 
   it("exposes the KCD 2023 brand logo for the callout band (EDIT-03)", () => {

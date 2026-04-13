@@ -19,8 +19,8 @@ import kcd2023_07 from "@/assets/photos/kcd2023/07.jpg";
 import kcd2023_08 from "@/assets/photos/kcd2023/08.jpg";
 import kcd2023_10 from "@/assets/photos/kcd2023/10.jpg";
 import ambiance03 from "@/assets/photos/ambiance/ambiance-03.jpg";
-import ambiance05 from "@/assets/photos/ambiance/ambiance-05.jpg";
 import ambiance06 from "@/assets/photos/ambiance/ambiance-06.jpg";
+import ambiance08 from "@/assets/photos/ambiance/ambiance-08.jpg";
 import ambiance10 from "@/assets/photos/ambiance/ambiance-10.jpg";
 import kcdLogo from "@/assets/logos/kcd2023/logo-color.png";
 
@@ -44,7 +44,7 @@ export const EDITION_2026 = {
   // Rendered as a clean 2×2 grid via size: "hero" (col-span-12 md:col-span-6).
   thumbnails: [
     { src: ambiance03, altKey: "editions.2026.thumbnail_alt.1", size: "hero" },
-    { src: ambiance05, altKey: "editions.2026.thumbnail_alt.2", size: "hero" },
+    { src: ambiance08, altKey: "editions.2026.thumbnail_alt.2", size: "hero" },
     { src: ambiance06, altKey: "editions.2026.thumbnail_alt.3", size: "hero" },
     { src: ambiance10, altKey: "editions.2026.thumbnail_alt.4", size: "hero" },
   ] as const satisfies ReadonlyArray<Thumbnail>,
@@ -66,15 +66,16 @@ export const EDITION_2023 = {
     { value: "42", labelKey: "editions.2023.stats.speakers" },
     { value: "24", labelKey: "editions.2023.stats.sessions" },
   ] as const satisfies ReadonlyArray<Stat>,
-  // Homepage mosaic — curated subset of 6 from the 10 KCD 2023 masters.
-  // Full 10-photo mosaic + lightbox ships on a dedicated 2023 page in a later phase.
+  // Homepage grid — 6 curated photos from the 10 KCD 2023 masters, rendered as
+  // a uniform 3×2 grid (all size: "medium" → col-span-4). Full 10-photo mosaic
+  // + lightbox ships on a dedicated 2023 page in a later phase.
   thumbnails: [
-    { src: kcd2023_01, altKey: "editions.2023.thumbnail_alt.1", size: "hero" },
-    { src: kcd2023_03, altKey: "editions.2023.thumbnail_alt.3", size: "hero" },
+    { src: kcd2023_01, altKey: "editions.2023.thumbnail_alt.1", size: "medium" },
+    { src: kcd2023_03, altKey: "editions.2023.thumbnail_alt.3", size: "medium" },
     { src: kcd2023_05, altKey: "editions.2023.thumbnail_alt.5", size: "medium" },
     { src: kcd2023_07, altKey: "editions.2023.thumbnail_alt.7", size: "medium" },
-    { src: kcd2023_08, altKey: "editions.2023.thumbnail_alt.8", size: "small" },
-    { src: kcd2023_10, altKey: "editions.2023.thumbnail_alt.10", size: "small" },
+    { src: kcd2023_08, altKey: "editions.2023.thumbnail_alt.8", size: "medium" },
+    { src: kcd2023_10, altKey: "editions.2023.thumbnail_alt.10", size: "medium" },
   ] as const satisfies ReadonlyArray<Thumbnail>,
   brandLogo: kcdLogo,
   placeholder: false,
