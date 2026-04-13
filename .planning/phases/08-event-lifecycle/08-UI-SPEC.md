@@ -1,10 +1,11 @@
 ---
 phase: 8
 slug: event-lifecycle
-status: draft
+status: approved
 shadcn_initialized: true
 preset: base-nova
 created: 2026-04-13
+reviewed_at: 2026-04-13
 ---
 
 # Phase 8 — UI Design Contract
