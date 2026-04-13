@@ -46,7 +46,11 @@ Full archive at [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md).
   3. 2026 and 2023 section variants are designed inside the same shared-shell rhythm (rail label, h2, stats, photos, optional video, optional brand callout)
   4. Testimonials strip layout (marquee direction, card style, pause affordance) is locked
   5. User has explicitly approved the mock and any open design questions are resolved
-**Plans**: TBD
+**Plans**: 4 plans
+  - [ ] 15-01-PLAN.md - Generate full-homepage Stitch mock (all 7 sections, DS tokens only) + user approval
+  - [ ] 15-02-PLAN.md - Generate 2026 vs 2023 variant detail screens within shared shell + user approval
+  - [ ] 15-03-PLAN.md - Generate testimonials marquee detail (direction, card, pause affordance) + user approval
+  - [ ] 15-04-PLAN.md - Update DESIGN.md with locked Homepage Layout Contract (D-01..D-12)
 **UI hint**: yes
 
 ### Phase 16: Foundation - Assets, i18n, A11y Baseline, Shared Shell
@@ -121,7 +125,7 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 (and in parallel: 19, 20 a
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1-14 (archived) | v1.0 | 33/33 | Shipped | 2026-04-13 |
-| 15. Stitch Full-Homepage Mock | v1.1 | 0/TBD | Not started | - |
+| 15. Stitch Full-Homepage Mock | v1.1 | 0/4 | Planned | - |
 | 16. Foundation - Assets, i18n, A11y Baseline, Shared Shell | v1.1 | 0/TBD | Not started | - |
 | 17. Integrate 2026 Edition Section on Homepage | v1.1 | 0/TBD | Not started | - |
 | 18. Venue Page Cleanup | v1.1 | 0/TBD | Not started | - |
