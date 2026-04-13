@@ -21,6 +21,7 @@ Design-only gate: produce a single Stitch-approved, full-homepage visual contrac
 ### 2026 vs 2023 Variants
 - **D-04:** 2023 photo grid uses an **asymmetric / mosaic layout**: one or two larger "hero" photos plus smaller supporting tiles (e.g., 2-up large + 3-up small + 5-up bottom row), totaling 10 photos. Editorial feel; each tile opens the lightbox (lightbox itself is Phase 19).
 - **D-05:** 2023 KCD brand-history callout sits **below the photo grid as a full-width band** — closes the section as a "why this matters" moment with KCD logo + short history copy. (Organizer sign-off on copy is required before Phase 19 ships.)
+- **D-13:** 2023 section also carries a **single featured video embed** placed **between the photo mosaic and the KCD brand-history callout**. Source: YouTube playlist `PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h` (2023 session recordings). Homepage shows one featured thumbnail with a "Watch all 2023 sessions →" link pointing to the full playlist; individual-video lightbox handling is deferred to Phase 19.
 - **D-06:** 2026 placeholder content carries a **visible "PLACEHOLDER" badge** in the Stitch mock so reviewers see the dev/staging treatment that will ship in Phase 17. Badge styling (color, position) is part of the design contract.
 
 ### Testimonials Marquee

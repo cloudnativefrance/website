@@ -173,3 +173,10 @@
 - **Prompt:** full homepage (Hero → KeyNumbers → CFP → 2026 → 2023 → Testimonials → Footer) with D-01..D-12 locked decisions verbatim. CFP compact band, 48px Hero→KeyNumbers→CFP mobile gaps (D-11), 64px below (D-03), vertical left rail labels (D-02), asymmetric 2+3+5 mosaic (D-04), full-width KCD callout band (D-05), PLACEHOLDER pink badge on 2026 (D-06), right-to-left quote-led marquee with hover-pause hint (D-07/D-08/D-09).
 - **Preview:** open the Stitch canvas for project 14858529831105057917 and select screen `f05b5cf59da64439bbbde201f90c5c22`.
 - **Iteration:** 1 (awaiting user approval).
+
+### 2026-04-13 — 15-01 Iteration 2: Add featured video to 2023 section (D-13)
+
+- **Trigger:** User surfaced YouTube playlist `PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h` for 2023 sessions. New decision D-13 recorded in 15-CONTEXT.md: one featured video embed between the 10-photo mosaic and the KCD callout, with "Watch all 2023 sessions →" link to the playlist.
+- **Previous screen:** `f05b5cf59da64439bbbde201f90c5c22` (iteration 1)
+- **New screen (current):** `e23cde61c70c4b80b4e4d10fbfd9a14e` ("Mobile Homepage — Updated 2023 Section")
+- **Changes:** 2023 section now shows photos → featured video thumbnail (16:9, Card surface, play-button overlay, Muted caption) → "Watch all 2023 sessions →" Primary Blue link → KCD history band. 64px vertical rhythm preserved. Other sections unchanged.
