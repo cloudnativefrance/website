@@ -110,3 +110,10 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* D-10 Phase 17: deep-link anchor offset for sticky nav.
+   Applies only when a URL fragment targets an element (e.g. /#edition-2026).
+   5rem = 80px = sticky nav height (64-72px) + breathing room. */
+:target {
+  scroll-margin-top: 5rem;
+}
