@@ -67,27 +67,27 @@
 
 | REQ-ID | Phase | Status |
 |---|---|---|
-| EDIT-01 | TBD | pending |
-| EDIT-02 | TBD | pending |
-| EDIT-03 | TBD | pending |
-| EDIT-04 | TBD | pending |
-| EDIT-05 | TBD | pending |
-| EDIT-06 | TBD | pending |
-| EDIT-07 | TBD | pending |
-| TEST-01 | TBD | pending |
-| TEST-02 | TBD | pending |
-| TEST-03 | TBD | pending |
-| A11Y-01 | TBD | pending |
-| A11Y-02 | TBD | pending |
-| A11Y-03 | TBD | pending |
-| A11Y-04 | TBD | pending |
-| A11Y-05 | TBD | pending |
-| VENUE-01 | TBD | pending |
-| VENUE-02 | TBD | pending |
-| VENUE-03 | TBD | pending |
-| VENUE-04 | TBD | pending |
-| I18N-01 | TBD | pending |
-| I18N-02 | TBD | pending |
-| I18N-03 | TBD | pending |
+| EDIT-01 | Phase 17 | pending |
+| EDIT-02 | Phase 19 | pending |
+| EDIT-03 | Phase 19 | pending |
+| EDIT-04 | Phase 16 | pending |
+| EDIT-05 | Phase 19 | pending |
+| EDIT-06 | Phase 15 | pending |
+| EDIT-07 | Phase 19 | pending |
+| TEST-01 | Phase 20 | pending |
+| TEST-02 | Phase 20 | pending |
+| TEST-03 | Phase 20 | pending |
+| A11Y-01 | Phase 20 | pending |
+| A11Y-02 | Phase 20 | pending |
+| A11Y-03 | Phase 19 | pending |
+| A11Y-04 | Phase 19 | pending |
+| A11Y-05 | Phase 16 | pending |
+| VENUE-01 | Phase 18 | pending |
+| VENUE-02 | Phase 18 | pending |
+| VENUE-03 | Phase 18 | pending |
+| VENUE-04 | Phase 18 | pending |
+| I18N-01 | Phase 16 | pending |
+| I18N-02 | Phase 16 | pending |
+| I18N-03 | Phase 19 | pending |
 
-_Traceability populated by roadmapper when phases are defined._
+_Traceability populated by roadmapper 2026-04-13._
