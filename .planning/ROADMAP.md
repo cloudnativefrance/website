@@ -22,6 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: Event Lifecycle** - Post-event replay mode, YouTube recording links, CFP status indicator (completed 2026-04-13)
 - [x] **Phase 9: SEO, Legal & Polish** - Meta tags, structured data, hreflang, legal pages, footer, sitemap (completed 2026-04-12)
 - [ ] **Phase 13: Speaker Schema Drift Cleanup** - Resolve 33 pre-existing astro-check errors and 2 broken test suites from `talk*` field drift in speaker pages (gap closure from v1.0 audit)
+- [ ] **Phase 14: Project Documentation** - README, repo structure guide, CSV update runbook, testing docs, CONTRIBUTING
 
 ## Phase Details
 
@@ -234,6 +235,22 @@ Plans:
 Plans:
 - [ ] 13-01: TBD
 
+### Phase 14: Project Documentation
+**Goal**: Onboard a new contributor in under 30 minutes — they know what the site is, how the repo is structured, how to run/test it locally, and how to update the CSV-sourced content
+**Depends on**: Nothing (documentation of existing work)
+**Requirements**: — (no user-facing REQ-IDs; this closes organizational tech debt)
+**Gap Closure:** Fills a gap not in the v1.0 audit — the project has no README/CONTRIBUTING/runbook surface
+**Success Criteria** (what must be TRUE):
+  1. `README.md` at repo root explains: what the site is (CND France 2027 conference site), who it serves, stack overview (Astro + React islands + Tailwind 4 + shadcn, K8s deployment), quickstart (`pnpm install`, `pnpm dev`, `pnpm build`), and where to find deeper docs
+  2. `docs/repo-structure.md` (or equivalent) maps the top-level directories — `src/pages`, `src/components`, `src/content` (CSV fallbacks), `src/lib` (data loaders), `src/i18n`, `.planning/` (GSD artifacts), `tests/`
+  3. `docs/updating-content.md` is the runbook for CSV-backed data — shows the four Google Sheets (speakers, sessions, sponsors, team), how to publish them as CSV, which env vars point to them (`SCHEDULE_SESSIONS_CSV_URL` etc.), how the local fallback files relate, and how to run a rebuild after an edit
+  4. `docs/testing.md` covers the test runners (`pnpm vitest run` for unit + build tests, `pnpm astro check` for types, `pnpm astro build` as the integration smoke test) plus known pre-existing failures to ignore until Phase 13 closes them
+  5. `CONTRIBUTING.md` captures the CSV-is-source-of-truth rule, the Stitch-first rule (referenced from CLAUDE.md), the i18n-key rule (no hardcoded FR/EN strings), and the PR/review flow
+  6. Links from `README.md` make the doc surface discoverable without grep
+
+Plans:
+- [ ] 14-01: TBD
+
 ## Progress
 
 **Execution Order:**
@@ -254,3 +271,4 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | 11. Security & i18n Hardcode Fixes | 3/3 | Complete   | 2026-04-12 |
 | 12. CTA & Brand Completion | 1/1 | Complete   | 2026-04-12 |
 | 13. Speaker Schema Drift Cleanup | 0/? | Not started | - |
+| 14. Project Documentation | 0/? | Not started | - |
