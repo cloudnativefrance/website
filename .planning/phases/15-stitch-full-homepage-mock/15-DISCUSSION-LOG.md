@@ -180,3 +180,7 @@
 - **Previous screen:** `f05b5cf59da64439bbbde201f90c5c22` (iteration 1)
 - **New screen (current):** `e23cde61c70c4b80b4e4d10fbfd9a14e` ("Mobile Homepage — Updated 2023 Section")
 - **Changes:** 2023 section now shows photos → featured video thumbnail (16:9, Card surface, play-button overlay, Muted caption) → "Watch all 2023 sessions →" Primary Blue link → KCD history band. 64px vertical rhythm preserved. Other sections unchanged.
+
+### 2026-04-13 — 15-01 approved (screen e23cde61c70c4b80b4e4d10fbfd9a14e)
+
+User explicitly approved Stitch screen e23cde61c70c4b80b4e4d10fbfd9a14e as the locked full-homepage visual contract for v1.1. All 10 checklist points + D-13 video addition confirmed. Iteration count: 2 (initial generation + D-13 video insertion).
