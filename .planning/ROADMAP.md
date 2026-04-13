@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: Event Lifecycle** - Post-event replay mode, YouTube recording links, CFP status indicator (completed 2026-04-13)
 - [x] **Phase 9: SEO, Legal & Polish** - Meta tags, structured data, hreflang, legal pages, footer, sitemap (completed 2026-04-12)
 - [x] **Phase 13: Speaker Schema Drift Cleanup** - Resolve 33 pre-existing astro-check errors and 2 broken test suites from `talk*` field drift in speaker pages (gap closure from v1.0 audit) (completed 2026-04-13)
-- [ ] **Phase 14: Project Documentation** - README, repo structure guide, CSV update runbook, testing docs, CONTRIBUTING
+- [x] **Phase 14: Project Documentation** - README, repo structure guide, CSV update runbook, testing docs, CONTRIBUTING (completed 2026-04-13)
 
 ## Phase Details
 
@@ -249,7 +249,7 @@ Plans:
   6. Links from `README.md` make the doc surface discoverable without grep
 
 Plans:
-- [ ] 14-01: TBD
+- [x] 14-01: TBD
 
 ## Progress
 
@@ -271,4 +271,4 @@ Phases execute in numeric order. Phases 4, 5, 6 can execute in parallel (all dep
 | 11. Security & i18n Hardcode Fixes | 3/3 | Complete   | 2026-04-12 |
 | 12. CTA & Brand Completion | 1/1 | Complete   | 2026-04-12 |
 | 13. Speaker Schema Drift Cleanup | 2/2 | Complete   | 2026-04-13 |
-| 14. Project Documentation | 0/? | Not started | - |
+| 14. Project Documentation | 2/2 | Complete   | 2026-04-13 |
