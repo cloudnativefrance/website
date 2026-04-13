@@ -201,3 +201,11 @@ User explicitly approved Stitch screen e23cde61c70c4b80b4e4d10fbfd9a14e as the l
 - D-08 locked: quote-led cards (~340px desktop / ~280px mobile), opening quote glyph, Foreground quote text, small Muted attribution "Prénom N. — Rôle", no avatars.
 - D-09 locked: no visible pause button; one card shown in hover state (Primary Blue border at 50% + stronger shadow) with annotation "Marquee pauses on :hover and :focus-within. No pause button. Reduced-motion handled globally."
 - **Iteration:** 1 (awaiting user approval).
+
+### 2026-04-13 — 15-02 approved (screens 94b59cfb77ea4a3f9ff88c5c83c2d199, ca4bff97fca241d6b7ba4e9892f8458c, 9b0c7dd494534b44a602ad22e7db9121)
+
+User explicitly approved both variant detail screens. 2026 variant desktop 94b59cfb77ea4a3f9ff88c5c83c2d199 + mobile ca4bff97fca241d6b7ba4e9892f8458c; 2023 variant 9b0c7dd494534b44a602ad22e7db9121. Shared-shell rhythm confirmed — rails read as siblings, D-01..D-06 + D-13 all locked.
+
+### 2026-04-13 — 15-03 approved (screen 53f270cebda347c98a08d680db43dac8)
+
+User explicitly approved testimonials marquee detail screen 53f270cebda347c98a08d680db43dac8. D-07 direction, D-08 quote-led card style, D-09 hover-pause affordance all locked.
