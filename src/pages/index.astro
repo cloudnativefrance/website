@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import HeroSection from "@/components/hero/HeroSection.astro";
 import KeyNumbers from "@/components/hero/KeyNumbers";
+import CfpSection from "@/components/cfp/CfpSection.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { eventSchemaJson } from "@/lib/event-schema";
 
@@ -21,5 +22,6 @@ const schemaJson = eventSchemaJson({ lang, siteUrl, description });
   <main>
     <HeroSection />
     <KeyNumbers client:idle lang={lang} />
+    <CfpSection />
   </main>
 </Layout>
