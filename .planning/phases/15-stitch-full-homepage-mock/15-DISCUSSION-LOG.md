@@ -159,3 +159,17 @@
 - Two-row opposite-direction marquee
 - CFP track list on homepage
 - Avatar-led testimonial cards (until real testimonials arrive)
+
+---
+
+## Execution Log
+
+### 2026-04-13 — 15-01 Task 1: Full-homepage mock generated
+
+- **Stitch screen ID:** `f05b5cf59da64439bbbde201f90c5c22`
+- **Project:** `14858529831105057917` (Cloud Native Days France 2027)
+- **Design system:** `3926684191749761173` (token-only prompt, no raw hex injected)
+- **Device:** MOBILE (390x844 target)
+- **Prompt:** full homepage (Hero → KeyNumbers → CFP → 2026 → 2023 → Testimonials → Footer) with D-01..D-12 locked decisions verbatim. CFP compact band, 48px Hero→KeyNumbers→CFP mobile gaps (D-11), 64px below (D-03), vertical left rail labels (D-02), asymmetric 2+3+5 mosaic (D-04), full-width KCD callout band (D-05), PLACEHOLDER pink badge on 2026 (D-06), right-to-left quote-led marquee with hover-pause hint (D-07/D-08/D-09).
+- **Preview:** open the Stitch canvas for project 14858529831105057917 and select screen `f05b5cf59da64439bbbde201f90c5c22`.
+- **Iteration:** 1 (awaiting user approval).
