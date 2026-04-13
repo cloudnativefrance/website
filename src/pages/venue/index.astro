@@ -1,6 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { EDITION_2026 } from "@/lib/editions-data";
 
 import ambiance03 from "@/assets/photos/ambiance/ambiance-03.jpg";
 import ambiance06 from "@/assets/photos/ambiance/ambiance-06.jpg";
@@ -21,9 +22,8 @@ const bbox = `${VENUE.lon - 0.006},${VENUE.lat - 0.0035},${VENUE.lon + 0.006},${
 const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${VENUE.lat},${VENUE.lon}`;
 const mapLink = `https://www.openstreetmap.org/?mlat=${VENUE.lat}&mlon=${VENUE.lon}#map=17/${VENUE.lat}/${VENUE.lon}`;
 
-const YOUTUBE_ID = "qyMGuU2-w8o";
-const GALLERY_URL =
-  "https://albums.ente.io/?t=QRX4L3WBSD#5jsodRK1mQbqS83qJMd2sVBZr9oW4Bzgm9DuVP6MowY5";
+const YOUTUBE_ID = EDITION_2026.youtubeId;
+const GALLERY_URL = EDITION_2026.galleryUrl;
 
 const transport = [
   {
@@ -60,10 +60,12 @@ const accessibility = [
   t("venue.access.guide_dogs"),
 ];
 
+// Labels stay on the venue-specific `venue.prev.*` keys (untouched in Phase 17 — removed Phase 18).
+// Values are the single source of truth from editions-data.ts (D-01).
 const previousStats = [
-  { value: "1700+", label: t("venue.prev.participants") },
-  { value: "50+", label: t("venue.prev.talks") },
-  { value: "40+", label: t("venue.prev.partners") },
+  { value: EDITION_2026.stats[0].value, label: t("venue.prev.participants") },
+  { value: EDITION_2026.stats[1].value, label: t("venue.prev.talks") },
+  { value: EDITION_2026.stats[2].value, label: t("venue.prev.partners") },
 ];
 
 const thumbnails = [
