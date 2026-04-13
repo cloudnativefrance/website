@@ -62,18 +62,16 @@ Exceptions: none.
 
 ## Typography
 
-All sizes and weights come from DESIGN.md Type Scale. No overrides.
+All sizes and weights come from DESIGN.md Type Scale. No overrides. Reduced palette: exactly 4 sizes and exactly 2 weights.
 
 | Role | DS Token | Size | Weight | Line Height | Usage in this phase |
 |------|----------|------|--------|-------------|---------------------|
-| Body | `--text-base` | 16px | 400 | 1.6 | Status description copy, card speaker line |
-| Label / Badge | `--text-xs` | 12px | 500 | 1.5 | CFP status pill text, track badge on cards (uppercase, `letter-spacing: 0.05em`) |
-| Card title | `--text-lg` | 18px | 600 | 1.6 | Recording card session title |
-| Section sub-heading | `--text-2xl` | 24px | 600 | 1.3 | Track group headings on `/replays` |
-| Section heading | `--text-3xl` | 30px | 600 | 1.3 | CFP section headline on homepage |
+| Label / Badge | `--text-xs` | 12px | 400 | 1.5 | CFP status pill text, track badge on cards (uppercase, `letter-spacing: 0.05em`) |
+| Body / Card title | `--text-base` | 16px | 400 (body) / 700 (card title) | 1.6 | Body copy (status description, speaker line, lead paragraph). Recording card session title uses 16px weight 700. |
+| Sub-heading / CFP headline | `--text-2xl` | 24px | 700 | 1.3 | Track group headings on `/replays`; CFP section headline on homepage |
 | Page heading | `--text-4xl` | 36px | 700 | 1.2 | `/replays` page H1 |
 
-Letter spacing: headings `-0.02em` (h1/h2) / `-0.01em` (h3/h4); uppercase labels `0.05em`. Body = default.
+Letter spacing: headings `-0.02em` (page heading and sub-heading); uppercase labels `0.05em`. Body = default.
 
 ---
 
@@ -121,11 +119,11 @@ Located between Key Numbers block and Footer in `src/pages/index.astro` and `src
 - Section wrapper: full-width, `--spacing-12` top/bottom padding, `--color-background`, optional subtle hex-mesh pattern at 8% opacity consistent with hero
 - Inner container: `max-w-[1280px]`, centered, `--spacing-4` horizontal padding on mobile
 - Content stack (vertical, center-aligned on mobile, left-aligned from `md` up):
-  - CFP status pill (top): small badge, `--radius-full`, `4px 10px` padding, `--text-xs` weight 500 uppercase. Icon (lucide `Megaphone` for coming-soon, `Send` for open, `Archive` for closed) + label.
-  - Section headline: `--text-3xl` weight 600, token `cfp.heading`
-  - Description paragraph: `--text-base`, `--color-muted-foreground`, max 2 lines on desktop, token `cfp.description.<state>`
+  - CFP status pill (top): small badge, `--radius-full`, `4px 10px` padding, `--text-xs` weight 400 uppercase. Icon (lucide `Megaphone` for coming-soon, `Send` for open, `Archive` for closed) + label.
+  - Section headline: `--text-2xl` weight 700, token `cfp.heading`
+  - Description paragraph: `--text-base` weight 400, `--color-muted-foreground`, max 2 lines on desktop, token `cfp.description.<state>`
   - CTA button (primary slot): see state → color mapping table. Button height 52px (`lg` size), `--radius-md`, icon + label (lucide `ArrowRight` trailing)
-  - Secondary meta row (small, `--text-sm` muted): displays deadline when state=`open` (e.g. "Closes April 30, 2027") — computed from `CFP_CLOSES` constant in user's locale via `Intl.DateTimeFormat`
+  - Secondary meta row (small, `--text-xs` weight 400 muted): displays deadline when state=`open` (e.g. "Closes April 30, 2027") — computed from `CFP_CLOSES` constant in user's locale via `Intl.DateTimeFormat`
 
 **States:**
 - `coming-soon` — pill muted, "Coming soon" label, description promises announcement, CTA ghost or hidden
@@ -154,20 +152,20 @@ Files: `src/pages/replays/index.astro` + `src/pages/en/replays/index.astro` (mir
 **Structure:**
 - Page header (top, `--spacing-24` top padding, `--spacing-12` bottom):
   - H1: `--text-4xl` weight 700, token `replays.heading` ("Replays" / "Replays") — same word both locales OR localize per planner
-  - Lead paragraph: `--text-lg` `--color-muted-foreground`, max ~70 chars/line, token `replays.lead`
+  - Lead paragraph: `--text-base` weight 400 `--color-muted-foreground`, max ~70 chars/line, token `replays.lead`
   - "Back to schedule" ghost link (top-left or below lead): lucide `ArrowLeft` icon + label, token `replays.back_to_schedule`
 - Track groups (main content, `--spacing-12` gap between groups):
-  - Each group has a sub-heading (`--text-2xl` weight 600) with a 4px-wide left border in the track's `trackColor()` hue, `--spacing-3` padding-left
+  - Each group has a sub-heading (`--text-2xl` weight 700) with a 4px-wide left border in the track's `trackColor()` hue, `--spacing-3` padding-left
   - Below sub-heading: responsive grid of recording cards
 - Footer spacer: `--spacing-24` bottom padding before site Footer
 
 **Recording card:**
 - Container: `--color-card` background, `--radius-lg` (8px), `1px solid --color-border`, `--spacing-6` padding, full-card clickable link to YouTube session URL
 - Left accent: 4px solid vertical bar in `trackColor(track)` hue, flush-left inside the card (inset `--spacing-6` from content)
-- Top line: track badge pill — `--text-xs` weight 500 uppercase, bg = track color at 15% opacity, text = track color at 100%, `--radius-full`, `4px 10px` padding
-- Title: `--text-lg` weight 600, `--color-card-foreground`, 2-line clamp with `line-clamp-2`
-- Speakers row: `--text-sm` `--color-muted-foreground`, 1-line truncate, comma-separated
-- Watch indicator (bottom-right of card OR right side of content): lucide `Play` icon in a small circle bg=`--color-primary` at 15% opacity, icon color=`--color-primary`, 32px diameter. Alt: text link "Watch" with `ArrowUpRight` icon.
+- Top line: track badge pill — `--text-xs` weight 400 uppercase, bg = track color at 15% opacity, text = track color at 100%, `--radius-full`, `4px 10px` padding
+- Title: `--text-base` weight 700, `--color-card-foreground`, 2-line clamp with `line-clamp-2`
+- Speakers row: `--text-xs` weight 400 `--color-muted-foreground`, 1-line truncate, comma-separated
+- Watch indicator (bottom-right of card OR right side of content): lucide `Play` icon in a small circle bg=`--color-primary` at 15% opacity, icon color=`--color-primary`, 32px diameter. Visible label reads "Watch replay" / "Regarder le replay" (see copywriting contract).
 - Hover: border transitions to `--color-primary` at 50% opacity (existing DS card hover pattern), 200ms ease. Optional: `translateY(-2px)` with `--shadow-md` lift.
 - Focus: DS focus ring (`--color-ring`, 2px offset)
 - Minimum touch target: entire card is the link, card height ≥ 120px — well above 44px
@@ -211,13 +209,13 @@ All user-facing strings MUST live in `src/i18n/ui.ts` under flat keys. New keys 
 | `replays.back_to_schedule` | Retour au programme | Back to schedule |
 | `replays.empty.heading` | Replays à venir | Recordings coming soon |
 | `replays.empty.body` | Les enregistrements seront publiés après l'événement. | Recordings will be published after the event. |
-| `replays.watch` | Regarder | Watch |
+| `replays.watch` | Regarder le replay | Watch replay |
 | `nav.replays` | Replays | Replays |
 
 | Element | Copy |
 |---------|------|
 | Primary CTA (CFP, open state) | Submit a talk / Soumettre une conférence |
-| Primary CTA (`/replays` cards) | Watch / Regarder (card is the link; label appears on the Play indicator / aria-label) |
+| Primary CTA (`/replays` cards) | Watch replay / Regarder le replay (visible label on the Play indicator + card aria-label) |
 | Secondary CTA (countdown post-event) | (unchanged — uses existing `hero.cta.replays`: "Voir les replays" / "Watch replays") |
 | Empty state heading (`/replays`) | Recordings coming soon / Replays à venir |
 | Empty state body (`/replays`) | Recordings will be published after the event. / Les enregistrements seront publiés après l'événement. |
@@ -228,7 +226,7 @@ All user-facing strings MUST live in `src/i18n/ui.ts` under flat keys. New keys 
 
 **aria-labels (accessibility):**
 - CFP status pill: `aria-label` = `{cfp.status.*} — {cfp.description.*}`
-- Recording card link: `aria-label` = `{replays.watch} {session.title} — {speaker names}`
+- Recording card link: `aria-label` = `{replays.watch} : {session.title} — {speaker names}` (renders as "Watch replay: …" / "Regarder le replay : …")
 - Countdown post-event CTA: existing aria-label via link text ("Watch replays")
 
 ---
@@ -257,10 +255,10 @@ Before coding begins (per D-13 + CLAUDE.md):
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS (FR + EN symmetric, all keys declared)
+- [ ] Dimension 1 Copywriting: PASS (FR + EN symmetric, all keys declared, `replays.watch` now "Watch replay" / "Regarder le replay")
 - [ ] Dimension 2 Visuals: PASS (reuses DS card + button + badge patterns, no new primitives)
 - [ ] Dimension 3 Color: PASS (60/30/10 respected, accent reserved for CFP open state + submit CTA only)
-- [ ] Dimension 4 Typography: PASS (6 roles declared, all from DS type scale, weights 400/500/600/700 per DS)
+- [ ] Dimension 4 Typography: PASS (4 sizes × 2 weights — 12/16/24/36, weights 400/700 only)
 - [ ] Dimension 5 Spacing: PASS (8 tokens declared, all multiples of 4, all from DS)
 - [ ] Dimension 6 Registry Safety: PASS (shadcn official only, no third-party)
 
