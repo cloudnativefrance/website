@@ -1,0 +1,113 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import RecordingCard from "@/components/replays/RecordingCard.astro";
+import {
+  getLangFromUrl,
+  useTranslations,
+  getLocalePath,
+} from "@/i18n/utils";
+import { loadSessions, type SessionRow } from "@/lib/schedule";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const all = await loadSessions();
+const withRecordings = all.filter((s) => s.recordingUrl !== "");
+
+// Group by track (stable order: first-seen wins)
+const byTrack = new Map<string, SessionRow[]>();
+for (const s of withRecordings) {
+  const key = s.track || t("replays.heading");
+  if (!byTrack.has(key)) byTrack.set(key, []);
+  byTrack.get(key)!.push(s);
+}
+
+function trackColor(name: string): string {
+  if (!name) return "hsl(220 10% 50%)";
+  let h = 0;
+  for (let i = 0; i < name.length; i++) {
+    h = ((h << 5) - h + name.charCodeAt(i)) | 0;
+  }
+  return `hsl(${Math.abs(h) % 360} 60% 62%)`;
+}
+
+const scheduleHref = getLocalePath(lang, "/programme");
+const homeHref = getLocalePath(lang, "/");
+const isEmpty = withRecordings.length === 0;
+const pageTitle = `${t("replays.heading")} — ${t("site.title")}`;
+---
+
+<Layout title={pageTitle} description={t("replays.lead")}>
+  <main class="mx-auto max-w-[1280px] px-4 md:px-6 pt-24 pb-24">
+    <header class="mb-12 flex flex-col gap-4">
+      <a
+        href={scheduleHref}
+        class="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors self-start"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m12 19-7-7 7-7" />
+          <path d="M19 12H5" />
+        </svg>
+        {t("replays.back_to_schedule")}
+      </a>
+      <h1
+        class="text-4xl font-bold tracking-[-0.02em] text-foreground"
+      >
+        {t("replays.heading")}
+      </h1>
+      <p class="text-base text-muted-foreground max-w-[60ch]">
+        {t("replays.lead")}
+      </p>
+    </header>
+
+    {isEmpty ? (
+      <div class="mx-auto max-w-md text-center py-24">
+        <h2
+          class="text-2xl font-bold text-foreground mb-4"
+        >
+          {t("replays.empty.heading")}
+        </h2>
+        <p class="text-base text-muted-foreground mb-6">
+          {t("replays.empty.body")}
+        </p>
+        <a
+          href={homeHref}
+          class="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+        >
+          {t("nav.home")}
+        </a>
+      </div>
+    ) : (
+      <div class="flex flex-col gap-12">
+        {Array.from(byTrack.entries()).map(([track, sessions]) => (
+          <section>
+            <h2
+              class="text-2xl font-bold text-foreground mb-6 pl-3 border-l-4 tracking-[-0.02em]"
+              style={`border-color:${trackColor(track)}`}
+            >
+              {track}
+            </h2>
+            <div
+              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
+            >
+              {sessions.map((session) => (
+                <RecordingCard session={session} lang={lang} />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    )}
+  </main>
+</Layout>

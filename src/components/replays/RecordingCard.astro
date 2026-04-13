@@ -1,0 +1,81 @@
+---
+import { useTranslations } from "@/i18n/utils";
+import type { SessionRow } from "@/lib/schedule";
+import type { Locale } from "@/i18n/ui";
+
+interface Props {
+  session: SessionRow;
+  lang: Locale;
+}
+
+const { session, lang } = Astro.props;
+const t = useTranslations(lang);
+
+// Mirrored from src/components/schedule/ScheduleGrid.astro:95-103 so colors
+// match the schedule page exactly. Duplicated (not imported) to keep this
+// component self-contained.
+function trackColor(name: string): string {
+  if (!name) return "hsl(220 10% 50%)";
+  let h = 0;
+  for (let i = 0; i < name.length; i++) {
+    h = ((h << 5) - h + name.charCodeAt(i)) | 0;
+  }
+  const hue = Math.abs(h) % 360;
+  return `hsl(${hue} 60% 62%)`;
+}
+
+const color = trackColor(session.track);
+const watch = t("replays.watch");
+const speakers = session.speakers.join(", ");
+const ariaLabel = `${watch}: ${session.title}${speakers ? " — " + speakers : ""}`;
+---
+
+<a
+  href={session.recordingUrl}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label={ariaLabel}
+  class="group relative flex flex-col gap-4 rounded-lg border border-border bg-card p-6 pl-7 transition-[border-color,transform,box-shadow] duration-200 hover:border-[color-mix(in_oklch,var(--color-primary)_50%,transparent)] hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 min-h-[120px]"
+>
+  <span
+    class="absolute left-0 top-6 bottom-6 w-1 rounded-r"
+    style={`background:${color}`}
+    aria-hidden="true"
+  ></span>
+
+  {session.track && (
+    <span
+      class="inline-flex self-start items-center rounded-full px-[10px] py-1 text-xs font-normal uppercase tracking-[0.05em]"
+      style={`background: color-mix(in oklch, ${color} 15%, transparent); color: ${color}`}
+    >
+      {session.track}
+    </span>
+  )}
+
+  <h3 class="text-base font-bold text-card-foreground line-clamp-2">
+    {session.title}
+  </h3>
+
+  {speakers && (
+    <p class="text-xs text-muted-foreground truncate">{speakers}</p>
+  )}
+
+  <div class="flex items-center gap-2 mt-auto">
+    <span
+      class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/15 text-primary"
+      aria-hidden="true"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        stroke="none"
+      >
+        <path d="M8 5v14l11-7z" />
+      </svg>
+    </span>
+    <span class="text-sm font-medium text-primary">{watch}</span>
+  </div>
+</a>
