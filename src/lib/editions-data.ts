@@ -13,11 +13,8 @@
 import type { ImageMetadata } from "astro";
 
 import kcd2023_01 from "@/assets/photos/kcd2023/01.jpg";
-import kcd2023_03 from "@/assets/photos/kcd2023/03.jpg";
 import kcd2023_05 from "@/assets/photos/kcd2023/05.jpg";
-import kcd2023_07 from "@/assets/photos/kcd2023/07.jpg";
 import kcd2023_08 from "@/assets/photos/kcd2023/08.jpg";
-import kcd2023_10 from "@/assets/photos/kcd2023/10.jpg";
 import ambiance03 from "@/assets/photos/ambiance/ambiance-03.jpg";
 import ambiance06 from "@/assets/photos/ambiance/ambiance-06.jpg";
 import ambiance08 from "@/assets/photos/ambiance/ambiance-08.jpg";
@@ -66,16 +63,13 @@ export const EDITION_2023 = {
     { value: "42", labelKey: "editions.2023.stats.speakers" },
     { value: "24", labelKey: "editions.2023.stats.sessions" },
   ] as const satisfies ReadonlyArray<Stat>,
-  // Homepage grid — 6 curated photos from the 10 KCD 2023 masters, rendered as
-  // a uniform 3×2 grid (all size: "medium" → col-span-4). Full 10-photo mosaic
-  // + lightbox ships on a dedicated 2023 page in a later phase.
+  // Homepage minimal block (17-04) — 3 curated photos (01, 05, 08) consumed by
+  // PastEditionMinimal.astro. Full 10-photo mosaic + lightbox ships on a
+  // dedicated 2023 page in a later phase.
   thumbnails: [
     { src: kcd2023_01, altKey: "editions.2023.thumbnail_alt.1", size: "medium" },
-    { src: kcd2023_03, altKey: "editions.2023.thumbnail_alt.3", size: "medium" },
     { src: kcd2023_05, altKey: "editions.2023.thumbnail_alt.5", size: "medium" },
-    { src: kcd2023_07, altKey: "editions.2023.thumbnail_alt.7", size: "medium" },
     { src: kcd2023_08, altKey: "editions.2023.thumbnail_alt.8", size: "medium" },
-    { src: kcd2023_10, altKey: "editions.2023.thumbnail_alt.10", size: "medium" },
   ] as const satisfies ReadonlyArray<Thumbnail>,
   brandLogo: kcdLogo,
   placeholder: false,

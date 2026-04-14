@@ -67,8 +67,8 @@ describe("EDIT-02 / EDIT-03: EDITION_2023 data module (real KCD 2023 content)", 
     ]);
   });
 
-  it("has 6 thumbnails wired to kcd2023 masters (homepage mosaic subset)", () => {
-    expect(EDITION_2023.thumbnails).toHaveLength(6);
+  it("has 3 thumbnails wired to kcd2023 masters (17-04 minimal homepage block)", () => {
+    expect(EDITION_2023.thumbnails).toHaveLength(3);
     EDITION_2023.thumbnails.forEach((thumb) => {
       expect(thumb.src).toBeDefined();
       const s = srcString(thumb.src);
@@ -76,7 +76,7 @@ describe("EDIT-02 / EDIT-03: EDITION_2023 data module (real KCD 2023 content)", 
     });
   });
 
-  it("uses uniform medium size for a clean 3×2 grid", () => {
+  it("uses uniform medium size (carried over from 17-03 shape)", () => {
     const sizes = EDITION_2023.thumbnails.map((t) => t.size);
     expect(sizes.every((s) => s === "medium")).toBe(true);
   });

@@ -1,0 +1,61 @@
+---
+/**
+ * EDIT-07 (17-04): Minimal past-edition section for historical editions (2023+).
+ *
+ * Compact 2-column layout: LEFT = photos + logo, RIGHT = playlist link.
+ * No rail, no h2, no stats, no video embed, no brand-callout paragraph.
+ *
+ * Consumed by src/pages/index.astro + src/pages/en/index.astro (2023 mount).
+ */
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  id?: string;
+  photos: Array<{ src: ImageMetadata; alt: string }>;
+  logo: ImageMetadata;
+  logoAlt: string;
+  playlistLink: { label: string; href: string };
+}
+
+const { id, photos, logo, logoAlt, playlistLink } = Astro.props;
+const visiblePhotos = photos.slice(0, 3);
+---
+<section
+  id={id}
+  class="relative max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24"
+>
+  <div class="grid gap-8 md:grid-cols-2 md:gap-12 items-center">
+    {/* LEFT: photos (3-col grid) + logo below, centered */}
+    <div class="flex flex-col gap-6">
+      <div class="grid grid-cols-3 gap-3">
+        {visiblePhotos.map((p) => (
+          <figure class="overflow-hidden rounded-md bg-card border border-border aspect-[4/3]">
+            <Image
+              src={p.src}
+              alt={p.alt}
+              widths={[300, 600]}
+              sizes="(min-width: 768px) 20vw, 33vw"
+              class="w-full h-full object-cover"
+            />
+          </figure>
+        ))}
+      </div>
+      <div class="w-32 md:w-40 mx-auto md:mx-0">
+        <Image src={logo} alt={logoAlt} class="w-full h-auto" />
+      </div>
+    </div>
+
+    {/* RIGHT: playlist link */}
+    <div class="flex md:justify-start">
+      <a
+        href={playlistLink.href}
+        class="inline-flex items-center gap-2 text-base font-semibold text-primary hover:underline"
+        rel="noopener"
+        target="_blank"
+      >
+        {playlistLink.label} <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</section>
