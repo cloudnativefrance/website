@@ -151,6 +151,14 @@ All 13 `must_haves.truths` from the plan frontmatter satisfied — verified prog
 - **Phase 19 (dedicated 2023 page + lightbox):** Unaffected. The dedicated page remains the destination for the full 10-photo mosaic + lightbox; this homepage simplification does not conflict with it.
 - **Phase 20 (testimonials marquee):** Unblocked.
 
+## Post-UAT Layout Revision (2026-04-14, after initial ship)
+
+User reviewed the 2-column layout live and requested two tweaks:
+1. Add a compact title "Édition 2023 (Kubernetes Community Days France)" alongside the logo — commit `8e11576`. New i18n key `editions.2023.compact_title` (FR + EN). Test `"2023 block has NO h2 heading"` replaced with `"2023 block shows compact title alongside logo"`.
+2. Restack to 3 full-width rows — commit `f597371`. Final order: **row 1** logo + title · **row 2** 3 photos (full-width 3-col grid, larger) · **row 3** playlist link. Supersedes the 2-col LEFT/RIGHT layout described above.
+
+Build 154 pages green; 26/26 phase-17 tests green after both revisions.
+
 ## Self-Check: PASSED
 
 - `src/components/past-editions/PastEditionMinimal.astro` — FOUND

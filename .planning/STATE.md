@@ -73,6 +73,6 @@ Decisions are logged in PROJECT.md Key Decisions table and the v1.0 archive at `
 
 ## Session Continuity
 
-Last session: 2026-04-13T18:23:15.555Z
-Stopped at: Phase 15 context gathered
-Resume action: `/gsd-plan-phase 15` (Stitch Full-Homepage Mock)
+Last session: 2026-04-14T07:40:00.000Z
+Stopped at: Phase 17 gap-closure (17-04) complete + post-UAT layout revision (3-row stack)
+Resume action: `/gsd-plan-phase 15` (Stitch Full-Homepage Mock) or `/gsd-next`
