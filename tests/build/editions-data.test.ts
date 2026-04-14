@@ -90,4 +90,35 @@ describe("EDIT-02 / EDIT-03: EDITION_2023 data module (real KCD 2023 content)", 
   it("is NOT flagged as placeholder (real content)", () => {
     expect(EDITION_2023.placeholder).toBe(false);
   });
+
+  /** Phase 19 EDIT-02 / A11Y-04: dedicated `/2023` page shape. */
+  it("exposes exactly 10 kcd2023 photos via photos10 (dedicated page)", () => {
+    expect(EDITION_2023.photos10).toHaveLength(10);
+    EDITION_2023.photos10.forEach((p) => {
+      const s = srcString(p.src);
+      expect(s).toContain("kcd2023");
+    });
+  });
+
+  it("has 10 distinct altKeys on photos10 (no alt-key reuse)", () => {
+    const keys = EDITION_2023.photos10.map((p) => p.altKey);
+    expect(new Set(keys).size).toBe(10);
+    keys.forEach((k) => {
+      expect(k).toMatch(/^editions\.2023\.photo_alt\.(01|02|03|04|05|06|07|08|09|10)$/);
+    });
+  });
+
+  it("exposes brandHistory sub-object with i18n key references (EDIT-03)", () => {
+    expect(EDITION_2023.brandHistory).toBeDefined();
+    expect(EDITION_2023.brandHistory.headingKey).toBe("editions.2023.brand_history.heading");
+    expect(EDITION_2023.brandHistory.bodyKey).toBe("editions.2023.brand_history.body");
+    expect(EDITION_2023.brandHistory.venueKey).toBe("editions.2023.brand_history.venue");
+    expect(EDITION_2023.brandHistory.logoAltKey).toBe("editions.2023.brand_history.logo_alt");
+  });
+
+  it("flags gallery URL + stats as placeholder with tracker (EDIT-07)", () => {
+    expect(EDITION_2023.galleryPlaceholder).toBe(true);
+    expect(EDITION_2023.trackerUrl).toMatch(/^https:\/\/github\.com/);
+    expect(EDITION_2023.galleryUrl).toMatch(/^https:\/\//);
+  });
 });
