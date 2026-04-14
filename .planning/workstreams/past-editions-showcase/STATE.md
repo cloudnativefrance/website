@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Past Editions Showcase
-status: verifying
-stopped_at: Completed 18-02-PLAN.md (Phase 18 complete — 2/2 plans)
-last_updated: "2026-04-14T07:56:45.000Z"
+status: in_progress
+stopped_at: "Completed Phases 15–20; Phase 21-01 (documentation backfill) in progress"
+last_updated: "2026-04-14T12:00:00.000Z"
 last_activity: 2026-04-14
 progress:
-  total_phases: 6
-  completed_phases: 4
-  total_plans: 14
-  completed_plans: 14
+  total_phases: 8
+  completed_phases: 6
+  total_plans: 21
+  completed_plans: 21
   percent: 100
 ---
 
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13 for v1.1 initialization)
 
 **Core value:** A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register -- all within 5 seconds of landing.
-**Current focus:** Phase 17 — integrate-2026-edition-section-on-homepage
+**Current focus:** Phase 21 — documentation-backfill-and-discovery-loop (v1.1 close-out)
 
 ## Current Position
 
-Milestone: v1.1 — Past Editions Showcase (Phases 15-20)
-Phase: 18 (venue-page-cleanup) — COMPLETE (2/2 plans)
-Plan: Both plans shipped — 18-01 (block deletion) + 18-02 (i18n sweep)
-Status: Phase complete — ready for /gsd-verify-work 18, then Phase 19/20
+Milestone: v1.1 — Past Editions Showcase (Phases 15–20 core + 21–22 close-out)
+Phase: 21 — documentation backfill + discovery-loop fix (in progress)
+Plan: 21-01 (doc backfill) → 21-02 (discovery-loop fix)
+Status: v1.1 Phases 15–20 shipped; Phase 21 closing audit-driven gaps; Phase 22 closes manual UAT.
 Last activity: 2026-04-14
 
-Progress: [░░░░░░░░░░] 0% (0 of 6 v1.1 phases complete)
+Progress: [██████████] 100% (6 of 6 v1.1 core phases complete; Phases 21–22 close-out)
 
 ## Accumulated Context
 
@@ -71,8 +71,19 @@ Decisions are logged in PROJECT.md Key Decisions table and the v1.0 archive at `
 - Phase 19 content gate: 2023 final stats + gallery URL pending — ship with placeholder + tracker (EDIT-07)
 - Phase 17 content gate: Real 2026 recap pending — ship with placeholder + tracker
 
+## Upcoming
+
+- **Phase 21 — Documentation Backfill + Discovery-Loop Fix** (in progress)
+  - 21-01: doc backfill (Phase 19 summaries, STATE reconciliation, REQUIREMENTS refresh, ROADMAP note) — this plan.
+  - 21-02: wire homepage `PastEditionMinimal` 2023 block to `/2023` (new "View 2023 edition →" CTA + i18n key + Vitest assertion).
+- **Phase 22 — A11y UAT Closeout**
+  - Close 10 lightbox keyboard-journey items from `19-UAT.md`.
+  - Capture Stitch approval for `/2023`.
+  - Lighthouse CLS ≤ 0.02 on `/2023` + `/en/2023`.
+  - Decide on Playwright reduced-motion automation (or explicit v1.2 defer).
+
 ## Session Continuity
 
-Last session: 2026-04-14T07:56:45.000Z
-Stopped at: Completed 18-02-PLAN.md (Phase 18 complete — 2/2 plans)
-Resume action: `/gsd-verify-work 18` then `/gsd-plan-phase 19` (or parallelize 19/20)
+Last session: 2026-04-14T12:00:00.000Z
+Stopped at: Phase 21-01 (documentation backfill) in progress — Phases 15–20 shipped.
+Resume action: continue Phase 21-01 tasks, then `/gsd-execute-phase 21` plan 21-02, then `/gsd-plan-phase 22`.
