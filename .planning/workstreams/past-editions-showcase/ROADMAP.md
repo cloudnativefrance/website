@@ -27,6 +27,8 @@ Full archive at [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md).
 
 **Milestone Goal:** Tell the "where we come from" story on the homepage with dedicated past-edition sections (2026, 2023), an animated testimonials strip, a global motion-reduction baseline, and a clean venue-page handoff.
 
+> **Section order update (post-Stitch review):** Testimonials renders **before** the past-edition sections (CFP → Testimonials → 2026 → 2023), not after as originally drafted.
+
 - [x] **Phase 15: Stitch Full-Homepage Mock** - Design-gate: full-page mock of the new homepage (Hero -> KeyNumbers -> CFP -> 2026 -> 2023 -> Testimonials), validated by user, before any code (completed 2026-04-13)
 - [x] **Phase 16: Foundation - Assets, i18n, A11y Baseline, Shared Shell** - Pre-optimize photos, add bilingual `editions.*`/`testimonials.*` keys, ship the global `prefers-reduced-motion` reset, and build the prop-driven `PastEditionSection.astro` shell (completed 2026-04-13)
 - [x] **Phase 17: Integrate 2026 Edition Section on Homepage** - Render `Edition2026Section` on `/` and `/en/`, verify live in both locales (gates Phase 18) (completed 2026-04-13)
