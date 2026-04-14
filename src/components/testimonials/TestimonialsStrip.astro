@@ -97,4 +97,58 @@ const t = useTranslations(lang);
     color: var(--color-muted-foreground);
     margin: 0;
   }
+
+  /* D-07 marquee keyframes: right → left drift, 40s linear infinite. */
+  @keyframes scroll-x {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* The dual-track flex row means translateX(-50%) of the combined width
+     aligns the start of track 2 with the start of track 1 — seamless loop. */
+  .marquee {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black 4rem,
+      black calc(100% - 4rem),
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      black 4rem,
+      black calc(100% - 4rem),
+      transparent 100%
+    );
+  }
+
+  .marquee-track {
+    animation: scroll-x 40s linear infinite;
+    will-change: transform;
+  }
+
+  /* D-08 pause on hover and keyboard focus — no play/pause button. */
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* A11Y-01 defensive reduced-motion reset: stops animation + enables
+     horizontal-scroll fallback with snap points. The global Phase 16 reset
+     already neutralizes animation-duration; this block is authoritative. */
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      mask-image: none;
+      -webkit-mask-image: none;
+    }
+    .marquee-track {
+      animation: none;
+    }
+    .marquee-track > .card {
+      scroll-snap-align: start;
+    }
+  }
 </style>
