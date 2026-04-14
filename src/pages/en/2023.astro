@@ -1,14 +1,22 @@
 ---
 /**
  * Phase 19 — Dedicated 2023 edition page (EN).
- * See src/pages/2023.astro for FR mirror and docstring.
+ * See src/pages/2023.astro for FR mirror and full docstring.
  */
 import Layout from "@/layouts/Layout.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { EDITION_2023 } from "@/lib/editions-data";
+import Edition2023PhotoGrid from "@/components/past-editions/Edition2023PhotoGrid.astro";
+import KcdBrandHistoryCallout from "@/components/past-editions/KcdBrandHistoryCallout.astro";
+import Edition2023Lightbox from "@/components/past-editions/Edition2023Lightbox.astro";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+
+const photos = EDITION_2023.photos10.map((p) => ({
+  src: p.src,
+  alt: t(p.altKey),
+}));
 ---
 <Layout
   title={t("editions.2023.page.title")}
@@ -26,6 +34,7 @@ const t = useTranslations(lang);
       <p class="mt-4 text-base md:text-lg text-muted-foreground max-w-3xl">
         {t("editions.2023.page.intro")}
       </p>
+
       <dl class="mt-10 grid grid-cols-3 gap-4 md:gap-8">
         {EDITION_2023.stats.map((s) => (
           <div class="flex flex-col gap-1">
@@ -34,7 +43,50 @@ const t = useTranslations(lang);
           </div>
         ))}
       </dl>
-      {/* Photo grid + brand-history callout + lightbox compose in 19-05 */}
+
+      <Edition2023PhotoGrid
+        photos={photos}
+        openLabelTemplate={t("editions.2023.photo_open_label")}
+      />
+
+      <KcdBrandHistoryCallout
+        logo={EDITION_2023.brandHistory.logo}
+        logoAlt={t(EDITION_2023.brandHistory.logoAltKey)}
+        heading={t(EDITION_2023.brandHistory.headingKey)}
+        body={t(EDITION_2023.brandHistory.bodyKey)}
+        venue={t(EDITION_2023.brandHistory.venueKey)}
+      />
+
+      <p class="mt-10">
+        <a
+          href={EDITION_2023.galleryUrl}
+          class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+          rel="noopener"
+          target="_blank"
+        >
+          {t("editions.2023.gallery_cta")} <span aria-hidden="true">→</span>
+        </a>
+        {EDITION_2023.galleryPlaceholder && (
+          <a
+            href={EDITION_2023.trackerUrl}
+            rel="noopener"
+            target="_blank"
+            class="ml-3 inline-flex items-center rounded-full bg-accent text-accent-foreground px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label="Placeholder content — see tracker issue"
+          >
+            PLACEHOLDER
+          </a>
+        )}
+      </p>
     </section>
+
+    <Edition2023Lightbox
+      photos={photos}
+      dialogLabel={t("editions.2023.lightbox.dialog_label")}
+      closeLabel={t("editions.2023.lightbox.close")}
+      prevLabel={t("editions.2023.lightbox.prev")}
+      nextLabel={t("editions.2023.lightbox.next")}
+      counterTemplate={t("editions.2023.lightbox.counter_template")}
+    />
   </main>
 </Layout>
