@@ -133,14 +133,6 @@ export const ui = {
     "venue.around.food_heading": "Restaurants & bars",
     "venue.around.food_body":
       "Les cantines internes du CENTQUATRE (Grand Central, Cafe 104) proposent une restauration rapide sur place. Autour du Canal de l'Ourcq, comptez des adresses comme Le Pavillon des Canaux, Paname Brewing Company ou les tables de la rue de l'Ourcq pour un diner communautaire apres les talks.",
-    "venue.prev.rail_label": "Edition 2026 \u2014 replay",
-    "venue.prev.heading": "Revivez l'edition 2026",
-    "venue.prev.video_title": "Aftermovie Cloud Native Days France 2026",
-    "venue.prev.participants": "Participants",
-    "venue.prev.talks": "Conferences",
-    "venue.prev.partners": "Partenaires",
-    "venue.prev.thumb_alt": "Ambiance Cloud Native Days France 2026",
-    "venue.prev.gallery_link": "Voir la galerie complete 2026",
     "schedule.heading": "Programme complet",
     "schedule.rail_label": "Programme \u2014 3 juin 2027",
     "schedule.subtitle":
@@ -401,14 +393,6 @@ export const ui = {
     "venue.around.food_heading": "Food & drinks",
     "venue.around.food_body":
       "CENTQUATRE's in-house eateries (Grand Central, Cafe 104) serve quick food on site. Around Canal de l'Ourcq, spots like Le Pavillon des Canaux, Paname Brewing Company, or the restaurants along rue de l'Ourcq are great for a post-talks community dinner.",
-    "venue.prev.rail_label": "2026 edition \u2014 replay",
-    "venue.prev.heading": "Relive the 2026 edition",
-    "venue.prev.video_title": "Aftermovie Cloud Native Days France 2026",
-    "venue.prev.participants": "Attendees",
-    "venue.prev.talks": "Talks",
-    "venue.prev.partners": "Partners",
-    "venue.prev.thumb_alt": "Cloud Native Days France 2026 atmosphere",
-    "venue.prev.gallery_link": "View the full 2026 gallery",
     "schedule.heading": "Full schedule",
     "schedule.rail_label": "Schedule \u2014 June 3, 2027",
     "schedule.subtitle":

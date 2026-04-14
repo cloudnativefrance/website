@@ -14,8 +14,8 @@
  *
  * See `.planning/phases/18-venue-page-cleanup/18-CONTEXT.md` decisions D-01..D-05.
  *
- * TODO(18-02): assert grep venue.prev src/i18n/ui.ts -> 0 matches once the
- * i18n sweep commit lands.
+ * 18-02 extension: asserts the i18n-sweep commit landed — `src/i18n/ui.ts`
+ * contains zero matches for `venue.prev` (Roadmap SC3).
  */
 import { describe, it, expect } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
@@ -25,6 +25,7 @@ const ROOT = resolve(import.meta.dirname, "../..");
 
 const SRC_FR = resolve(ROOT, "src/pages/venue/index.astro");
 const SRC_EN = resolve(ROOT, "src/pages/en/venue/index.astro");
+const I18N_UI = resolve(ROOT, "src/i18n/ui.ts");
 const DIST_FR = resolve(ROOT, "dist/venue/index.html");
 const DIST_EN = resolve(ROOT, "dist/en/venue/index.html");
 
@@ -60,6 +61,14 @@ describe("18-01 / SC2: venue source is free of orphaned previous-edition symbols
       ).toBeNull();
     });
   }
+});
+
+describe("18-02 / SC3: src/i18n/ui.ts is free of venue.prev.* keys", () => {
+  it("contains zero matches for /venue\\.prev/", () => {
+    const content = readFileSync(I18N_UI, "utf8");
+    const matches = content.match(/venue\.prev/g) ?? [];
+    expect(matches).toHaveLength(0);
+  });
 });
 
 describe("18-01 / SC5: rendered venue is free of the previous-edition block", () => {
