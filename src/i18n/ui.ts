@@ -223,6 +223,7 @@ export const ui = {
     "editions.2023.video_caption":
       "Aftermovie de l'édition KCD France 2023",
     "editions.2023.video_cta": "Voir la playlist YouTube 2023",
+    "editions.2023.view_page_cta": "Voir l'édition 2023 →",
     "editions.2023.stats.participants": "1\u00a0700+ participants",
     "editions.2023.stats.speakers": "42 intervenants",
     "editions.2023.stats.sessions": "24 sessions",
@@ -511,6 +512,7 @@ export const ui = {
     "editions.2023.video_caption":
       "Aftermovie from KCD France 2023",
     "editions.2023.video_cta": "Watch the 2023 YouTube playlist",
+    "editions.2023.view_page_cta": "View the 2023 edition →",
     "editions.2023.stats.participants": "1,700+ attendees",
     "editions.2023.stats.speakers": "42 speakers on stage",
     "editions.2023.stats.sessions": "24 talks delivered",

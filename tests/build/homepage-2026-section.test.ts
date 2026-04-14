@@ -133,6 +133,33 @@ describe("EDIT-07 / 17-04: 2023 simplified minimal block", () => {
           expect(section).toMatch(/Watch the 2023 YouTube playlist/);
         }
       });
+
+      it.skipIf(!distExists)("2023 block links to the dedicated /2023 page with a locale-correct href (21-02 / EDIT-02 discovery-loop)", () => {
+        const section = extract2023Section(readFileSync(path, "utf8"));
+        if (locale === "fr") {
+          expect(section).toMatch(/<a href="\/2023"/);
+        } else {
+          expect(section).toMatch(/<a href="\/en\/2023"/);
+        }
+      });
+
+      it.skipIf(!distExists)("2023 block view-page link does not leak the wrong locale (parity guard)", () => {
+        const section = extract2023Section(readFileSync(path, "utf8"));
+        if (locale === "fr") {
+          expect(section).not.toMatch(/<a href="\/en\/2023"/);
+        } else {
+          expect(section).not.toMatch(/<a href="\/2023"(?!\d)/);
+        }
+      });
+
+      it.skipIf(!distExists)("2023 block view-page link uses the localized CTA copy", () => {
+        const section = extract2023Section(readFileSync(path, "utf8"));
+        if (locale === "fr") {
+          expect(section).toMatch(/Voir l(?:['’]|&#39;|&rsquo;)édition 2023/);
+        } else {
+          expect(section).toMatch(/View the 2023 edition/);
+        }
+      });
     });
   }
 });

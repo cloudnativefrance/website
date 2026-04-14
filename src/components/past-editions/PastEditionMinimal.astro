@@ -17,9 +17,13 @@ interface Props {
   logo: ImageMetadata;
   logoAlt: string;
   playlistLink: { label: string; href: string };
+  /** Optional 21-02: internal link to the dedicated edition page. Renders CTA only when both viewPageHref + viewPageLabel are set. */
+  viewPageHref?: string;
+  /** Optional 21-02: localized label for the internal edition-page CTA. */
+  viewPageLabel?: string;
 }
 
-const { id, title, photos, logo, logoAlt, playlistLink } = Astro.props;
+const { id, title, photos, logo, logoAlt, playlistLink, viewPageHref, viewPageLabel } = Astro.props;
 const visiblePhotos = photos.slice(0, 3);
 ---
 <section
@@ -52,8 +56,8 @@ const visiblePhotos = photos.slice(0, 3);
       ))}
     </div>
 
-    {/* ROW 3: playlist link */}
-    <div class="flex">
+    {/* ROW 3: playlist link + optional view-page CTA (21-02) */}
+    <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
       <a
         href={playlistLink.href}
         class="inline-flex items-center gap-2 text-base font-semibold text-primary hover:underline"
@@ -62,6 +66,14 @@ const visiblePhotos = photos.slice(0, 3);
       >
         {playlistLink.label} <span aria-hidden="true">→</span>
       </a>
+      {viewPageHref && viewPageLabel && (
+        <a
+          href={viewPageHref}
+          class="inline-flex items-center gap-2 text-base font-semibold text-primary hover:underline"
+        >
+          {viewPageLabel}
+        </a>
+      )}
     </div>
   </div>
 </section>
