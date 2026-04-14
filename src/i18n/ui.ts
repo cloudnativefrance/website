@@ -249,6 +249,13 @@ export const ui = {
     "editions.2023.photo_alt.09": "Micro tendu à un participant lors de la session questions-réponses",
     "editions.2023.photo_alt.10": "Vue d'ensemble de la journée capturée en fin de soirée dans le foyer",
     "editions.2023.photo_open_label": "Ouvrir la photo en grand : {alt}",
+    "editions.2023.brand_history.heading": "Une édition historique — KCD France",
+    "editions.2023.brand_history.body":
+      "TODO(19) I18N-03 — placeholder en attente de la relecture organisateur : en 2023, l'événement s'appelait à l'origine Kubernetes Community Days France (KCD France) ; il a été rebaptisé Cloud Native Days France en 2026 pour refléter la diversité de l'écosystème cloud-native francophone.",
+    "editions.2023.brand_history.venue":
+      "Lieu : Centre Georges Pompidou, Paris — Beaubourg.",
+    "editions.2023.brand_history.logo_alt":
+      "Logo Kubernetes Community Days France 2023 (KCD France)",
     "editions.2023.page.title": "Édition 2023 — KCD France | Cloud Native Days France",
     "editions.2023.page.meta_description":
       "Revivez la première édition francophone (KCD France 2023) au Centre Georges Pompidou : keynotes, photos et moments forts.",
@@ -525,6 +532,13 @@ export const ui = {
     "editions.2023.photo_alt.09": "Microphone handed to an attendee during the Q&A session",
     "editions.2023.photo_alt.10": "Wide view of the venue captured at the end of the day in the lobby",
     "editions.2023.photo_open_label": "Open photo fullsize: {alt}",
+    "editions.2023.brand_history.heading": "A landmark edition — KCD France",
+    "editions.2023.brand_history.body":
+      "TODO(19) I18N-03 — placeholder awaiting organizer review: in 2023 the event was originally named Kubernetes Community Days France (KCD France); it was rebranded as Cloud Native Days France in 2026 to reflect the breadth of the French-speaking cloud-native ecosystem.",
+    "editions.2023.brand_history.venue":
+      "Venue: Centre Georges Pompidou, Paris — Beaubourg.",
+    "editions.2023.brand_history.logo_alt":
+      "Kubernetes Community Days France 2023 (KCD France) logo",
     "editions.2023.page.title": "2023 Edition — KCD France | Cloud Native Days France",
     "editions.2023.page.meta_description":
       "Revisit our first French-language edition (KCD France 2023) at Centre Georges Pompidou: keynotes, photos and highlights.",
