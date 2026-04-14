@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Past Editions Showcase
-status: in_progress
-stopped_at: "Completed Phases 15–20 + Phase 21 (21-01 doc backfill + 21-02 discovery-loop fix); ready for /gsd-verify-work 21 then Phase 22"
-last_updated: "2026-04-14T12:00:00.000Z"
+status: ready_to_ship
+stopped_at: "Phases 15–22 closed (22 manual UAT + Playwright deferred per user 2026-04-14 ship-now decision); ready for /gsd-complete-milestone v1.1"
+last_updated: "2026-04-14T12:30:00.000Z"
 last_activity: 2026-04-14
 progress:
   total_phases: 8
-  completed_phases: 6
-  total_plans: 21
-  completed_plans: 21
+  completed_phases: 8
+  total_plans: 22
+  completed_plans: 22
   percent: 100
 ---
 
