@@ -5,6 +5,7 @@ import KeyNumbers from "@/components/hero/KeyNumbers";
 import CfpSection from "@/components/cfp/CfpSection.astro";
 import PastEditionSection from "@/components/past-editions/PastEditionSection.astro";
 import PastEditionMinimal from "@/components/past-editions/PastEditionMinimal.astro";
+import TestimonialsStrip from "@/components/testimonials/TestimonialsStrip.astro";
 import { EDITION_2026, EDITION_2023 } from "@/lib/editions-data";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { eventSchemaJson } from "@/lib/event-schema";
@@ -63,6 +64,7 @@ const edition2023MinimalProps = {
     <HeroSection />
     <KeyNumbers client:idle lang={lang} />
     <CfpSection />
+    <TestimonialsStrip />
     <PastEditionSection {...edition2026Props} />
     <PastEditionMinimal {...edition2023MinimalProps} />
   </main>
