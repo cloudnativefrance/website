@@ -225,6 +225,7 @@ export const ui = {
     "editions.2026.thumbnail_alt.3": "Photo CND France 2026 — session technique",
     "editions.2026.thumbnail_alt.4": "Photo CND France 2026 — vue générale de l'événement",
     "editions.placeholder_badge_aria": "Contenu placeholder — voir le ticket de suivi (nouvelle fenêtre)",
+    "editions.2023.compact_title": "Édition 2023 (Kubernetes Community Days France)",
     "editions.2023.heading": "Souvenirs de l'édition 2023",
     "editions.2023.gallery_cta": "Voir la galerie complète",
     "editions.2023.video_caption":
@@ -490,6 +491,7 @@ export const ui = {
     "editions.2026.thumbnail_alt.3": "CND France 2026 photo — technical session",
     "editions.2026.thumbnail_alt.4": "CND France 2026 photo — overall event view",
     "editions.placeholder_badge_aria": "Placeholder content — open tracker issue (new window)",
+    "editions.2023.compact_title": "2023 Edition (Kubernetes Community Days France)",
     "editions.2023.heading": "Highlights from the 2023 edition",
     "editions.2023.gallery_cta": "View the full gallery",
     "editions.2023.video_caption":

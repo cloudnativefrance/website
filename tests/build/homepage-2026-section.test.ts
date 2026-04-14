@@ -77,9 +77,9 @@ describe("EDIT-07 / 17-04: 2023 simplified minimal block", () => {
         expect(section).not.toMatch(/2023 EDITION/);
       });
 
-      it.skipIf(!distExists)("2023 block has NO h2 heading", () => {
+      it.skipIf(!distExists)("2023 block shows compact title alongside logo", () => {
         const section = extract2023Section(readFileSync(path, "utf8"));
-        expect(section).not.toMatch(/<h2[\s>]/);
+        expect(section).toMatch(/Kubernetes Community Days France/);
       });
 
       it.skipIf(!distExists)("2023 block has NO stats digits (1700+/42/24)", () => {
