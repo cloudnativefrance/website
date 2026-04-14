@@ -1,0 +1,254 @@
+---
+/**
+ * Phase 19 D-12, D-13, D-14 (EDIT-05, A11Y-03): keyboard-accessible lightbox
+ * for the `/2023` photo grid.
+ *
+ * Implementation: Astro + vanilla TS (no React island). Follows the inline
+ * <script> pattern already used by Navigation.astro.
+ *
+ * Contract (consumed by Edition2023PhotoGrid triggers):
+ *   Trigger buttons in the grid must carry `data-lightbox-trigger="{index}"`.
+ *   This component listens for clicks on those, opens the dialog, and shows
+ *   the photo at that index.
+ *
+ * Keyboard:
+ *   - Escape closes (returns focus to originating trigger)
+ *   - ArrowLeft / ArrowRight navigate (wraps around)
+ *   - Tab cycles within dialog (focus trap)
+ *
+ * A11y:
+ *   - role="dialog", aria-modal="true", aria-label, aria-hidden toggled
+ *   - Body scroll locked while open
+ *   - Close/prev/next buttons have aria-labels
+ */
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Photo {
+  src: ImageMetadata;
+  alt: string;
+}
+
+interface Props {
+  photos: ReadonlyArray<Photo>;
+  dialogLabel: string;
+  closeLabel: string;
+  prevLabel: string;
+  nextLabel: string;
+  counterTemplate: string; // e.g. "{index} / {total}"
+}
+
+const { photos, dialogLabel, closeLabel, prevLabel, nextLabel, counterTemplate } = Astro.props;
+---
+<div
+  id="edition-2023-lightbox"
+  role="dialog"
+  aria-modal="true"
+  aria-label={dialogLabel}
+  aria-hidden="true"
+  class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/90 p-4 md:p-8"
+  data-lightbox-root
+>
+  {/* Invisible overlay click-to-close (distinct from decorative backdrop) */}
+  <button
+    type="button"
+    aria-label={closeLabel}
+    data-lightbox-backdrop
+    class="absolute inset-0 w-full h-full cursor-default focus:outline-none"
+    tabindex="-1"
+  ></button>
+
+  <div class="relative max-w-6xl max-h-full w-full flex flex-col items-center gap-4">
+    {/* Top chrome: close + counter */}
+    <div class="flex w-full items-center justify-between text-white">
+      <span data-lightbox-counter class="text-sm font-medium tabular-nums" aria-live="polite">
+        {counterTemplate.replace("{index}", "1").replace("{total}", String(photos.length))}
+      </span>
+      <button
+        type="button"
+        aria-label={closeLabel}
+        data-lightbox-close
+        class="inline-flex items-center justify-center w-11 h-11 rounded-md bg-white/10 hover:bg-white/20 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    {/* Photo stage */}
+    <figure class="relative w-full flex-1 flex items-center justify-center">
+      <div class="relative max-h-[75vh] w-full flex items-center justify-center" data-lightbox-stage>
+        {photos.map((p, i) => (
+          <Image
+            src={p.src}
+            alt={p.alt}
+            data-lightbox-photo={i}
+            widths={[800, 1200, 1600]}
+            sizes="(min-width: 1024px) 80vw, 100vw"
+            class:list={[
+              "max-h-[75vh] w-auto h-auto object-contain",
+              i === 0 ? "block" : "hidden",
+            ]}
+          />
+        ))}
+      </div>
+      <figcaption
+        data-lightbox-caption
+        class="mt-3 text-center text-sm md:text-base text-white/80 max-w-3xl"
+      >
+        {photos[0]?.alt}
+      </figcaption>
+    </figure>
+
+    {/* Prev / Next controls */}
+    <div class="flex items-center gap-4">
+      <button
+        type="button"
+        aria-label={prevLabel}
+        data-lightbox-prev
+        class="inline-flex items-center justify-center w-11 h-11 rounded-md bg-white/10 hover:bg-white/20 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <button
+        type="button"
+        aria-label={nextLabel}
+        data-lightbox-next
+        class="inline-flex items-center justify-center w-11 h-11 rounded-md bg-white/10 hover:bg-white/20 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script is:inline define:vars={{ counterTemplate, total: photos.length }}>
+  /**
+   * Lightbox controller — single instance per page.
+   * Reads triggers via [data-lightbox-trigger], photos via [data-lightbox-photo],
+   * and controls visibility + focus + keyboard bindings.
+   */
+  (function initEdition2023Lightbox() {
+    const root = document.getElementById("edition-2023-lightbox");
+    if (!root) return;
+
+    const photos = Array.from(root.querySelectorAll("[data-lightbox-photo]"));
+    if (photos.length === 0) return;
+
+    const caption = root.querySelector("[data-lightbox-caption]");
+    const counter = root.querySelector("[data-lightbox-counter]");
+    const closeBtn = root.querySelector("[data-lightbox-close]");
+    const prevBtn = root.querySelector("[data-lightbox-prev]");
+    const nextBtn = root.querySelector("[data-lightbox-next]");
+    const backdrop = root.querySelector("[data-lightbox-backdrop]");
+    const triggers = Array.from(
+      document.querySelectorAll("[data-lightbox-trigger]")
+    );
+
+    let currentIndex = 0;
+    let originTrigger = null;
+
+    function renderIndex(i) {
+      currentIndex = ((i % total) + total) % total;
+      photos.forEach((p, j) => {
+        if (j === currentIndex) {
+          p.classList.remove("hidden");
+          p.classList.add("block");
+        } else {
+          p.classList.add("hidden");
+          p.classList.remove("block");
+        }
+      });
+      if (caption) {
+        caption.textContent = photos[currentIndex].getAttribute("alt") || "";
+      }
+      if (counter) {
+        counter.textContent = counterTemplate
+          .replace("{index}", String(currentIndex + 1))
+          .replace("{total}", String(total));
+      }
+    }
+
+    function focusableInRoot() {
+      return Array.from(
+        root.querySelectorAll(
+          'button:not([disabled]):not([tabindex="-1"]), [href], [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((el) => !el.hasAttribute("aria-hidden"));
+    }
+
+    function openAt(i, trigger) {
+      originTrigger = trigger || null;
+      renderIndex(i);
+      root.classList.remove("hidden");
+      root.classList.add("flex");
+      root.setAttribute("aria-hidden", "false");
+      document.body.classList.add("overflow-hidden");
+      // Focus close on open
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function close() {
+      root.classList.add("hidden");
+      root.classList.remove("flex");
+      root.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("overflow-hidden");
+      if (originTrigger && typeof originTrigger.focus === "function") {
+        originTrigger.focus();
+      }
+      originTrigger = null;
+    }
+
+    function onKeyDown(ev) {
+      if (root.getAttribute("aria-hidden") === "true") return;
+      if (ev.key === "Escape") {
+        ev.preventDefault();
+        close();
+        return;
+      }
+      if (ev.key === "ArrowLeft") {
+        ev.preventDefault();
+        renderIndex(currentIndex - 1);
+        return;
+      }
+      if (ev.key === "ArrowRight") {
+        ev.preventDefault();
+        renderIndex(currentIndex + 1);
+        return;
+      }
+      if (ev.key === "Tab") {
+        // Focus trap
+        const focusable = focusableInRoot();
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        const active = document.activeElement;
+        if (ev.shiftKey && active === first) {
+          ev.preventDefault();
+          last.focus();
+        } else if (!ev.shiftKey && active === last) {
+          ev.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    triggers.forEach((t) => {
+      t.addEventListener("click", () => {
+        const idx = Number(t.getAttribute("data-lightbox-trigger") || "0");
+        openAt(idx, t);
+      });
+    });
+    if (closeBtn) closeBtn.addEventListener("click", close);
+    if (backdrop) backdrop.addEventListener("click", close);
+    if (prevBtn) prevBtn.addEventListener("click", () => renderIndex(currentIndex - 1));
+    if (nextBtn) nextBtn.addEventListener("click", () => renderIndex(currentIndex + 1));
+    document.addEventListener("keydown", onKeyDown);
+  })();
+</script>

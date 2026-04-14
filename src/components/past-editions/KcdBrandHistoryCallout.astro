@@ -1,0 +1,39 @@
+---
+/**
+ * Phase 19 D-11 (EDIT-03, I18N-03): KCD brand-history callout for `/2023`.
+ *
+ * Surfaces: KCD 2023 logo + heading + body (containing the phrase
+ * "originally named Kubernetes Community Days France" in EN and its FR
+ * counterpart) + Centre Georges Pompidou venue mention.
+ *
+ * TODO(19) — organizer sign-off on FR + EN wording required before merge
+ * (see content-gates.md; I18N-03).
+ */
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  logo: ImageMetadata;
+  logoAlt: string;
+  heading: string;
+  body: string;
+  venue: string;
+}
+
+const { logo, logoAlt, heading, body, venue } = Astro.props;
+---
+<aside
+  class="mt-12 flex flex-col md:flex-row items-center gap-6 rounded-md bg-secondary text-secondary-foreground p-6 md:p-8"
+  aria-labelledby="kcd-brand-history-heading"
+>
+  <div class="shrink-0 w-32 md:w-40 mx-auto md:mx-0">
+    <Image src={logo} alt={logoAlt} class="w-full h-auto" />
+  </div>
+  <div class="flex flex-col gap-3 text-center md:text-left">
+    <h2 id="kcd-brand-history-heading" class="text-xl md:text-2xl font-semibold">
+      {heading}
+    </h2>
+    <p class="text-sm md:text-base leading-relaxed">{body}</p>
+    <p class="text-sm md:text-base leading-relaxed font-medium">{venue}</p>
+  </div>
+</aside>

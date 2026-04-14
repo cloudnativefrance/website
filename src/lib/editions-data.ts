@@ -13,8 +13,15 @@
 import type { ImageMetadata } from "astro";
 
 import kcd2023_01 from "@/assets/photos/kcd2023/01.jpg";
+import kcd2023_02 from "@/assets/photos/kcd2023/02.jpg";
+import kcd2023_03 from "@/assets/photos/kcd2023/03.jpg";
+import kcd2023_04 from "@/assets/photos/kcd2023/04.jpg";
 import kcd2023_05 from "@/assets/photos/kcd2023/05.jpg";
+import kcd2023_06 from "@/assets/photos/kcd2023/06.jpg";
+import kcd2023_07 from "@/assets/photos/kcd2023/07.jpg";
 import kcd2023_08 from "@/assets/photos/kcd2023/08.jpg";
+import kcd2023_09 from "@/assets/photos/kcd2023/09.jpg";
+import kcd2023_10 from "@/assets/photos/kcd2023/10.jpg";
 import ambiance03 from "@/assets/photos/ambiance/ambiance-03.jpg";
 import ambiance06 from "@/assets/photos/ambiance/ambiance-06.jpg";
 import ambiance08 from "@/assets/photos/ambiance/ambiance-08.jpg";
@@ -71,6 +78,43 @@ export const EDITION_2023 = {
     { src: kcd2023_05, altKey: "editions.2023.thumbnail_alt.5", size: "medium" },
     { src: kcd2023_08, altKey: "editions.2023.thumbnail_alt.8", size: "medium" },
   ] as const satisfies ReadonlyArray<Thumbnail>,
+  /**
+   * Phase 19: all 10 KCD 2023 masters for the dedicated `/2023` (FR) and
+   * `/en/2023` (EN) page photo grid + lightbox. Distinct alt keys per photo
+   * meet A11Y-04 (unique descriptive alt, no "photo 1/2" patterns).
+   */
+  photos10: [
+    { src: kcd2023_01, altKey: "editions.2023.photo_alt.01" },
+    { src: kcd2023_02, altKey: "editions.2023.photo_alt.02" },
+    { src: kcd2023_03, altKey: "editions.2023.photo_alt.03" },
+    { src: kcd2023_04, altKey: "editions.2023.photo_alt.04" },
+    { src: kcd2023_05, altKey: "editions.2023.photo_alt.05" },
+    { src: kcd2023_06, altKey: "editions.2023.photo_alt.06" },
+    { src: kcd2023_07, altKey: "editions.2023.photo_alt.07" },
+    { src: kcd2023_08, altKey: "editions.2023.photo_alt.08" },
+    { src: kcd2023_09, altKey: "editions.2023.photo_alt.09" },
+    { src: kcd2023_10, altKey: "editions.2023.photo_alt.10" },
+  ] as const,
   brandLogo: kcdLogo,
+  /**
+   * Phase 19 D-11: brand-history callout references.
+   * Body + heading + venue strings live in i18n (FR + EN) and are gated on
+   * organizer sign-off (see content-gates.md — TODO(19) I18N-03 / EDIT-07).
+   */
+  brandHistory: {
+    logo: kcdLogo,
+    logoAltKey: "editions.2023.brand_history.logo_alt",
+    headingKey: "editions.2023.brand_history.heading",
+    bodyKey: "editions.2023.brand_history.body",
+    venueKey: "editions.2023.brand_history.venue",
+  } as const,
+  /**
+   * Phase 19 EDIT-07: gallery URL + real stats are placeholders awaiting
+   * organizer confirmation. The playlist URL is a reasonable interim target
+   * so visitors can still reach the 2023 content.
+   */
+  galleryUrl: "https://www.youtube.com/playlist?list=PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h",
+  galleryPlaceholder: true,
+  trackerUrl: "https://github.com/cloudnativefrance/website/issues/19",
   placeholder: false,
 } as const;

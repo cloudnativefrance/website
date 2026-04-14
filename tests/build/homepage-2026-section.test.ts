@@ -105,13 +105,16 @@ describe("EDIT-07 / 17-04: 2023 simplified minimal block", () => {
 
       it.skipIf(!distExists)("2023 block renders exactly 3 KCD 2023 photos (01, 05, 08)", () => {
         const section = extract2023Section(readFileSync(path, "utf8"));
-        // astro:assets rewrites image paths (no "kcd2023" in src). Match by the
-        // locale-specific alt prefix from editions.2023.thumbnail_alt.* keys.
-        const altPattern = locale === "fr"
-          ? /alt="Photo KCD France 2023[^"]*"/g
-          : /alt="KCD France 2023 photo[^"]*"/g;
-        const matches = section.match(altPattern) ?? [];
-        expect(matches.length).toBe(3);
+        // astro:assets rewrites image paths (no "kcd2023" in src). The homepage
+        // minimal block is the ONLY source of <figure> tags inside the 2023
+        // section (no lightbox, no brand callout on the homepage variant), so
+        // figure-count is a stable structural check.
+        // Phase 19 rewrote the alt texts to meet A11Y-04 (no "photo 1/photo 2"
+        // pattern) — locale-prefix matching is no longer valid. The figure
+        // count is the structural contract; the alts are now unique + descriptive.
+        void locale; // locale retained on the describe for fixture labelling only
+        const figureMatches = section.match(/<figure\b/g) ?? [];
+        expect(figureMatches.length).toBe(3);
       });
 
       it.skipIf(!distExists)("2023 block renders the KCD France 2023 logo", () => {
