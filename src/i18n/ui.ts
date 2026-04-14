@@ -238,6 +238,13 @@ export const ui = {
     "editions.2023.thumbnail_alt.8": "Photo KCD France 2023 — atelier technique",
     "editions.2023.thumbnail_alt.9": "Photo KCD France 2023 — questions / réponses",
     "editions.2023.thumbnail_alt.10": "Photo KCD France 2023 — ambiance générale de la journée",
+    "editions.2023.page.title": "Édition 2023 — KCD France | Cloud Native Days France",
+    "editions.2023.page.meta_description":
+      "Revivez la première édition francophone (KCD France 2023) au Centre Georges Pompidou : keynotes, photos et moments forts.",
+    "editions.2023.page.rail": "Édition 2023",
+    "editions.2023.page.heading": "KCD France 2023 — notre première édition au Pompidou",
+    "editions.2023.page.intro":
+      "Retour en images sur la première édition francophone, organisée au Centre Georges Pompidou sous le nom Kubernetes Community Days France.",
     "testimonials.heading": "Ils en parlent mieux que nous",
     "testimonials.pause_hint": "Survolez pour mettre en pause",
     "testimonials.0.quote":
@@ -496,6 +503,13 @@ export const ui = {
     "editions.2023.thumbnail_alt.8": "KCD France 2023 photo — technical workshop",
     "editions.2023.thumbnail_alt.9": "KCD France 2023 photo — Q&A session",
     "editions.2023.thumbnail_alt.10": "KCD France 2023 photo — overall atmosphere of the day",
+    "editions.2023.page.title": "2023 Edition — KCD France | Cloud Native Days France",
+    "editions.2023.page.meta_description":
+      "Revisit our first French-language edition (KCD France 2023) at Centre Georges Pompidou: keynotes, photos and highlights.",
+    "editions.2023.page.rail": "2023 edition",
+    "editions.2023.page.heading": "KCD France 2023 — our first edition at Pompidou",
+    "editions.2023.page.intro":
+      "A visual recap of the first French-language edition, hosted at Centre Georges Pompidou under the name Kubernetes Community Days France.",
     "testimonials.heading": "They said it better than we could",
     "testimonials.pause_hint": "Hover to pause",
     "testimonials.0.quote":

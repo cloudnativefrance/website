@@ -1,0 +1,45 @@
+---
+/**
+ * Phase 19 — Dedicated 2023 edition page (FR).
+ *
+ * Full recap: 10-photo grid + lightbox + KCD brand-history callout.
+ * Assembly happens in Plan 19-05; this file is scaffolded in 19-01.
+ *
+ * Homepage 2023 minimal block (src/pages/index.astro) is INTENTIONALLY
+ * untouched — Phase 18 UAT signed off on the current shape.
+ */
+import Layout from "@/layouts/Layout.astro";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { EDITION_2023 } from "@/lib/editions-data";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+<Layout
+  title={t("editions.2023.page.title")}
+  description={t("editions.2023.page.meta_description")}
+  canonicalPath="/2023"
+>
+  <main>
+    <section class="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        {t("editions.2023.page.rail")}
+      </p>
+      <h1 class="mt-4 text-4xl md:text-5xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+        {t("editions.2023.page.heading")}
+      </h1>
+      <p class="mt-4 text-base md:text-lg text-muted-foreground max-w-3xl">
+        {t("editions.2023.page.intro")}
+      </p>
+      <dl class="mt-10 grid grid-cols-3 gap-4 md:gap-8">
+        {EDITION_2023.stats.map((s) => (
+          <div class="flex flex-col gap-1">
+            <dt class="text-3xl md:text-4xl font-bold text-foreground">{s.value}</dt>
+            <dd class="text-sm text-muted-foreground">{t(s.labelKey)}</dd>
+          </div>
+        ))}
+      </dl>
+      {/* Photo grid + brand-history callout + lightbox compose in 19-05 */}
+    </section>
+  </main>
+</Layout>
