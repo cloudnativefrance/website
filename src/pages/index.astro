@@ -4,6 +4,7 @@ import HeroSection from "@/components/hero/HeroSection.astro";
 import KeyNumbers from "@/components/hero/KeyNumbers";
 import CfpSection from "@/components/cfp/CfpSection.astro";
 import PastEditionSection from "@/components/past-editions/PastEditionSection.astro";
+import PastEditionMinimal from "@/components/past-editions/PastEditionMinimal.astro";
 import { EDITION_2026, EDITION_2023 } from "@/lib/editions-data";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { eventSchemaJson } from "@/lib/event-schema";
@@ -36,31 +37,19 @@ const edition2026Props = {
   id: "edition-2026",
 };
 
-// 2023-variant props — real KCD France 2023 content (10-photo mosaic + playlist)
-const edition2023Props = {
-  rail: t("editions.rail.2023"),
-  heading: t("editions.2023.heading"),
-  stats: EDITION_2023.stats.map((s) => ({ value: s.value, label: t(s.labelKey) })),
-  video: {
-    youtubeId: EDITION_2023.youtubeId,
-    caption: t("editions.2023.video_caption"),
-    playlistCta: {
-      label: t("editions.2023.video_cta"),
-      href: EDITION_2023.playlistUrl,
-    },
-  },
+// 2023-variant props — minimal homepage block (17-04): 3 photos + logo + playlist link
+const edition2023MinimalProps = {
+  id: "edition-2023",
   photos: EDITION_2023.thumbnails.map((th) => ({
     src: th.src,
     alt: t(th.altKey),
-    size: th.size,
   })),
-  brandCallout: {
-    logo: EDITION_2023.brandLogo,
-    logoAlt: "Kubernetes Community Days France 2023",
-    body: t("editions.2023.brand_note"),
+  logo: EDITION_2023.brandLogo,
+  logoAlt: "Kubernetes Community Days France 2023",
+  playlistLink: {
+    label: t("editions.2023.video_cta"),
+    href: EDITION_2023.playlistUrl,
   },
-  placeholder: EDITION_2023.placeholder,
-  id: "edition-2023",
 };
 ---
 
@@ -75,6 +64,6 @@ const edition2023Props = {
     <KeyNumbers client:idle lang={lang} />
     <CfpSection />
     <PastEditionSection {...edition2026Props} />
-    <PastEditionSection {...edition2023Props} />
+    <PastEditionMinimal {...edition2023MinimalProps} />
   </main>
 </Layout>

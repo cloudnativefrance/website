@@ -105,7 +105,12 @@ describe("EDIT-07 / 17-04: 2023 simplified minimal block", () => {
 
       it.skipIf(!distExists)("2023 block renders exactly 3 KCD 2023 photos (01, 05, 08)", () => {
         const section = extract2023Section(readFileSync(path, "utf8"));
-        const matches = section.match(/<img[^>]+kcd2023[^>]*>/g) ?? [];
+        // astro:assets rewrites image paths (no "kcd2023" in src). Match by the
+        // locale-specific alt prefix from editions.2023.thumbnail_alt.* keys.
+        const altPattern = locale === "fr"
+          ? /alt="Photo KCD France 2023[^"]*"/g
+          : /alt="KCD France 2023 photo[^"]*"/g;
+        const matches = section.match(altPattern) ?? [];
         expect(matches.length).toBe(3);
       });
 
