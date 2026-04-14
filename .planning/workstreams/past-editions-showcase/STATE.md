@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Past Editions Showcase
 status: in_progress
-stopped_at: "Completed Phases 15–20; Phase 21-01 (documentation backfill) in progress"
+stopped_at: "Completed Phases 15–20 + Phase 21 (21-01 doc backfill + 21-02 discovery-loop fix); ready for /gsd-verify-work 21 then Phase 22"
 last_updated: "2026-04-14T12:00:00.000Z"
 last_activity: 2026-04-14
 progress:
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-13 for v1.1 initialization)
 ## Current Position
 
 Milestone: v1.1 — Past Editions Showcase (Phases 15–20 core + 21–22 close-out)
-Phase: 21 — documentation backfill + discovery-loop fix (in progress)
-Plan: 21-01 (doc backfill) → 21-02 (discovery-loop fix)
-Status: v1.1 Phases 15–20 shipped; Phase 21 closing audit-driven gaps; Phase 22 closes manual UAT.
+Phase: 21 — documentation backfill + discovery-loop fix (COMPLETE)
+Plan: 21-01 (doc backfill) ✓ → 21-02 (discovery-loop fix) ✓
+Status: v1.1 Phases 15–21 shipped; Phase 22 (manual UAT + lighthouse) pending.
 Last activity: 2026-04-14
 
 Progress: [██████████] 100% (6 of 6 v1.1 core phases complete; Phases 21–22 close-out)
@@ -73,9 +73,9 @@ Decisions are logged in PROJECT.md Key Decisions table and the v1.0 archive at `
 
 ## Upcoming
 
-- **Phase 21 — Documentation Backfill + Discovery-Loop Fix** (in progress)
-  - 21-01: doc backfill (Phase 19 summaries, STATE reconciliation, REQUIREMENTS refresh, ROADMAP note) — this plan.
-  - 21-02: wire homepage `PastEditionMinimal` 2023 block to `/2023` (new "View 2023 edition →" CTA + i18n key + Vitest assertion).
+- **Phase 21 — Documentation Backfill + Discovery-Loop Fix** (COMPLETE)
+  - 21-01: doc backfill ✓ (commits 2ee9711, 8762575, 512de96, ba38fbb, 0805274)
+  - 21-02: discovery-loop CTA ✓ (commit 14068e5 — `feat(21-02): wire homepage 2023 minimal block to /2023 + i18n cta key`)
 - **Phase 22 — A11y UAT Closeout**
   - Close 10 lightbox keyboard-journey items from `19-UAT.md`.
   - Capture Stitch approval for `/2023`.
@@ -85,5 +85,5 @@ Decisions are logged in PROJECT.md Key Decisions table and the v1.0 archive at `
 ## Session Continuity
 
 Last session: 2026-04-14T12:00:00.000Z
-Stopped at: Phase 21-01 (documentation backfill) in progress — Phases 15–20 shipped.
-Resume action: continue Phase 21-01 tasks, then `/gsd-execute-phase 21` plan 21-02, then `/gsd-plan-phase 22`.
+Stopped at: Phase 21 COMPLETE (21-01 doc backfill + 21-02 discovery-loop CTA) — Phases 15–21 shipped.
+Resume action: `/gsd-verify-work 21` then `/gsd-plan-phase 22` (A11y UAT closeout).
