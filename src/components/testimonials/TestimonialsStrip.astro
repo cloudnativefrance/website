@@ -1,0 +1,100 @@
+---
+/**
+ * TEST-01 + TEST-02 + A11Y-01 + A11Y-02 (Phase 20, D-04..D-08).
+ *
+ * Marquee-animated testimonials strip. Zero JS — pure Astro SSR + CSS.
+ * Visual contract locked in Phase 15 §Testimonials Marquee (D-07/D-08/D-09):
+ *   - right → left drift (~40s)
+ *   - quote-led card, no avatars
+ *   - pause on :hover and :focus-within
+ *   - duplicate track hidden from AT via inert + aria-hidden
+ *   - prefers-reduced-motion respected (global Phase 16 reset + local defense)
+ */
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { TESTIMONIALS } from "@/lib/testimonials-data";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section class="testimonials-strip" aria-labelledby="testimonials-heading">
+  <div class="container">
+    <h2 id="testimonials-heading">{t("testimonials.heading")}</h2>
+    <p class="pause-hint">{t("testimonials.pause_hint")}</p>
+
+    <div class="marquee" role="region" aria-label={t("testimonials.heading")}>
+      <ul class="marquee-track" data-track="canonical">
+        {TESTIMONIALS.map((item) => (
+          <li class="card">
+            <blockquote class="quote">{t(item.quoteKey)}</blockquote>
+            <p class="attribution">{t(item.attributionKey)}</p>
+          </li>
+        ))}
+      </ul>
+      <ul class="marquee-track" data-track="duplicate" aria-hidden="true" inert>
+        {TESTIMONIALS.map((item) => (
+          <li class="card">
+            <blockquote class="quote">{t(item.quoteKey)}</blockquote>
+            <p class="attribution">{t(item.attributionKey)}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Scaffold styles — marquee animation + a11y media query land in Plan 20-02. */
+  .testimonials-strip {
+    padding-block: 4rem;
+    color: var(--color-foreground);
+  }
+  .container {
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+  h2 {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .pause-hint {
+    font-size: 0.875rem;
+    color: var(--color-muted-foreground);
+    margin-bottom: 2rem;
+  }
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    gap: 2rem;
+  }
+  .marquee-track {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .card {
+    flex: 0 0 auto;
+    width: clamp(18rem, 28vw, 24rem);
+    padding: 1.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-card);
+    color: var(--color-card-foreground);
+  }
+  .quote {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    margin: 0 0 1rem;
+    font-style: italic;
+  }
+  .attribution {
+    font-size: 0.875rem;
+    color: var(--color-muted-foreground);
+    margin: 0;
+  }
+</style>
