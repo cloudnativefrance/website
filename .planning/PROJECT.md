@@ -2,7 +2,14 @@
 
 ## Current State
 
-**v1.0 shipped 2026-04-13** — 14 phases, 33 plans, 48/49 requirements satisfied (FNDN-07 deferred to `cnd-platform` repo by design). Audit passed. See [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md) and [`milestones/v1.0-REQUIREMENTS.md`](milestones/v1.0-REQUIREMENTS.md).
+**v1.1 shipped 2026-04-14** — 8 phases (15–22), 22 plans, 20/22 requirements satisfied (2 organizer content gates pending: I18N-03 brand-history wording, EDIT-07 stats + gallery URL). Audit: PASS_WITH_GAPS (manual a11y UAT + Playwright deferred to v1.2 per ship-now decision). Build green at 156 pages. See [`milestones/v1.1-ROADMAP.md`](milestones/v1.1-ROADMAP.md), [`milestones/v1.1-REQUIREMENTS.md`](milestones/v1.1-REQUIREMENTS.md), and [`milestones/v1.1-MILESTONE-AUDIT.md`](milestones/v1.1-MILESTONE-AUDIT.md).
+
+<details>
+<summary>v1.0 (archived) — shipped 2026-04-13</summary>
+
+14 phases, 33 plans, 48/49 requirements satisfied (FNDN-07 deferred to `cnd-platform` repo by design). Audit passed. See [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md) and [`milestones/v1.0-REQUIREMENTS.md`](milestones/v1.0-REQUIREMENTS.md).
+
+</details>
 
 ## What This Is
 
