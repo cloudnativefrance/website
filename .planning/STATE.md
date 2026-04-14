@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Past Editions Showcase
 status: executing
-stopped_at: Phase 15 context gathered
-last_updated: "2026-04-13T21:30:18.343Z"
-last_activity: 2026-04-13 -- Phase 17 planning complete
+stopped_at: Phase 17-04 complete (2023 homepage block simplified — EDIT-07)
+last_updated: "2026-04-14T07:35:00Z"
+last_activity: 2026-04-14 -- Phase 17 plan 04 (gap closure) completed
 progress:
   total_phases: 6
   completed_phases: 2
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13 for v1.1 initialization)
 
 **Core value:** A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register -- all within 5 seconds of landing.
-**Current focus:** Phase 16 — foundation-assets-i18n-a11y-baseline-shared-shell
+**Current focus:** Phase 17 — integrate-2026-edition-section-on-homepage
 
 ## Current Position
 
 Milestone: v1.1 — Past Editions Showcase (Phases 15-20)
-Phase: 16 (foundation-assets-i18n-a11y-baseline-shared-shell) — EXECUTING
-Plan: 1 of 4
-Status: Ready to execute
-Last activity: 2026-04-13 -- Phase 17 planning complete
+Phase: 17 (integrate-2026-edition-section-on-homepage) — EXECUTING
+Plan: 4 of 4 (17-04 gap-closure complete)
+Status: Phase 17 UAT gap EDIT-07 closed; awaiting visual re-UAT before Phase 18
+Last activity: 2026-04-14 -- 17-04 (gap closure) completed, 2023 block simplified
 
 Progress: [░░░░░░░░░░] 0% (0 of 6 v1.1 phases complete)
 
