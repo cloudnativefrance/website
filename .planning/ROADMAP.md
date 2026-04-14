@@ -30,7 +30,7 @@ Full archive at [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md).
 - [x] **Phase 15: Stitch Full-Homepage Mock** - Design-gate: full-page mock of the new homepage (Hero -> KeyNumbers -> CFP -> 2026 -> 2023 -> Testimonials), validated by user, before any code (completed 2026-04-13)
 - [x] **Phase 16: Foundation - Assets, i18n, A11y Baseline, Shared Shell** - Pre-optimize photos, add bilingual `editions.*`/`testimonials.*` keys, ship the global `prefers-reduced-motion` reset, and build the prop-driven `PastEditionSection.astro` shell (completed 2026-04-13)
 - [x] **Phase 17: Integrate 2026 Edition Section on Homepage** - Render `Edition2026Section` on `/` and `/en/`, verify live in both locales (gates Phase 18) (completed 2026-04-13)
-- [ ] **Phase 18: Venue Page Cleanup** - Remove the relocated 2026 block, orphaned imports/constants/assets, deprecated `venue.prev.*` keys, and audit/redirect old anchors (gated on Phase 17 verified live)
+- [x] **Phase 18: Venue Page Cleanup** - Remove the relocated 2026 block, orphaned imports/constants/assets, deprecated `venue.prev.*` keys, and audit/redirect old anchors (gated on Phase 17 verified live) (completed 2026-04-14)
 - [ ] **Phase 19: Integrate 2023 Edition Section + Lightbox** - 10-photo grid, KCD brand-history callout (with organizer sign-off), accessible lightbox overlay, placeholder stats with tracker
 - [ ] **Phase 20: Animated Testimonials Strip** - Marquee testimonials with reduced-motion respect, pause-on-hover/focus, ARIA-hidden duplicated track, and clearly placeholder attributions
 
@@ -135,6 +135,6 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 (and in parallel: 19, 20 a
 | 15. Stitch Full-Homepage Mock | v1.1 | 4/4 | Complete   | 2026-04-13 |
 | 16. Foundation - Assets, i18n, A11y Baseline, Shared Shell | v1.1 | 4/4 | Complete   | 2026-04-13 |
 | 17. Integrate 2026 Edition Section on Homepage | v1.1 | 3/3 | Complete   | 2026-04-13 |
-| 18. Venue Page Cleanup | v1.1 | 1/2 | In Progress|  |
+| 18. Venue Page Cleanup | v1.1 | 2/2 | Complete   | 2026-04-14 |
 | 19. Integrate 2023 Edition Section + Lightbox | v1.1 | 0/TBD | Not started | - |
 | 20. Animated Testimonials Strip | v1.1 | 0/TBD | Not started | - |
