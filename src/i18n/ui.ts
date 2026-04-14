@@ -256,6 +256,11 @@ export const ui = {
       "Lieu : Centre Georges Pompidou, Paris — Beaubourg.",
     "editions.2023.brand_history.logo_alt":
       "Logo Kubernetes Community Days France 2023 (KCD France)",
+    "editions.2023.lightbox.dialog_label": "Galerie photos KCD France 2023 — visionneuse",
+    "editions.2023.lightbox.close": "Fermer la visionneuse",
+    "editions.2023.lightbox.prev": "Photo précédente",
+    "editions.2023.lightbox.next": "Photo suivante",
+    "editions.2023.lightbox.counter_template": "{index} sur {total}",
     "editions.2023.page.title": "Édition 2023 — KCD France | Cloud Native Days France",
     "editions.2023.page.meta_description":
       "Revivez la première édition francophone (KCD France 2023) au Centre Georges Pompidou : keynotes, photos et moments forts.",
@@ -539,6 +544,11 @@ export const ui = {
       "Venue: Centre Georges Pompidou, Paris — Beaubourg.",
     "editions.2023.brand_history.logo_alt":
       "Kubernetes Community Days France 2023 (KCD France) logo",
+    "editions.2023.lightbox.dialog_label": "KCD France 2023 photo gallery — viewer",
+    "editions.2023.lightbox.close": "Close the viewer",
+    "editions.2023.lightbox.prev": "Previous photo",
+    "editions.2023.lightbox.next": "Next photo",
+    "editions.2023.lightbox.counter_template": "{index} of {total}",
     "editions.2023.page.title": "2023 Edition — KCD France | Cloud Native Days France",
     "editions.2023.page.meta_description":
       "Revisit our first French-language edition (KCD France 2023) at Centre Georges Pompidou: keynotes, photos and highlights.",
