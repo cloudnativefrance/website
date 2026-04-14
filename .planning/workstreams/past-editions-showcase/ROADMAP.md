@@ -31,8 +31,10 @@ Full archive at [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md).
 - [x] **Phase 16: Foundation - Assets, i18n, A11y Baseline, Shared Shell** - Pre-optimize photos, add bilingual `editions.*`/`testimonials.*` keys, ship the global `prefers-reduced-motion` reset, and build the prop-driven `PastEditionSection.astro` shell (completed 2026-04-13)
 - [x] **Phase 17: Integrate 2026 Edition Section on Homepage** - Render `Edition2026Section` on `/` and `/en/`, verify live in both locales (gates Phase 18) (completed 2026-04-13)
 - [x] **Phase 18: Venue Page Cleanup** - Remove the relocated 2026 block, orphaned imports/constants/assets, deprecated `venue.prev.*` keys, and audit/redirect old anchors (gated on Phase 17 verified live) (completed 2026-04-14)
-- [ ] **Phase 19: Integrate 2023 Edition Section + Lightbox** - 10-photo grid, KCD brand-history callout (with organizer sign-off), accessible lightbox overlay, placeholder stats with tracker
-- [ ] **Phase 20: Animated Testimonials Strip** - Marquee testimonials with reduced-motion respect, pause-on-hover/focus, ARIA-hidden duplicated track, and clearly placeholder attributions
+- [x] **Phase 19: Integrate 2023 Edition Section + Lightbox** - 10-photo grid, KCD brand-history callout (with organizer sign-off), accessible lightbox overlay, placeholder stats with tracker (completed 2026-04-14)
+- [x] **Phase 20: Animated Testimonials Strip** - Marquee testimonials with reduced-motion respect, pause-on-hover/focus, ARIA-hidden duplicated track, and clearly placeholder attributions (completed 2026-04-14)
+- [ ] **Phase 21: Documentation Backfill + Discovery-Loop Fix** - Backfill Phase 19 summaries, reconcile STATE.md, refresh REQUIREMENTS.md traceability, correct ROADMAP wording, wire homepage 2023 block to `/2023` (audit-driven)
+- [ ] **Phase 22: A11y UAT Closeout** - Close 10 lightbox keyboard-journey items, capture Stitch approval for `/2023`, capture Lighthouse CLS, decide on Playwright reduced-motion automation
 
 ## Phase Details
 
@@ -124,6 +126,29 @@ Full archive at [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md).
 **Plans**: TBD
 **UI hint**: yes
 
+### Phase 21: Documentation Backfill + Discovery-Loop Fix
+**Goal**: Close documentation debt surfaced by the v1.1 milestone audit and wire the homepage 2023 minimal block to the dedicated `/2023` page so the discovery loop is complete.
+**Depends on**: Phases 15–20
+**Requirements**: EDIT-02 (discovery-loop completion), DOC-01 (audit-driven documentation backfill)
+**Success Criteria** (what must be TRUE):
+  1. Phase 19 has `19-01-SUMMARY.md` … `19-05-SUMMARY.md` plus a phase-level `19-SUMMARY.md` matching the Phase 16/17/20 frontmatter style
+  2. `STATE.md` header (current focus, completed_phases, status) is reconciled with its frontmatter (`completed_phases: 6`, `percent: 100`, status reflects post-merge state)
+  3. `REQUIREMENTS.md` traceability table reads `Complete` for the 19 shipped REQ-IDs (only the 3 organizer-content-gate rows remain `pending`)
+  4. ROADMAP §v1.1 goal line documents that Testimonials renders **before** the past-edition sections (or is corrected to match the shipped order)
+  5. `src/components/past-editions/PastEditionMinimal.astro` renders a visible "View 2023 edition →" CTA pointing to `/2023` (FR) and `/en/2023` (EN); covered by a Vitest assertion in `tests/build/homepage-2026-section.test.ts` (or a new file) checking the link is present in dist HTML for both locales
+**Plans**: TBD
+
+### Phase 22: A11y UAT Closeout
+**Goal**: Convert deferred manual a11y items into checked UAT outcomes (or automated coverage) so v1.1 ships with documented a11y validation.
+**Depends on**: Phase 21
+**Requirements**: A11Y-01, A11Y-03, EDIT-05
+**Success Criteria** (what must be TRUE):
+  1. `19-UAT.md` lightbox keyboard-journey checkboxes (10 items) are each marked checked or `n/a` with one-line evidence
+  2. Stitch visual approval for `/2023` and `/en/2023` is recorded in `phases/19-*/content-gates.md` (or a screenshot reference)
+  3. Lighthouse CLS ≤ 0.02 on `/2023` and `/en/2023` is captured (manual run acceptable; result pasted into `19-UAT.md`)
+  4. (Optional, scope decision in 22-CONTEXT) Playwright reduced-motion test added under `tests/browser/` asserting `animation: none` and lightbox keyboard-journey passes — OR explicit defer-to-v1.2 documented with rationale
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
@@ -136,5 +161,7 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 (and in parallel: 19, 20 a
 | 16. Foundation - Assets, i18n, A11y Baseline, Shared Shell | v1.1 | 4/4 | Complete   | 2026-04-13 |
 | 17. Integrate 2026 Edition Section on Homepage | v1.1 | 3/3 | Complete   | 2026-04-13 |
 | 18. Venue Page Cleanup | v1.1 | 2/2 | Complete   | 2026-04-14 |
-| 19. Integrate 2023 Edition Section + Lightbox | v1.1 | 0/TBD | Not started | - |
-| 20. Animated Testimonials Strip | v1.1 | 0/TBD | Not started | - |
+| 19. Integrate 2023 Edition Section + Lightbox | v1.1 | 5/5 | Complete   | 2026-04-14 |
+| 20. Animated Testimonials Strip | v1.1 | 3/3 | Complete   | 2026-04-14 |
+| 21. Documentation Backfill + Discovery-Loop Fix | v1.1 | 0/TBD | Not started | - |
+| 22. A11y UAT Closeout | v1.1 | 0/TBD | Not started | - |
