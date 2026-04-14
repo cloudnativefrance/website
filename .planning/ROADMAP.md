@@ -135,6 +135,6 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 (and in parallel: 19, 20 a
 | 15. Stitch Full-Homepage Mock | v1.1 | 4/4 | Complete   | 2026-04-13 |
 | 16. Foundation - Assets, i18n, A11y Baseline, Shared Shell | v1.1 | 4/4 | Complete   | 2026-04-13 |
 | 17. Integrate 2026 Edition Section on Homepage | v1.1 | 3/3 | Complete   | 2026-04-13 |
-| 18. Venue Page Cleanup | v1.1 | 0/TBD | Not started | - |
+| 18. Venue Page Cleanup | v1.1 | 1/2 | In Progress|  |
 | 19. Integrate 2023 Edition Section + Lightbox | v1.1 | 0/TBD | Not started | - |
 | 20. Animated Testimonials Strip | v1.1 | 0/TBD | Not started | - |

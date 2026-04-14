@@ -34,10 +34,10 @@
 
 ### Venue Cleanup (VENUE-*)
 
-- [ ] **VENUE-01**: "Previous edition 2026" block removed from `src/pages/venue/index.astro` after the homepage 2026 section is verified live — delivered as a separate commit from the homepage addition
-- [ ] **VENUE-02**: Orphaned imports, constants, and asset references (`ambiance03/06/10`, `YOUTUBE_ID`, `GALLERY_URL`, `previousStats`, `thumbnails`) removed from the venue page in the same cleanup commit
+- [x] **VENUE-01**: "Previous edition 2026" block removed from `src/pages/venue/index.astro` after the homepage 2026 section is verified live — delivered as a separate commit from the homepage addition
+- [x] **VENUE-02**: Orphaned imports, constants, and asset references (`ambiance03/06/10`, `YOUTUBE_ID`, `GALLERY_URL`, `previousStats`, `thumbnails`) removed from the venue page in the same cleanup commit
 - [ ] **VENUE-03**: Deprecated `venue.prev.*` i18n keys removed from `src/i18n/ui.ts` after homepage integration verified and `grep` confirms no remaining consumers
-- [ ] **VENUE-04**: Any external anchors pointing at the old venue `#previous-edition` anchor either redirect to the homepage section or are audited and confirmed absent
+- [x] **VENUE-04**: Any external anchors pointing at the old venue `#previous-edition` anchor either redirect to the homepage section or are audited and confirmed absent
 
 ### Bilingual (I18N-*)
 
@@ -82,10 +82,10 @@
 | A11Y-03 | Phase 19 | pending |
 | A11Y-04 | Phase 19 | pending |
 | A11Y-05 | Phase 16 | pending |
-| VENUE-01 | Phase 18 | pending |
-| VENUE-02 | Phase 18 | pending |
+| VENUE-01 | Phase 18 | Complete |
+| VENUE-02 | Phase 18 | Complete |
 | VENUE-03 | Phase 18 | pending |
-| VENUE-04 | Phase 18 | pending |
+| VENUE-04 | Phase 18 | Complete |
 | I18N-01 | Phase 16 | pending |
 | I18N-02 | Phase 16 | pending |
 | I18N-03 | Phase 19 | pending |
