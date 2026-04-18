@@ -42,7 +42,9 @@ See [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full phase deta
   2. Section includes a "Voir tous les replays" link pointing to the replays page/playlist
   3. Section includes a "Telecharger le bilan 2026 (PDF)" link that opens the one-pager PDF
   4. Testimonial cards render within the same section (replacing the old separate TestimonialsStrip)
-**Plans**: TBD
+**Plans**: 2 plans
+  - [ ] 23-01-data-and-i18n-PLAN.md — Mutate EDITION_2026 (3 thumbnails, replaysUrl, pdfUrl; drop ambiance-08) and add 4 new editions.2026.* i18n keys to fr+en (D-04..D-08)
+  - [ ] 23-02-component-PLAN.md — Create src/components/past-editions/Edition2026Combined.astro with 6-block anatomy (rail, h2, mosaic, video, CTA row, testimonials) per UI-SPEC (D-01..D-03, D-11..D-14)
 **UI hint**: yes
 
 ### Phase 24: Sponsors Platinum & Edition 2023
@@ -89,7 +91,7 @@ Phases execute in numeric order: 23 → 24 → 25 → 26
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 23. Edition 2026 Combined Section | v1.2 | 0/? | Not started | - |
+| 23. Edition 2026 Combined Section | v1.2 | 0/2 | Planned | - |
 | 24. Sponsors Platinum & Edition 2023 | v1.2 | 0/? | Not started | - |
 | 25. Hero Redesign | v1.2 | 0/? | Not started | - |
 | 26. Homepage Wiring | v1.2 | 0/? | Not started | - |
