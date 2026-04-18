@@ -12,6 +12,8 @@
  */
 import type { ImageMetadata } from "astro";
 
+import { ui } from "@/i18n/ui";
+
 import kcd2023_01 from "@/assets/photos/kcd2023/01.jpg";
 import kcd2023_02 from "@/assets/photos/kcd2023/02.jpg";
 import kcd2023_03 from "@/assets/photos/kcd2023/03.jpg";
@@ -30,7 +32,12 @@ import kcdLogo from "@/assets/logos/kcd2023/logo-color.png";
 type Stat = { value: string; labelKey: string };
 type Thumbnail = {
   src: ImageMetadata;
-  altKey: string;
+  /**
+   * i18n key for the alt text. Narrowed to `keyof typeof ui.fr` so that
+   * `t(thumbnail.altKey)` typechecks at call sites without an `as any` cast
+   * (Phase 23 WR-01 — match testimonials-data.ts template-literal pattern).
+   */
+  altKey: keyof typeof ui.fr;
   size?: "hero" | "medium" | "small";
 };
 

@@ -58,7 +58,7 @@ const photos =
   props.photos ??
   EDITION_2026.thumbnails.map((p) => ({
     src: p.src,
-    alt: t(p.altKey as any),
+    alt: t(p.altKey),
     size: p.size as "hero" | "medium",
   }));
 const video = props.video ?? {
@@ -77,8 +77,11 @@ const pdfCta = props.pdfCta ?? {
 const testimonials =
   props.testimonials ??
   TESTIMONIALS.slice(0, 3).map((item) => ({
-    quote: t(item.quoteKey as any),
-    attribution: t(item.attributionKey as any),
+    // Casts narrow `testimonials.${number}.{quote|attribution}` template-literal
+    // type to a concrete i18n key. Matches the existing TestimonialsStrip.astro
+    // pattern but uses a tighter cast than `as any` (Phase 23 WR-01).
+    quote: t(item.quoteKey as keyof typeof import("@/i18n/ui").ui.fr),
+    attribution: t(item.attributionKey as keyof typeof import("@/i18n/ui").ui.fr),
   }));
 
 /** Tailwind col-span map — UI-SPEC §3 (medium uses md:col-span-3 to fill 12 cols). */
