@@ -1,0 +1,184 @@
+---
+/**
+ * Edition2026Combined.astro (Phase 23, D-01..D-14)
+ *
+ * Purpose-built homepage section that merges the 2026 recap into one block:
+ *   1. Rotated rail label
+ *   2. Section heading (h2)
+ *   3. 3-photo asymmetric mosaic (1 hero + 2 medium)
+ *   4. YouTube aftermovie embed (youtube-nocookie per D-12)
+ *   5. CTA row — "Voir tous les replays" + "Télécharger le bilan 2026 (PDF)"
+ *   6. Testimonials sub-block — h3 + 3-up grid (no marquee)
+ *
+ * Pure Astro SSR. Zero hydration directives (D-02). DS tokens only (D-13).
+ * Resolves its own i18n + data so Phase 26 can mount it with no props,
+ * but exports a Props interface for future flexibility.
+ *
+ * NOT mounted to any page in Phase 23 — Phase 26 owns homepage wiring.
+ */
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import { EDITION_2026 } from "@/lib/editions-data";
+import { TESTIMONIALS } from "@/lib/testimonials-data";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+export interface Props {
+  /** Anchor id for deep-linking. Recommended: "edition-2026". */
+  id?: string;
+  /** Localised rail label, e.g. t("editions.rail.2026"). */
+  rail?: string;
+  /** Localised h2 copy, e.g. t("editions.2026.heading"). */
+  heading?: string;
+  /** Localised h3 copy for the testimonials sub-section. */
+  testimonialsHeading?: string;
+  /** 3 photos in render order. Size assignments per UI-SPEC §3. */
+  photos?: ReadonlyArray<{ src: ImageMetadata; alt: string; size: "hero" | "medium" }>;
+  /** YouTube embed config — uses youtube-nocookie. */
+  video?: { youtubeId: string; caption: string };
+  /** External CTA: 2026 replays YouTube playlist. */
+  replaysCta?: { label: string; href: string };
+  /** External CTA: Google Drive one-pager PDF. */
+  pdfCta?: { label: string; href: string; ariaLabel: string };
+  /** Testimonials list. Component slices to first 3 if longer. */
+  testimonials?: ReadonlyArray<{ quote: string; attribution: string }>;
+}
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const props = Astro.props as Props;
+
+// Default anchor id="edition-2026" enables deep-linking and matches Phase 26 expectations.
+const id = props.id ?? "edition-2026";
+const rail = props.rail ?? t("editions.rail.2026");
+const heading = props.heading ?? t("editions.2026.heading");
+const testimonialsHeading =
+  props.testimonialsHeading ?? t("editions.2026.testimonials_heading");
+const photos =
+  props.photos ??
+  EDITION_2026.thumbnails.map((p) => ({
+    src: p.src,
+    alt: t(p.altKey as any),
+    size: p.size as "hero" | "medium",
+  }));
+const video = props.video ?? {
+  youtubeId: EDITION_2026.youtubeId,
+  caption: t("editions.2026.video_caption"),
+};
+const replaysCta = props.replaysCta ?? {
+  label: t("editions.2026.replays_cta"),
+  href: EDITION_2026.replaysUrl,
+};
+const pdfCta = props.pdfCta ?? {
+  label: t("editions.2026.pdf_cta"),
+  href: EDITION_2026.pdfUrl,
+  ariaLabel: t("editions.2026.pdf_cta_aria"),
+};
+const testimonials =
+  props.testimonials ??
+  TESTIMONIALS.slice(0, 3).map((item) => ({
+    quote: t(item.quoteKey as any),
+    attribution: t(item.attributionKey as any),
+  }));
+
+/** Tailwind col-span map — UI-SPEC §3 (medium uses md:col-span-3 to fill 12 cols). */
+const colSpan = {
+  hero: "col-span-12 md:col-span-6",
+  medium: "col-span-6 md:col-span-3",
+} as const;
+---
+<section
+  id={id}
+  class="relative max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24"
+>
+  {/* 1. Rotated rail (decorative, hidden on mobile) */}
+  <p
+    class="absolute left-0 top-24 hidden md:block rotate-[-90deg] origin-top-left text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
+  >
+    {rail}
+  </p>
+
+  {/* 2. Section heading (single h2 per Pitfall 8 mitigation) */}
+  <h2
+    class="text-3xl md:text-4xl font-bold text-foreground tracking-tight"
+    style="letter-spacing:-0.02em;"
+  >
+    {heading}
+  </h2>
+
+  {/* 3. Photo mosaic — 3 thumbnails, 1 hero + 2 medium */}
+  {photos && photos.length > 0 && (
+    <div class="mt-12 grid grid-cols-12 gap-3 md:gap-4 [grid-auto-rows:12rem] md:[grid-auto-rows:14rem]">
+      {photos.map((p) => (
+        <figure
+          class={`${colSpan[p.size]} row-span-1 overflow-hidden rounded-md bg-card border border-border`}
+        >
+          <Image
+            src={p.src}
+            alt={p.alt}
+            widths={[400, 800, 1200]}
+            sizes="(min-width: 768px) 33vw, 100vw"
+            class="w-full h-full object-cover"
+          />
+        </figure>
+      ))}
+    </div>
+  )}
+
+  {/* 4. YouTube video embed (youtube-nocookie per D-12) */}
+  {video && (
+    <figure class="mt-12 max-w-2xl mx-auto">
+      <div class="relative aspect-video w-full overflow-hidden rounded-md bg-card">
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}`}
+          title={video.caption}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          class="absolute inset-0 h-full w-full"
+        ></iframe>
+      </div>
+      <figcaption class="mt-3 text-sm text-muted-foreground">{video.caption}</figcaption>
+    </figure>
+  )}
+
+  {/* 5. CTA row — replays + PDF; stacked mobile, side-by-side desktop */}
+  <div class="mt-8 flex flex-col sm:flex-row gap-4 sm:gap-8 max-w-2xl mx-auto">
+    <a
+      href={replaysCta.href}
+      class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      {replaysCta.label} <span aria-hidden="true">→</span>
+    </a>
+    <a
+      href={pdfCta.href}
+      class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+      rel="noopener noreferrer"
+      target="_blank"
+      aria-label={pdfCta.ariaLabel}
+    >
+      {pdfCta.label} <span aria-hidden="true">→</span>
+    </a>
+  </div>
+
+  {/* 6. Testimonials block — h3 + 3-up static grid (no marquee) */}
+  {testimonials.length > 0 && (
+    <div class="mt-12">
+      <h3 class="text-xl md:text-2xl font-semibold text-foreground tracking-tight">
+        {testimonialsHeading}
+      </h3>
+      <ul class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 list-none p-0">
+        {testimonials.map((item) => (
+          <li class="rounded-md border border-border bg-card text-card-foreground p-6 md:p-7">
+            <blockquote class="text-base md:text-lg italic leading-relaxed text-card-foreground m-0">
+              {item.quote}
+            </blockquote>
+            <p class="mt-4 text-sm text-muted-foreground m-0">{item.attribution}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</section>
