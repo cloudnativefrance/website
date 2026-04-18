@@ -27,7 +27,7 @@ See [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full phase deta
 **Milestone Goal:** Restructure the homepage layout per validated Stitch mockup -- merge 2026 film+testimonials, add newsletter CTA, add sponsors platinum section, simplify 2023 bloc.
 
 - [x] **Phase 23: Edition 2026 Combined Section** - New component merging photos, film, replays link, PDF link, and testimonials into one section [completed 2026-04-18]
-- [ ] **Phase 24: Sponsors Platinum & Edition 2023** - Platinum sponsor logo strip and simplified 2023 mini-bloc
+- [x] **Phase 24: Sponsors Platinum & Edition 2023** - Platinum sponsor logo strip and simplified 2023 mini-bloc [plans complete 2026-04-18; awaiting Phase 26 homepage mount]
 - [ ] **Phase 25: Hero Redesign** - New background image, adjusted opacity, and 3-CTA layout
 - [ ] **Phase 26: Homepage Wiring** - Atomic section reorder across both locale homepages with accessibility check
 
@@ -59,7 +59,7 @@ See [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full phase deta
 **Plans**: 3 plans (2 waves)
   - [x] 24-01-PLAN.md — Foundation: extract safeUrl + safeLogoPath into src/lib/sponsor-utils.ts, refactor SponsorCard.astro, add sponsors.homepage.{heading,cta} i18n keys in fr+en (Pattern B arrow-free) [completed 2026-04-18]
   - [x] 24-02-PLAN.md — SponsorsPlatinumStrip.astro (NEW) — Platinum logo strip + "Voir tous les sponsors" CTA [completed 2026-04-18]
-  - [ ] 24-03-PLAN.md — Edition2023Link.astro (NEW) — minimalised KCD 2023 mini-bloc (logo + heading + text link to /2023)
+  - [x] 24-03-PLAN.md — Edition2023Link.astro (NEW) — minimalised KCD 2023 mini-bloc (logo + heading + text link to /2023) [completed 2026-04-18]
 **UI hint**: yes
 
 ### Phase 25: Hero Redesign
@@ -95,6 +95,6 @@ Phases execute in numeric order: 23 → 24 → 25 → 26
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 23. Edition 2026 Combined Section | v1.2 | 2/2 | Complete | 2026-04-18 |
-| 24. Sponsors Platinum & Edition 2023 | v1.2 | 2/3 | In progress | - |
+| 24. Sponsors Platinum & Edition 2023 | v1.2 | 3/3 | Complete (components) | 2026-04-18 |
 | 25. Hero Redesign | v1.2 | 0/? | Not started | - |
 | 26. Homepage Wiring | v1.2 | 0/? | Not started | - |

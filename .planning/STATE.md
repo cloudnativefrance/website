@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Homepage Restructuring
 status: in progress
-stopped_at: Phase 24 plan 24-02 (SponsorsPlatinumStrip.astro) complete; next up 24-03 Edition2023Link.astro in wave 2
-last_updated: "2026-04-18T17:21:12.000Z"
-last_activity: 2026-04-18 -- Phase 24 plan 02 (SponsorsPlatinumStrip) executed and committed
+stopped_at: Phase 24 complete (all 3 plans shipped — foundation, SponsorsPlatinumStrip, Edition2023Link); next up Phase 25 (Hero Redesign) then Phase 26 (Homepage Wiring)
+last_updated: "2026-04-18T17:30:00.000Z"
+last_activity: 2026-04-18 -- Phase 24 plan 03 (Edition2023Link.astro) executed and committed — Phase 24 component layer is 100% done
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
-  percent: 47
+  completed_plans: 5
+  percent: 60
 ---
 
 # Project State
@@ -21,31 +21,31 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register -- all within 5 seconds of landing.
-**Current focus:** Phase 24 - Sponsors Platinum & Edition 2023 (planned, ready to execute)
+**Current focus:** Phase 24 complete (components) — ready to plan Phase 25 (Hero Redesign)
 
 ## Current Position
 
-Phase: 24 (2 of 4 in v1.2) -- Sponsors Platinum & Edition 2023
-Plan: 2 of 3 in current phase (24-01 foundation + 24-02 SponsorsPlatinumStrip shipped; 24-03 Edition2023Link.astro remaining in wave 2)
-Status: In progress
-Last activity: 2026-04-18 -- Phase 24 plan 02 executed: created src/components/sponsors/SponsorsPlatinumStrip.astro (pure-SSR, data-agnostic, safeUrl+safeLogoPath imports, Pattern B arrow CTA, belt-and-braces empty-state guard); astro check baseline unchanged; build green
+Phase: 24 complete (components shipped; awaiting Phase 26 homepage mount). Next up: Phase 25 (Hero Redesign, 3 of 4 in v1.2).
+Plan: 3 of 3 in Phase 24 (24-01 foundation + 24-02 SponsorsPlatinumStrip + 24-03 Edition2023Link all shipped)
+Status: Phase 24 plans complete; Phase 25 not yet planned
+Last activity: 2026-04-18 -- Phase 24 plan 03 executed: created src/components/past-editions/Edition2023Link.astro (pure-SSR, fully prop-driven, Pattern A arrow — glyph in i18n value, same-tab /2023 CTA, h2 font-semibold + tracking-tight); astro check baseline unchanged; build green
 
-Progress: [████░░░░░░] 47% (4/5 plans in v1.2 complete — 2 in Phase 23, 2 in Phase 24)
+Progress: [██████░░░░] 60% (5/5 plans scheduled so far in v1.2 complete — 2 in Phase 23, 3 in Phase 24; Phases 25 + 26 not yet planned)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 4 (v1.2)
-- Average duration: ~7 min
-- Total execution time: ~0.50 hours
+- Total plans completed: 5 (v1.2)
+- Average duration: ~6 min
+- Total execution time: ~0.55 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 23 | 2/2 | ~19 min | ~10 min |
-| 24 | 2/3 | ~11 min | ~6 min |
+| 24 | 3/3 | ~14 min | ~5 min |
 
 ## Accumulated Context
 
@@ -71,6 +71,11 @@ Progress: [████░░░░░░] 47% (4/5 plans in v1.2 complete — 2
 - [24-02]: Belt-and-braces empty-state guard wraps the entire `<section>` (not just the `<ul>`). When sponsors.length === 0 the component emits ZERO DOM — caller also guards, redundancy is intentional (T-24-10 / PITFALLS #3).
 - [24-02]: No SponsorCard nesting — copied SponsorCard's interaction classes into a local `cardClasses` string. Rationale: homepage strip diverges from SponsorCard Platinum on 2 axes (max-w-[180px] max-h-16 vs [220px] max-h-20; p-6 md:p-7 vs p-8) — a shared component would force a new tier/prop, both of which scope-creep.
 - [24-02]: Component NOT mounted to any page in Phase 24 — Phase 26 owns the homepage swap (same CONTEXT discipline as Phase 23).
+- [24-03]: Edition2023Link.astro is fully prop-driven — no imports from @/lib/editions-data or @/i18n/utils. Caller (Phase 26) resolves i18n + locale-aware href before passing props. Keeps Stitch mockup → code 1:1 with no flag-driven branches.
+- [24-03]: Pattern A arrow on /2023 CTA (trailing glyph lives in the i18n value editions.2023.view_page_cta). Template renders {viewPageLabel} alone — no decorative <span>. OPPOSITE of Pattern B used by 24-02; both coexist in the codebase. Rule: match the pattern the consumed i18n value already uses.
+- [24-03]: h2 uses font-semibold + tracking-tight (NOT font-bold + uppercase + tracking-wider) — one notch lighter than the Sponsors strip h2 per UI-SPEC §Typography.
+- [24-03]: Logo sits on bare background (no bg-card plate) per UI-SPEC §Discretion Resolutions. Default id="edition-2023" preserves existing /#edition-2023 deep-link resolution.
+- [24-03]: Component NOT mounted to any page in Phase 24 — Phase 26 owns the homepage swap + PastEditionMinimal.astro deletion.
 
 ### Pending Todos
 
@@ -84,6 +89,6 @@ Progress: [████░░░░░░] 47% (4/5 plans in v1.2 complete — 2
 
 ## Session Continuity
 
-Last session: 2026-04-18T17:21:12.000Z
-Stopped at: Phase 24 plan 02 (SponsorsPlatinumStrip.astro) complete — new component file shipped, astro check baseline unchanged, build green; next: 24-03 (Edition2023Link.astro) — sibling wave-2 component, no shared module
-Resume file: .planning/phases/24-sponsors-platinum-edition-2023/24-02-SUMMARY.md
+Last session: 2026-04-18T17:30:00.000Z
+Stopped at: Phase 24 complete (all 3 plans shipped: 24-01 foundation, 24-02 SponsorsPlatinumStrip, 24-03 Edition2023Link). Astro check baseline unchanged (11 pre-existing errors), build green (156 pages). Phase 24 component layer is 100% done; mounting + PastEditionMinimal cleanup deferred to Phase 26 per CONTEXT D-01. Next: plan Phase 25 (Hero Redesign) — blocked on user-provided replacement background image.
+Resume file: .planning/phases/24-sponsors-platinum-edition-2023/24-03-SUMMARY.md
