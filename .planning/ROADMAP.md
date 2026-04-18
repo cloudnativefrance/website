@@ -56,7 +56,10 @@ See [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full phase deta
   2. Sponsors section includes a "Voir tous les sponsors" link navigating to the /sponsors page
   3. The 2023 bloc shows only the KCD logo and a text link to /2023 (no photo grid)
   4. Sponsors section gracefully hides when no Platinum sponsors exist in the data
-**Plans**: TBD
+**Plans**: 3 plans (2 waves)
+  - [x] 24-01-PLAN.md — Foundation: extract safeUrl + safeLogoPath into src/lib/sponsor-utils.ts, refactor SponsorCard.astro, add sponsors.homepage.{heading,cta} i18n keys in fr+en (Pattern B arrow-free) [completed 2026-04-18]
+  - [ ] 24-02-PLAN.md — SponsorsPlatinumStrip.astro (NEW) — Platinum logo strip + "Voir tous les sponsors" CTA
+  - [ ] 24-03-PLAN.md — Edition2023Link.astro (NEW) — minimalised KCD 2023 mini-bloc (logo + heading + text link to /2023)
 **UI hint**: yes
 
 ### Phase 25: Hero Redesign
@@ -91,7 +94,7 @@ Phases execute in numeric order: 23 → 24 → 25 → 26
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 23. Edition 2026 Combined Section | v1.2 | 1/2 | In progress | - |
-| 24. Sponsors Platinum & Edition 2023 | v1.2 | 0/? | Not started | - |
+| 23. Edition 2026 Combined Section | v1.2 | 2/2 | Complete | 2026-04-18 |
+| 24. Sponsors Platinum & Edition 2023 | v1.2 | 1/3 | In progress | - |
 | 25. Hero Redesign | v1.2 | 0/? | Not started | - |
 | 26. Homepage Wiring | v1.2 | 0/? | Not started | - |
