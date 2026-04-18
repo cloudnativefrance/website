@@ -1,10 +1,12 @@
 ---
 phase: 23
 slug: edition-2026-combined-section
-status: draft
+status: approved
 shadcn_initialized: true
 preset: base-nova (neutral baseColor, custom oklch DS in src/styles/global.css)
 created: 2026-04-18
+reviewed_at: 2026-04-18
+checker_verdict: APPROVED (1 non-blocking FLAG on Dimension 4 — see below)
 ---
 
 # Phase 23 — UI Design Contract
@@ -382,11 +384,11 @@ Note: per UI-SPEC the `stats` field is no longer consumed by `Edition2026Combine
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: FLAG — 3 weights declared (400/600/700) vs 2-weight ceiling. Non-blocking: 700 is a verbatim carry-over from the locked `PastEditionSection.astro` line 83 to preserve site-wide rhythm with neighbouring past-editions sections. Recommend a future global UI-SPEC note declaring "site-wide accepted weights: 400, 600, 700".
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** APPROVED 2026-04-18 (1 non-blocking FLAG, see Dimension 4)
