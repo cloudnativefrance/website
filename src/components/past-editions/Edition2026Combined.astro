@@ -84,10 +84,14 @@ const testimonials =
     attribution: t(item.attributionKey as keyof typeof import("@/i18n/ui").ui.fr),
   }));
 
-/** Tailwind col-span map — UI-SPEC §3 (medium uses md:col-span-3 to fill 12 cols). */
-const colSpan = {
-  hero: "col-span-12 md:col-span-6",
-  medium: "col-span-6 md:col-span-3",
+/**
+ * Tailwind grid classes — UI-SPEC §3 ("1 large left + 2 stacked-equivalent right on desktop").
+ * Hero: full width on mobile, left 2/3 on desktop spanning both rows.
+ * Medium: half width on mobile (side-by-side under hero), right 1/3 on desktop, one per row.
+ */
+const cellClass = {
+  hero: "col-span-12 md:col-span-8 md:row-span-2",
+  medium: "col-span-6 md:col-span-4 md:row-span-1",
 } as const;
 ---
 <section
@@ -114,13 +118,13 @@ const colSpan = {
     <div class="mt-12 grid grid-cols-12 gap-3 md:gap-4 [grid-auto-rows:12rem] md:[grid-auto-rows:14rem]">
       {photos.map((p) => (
         <figure
-          class={`${colSpan[p.size]} row-span-1 overflow-hidden rounded-md bg-card border border-border`}
+          class={`${cellClass[p.size]} overflow-hidden rounded-md bg-card border border-border`}
         >
           <Image
             src={p.src}
             alt={p.alt}
             widths={[400, 800, 1200]}
-            sizes="(min-width: 768px) 33vw, 100vw"
+            sizes="(min-width: 768px) 66vw, 100vw"
             class="w-full h-full object-cover"
           />
         </figure>
@@ -130,7 +134,7 @@ const colSpan = {
 
   {/* 4. YouTube video embed (youtube-nocookie per D-12) */}
   {video && (
-    <figure class="mt-12 max-w-2xl mx-auto">
+    <figure class="mt-12 max-w-4xl mx-auto">
       <div class="relative aspect-video w-full overflow-hidden rounded-md bg-card">
         <iframe
           src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}`}
