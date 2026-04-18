@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
+import { safeUrl, safeLogoPath } from "@/lib/sponsor-utils";
 
 interface Props {
   sponsor: CollectionEntry<"sponsors">;
@@ -11,46 +12,6 @@ interface Props {
 
 const { sponsor, lang, tier } = Astro.props;
 const t = useTranslations(lang);
-
-/**
- * URL allowlist — threat T-05-02 mitigation.
- * Only http(s) URLs are rewritten into an anchor href.
- * Pattern copied verbatim from src/components/speakers/SocialLinks.astro.
- */
-function safeUrl(raw: string | undefined): string | null {
-  if (!raw) return null;
-  const trimmed = raw.trim();
-  if (!trimmed) return null;
-  try {
-    const u = new URL(trimmed);
-    if (u.protocol === "http:" || u.protocol === "https:") return u.toString();
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Logo path allowlist — threat T-05-03 mitigation.
- * Accepts either an absolute public path (`/sponsors/foo.svg`) or an
- * `https://` URL. Rejects `javascript:`, `data:`, `//protocol-relative`,
- * and any path containing `..` traversal.
- */
-function safeLogoPath(raw: string | undefined): string | null {
-  const t = (raw || "").trim();
-  if (!t) return null;
-  if (t.includes("..")) return null;
-  // Absolute public paths ("/sponsors/foo.svg") — reject protocol-relative
-  if (t.startsWith("/") && !t.startsWith("//")) return t;
-  // https absolute URLs only
-  try {
-    const u = new URL(t);
-    if (u.protocol === "https:") return u.toString();
-  } catch {
-    /* fallthrough */
-  }
-  return null;
-}
 
 const description = lang === "fr" ? sponsor.data.description_fr : sponsor.data.description_en;
 const safeHref = safeUrl(sponsor.data.url);
