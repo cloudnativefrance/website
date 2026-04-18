@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Homepage Restructuring
 status: ready to execute
-stopped_at: Phase 25 planned (1 plan, 1 wave; UI-SPEC + plan-checker both PASS)
-last_updated: "2026-04-19T08:00:00.000Z"
-last_activity: 2026-04-19 -- Phase 25 UI-SPEC approved + plan created and verified
+stopped_at: Phase 25 complete (1 plan, 2 tasks shipped: 25-01 hero redesign live with ambiance-00 @ opacity-75 + 3-CTA row + Pink Ghost newsletter button + 2 i18n keys)
+last_updated: "2026-04-18T23:00:30.000Z"
+last_activity: 2026-04-18 -- Phase 25 plan 01 executed (HERO-01 + HERO-02 satisfied, hero ships live)
 progress:
   total_phases: 4
-  completed_phases: 2
-  total_plans: 6
-  completed_plans: 5
-  percent: 60
+  completed_phases: 3
+  total_plans: 7
+  completed_plans: 6
+  percent: 75
 ---
 
 # Project State
@@ -21,24 +21,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register -- all within 5 seconds of landing.
-**Current focus:** Phase 25 - Hero Redesign (planned, ready to execute)
+**Current focus:** Phase 26 - Homepage Wiring (next; Phase 25 complete and live)
 
 ## Current Position
 
-Phase: 25 (3 of 4 in v1.2) -- Hero Redesign
-Plan: 0 of 1 in current phase
-Status: Ready to execute
-Last activity: 2026-04-19 -- Phase 25 planned (UI-SPEC approved 5 PASS / 1 FLAG, plan-checker PASS, calibration on Accent Pink lockout endorsed as non-regression delta = 9)
+Phase: 26 (4 of 4 in v1.2) -- Homepage Wiring (next)
+Plan: 0 of TBD in next phase
+Status: Phase 25 complete; Phase 26 awaits planning
+Last activity: 2026-04-18 -- Phase 25 plan 01 executed in ~4 min: HERO-01 + HERO-02 shipped LIVE on both /fr and /en homepages (ambiance-00 @ opacity-75 background, 3-CTA row with Pink Ghost newsletter button, #newsletter-stub anchor, 2 new i18n keys, fr/en parity preserved). Astro check 11/11 baseline preserved (no NEW errors), build green (156 pages). Accent Pink lockout non-regression: non-hero count holds at 9, in-hero rises 2 → 4 (Ghost CTA overlays).
 
-Progress: [██████░░░░] 60% (5/5 plans scheduled so far in v1.2 complete — 2 in Phase 23, 3 in Phase 24; Phases 25 + 26 not yet planned)
+Progress: [███████░░░] 75% (6/8 plans complete in v1.2: 2 in Phase 23, 3 in Phase 24, 1 in Phase 25; Phase 26 not yet planned)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 5 (v1.2)
+- Total plans completed: 6 (v1.2)
 - Average duration: ~6 min
-- Total execution time: ~0.55 hours
+- Total execution time: ~0.62 hours
 
 **By Phase:**
 
@@ -46,6 +46,7 @@ Progress: [██████░░░░] 60% (5/5 plans scheduled so far in v1
 |-------|-------|-------|----------|
 | 23 | 2/2 | ~19 min | ~10 min |
 | 24 | 3/3 | ~14 min | ~5 min |
+| 25 | 1/1 | ~4 min | ~4 min |
 
 ## Accumulated Context
 
@@ -76,6 +77,14 @@ Progress: [██████░░░░] 60% (5/5 plans scheduled so far in v1
 - [24-03]: h2 uses font-semibold + tracking-tight (NOT font-bold + uppercase + tracking-wider) — one notch lighter than the Sponsors strip h2 per UI-SPEC §Typography.
 - [24-03]: Logo sits on bare background (no bg-card plate) per UI-SPEC §Discretion Resolutions. Default id="edition-2023" preserves existing /#edition-2023 deep-link resolution.
 - [24-03]: Component NOT mounted to any page in Phase 24 — Phase 26 owns the homepage swap + PastEditionMinimal.astro deletion.
+- [25-01]: Background opacity locked to single `<img>` @ `opacity-75` (no overlay div); contrast math passes AA over the existing vertical wash + radial gradient + GeoBackground scaffolding.
+- [25-01]: Mail icon hand-inlined as `<svg>` child of the anchor (lucide "mail" geometry, MIT) — NO `lucide-react` import added (mirrors Phase 23/24 site-wide convention; package.json unchanged).
+- [25-01]: Newsletter placeholder anchor = `href="#newsletter-stub"` paired with sibling `<div id="newsletter-stub" class="sr-only" aria-hidden="true">` inside the hero section; same-page scroll within hero fold = no visual jump; CLO-6 swap-ready by changing href + deleting stub.
+- [25-01]: Ghost CTA focus ring overrides default `ring-ring/50` to `ring-accent/50` — identity match (Pink button, Pink ring); override scoped to single CTA via cn() class concat.
+- [25-01]: Mobile button widths kept intrinsic (no `w-full`) — UI-SPEC §Discretion Resolutions rejects `w-full` because it pushes Countdown out of the 80vh fold on small phones.
+- [25-01]: EN copy "Stay in the loop" chosen over alternatives — idiomatic EN matching the casual register of "Get Your Ticket" / "View Schedule".
+- [25-01]: ambiance-10.jpg KEPT on disk and in `src/lib/editions-data.ts` (still consumed by PastEditionSection / Edition2026Combined per UI-SPEC §Data Module & Asset Changes).
+- [25-01]: Hero ships LIVE with this commit chain (component already mounted on both /fr and /en homepages pre-edit; unlike Phase 23/24 deferred-mount components).
 
 ### Pending Todos
 
@@ -83,12 +92,12 @@ Progress: [██████░░░░] 60% (5/5 plans scheduled so far in v1
 
 ### Blockers/Concerns
 
-- Hero background image: user must provide the replacement image (blocks Phase 25)
+- Hero background image: RESOLVED — user-provided ambiance-00.jpg shipped in 25-01 (4.4 MB, opacity-75)
 - 2026 replays playlist URL: CONFIRMED & wired in `EDITION_2026.replaysUrl` as of 23-01 (ED26-02 data layer satisfied; visible CTA ships in 23-02)
-- Newsletter anchor behavior: scroll-to-stub vs aria-disabled -- decide during Phase 25 planning
+- Newsletter anchor behavior: RESOLVED — chose same-page anchor (`href="#newsletter-stub"` + in-hero sentinel `<div>`) per UI-SPEC §Discretion Resolutions; CLO-6 backend swap is a single-commit href change
 
 ## Session Continuity
 
-Last session: 2026-04-18T17:30:00.000Z
-Stopped at: Phase 24 complete (all 3 plans shipped: 24-01 foundation, 24-02 SponsorsPlatinumStrip, 24-03 Edition2023Link). Astro check baseline unchanged (11 pre-existing errors), build green (156 pages). Phase 24 component layer is 100% done; mounting + PastEditionMinimal cleanup deferred to Phase 26 per CONTEXT D-01. Next: plan Phase 25 (Hero Redesign) — blocked on user-provided replacement background image.
-Resume file: .planning/phases/24-sponsors-platinum-edition-2023/24-03-SUMMARY.md
+Last session: 2026-04-18T23:00:30.000Z
+Stopped at: Phase 25 complete (1 plan, 2 tasks shipped: 25-01 hero redesign live with ambiance-00 @ opacity-75 + 3-CTA row + Pink Ghost newsletter button + 2 i18n keys). Astro check baseline unchanged (11 pre-existing errors, no NEW), build green (156 pages). HERO-01 + HERO-02 satisfied; hero ships LIVE on both /fr and /en homepages (component was already mounted pre-edit). Accent Pink lockout non-regression: non-hero count holds at 9. Next: plan Phase 26 (Homepage Wiring — section reordering + PastEditionMinimal cleanup + WCAG AA contrast verification + favicon).
+Resume file: .planning/phases/25-hero-redesign/25-01-SUMMARY.md

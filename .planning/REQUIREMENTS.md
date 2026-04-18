@@ -9,8 +9,8 @@ Requirements for Homepage Restructuring milestone. Each maps to roadmap phases.
 
 ### Hero
 
-- [ ] **HERO-01**: Hero section displays user-provided background image at ~75% opacity (replacing ambiance-10.jpg)
-- [ ] **HERO-02**: Hero section shows 3 CTAs: "Réservez votre place" (Primary Blue filled), "Voir le programme" (Blue outline), "Restez informé" (Accent Pink ghost, mail icon)
+- [x] **HERO-01**: Hero section displays user-provided background image at ~75% opacity (replacing ambiance-10.jpg)
+- [x] **HERO-02**: Hero section shows 3 CTAs: "Réservez votre place" (Primary Blue filled), "Voir le programme" (Blue outline), "Restez informé" (Accent Pink ghost, mail icon)
 
 ### Edition 2026
 
@@ -59,8 +59,8 @@ Deferred to future milestones.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HERO-01 | Phase 25 | Pending |
-| HERO-02 | Phase 25 | Pending |
+| HERO-01 | Phase 25 | Complete (live; 25-01 shipped 2026-04-18) |
+| HERO-02 | Phase 25 | Complete (live; 25-01 shipped 2026-04-18) |
 | ED26-01 | Phase 23 | Pending |
 | ED26-02 | Phase 23 | Pending |
 | ED26-03 | Phase 23 | Pending |
@@ -76,4 +76,4 @@ Deferred to future milestones.
 
 ---
 *Requirements defined: 2026-04-18*
-*Last updated: 2026-04-18 after roadmap creation*
+*Last updated: 2026-04-18 — HERO-01 + HERO-02 marked complete after 25-01 ship*

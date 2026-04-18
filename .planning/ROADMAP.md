@@ -28,7 +28,7 @@ See [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full phase deta
 
 - [x] **Phase 23: Edition 2026 Combined Section** - New component merging photos, film, replays link, PDF link, and testimonials into one section [completed 2026-04-18]
 - [x] **Phase 24: Sponsors Platinum & Edition 2023** - Platinum sponsor logo strip and simplified 2023 mini-bloc [plans complete 2026-04-18; awaiting Phase 26 homepage mount]
-- [ ] **Phase 25: Hero Redesign** - New background image, adjusted opacity, and 3-CTA layout
+- [x] **Phase 25: Hero Redesign** - New background image, adjusted opacity, and 3-CTA layout [completed 2026-04-18; ships LIVE on both homepages]
 - [ ] **Phase 26: Homepage Wiring** - Atomic section reorder across both locale homepages with accessibility check
 
 ## Phase Details
@@ -74,7 +74,7 @@ See [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full phase deta
 **Plans**: 1 plan
 
 Plans:
-- [ ] 25-01-PLAN.md — Hero redesign in place: ambiance-00.jpg @ opacity-75 background swap (HERO-01) + 3-CTA row (Register filled / Schedule outline / Newsletter ghost+mail-SVG @ #newsletter-stub anchor) + 2 new hero.cta.newsletter* i18n keys in fr+en (HERO-02)
+- [x] 25-01-PLAN.md — Hero redesign in place: ambiance-00.jpg @ opacity-75 background swap (HERO-01) + 3-CTA row (Register filled / Schedule outline / Newsletter ghost+mail-SVG @ #newsletter-stub anchor) + 2 new hero.cta.newsletter* i18n keys in fr+en (HERO-02) [completed 2026-04-18]
 **UI hint**: yes
 
 ### Phase 26: Homepage Wiring
@@ -99,5 +99,5 @@ Phases execute in numeric order: 23 → 24 → 25 → 26
 |-------|-----------|----------------|--------|-----------|
 | 23. Edition 2026 Combined Section | v1.2 | 2/2 | Complete | 2026-04-18 |
 | 24. Sponsors Platinum & Edition 2023 | v1.2 | 3/3 | Complete (components) | 2026-04-18 |
-| 25. Hero Redesign | v1.2 | 0/1 | Planned | - |
+| 25. Hero Redesign | v1.2 | 1/1 | Complete (live) | 2026-04-18 |
 | 26. Homepage Wiring | v1.2 | 0/? | Not started | - |
