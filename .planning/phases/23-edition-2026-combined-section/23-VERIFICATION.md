@@ -1,15 +1,19 @@
 ---
 phase: 23-edition-2026-combined-section
 verified: 2026-04-18T13:25:00Z
-status: human_needed
-score: 4/4 must-haves verified (component-level); 0/2 mounted-on-homepage truths (deferred to Phase 26)
+human_verified: 2026-04-18T13:55:00Z
+status: passed
+score: 4/4 must-haves verified (component-level); 0/2 mounted-on-homepage truths (deferred to Phase 26 by design); human visual UAT confirmed
 overrides_applied: 0
 re_verification:
-  previous_status: none
-  previous_score: n/a
-  gaps_closed: []
+  previous_status: human_needed
+  previous_score: 4/4 component-level
+  gaps_closed: ["visual UAT — user reviewed rendered output on dev server"]
   gaps_remaining: []
-  regressions: []
+  regressions:
+    - found: "PastEditionSection.astro mosaic wrapped photo 3 to a new row with empty space at md+ viewports after EDITION_2026.thumbnails was trimmed from 4 to 3 entries (sizes [hero, medium, medium] → 6+4+4=14 cols)"
+      fixed_in: "8f77bef (PastEditionSection cellClass rebalance) + c785d0d (video max-w-4xl)"
+      also_applied: "3b2e8ca (Edition2026Combined.astro received the same rebalance to stay consistent for Phase 26)"
 deferred:
   - truth: "Visitor sees the combined section live on the homepage at / and /en"
     addressed_in: "Phase 26"

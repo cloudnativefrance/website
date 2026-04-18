@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Homepage Restructuring
-status: in progress
-stopped_at: Phase 23 plans complete (data + i18n + component shipped); awaiting code review and verification
-last_updated: "2026-04-18T10:45:00.000Z"
-last_activity: 2026-04-18 -- Phase 23 plan 02 complete (Edition2026Combined.astro shipped)
+status: phase complete
+stopped_at: Phase 23 fully verified (visual UAT confirmed by user; mosaic regression on PastEditionSection fixed); ready for Phase 24
+last_updated: "2026-04-18T13:55:00.000Z"
+last_activity: 2026-04-18 -- Phase 23 verified + homepage mosaic regression fixed
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
   completed_plans: 2
-  percent: 100
+  percent: 25
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register -- all within 5 seconds of landing.
-**Current focus:** Phase 23 - Edition 2026 Combined Section (execution complete; next: code review + verification)
+**Current focus:** Phase 24 - Sponsors Platinum & Edition 2023 (Phase 23 closed; ready to plan Phase 24)
 
 ## Current Position
 
-Phase: 23 (1 of 4 in v1.2) -- Edition 2026 Combined Section
-Plan: 2 of 2 in current phase (23-01 + 23-02 complete; awaiting code review and verification)
-Status: Execution complete
-Last activity: 2026-04-18 -- Phase 23 plan 02 complete (Edition2026Combined.astro 184-line pure-SSR component shipped)
+Phase: 24 (2 of 4 in v1.2) -- Sponsors Platinum & Edition 2023 (not yet started)
+Plan: 0 of ? (phase not yet planned)
+Status: Ready to plan
+Last activity: 2026-04-18 -- Phase 23 verified + PastEditionSection mosaic regression fixed (commits 3b2e8ca, 8f77bef, c785d0d)
 
-Progress: [██████████] 100% (within Phase 23: 2/2 plans)
+Progress: [██░░░░░░░░] 25% (1/4 phases in v1.2 complete)
 
 ## Performance Metrics
 
@@ -62,6 +62,8 @@ Progress: [██████████] 100% (within Phase 23: 2/2 plans)
 - [23-02]: Both external CTAs (replays + PDF) carry `target="_blank" rel="noopener noreferrer"` per D-11 (reverse-tabnabbing + Referer leak mitigation).
 - [23-02]: Testimonials sub-block rendered with `<h3>` (not a second `<h2>`) to preserve single-h2-per-section heading hierarchy (Pitfall #8).
 - [23-02]: Component NOT mounted to any page in Phase 23 — Phase 26 owns the homepage swap (CONTEXT D-01).
+- [23-fix]: Mosaic layout pattern adopted across PastEditionSection.astro AND Edition2026Combined.astro: hero col-span-12 / md:col-span-8 + md:row-span-2; medium+small col-span-6 / md:col-span-4 + md:row-span-1. Produces "1 large left + 2 stacked right" on desktop, robust against [hero, medium, medium] data shapes (was 6+4+4=14 wrap regression).
+- [23-fix]: Featured-video max-width unified to max-w-4xl across both PastEditionSection and Edition2026Combined for visual balance with the wider hero photo.
 
 ### Pending Todos
 

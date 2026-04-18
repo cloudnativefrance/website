@@ -26,7 +26,7 @@ See [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full phase deta
 
 **Milestone Goal:** Restructure the homepage layout per validated Stitch mockup -- merge 2026 film+testimonials, add newsletter CTA, add sponsors platinum section, simplify 2023 bloc.
 
-- [ ] **Phase 23: Edition 2026 Combined Section** - New component merging photos, film, replays link, PDF link, and testimonials into one section
+- [x] **Phase 23: Edition 2026 Combined Section** - New component merging photos, film, replays link, PDF link, and testimonials into one section [completed 2026-04-18]
 - [ ] **Phase 24: Sponsors Platinum & Edition 2023** - Platinum sponsor logo strip and simplified 2023 mini-bloc
 - [ ] **Phase 25: Hero Redesign** - New background image, adjusted opacity, and 3-CTA layout
 - [ ] **Phase 26: Homepage Wiring** - Atomic section reorder across both locale homepages with accessibility check
