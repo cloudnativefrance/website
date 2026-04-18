@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Homepage Restructuring
 status: in progress
-stopped_at: Phase 23 plan 01 complete (data + i18n foundation shipped)
-last_updated: "2026-04-18T08:33:22.000Z"
-last_activity: 2026-04-18 -- Phase 23 plan 01 complete
+stopped_at: Phase 23 plans complete (data + i18n + component shipped); awaiting code review and verification
+last_updated: "2026-04-18T10:45:00.000Z"
+last_activity: 2026-04-18 -- Phase 23 plan 02 complete (Edition2026Combined.astro shipped)
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 2
-  completed_plans: 1
-  percent: 50
+  completed_plans: 2
+  percent: 100
 ---
 
 # Project State
@@ -21,30 +21,30 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register -- all within 5 seconds of landing.
-**Current focus:** Phase 23 - Edition 2026 Combined Section
+**Current focus:** Phase 23 - Edition 2026 Combined Section (execution complete; next: code review + verification)
 
 ## Current Position
 
 Phase: 23 (1 of 4 in v1.2) -- Edition 2026 Combined Section
-Plan: 1 of 2 in current phase (23-01 complete; next: 23-02 component)
-Status: In progress
-Last activity: 2026-04-18 -- Phase 23 plan 01 complete (data + i18n foundation shipped)
+Plan: 2 of 2 in current phase (23-01 + 23-02 complete; awaiting code review and verification)
+Status: Execution complete
+Last activity: 2026-04-18 -- Phase 23 plan 02 complete (Edition2026Combined.astro 184-line pure-SSR component shipped)
 
-Progress: [█████░░░░░] 50% (within Phase 23: 1/2 plans)
+Progress: [██████████] 100% (within Phase 23: 2/2 plans)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 1 (v1.2)
-- Average duration: ~7 min
-- Total execution time: ~0.12 hours
+- Total plans completed: 2 (v1.2)
+- Average duration: ~10 min
+- Total execution time: ~0.32 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 23 | 1/2 | ~7 min | ~7 min |
+| 23 | 2/2 | ~19 min | ~10 min |
 
 ## Accumulated Context
 
@@ -58,6 +58,10 @@ Progress: [█████░░░░░] 50% (within Phase 23: 1/2 plans)
 - [23-01]: Used the clean `playlist?list=…` URL form for `EDITION_2026.replaysUrl` (vs. `watch?v=…&list=…`).
 - [23-01]: `editions.2026.thumbnail_alt.4` left in both locales as orphan (clean-up deferred per UI-SPEC §Accessibility checklist).
 - [23-01]: `EDITION_2026.stats` array preserved despite UI-SPEC dropping the stats row (data kept for future consumers; cleanup deferred to v1.3).
+- [23-02]: YouTube aftermovie embed uses `youtube-nocookie.com/embed` per D-12 (privacy-respecting, no tracking cookies until play).
+- [23-02]: Both external CTAs (replays + PDF) carry `target="_blank" rel="noopener noreferrer"` per D-11 (reverse-tabnabbing + Referer leak mitigation).
+- [23-02]: Testimonials sub-block rendered with `<h3>` (not a second `<h2>`) to preserve single-h2-per-section heading hierarchy (Pitfall #8).
+- [23-02]: Component NOT mounted to any page in Phase 23 — Phase 26 owns the homepage swap (CONTEXT D-01).
 
 ### Pending Todos
 
@@ -71,6 +75,6 @@ Progress: [█████░░░░░] 50% (within Phase 23: 1/2 plans)
 
 ## Session Continuity
 
-Last session: 2026-04-18T08:33:22.000Z
-Stopped at: Phase 23 plan 01 complete (data + i18n foundation shipped); next plan 23-02 (Edition2026Combined.astro component)
-Resume file: .planning/phases/23-edition-2026-combined-section/23-02-component-PLAN.md
+Last session: 2026-04-18T10:45:00.000Z
+Stopped at: Phase 23 execution complete (both plans shipped); next: code review + phase verification, then advance to Phase 24
+Resume file: .planning/phases/23-edition-2026-combined-section/23-02-SUMMARY.md

@@ -44,7 +44,7 @@ See [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full phase deta
   4. Testimonial cards render within the same section (replacing the old separate TestimonialsStrip)
 **Plans**: 2 plans
   - [x] 23-01-data-and-i18n-PLAN.md — Mutate EDITION_2026 (3 thumbnails, replaysUrl, pdfUrl; drop ambiance-08) and add 4 new editions.2026.* i18n keys to fr+en (D-04..D-08) [completed 2026-04-18]
-  - [ ] 23-02-component-PLAN.md — Create src/components/past-editions/Edition2026Combined.astro with 6-block anatomy (rail, h2, mosaic, video, CTA row, testimonials) per UI-SPEC (D-01..D-03, D-11..D-14)
+  - [x] 23-02-component-PLAN.md — Create src/components/past-editions/Edition2026Combined.astro with 6-block anatomy (rail, h2, mosaic, video, CTA row, testimonials) per UI-SPEC (D-01..D-03, D-11..D-14) [completed 2026-04-18]
 **UI hint**: yes
 
 ### Phase 24: Sponsors Platinum & Edition 2023
