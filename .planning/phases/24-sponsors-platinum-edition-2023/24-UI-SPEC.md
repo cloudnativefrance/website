@@ -1,10 +1,12 @@
 ---
 phase: 24
 slug: sponsors-platinum-edition-2023
-status: draft
+status: approved
 shadcn_initialized: true
 preset: base-nova (neutral baseColor, custom oklch DS in src/styles/global.css)
 created: 2026-04-18
+reviewed_at: 2026-04-18
+checker_verdict: APPROVED (1 non-blocking FLAG on Dimension 4 — 3 weights vs 2-weight ceiling, mirrors Phase 23 precedent)
 ---
 
 # Phase 24 — UI Design Contract
@@ -116,7 +118,7 @@ Both components have no async data and no error/destructive interactions — all
 | Element | i18n key | FR copy | EN copy |
 |---------|----------|---------|---------|
 | Section heading h2 | `sponsors.homepage.heading` (**NEW** — D-01) | "Nos partenaires Platinum" | "Our Platinum sponsors" |
-| CTA label | `sponsors.homepage.cta` (**NEW** — D-02) | "Voir tous les sponsors →" *(arrow rendered as separate `<span aria-hidden="true">`, label string ends without arrow)* | "View all sponsors →" |
+| CTA label | `sponsors.homepage.cta` (**NEW** — D-02) | "Voir tous les sponsors" *(NO arrow in i18n value; arrow rendered as decorative `<span aria-hidden="true">→</span>` in template per Pattern B)* | "View all sponsors" *(same — no arrow in i18n value)* |
 | CTA href | n/a | `/sponsors` | `/en/sponsors` |
 | Sponsor card aria-label (per logo) | `sponsors.card.aria` (existing — reuse) | "Visiter le site de {name} (nouvelle fenêtre)" | "Visit {name}'s website (opens in a new window)" |
 | Sponsor name fallback (when logo missing) | rendered from CSV `name` column | (sponsor name verbatim) | (sponsor name verbatim) |
@@ -415,7 +417,7 @@ The items below are NON-DEFAULT design choices flagged by the orchestrator in th
 | Key | Status | FR | EN |
 |-----|--------|----|----|
 | `sponsors.homepage.heading` | **NEW (D-01)** | "Nos partenaires Platinum" | "Our Platinum sponsors" |
-| `sponsors.homepage.cta` | **NEW (D-02)** | "Voir tous les sponsors →" *(arrow rendered as separate `<span aria-hidden="true">`; the literal `→` glyph at the end of the string is the visible arrow — see note below)* | "View all sponsors →" |
+| `sponsors.homepage.cta` | **NEW (D-02)** | "Voir tous les sponsors" *(NO trailing arrow in the value — Pattern B is final; arrow rendered as decorative `<span aria-hidden="true">→</span>` in template only)* | "View all sponsors" *(same — no trailing arrow)* |
 | `sponsors.card.aria` | EXISTING (reuse) | "Visiter le site de {name} (nouvelle fenêtre)" | "Visit {name}'s website (opens in a new window)" |
 | `editions.2023.compact_title` | EXISTING (reuse) | "Édition 2023 (Kubernetes Community Days France)" | "2023 Edition (Kubernetes Community Days France)" |
 | `editions.2023.view_page_cta` | EXISTING (reuse) | "Voir l'édition 2023 →" | "View the 2023 edition →" |
@@ -457,11 +459,11 @@ Phase 24 SHOULD adopt Pattern B for the new `sponsors.homepage.cta` key (i.e. tr
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS / FLAG / FAIL
-- [ ] Dimension 2 Visuals: PASS / FLAG / FAIL
-- [ ] Dimension 3 Color: PASS / FLAG / FAIL
-- [ ] Dimension 4 Typography: PASS / FLAG / FAIL
-- [ ] Dimension 5 Spacing: PASS / FLAG / FAIL
-- [ ] Dimension 6 Registry Safety: PASS / FLAG / FAIL
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: FLAG — 3 weights (400/600/700) vs 2-weight strict ceiling. Non-blocking: identical to Phase 23's same-FLAG (locked carry-over from `PastEditionSection.astro` line 83 to preserve site-wide rhythm). Recommendation: future v1.3 housekeeping pass should add a project-level UI-SPEC note declaring "site-wide accepted weights: 400, 600, 700".
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending (awaiting `gsd-ui-checker` review)
+**Approval:** APPROVED 2026-04-18 (1 non-blocking FLAG, see Dimension 4)
