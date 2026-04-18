@@ -30,6 +30,10 @@ Requirements for Homepage Restructuring milestone. Each maps to roadmap phases.
 
 - [ ] **LAYO-01**: Homepage sections follow order: Hero → Key Numbers → Édition 2026 → Mini-bloc 2023 → CFP → Sponsors Platinum
 
+### Branding
+
+- [ ] **BRND-01**: Favicon displays the French flag instead of current icon
+
 ## v2 Requirements
 
 Deferred to future milestones.
@@ -55,20 +59,21 @@ Deferred to future milestones.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HERO-01 | — | Pending |
-| HERO-02 | — | Pending |
-| ED26-01 | — | Pending |
-| ED26-02 | — | Pending |
-| ED26-03 | — | Pending |
-| ED23-01 | — | Pending |
-| SPON-01 | — | Pending |
-| LAYO-01 | — | Pending |
+| HERO-01 | Phase 25 | Pending |
+| HERO-02 | Phase 25 | Pending |
+| ED26-01 | Phase 23 | Pending |
+| ED26-02 | Phase 23 | Pending |
+| ED26-03 | Phase 23 | Pending |
+| ED23-01 | Phase 24 | Pending |
+| SPON-01 | Phase 24 | Pending |
+| LAYO-01 | Phase 26 | Pending |
+| BRND-01 | Phase 26 | Pending |
 
 **Coverage:**
-- v1.2 requirements: 8 total
-- Mapped to phases: 0
-- Unmapped: 8 ⚠️
+- v1.2 requirements: 9 total
+- Mapped to phases: 9
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-18*
-*Last updated: 2026-04-18 after initial definition*
+*Last updated: 2026-04-18 after roadmap creation*
