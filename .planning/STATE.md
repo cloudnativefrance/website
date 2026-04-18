@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Homepage Restructuring
-status: phase complete
-stopped_at: Phase 23 fully verified (visual UAT confirmed by user; mosaic regression on PastEditionSection fixed); ready for Phase 24
-last_updated: "2026-04-18T13:55:00.000Z"
-last_activity: 2026-04-18 -- Phase 23 verified + homepage mosaic regression fixed
+status: ready to execute
+stopped_at: Phase 24 planned (3 plans in 2 waves; plan-checker verdict PASS)
+last_updated: "2026-04-18T19:05:00.000Z"
+last_activity: 2026-04-18 -- Phase 24 plans created and verified
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 2
+  total_plans: 5
   completed_plans: 2
   percent: 25
 ---
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register -- all within 5 seconds of landing.
-**Current focus:** Phase 24 - Sponsors Platinum & Edition 2023 (Phase 23 closed; ready to plan Phase 24)
+**Current focus:** Phase 24 - Sponsors Platinum & Edition 2023 (planned, ready to execute)
 
 ## Current Position
 
-Phase: 24 (2 of 4 in v1.2) -- Sponsors Platinum & Edition 2023 (not yet started)
-Plan: 0 of ? (phase not yet planned)
-Status: Ready to plan
-Last activity: 2026-04-18 -- Phase 23 verified + PastEditionSection mosaic regression fixed (commits 3b2e8ca, 8f77bef, c785d0d)
+Phase: 24 (2 of 4 in v1.2) -- Sponsors Platinum & Edition 2023
+Plan: 0 of 3 in current phase
+Status: Ready to execute
+Last activity: 2026-04-18 -- Phase 24 planned (24-01 foundation, 24-02 SponsorsPlatinumStrip, 24-03 Edition2023Link); plan-checker verdict PASS
 
 Progress: [██░░░░░░░░] 25% (1/4 phases in v1.2 complete)
 
