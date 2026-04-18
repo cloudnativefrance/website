@@ -44,11 +44,17 @@ const {
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-/** Tailwind col-span map for mosaic sizes (D-04 Phase 15). */
-const colSpan = {
-  hero: "col-span-12 md:col-span-6",
-  medium: "col-span-6 md:col-span-4",
-  small: "col-span-6 md:col-span-3",
+/**
+ * Tailwind grid classes for mosaic sizes.
+ * Hero spans the left 2/3 + both rows; medium/small fill one cell on the right.
+ * This produces "1 large left + 2 stacked right" on desktop for [hero, medium, medium] data,
+ * matching Edition2026Combined.astro and avoiding the 6+4+4=14 wrap regression introduced
+ * when EDITION_2026.thumbnails was trimmed from 4 to 3 entries in Phase 23.
+ */
+const cellClass = {
+  hero: "col-span-12 md:col-span-8 md:row-span-2",
+  medium: "col-span-6 md:col-span-4 md:row-span-1",
+  small: "col-span-6 md:col-span-4 md:row-span-1",
 } as const;
 ---
 <section id={id} class="relative max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
@@ -98,7 +104,7 @@ const colSpan = {
   {photos && photos.length > 0 && (
     <div class="mt-12 grid grid-cols-12 gap-3 md:gap-4 [grid-auto-rows:12rem] md:[grid-auto-rows:14rem]">
       {photos.map((p) => (
-        <figure class={`${colSpan[p.size ?? "small"]} row-span-1 overflow-hidden rounded-md bg-card border border-border`}>
+        <figure class={`${cellClass[p.size ?? "medium"]} overflow-hidden rounded-md bg-card border border-border`}>
           <Image
             src={p.src}
             alt={p.alt}
