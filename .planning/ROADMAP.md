@@ -71,7 +71,10 @@ See [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full phase deta
   2. Hero shows 3 CTAs in a row: "Reservez votre place" (Primary Blue filled), "Voir le programme" (Blue outline), "Restez informe" (Accent Pink ghost with mail icon)
   3. The "Restez informe" CTA functions as a placeholder anchor (no backend integration required)
   4. CTA row is responsive and stacks gracefully on mobile viewports
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 25-01-PLAN.md — Hero redesign in place: ambiance-00.jpg @ opacity-75 background swap (HERO-01) + 3-CTA row (Register filled / Schedule outline / Newsletter ghost+mail-SVG @ #newsletter-stub anchor) + 2 new hero.cta.newsletter* i18n keys in fr+en (HERO-02)
 **UI hint**: yes
 
 ### Phase 26: Homepage Wiring
@@ -96,5 +99,5 @@ Phases execute in numeric order: 23 → 24 → 25 → 26
 |-------|-----------|----------------|--------|-----------|
 | 23. Edition 2026 Combined Section | v1.2 | 2/2 | Complete | 2026-04-18 |
 | 24. Sponsors Platinum & Edition 2023 | v1.2 | 3/3 | Complete (components) | 2026-04-18 |
-| 25. Hero Redesign | v1.2 | 0/? | Not started | - |
+| 25. Hero Redesign | v1.2 | 0/1 | Planned | - |
 | 26. Homepage Wiring | v1.2 | 0/? | Not started | - |
