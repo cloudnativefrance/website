@@ -1,0 +1,120 @@
+---
+/**
+ * Homepage Platinum sponsors strip (Phase 24 — SPON-01).
+ *
+ * Renders all Platinum-tier sponsor logos in a responsive grid (2/3/4 cols)
+ * plus a centred CTA to the dedicated /sponsors page.
+ *
+ * Data is supplied by the caller (Phase 26 homepage) via getCollection("sponsors")
+ * filtered on tier === "platinum" — see UI-SPEC §Props Interface for the
+ * canonical caller snippet. CSVs are the single source of truth (CLAUDE.md).
+ *
+ * Security: sponsor URL + logo path pass through the shared allowlist helpers
+ * in @/lib/sponsor-utils (T-05-02 + T-05-03 mitigations — same gates used by
+ * SponsorCard.astro on the /sponsors page).
+ *
+ * Empty-state: if the sponsors array is empty, the entire <section> is omitted
+ * from the DOM (belt-and-braces against PITFALLS #3). Caller SHOULD also guard
+ * with `{platinumSponsors.length > 0 && ...}` — the redundant guard is on purpose.
+ *
+ * Not mounted in Phase 24 — Phase 26 owns the homepage swap.
+ */
+import type { CollectionEntry } from "astro:content";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { safeUrl, safeLogoPath } from "@/lib/sponsor-utils";
+
+export interface Props {
+  /** Anchor id for deep-linking. Recommended: "sponsors-homepage". */
+  id?: string;
+  /** Platinum-tier sponsors (already filtered by caller from getCollection("sponsors")). */
+  sponsors: ReadonlyArray<CollectionEntry<"sponsors">>;
+  /** Active locale — drives CTA href ("/sponsors" vs "/en/sponsors"). */
+  lang: Locale;
+}
+
+const { id = "sponsors-homepage", sponsors, lang } = Astro.props;
+const t = useTranslations(lang);
+
+const heading = t("sponsors.homepage.heading");
+const ctaLabel = t("sponsors.homepage.cta");
+const ctaHref = lang === "en" ? "/en/sponsors" : "/sponsors";
+
+// Shared card chrome — mirrors SponsorCard.astro's interaction classes with two
+// deliberate homepage-only tweaks:
+//   - Lighter padding (p-6 md:p-7 vs /sponsors' p-8) — UI-SPEC §Spacing Scale D-05.
+//   - min-h-[112px] ensures consistent card height when a sponsor has no logo
+//     (fallback span) alongside cards that DO render an image — prevents grid jaggedness.
+const cardClasses =
+  "bg-card border border-border rounded-md p-6 md:p-7 flex items-center justify-center min-h-[112px] transition-all duration-200 motion-safe:hover:-translate-y-0.5 hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+---
+
+{sponsors.length > 0 && (
+  <section
+    id={id}
+    class="relative max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24"
+  >
+    {/* 1. Heading h2 (centred, single h2 per section — Pitfall 8) */}
+    <h2 class="text-2xl md:text-3xl font-bold tracking-wider uppercase text-foreground text-center">
+      {heading}
+    </h2>
+
+    {/* 2. Logo grid — 2 cols mobile / 3 cols sm / 4 cols lg */}
+    <ul class="mt-12 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 max-w-5xl mx-auto list-none p-0">
+      {sponsors.map((s) => {
+        const safeHref = safeUrl(s.data.url);
+        const logoSrc = safeLogoPath(s.data.logo);
+        const ariaLabel = t("sponsors.card.aria").replace("{name}", s.data.name);
+        return (
+          <li>
+            {safeHref ? (
+              <a
+                href={safeHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={ariaLabel}
+                class={cardClasses}
+              >
+                {logoSrc ? (
+                  <img
+                    src={logoSrc}
+                    alt={s.data.name}
+                    class="max-w-[180px] max-h-16 object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <span class="text-sm text-muted-foreground text-center">{s.data.name}</span>
+                )}
+              </a>
+            ) : (
+              <div class={cardClasses}>
+                {logoSrc ? (
+                  <img
+                    src={logoSrc}
+                    alt={s.data.name}
+                    class="max-w-[180px] max-h-16 object-contain"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <span class="text-sm text-muted-foreground text-center">{s.data.name}</span>
+                )}
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+
+    {/* 3. CTA row — centred text link to /sponsors (or /en/sponsors), Pattern B arrow */}
+    <p class="mt-12 text-center">
+      <a
+        href={ctaHref}
+        class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+      >
+        {ctaLabel} <span aria-hidden="true">→</span>
+      </a>
+    </p>
+  </section>
+)}
