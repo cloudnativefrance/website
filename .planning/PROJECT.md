@@ -19,24 +19,27 @@ The conference website for Cloud Native Days France, a community-driven cloud-na
 
 A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register — all within 5 seconds of landing.
 
-## Current Milestone: v1.1 Past Editions Showcase
+## Current Milestone: v1.2 Homepage Restructuring
 
-**Goal:** Tell the "where we come from" story on the homepage with dedicated past-edition sections (2026, 2023) plus an animated testimonial strip.
+**Goal:** Restructure the homepage layout per validated Stitch mockup — merge 2026 film+testimonials, add newsletter CTA, add sponsors platinum section, simplify 2023 bloc.
 
 **Target features:**
-- Homepage "2026 edition" section — promoted out of venue tab (placeholder content kept; final 2026 recap content is deferred)
-- Homepage "2023 edition" section — new, with 10 KCD France 2023 photos, KCD 2023 logo, "Kubernetes Community Days France" branding note, Centre Georges Pompidou venue, short history blurb
-- Homepage animated testimonials — 3 temporary French quotes
-- Venue tab cleanup — remove the relocated 2026 recap block
+- Hero: swap background image (user provides) + increase opacity ~75% + add 3rd CTA "Restez informé" (Accent Pink ghost button, mail icon, newsletter placeholder anchor)
+- Section reorder: Hero → Key Numbers → Édition 2026 → Mini-bloc 2023 → CFP → Sponsors Platinum
+- Édition 2026 combined section: 3 photos + film + "Voir tous les replays →" + "Télécharger le bilan 2026 (PDF) →" (one-pager link) + testimonials cards
+- Mini-bloc 2023: reduce to logo + text link only (remove photos)
+- Sponsors Platinum: new homepage section showing Platinum tier logos + "Voir tous les sponsors →" link
 
 **Scope notes:**
-- Static content only — no CSV, no content collection for past editions (2027 upcoming edition continues to use CSV loaders as v1.0)
-- Stitch-first workflow mandatory — homepage mocks designed + approved before any code
-- Testimonials data stays inline/hardcoded until real quotes arrive
+- Stitch mockup "Homepage Mockup v2 — Restructured Sections" (Accent Pink CTA version) is the design reference
+- Newsletter backend (CLO-6) is out of scope — hero CTA is placeholder anchor for now
+- One-pager PDF: https://drive.google.com/file/d/1rlrY9EkulGSgeCPenyiN4ZnxWs5BXPBo/view
+- Linear issues: CLO-14, CLO-16, CLO-23, CLO-26, partial CLO-6
 
-**Deferred from v1.0 (not in this milestone):**
+**Deferred:**
 - P1: Subjective visual UATs for 7 phases (~18 tests)
 - P2: SPKR-01 fixture drift, Zod 13 `LoaderConstraint` errors, organizer content placeholders
+- Newsletter backend integration (CLO-6 full scope)
 
 ## Requirements
 
@@ -117,4 +120,4 @@ A first-time visitor should immediately understand what the event is, when and w
 | Single-locale schema with FR fallback | Avoids duplicating FR content when EN is missing | Validated in v1.0 |
 
 ---
-*Last updated: 2026-04-13 — v1.1 milestone initialized (Past Editions Showcase).*
+*Last updated: 2026-04-18 — v1.2 milestone initialized (Homepage Restructuring).*
