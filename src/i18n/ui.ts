@@ -33,6 +33,8 @@ export const ui = {
     "hero.description":
       "Cloud Native, DevOps et IA \u2014 entre praticiens. Une journee de talks techniques et de rencontres a Paris, par et pour les pros de la plateforme : zero pitch commercial, que du partage d'expertise.",
     "hero.logo_alt": "Cloud Native Days France",
+    "hero.cta.newsletter": "Restez informé",
+    "hero.cta.newsletter_aria": "Restez informé des annonces Cloud Native Days France",
     "countdown.days": "jours",
     "countdown.hours": "heures",
     "countdown.minutes": "minutes",
@@ -329,6 +331,8 @@ export const ui = {
     "hero.description":
       "Cloud Native, DevOps and AI \u2014 from practitioners, for practitioners. A day of technical talks and hallway track in Paris, built for platform engineers: zero sales pitch, just shared expertise.",
     "hero.logo_alt": "Cloud Native Days France",
+    "hero.cta.newsletter": "Stay in the loop",
+    "hero.cta.newsletter_aria": "Stay informed about Cloud Native Days France announcements",
     "countdown.days": "days",
     "countdown.hours": "hours",
     "countdown.minutes": "minutes",
