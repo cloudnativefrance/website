@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Homepage Restructuring
 status: in progress
-stopped_at: Phase 24 plan 24-01 (foundation) complete; next up 24-02 SponsorsPlatinumStrip in wave 2
-last_updated: "2026-04-18T17:13:28.000Z"
-last_activity: 2026-04-18 -- Phase 24 plan 01 (foundation) executed and committed
+stopped_at: Phase 24 plan 24-02 (SponsorsPlatinumStrip.astro) complete; next up 24-03 Edition2023Link.astro in wave 2
+last_updated: "2026-04-18T17:21:12.000Z"
+last_activity: 2026-04-18 -- Phase 24 plan 02 (SponsorsPlatinumStrip) executed and committed
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 5
-  completed_plans: 3
-  percent: 35
+  completed_plans: 4
+  percent: 47
 ---
 
 # Project State
@@ -26,26 +26,26 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 ## Current Position
 
 Phase: 24 (2 of 4 in v1.2) -- Sponsors Platinum & Edition 2023
-Plan: 1 of 3 in current phase (24-01 foundation shipped; 24-02 + 24-03 next in wave 2)
+Plan: 2 of 3 in current phase (24-01 foundation + 24-02 SponsorsPlatinumStrip shipped; 24-03 Edition2023Link.astro remaining in wave 2)
 Status: In progress
-Last activity: 2026-04-18 -- Phase 24 plan 01 executed: extracted safeUrl + safeLogoPath into src/lib/sponsor-utils.ts, refactored SponsorCard.astro, added sponsors.homepage.{heading,cta} keys in fr+en
+Last activity: 2026-04-18 -- Phase 24 plan 02 executed: created src/components/sponsors/SponsorsPlatinumStrip.astro (pure-SSR, data-agnostic, safeUrl+safeLogoPath imports, Pattern B arrow CTA, belt-and-braces empty-state guard); astro check baseline unchanged; build green
 
-Progress: [███░░░░░░░] 35% (3/5 plans in v1.2 complete — 2 in Phase 23, 1 in Phase 24)
+Progress: [████░░░░░░] 47% (4/5 plans in v1.2 complete — 2 in Phase 23, 2 in Phase 24)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 3 (v1.2)
-- Average duration: ~9 min
-- Total execution time: ~0.45 hours
+- Total plans completed: 4 (v1.2)
+- Average duration: ~7 min
+- Total execution time: ~0.50 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 23 | 2/2 | ~19 min | ~10 min |
-| 24 | 1/3 | ~8 min | ~8 min |
+| 24 | 2/3 | ~11 min | ~6 min |
 
 ## Accumulated Context
 
@@ -67,6 +67,10 @@ Progress: [███░░░░░░░] 35% (3/5 plans in v1.2 complete — 2
 - [23-fix]: Featured-video max-width unified to max-w-4xl across both PastEditionSection and Edition2026Combined for visual balance with the wider hero photo.
 - [24-01]: safeUrl + safeLogoPath extracted into src/lib/sponsor-utils.ts (named exports, no default); SponsorCard.astro imports from there; SocialLinks.astro keeps its own inline safeUrl copy by planner design (cross-component extraction deferred to v1.3 per Pitfall #12).
 - [24-01]: sponsors.homepage.cta uses Pattern B (no arrow in i18n value; template renders `<span aria-hidden="true">→</span>`) — keeps the arrow accessibility-correct and locale-agnostic; mirrors Phase 23 convention for `editions.2026.replays_cta`.
+- [24-02]: SponsorsPlatinumStrip.astro is data-agnostic — accepts pre-filtered `ReadonlyArray<CollectionEntry<"sponsors">>` as props; caller (Phase 26) owns `getCollection("sponsors")` + tier filter. Keeps the CSV-as-source-of-truth rule (CLAUDE.md) enforced at the page boundary, not inside reusable UI.
+- [24-02]: Belt-and-braces empty-state guard wraps the entire `<section>` (not just the `<ul>`). When sponsors.length === 0 the component emits ZERO DOM — caller also guards, redundancy is intentional (T-24-10 / PITFALLS #3).
+- [24-02]: No SponsorCard nesting — copied SponsorCard's interaction classes into a local `cardClasses` string. Rationale: homepage strip diverges from SponsorCard Platinum on 2 axes (max-w-[180px] max-h-16 vs [220px] max-h-20; p-6 md:p-7 vs p-8) — a shared component would force a new tier/prop, both of which scope-creep.
+- [24-02]: Component NOT mounted to any page in Phase 24 — Phase 26 owns the homepage swap (same CONTEXT discipline as Phase 23).
 
 ### Pending Todos
 
@@ -80,6 +84,6 @@ Progress: [███░░░░░░░] 35% (3/5 plans in v1.2 complete — 2
 
 ## Session Continuity
 
-Last session: 2026-04-18T17:13:28.000Z
-Stopped at: Phase 24 plan 01 (foundation) complete — sponsor-utils.ts + SponsorCard refactor + 2 new i18n keys shipped; next: 24-02 (SponsorsPlatinumStrip.astro) and 24-03 (Edition2023Link.astro) in wave 2
-Resume file: .planning/phases/24-sponsors-platinum-edition-2023/24-01-SUMMARY.md
+Last session: 2026-04-18T17:21:12.000Z
+Stopped at: Phase 24 plan 02 (SponsorsPlatinumStrip.astro) complete — new component file shipped, astro check baseline unchanged, build green; next: 24-03 (Edition2023Link.astro) — sibling wave-2 component, no shared module
+Resume file: .planning/phases/24-sponsors-platinum-edition-2023/24-02-SUMMARY.md

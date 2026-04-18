@@ -65,7 +65,7 @@ Deferred to future milestones.
 | ED26-02 | Phase 23 | Pending |
 | ED26-03 | Phase 23 | Pending |
 | ED23-01 | Phase 24 | Pending |
-| SPON-01 | Phase 24 | In progress (data + i18n + security-helper foundation shipped in 24-01; component consumption pending 24-02) |
+| SPON-01 | Phase 24 | In progress (foundation + component shipped in 24-01 + 24-02; awaiting Phase 26 homepage mount) |
 | LAYO-01 | Phase 26 | Pending |
 | BRND-01 | Phase 26 | Pending |
 
