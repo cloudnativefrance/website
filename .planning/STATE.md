@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Homepage Restructuring
-status: phase complete
-stopped_at: Phase 24 complete — all 3 plans shipped + UAT passed (4 tests pass, 1 optional skipped, 0 issues); next up Phase 25 (Hero Redesign) then Phase 26 (Homepage Wiring)
-last_updated: "2026-04-18T20:00:00.000Z"
-last_activity: 2026-04-18 -- Phase 24 UAT complete (4 passed, 1 skipped deferred to Phase 26, 0 issues)
+status: ready to execute
+stopped_at: Phase 25 planned (1 plan, 1 wave; UI-SPEC + plan-checker both PASS)
+last_updated: "2026-04-19T08:00:00.000Z"
+last_activity: 2026-04-19 -- Phase 25 UI-SPEC approved + plan created and verified
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 5
+  total_plans: 6
   completed_plans: 5
   percent: 60
 ---
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register -- all within 5 seconds of landing.
-**Current focus:** Phase 24 complete (components) — ready to plan Phase 25 (Hero Redesign)
+**Current focus:** Phase 25 - Hero Redesign (planned, ready to execute)
 
 ## Current Position
 
-Phase: 24 complete (components shipped; awaiting Phase 26 homepage mount). Next up: Phase 25 (Hero Redesign, 3 of 4 in v1.2).
-Plan: 3 of 3 in Phase 24 (24-01 foundation + 24-02 SponsorsPlatinumStrip + 24-03 Edition2023Link all shipped)
-Status: Phase 24 plans complete; Phase 25 not yet planned
-Last activity: 2026-04-18 -- Phase 24 plan 03 executed: created src/components/past-editions/Edition2023Link.astro (pure-SSR, fully prop-driven, Pattern A arrow — glyph in i18n value, same-tab /2023 CTA, h2 font-semibold + tracking-tight); astro check baseline unchanged; build green
+Phase: 25 (3 of 4 in v1.2) -- Hero Redesign
+Plan: 0 of 1 in current phase
+Status: Ready to execute
+Last activity: 2026-04-19 -- Phase 25 planned (UI-SPEC approved 5 PASS / 1 FLAG, plan-checker PASS, calibration on Accent Pink lockout endorsed as non-regression delta = 9)
 
 Progress: [██████░░░░] 60% (5/5 plans scheduled so far in v1.2 complete — 2 in Phase 23, 3 in Phase 24; Phases 25 + 26 not yet planned)
 
