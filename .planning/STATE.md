@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Homepage Restructuring
-status: in progress
-stopped_at: Phase 24 complete (all 3 plans shipped — foundation, SponsorsPlatinumStrip, Edition2023Link); next up Phase 25 (Hero Redesign) then Phase 26 (Homepage Wiring)
-last_updated: "2026-04-18T17:30:00.000Z"
-last_activity: 2026-04-18 -- Phase 24 plan 03 (Edition2023Link.astro) executed and committed — Phase 24 component layer is 100% done
+status: phase complete
+stopped_at: Phase 24 complete — all 3 plans shipped + UAT passed (4 tests pass, 1 optional skipped, 0 issues); next up Phase 25 (Hero Redesign) then Phase 26 (Homepage Wiring)
+last_updated: "2026-04-18T20:00:00.000Z"
+last_activity: 2026-04-18 -- Phase 24 UAT complete (4 passed, 1 skipped deferred to Phase 26, 0 issues)
 progress:
   total_phases: 4
   completed_phases: 2
