@@ -1,518 +1,190 @@
-# Pitfalls Research — v1.1 Past Editions Showcase
+# Domain Pitfalls
 
-**Domain:** Astro 6 content site — adding static past-edition sections + animated testimonials to an already-shipped homepage
-**Researched:** 2026-04-13
-**Confidence:** HIGH — grounded in repo inspection (actual file paths, line ranges, installed deps, existing conventions) and v1.1 architecture + stack research
-
-> Numbered "pitfalls" align to the phase map from `ARCHITECTURE.md` so each can be pinned to a single owning phase.
+**Domain:** Homepage restructuring on multi-locale Astro conference site (v1.2)
+**Researched:** 2026-04-15
 
 ---
 
 ## Critical Pitfalls
 
-### Pitfall 1: Shipping 21 MB of raw JPG masters through `astro:assets` (LCP cliff + build slowdown)
+Mistakes that cause broken builds, runtime errors, or user-visible regressions.
 
-**Severity:** HIGH
-**Owning phase:** Phase 1 — Asset prep
+### Pitfall 1: Dual Homepage Files Diverge During Section Reorder
 
-**What goes wrong:**
-All 10 KCD 2023 photos get dropped into `src/assets/photos/kcd2023/` as provided (≈2.1 MB average). Astro's Sharp pipeline re-encodes them per requested width/format, but the *master* still sits in the git tree forever. Homepage LCP regresses, `pnpm build` slows, the git pack grows permanently.
+**What goes wrong:** `src/pages/index.astro` (FR) and `src/pages/en/index.astro` (EN) are near-identical copies that must stay in lockstep. The v1.2 reorder (Hero -> Key Numbers -> Edition 2026 -> Mini-bloc 2023 -> CFP -> Sponsors Platinum) requires changing section order, imports, and prop assembly in both files identically. Editing one and forgetting the other causes one locale to show the old layout.
 
-**Why it happens:**
-Fastest path: drag-and-drop into the folder. `<Picture>` "just works" visually in dev, so the issue is invisible until Lighthouse or a cold `pnpm build` on CI exposes it.
+**Why it happens:** Astro file-based i18n uses separate page files per locale. Today the only difference between the two files is the import path depth (`../layouts` vs `../../layouts`) and locale-specific hrefs (`/2023` vs `/en/2023`). Any restructuring change must be applied twice. Under time pressure, the second file is forgotten.
 
-**How to avoid:**
-- Run the repo-standard recipe from `src/assets/photos/README.md` BEFORE `git add`: long edge ≤ 2400 px, quality 82, EXIF stripped.
-- Target per-master: 300–850 KB. Total 2023 masters under ~6 MB.
-- Add a pre-commit assertion: `find src/assets/photos/kcd2023 -size +1M` must print nothing.
-- Verify `<Picture>` renders AVIF + WebP + JPG fallback (`formats={["avif","webp"]}`, explicit `widths`, explicit `sizes`).
+**Consequences:** FR visitors see the new layout; EN visitors see the old one (or vice versa). If a removed component is still imported in one file, the build may still pass but the page renders stale content. In the worst case, a removed import causes a build error on one locale only.
 
-**Warning signs:**
-- `git status` shows any `src/assets/photos/kcd2023/*.jpg` over 1 MB.
-- `pnpm build` reports Sharp processing time > 10 s for kcd2023/.
-- Dev-server "Compiling..." stalls on homepage load after the 2023 section renders.
+**Prevention:**
+1. Edit both files in the same commit. Never mark a homepage task as done until both are updated.
+2. After every change, run `diff src/pages/index.astro src/pages/en/index.astro` — only the import path and locale-specific hrefs should differ.
+3. Consider extracting shared section ordering and prop assembly into `src/lib/homepage-sections.ts` so both pages import the same structure. This eliminates the dual-maintenance problem entirely.
 
----
+**Detection:** `diff` both files after every homepage PR. A CI check that diffs the two files (ignoring known locale differences) catches drift automatically.
 
-### Pitfall 2: No `width`/`height` reservation on the 10-photo grid → CLS regression on homepage
+### Pitfall 2: i18n Key Drift Between `fr` and `en` Objects
 
-**Severity:** HIGH
-**Owning phase:** Phase 6 — Build Edition2023Section
+**What goes wrong:** New i18n keys for newsletter CTA (`hero.cta.newsletter`), sponsor section (`sponsors.homepage.*`), PDF link (`editions.2026.pdf_cta`), and simplified 2023 bloc are added to the `fr` object in `ui.ts` but forgotten in `en`. The `useTranslations` helper silently falls back to FR (line 21 of `utils.ts`: `ui[lang][key] ?? ui[defaultLang][key]`). English pages render French strings with no build error.
 
-**What goes wrong:**
-Photos load after layout → page jumps → CLS score on `/` and `/en/` drops below v1.0 baseline. Mobile users scrolling past the 2023 section lose their place mid-scroll.
+**Why it happens:** `ui.ts` is a single file with two ~300-key flat objects. No compile-time check enforces matching keys between locales. The silent FR fallback masks the bug during development.
 
-**Why it happens:**
-`<Picture src={imported}>` infers dimensions from the imported asset, BUT if the grid uses `object-cover` with flexible aspect ratios without constraining the wrapper, the browser still cannot reserve space until the first byte lands. A developer in a hurry uses raw `<img>` for a "quick preview" commit and forgets to convert back.
+**Consequences:** English visitors see French fragments ("Restez informe", "Telecharger le bilan 2026") mixed into an English page.
 
-**How to avoid:**
-- Always import via `import photo from "@/assets/photos/kcd2023/kcd2023-01.jpg"` and pass to `<Picture src={photo}>`. Never `<img src="/...">` from `public/`.
-- Wrap every tile in `aspect-[3/2]` (or whatever Stitch specifies) + `overflow-hidden` so reserved space is set before decode.
-- Set explicit `sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"` — same pattern as v1.0 venue block.
-- Run mobile Lighthouse before PR merge; CLS must stay ≤ 0.02 above v1.0 baseline.
+**Prevention:**
+1. Add every new key to both `fr` and `en` in the same commit — never split.
+2. Add a build-time or test-time check: `Object.keys(ui.fr)` must exactly match `Object.keys(ui.en)`. A vitest unit test is the simplest approach.
+3. In PR review, count new keys per locale — numbers must match.
 
-**Warning signs:**
-- Chrome DevTools "Rendering → Layout shift regions" flashes over the 2023 grid on first load.
-- Lighthouse mobile CLS rises above 0.05.
-- Manual test: throttle to Slow 4G and watch tiles pop in and push content down.
+**Detection:** Search for keys in `fr` absent from `en`: compare key arrays programmatically. Manual: visit `/en/` and search rendered HTML for French diacritics in the new sections.
 
----
+### Pitfall 3: Empty Sponsor Collection Renders Broken Homepage Section
 
-### Pitfall 3: Over-hydrating past-edition sections as React islands
+**What goes wrong:** The new Sponsors Platinum homepage section calls `getCollection("sponsors")` and filters for `tier === "platinum"`. If the CSV has zero platinum sponsors (or the CSV fetch fails and the fallback CSV is empty), the section renders a heading with no logos beneath it — or worse, an empty grid with allocated whitespace.
 
-**Severity:** HIGH
-**Owning phase:** Phase 2 — Build `PastEditionSection.astro`
+**Why it happens:** The sponsors CSV is fetched from a remote Google Sheets URL at build time (`content.config.ts` line 110-114). Network failures, rate limits, or a temporarily empty sheet cause an empty array. The existing `/sponsors` page has a guard (`hasAnySponsor`); a new homepage section built separately may omit it.
 
-**What goes wrong:**
-`Edition2026Section` or `Edition2023Section` is implemented as `.tsx` with `client:load` "because it was easier to copy from an existing island." Homepage JS payload balloons by 30–80 KB for content that is 100% static. LCP worsens, v1.0's "zero-JS-by-default" posture is broken.
+**Consequences:** Homepage shows "Nos partenaires" heading with empty space. Looks broken, especially for the most expensive sponsor tier.
 
-**Why it happens:**
-React muscle memory + precedent (`KeyNumbers client:idle` is already on the homepage) makes an island feel like the house pattern even though it is not.
+**Prevention:**
+1. Always guard: `{platinumSponsors.length > 0 && <SponsorsHomepage ... />}`. The entire section (heading included) must be conditional.
+2. Reuse the same `getCollection("sponsors")` + tier-filtering pattern from `sponsors.astro` rather than inventing a new approach.
+3. Test by temporarily renaming the fallback CSV (`src/content/sponsors/sponsors.csv`) and building — verify the homepage renders without errors or empty sections.
 
-**How to avoid:**
-- Both past-edition sections MUST be `.astro` (per ARCHITECTURE.md layout). No React, no `client:*` directive.
-- In PR review, grep the diff for `client:` — any hit under `src/components/past-editions/` is a red flag.
-- Only `TestimonialsStrip` may be an island, and only if Stitch requires JS-driven animation (default: pure CSS `.astro`, no island — see Pitfall 10).
-
-**Warning signs:**
-- `pnpm build` output shows a growing "client-side JS" figure vs v1.0 baseline.
-- `view-source:/` reveals `<astro-island>` tags wrapping photo grids.
-- Network tab shows additional `.js` bundles on first homepage load.
-
----
-
-### Pitfall 4: Missing EN translations → bilingual copy drift
-
-**Severity:** HIGH
-**Owning phase:** Phase 3 — Add i18n `editions.*` keys
-
-**What goes wrong:**
-FR keys added to `src/i18n/ui.ts` but `en` block forgotten or incomplete. Because `useTranslations` falls back to FR silently (project's "single-locale schema with FR fallback" decision), `/en/` renders mixed English/French copy — invisible in a FR-only dev check.
-
-**Why it happens:**
-FR fallback is deliberately forgiving. The safety net hides the bug during development.
-
-**How to avoid:**
-- Add every key to FR **and** EN in the same commit — treat `ui.ts` edits as a paired diff.
-- After Phase 3, key counts under `editions.*` and `testimonials.*` must be equal between FR and EN.
-- Add a Vitest assertion: for each `editions.*` / `testimonials.*` key in `fr`, assert `en` has the same path **and** value is NOT byte-identical to FR (prevents the accidental "copy FR into EN" shortcut that looks translated but isn't).
-- Manual QA: visit `/en/` with DevTools → search rendered HTML for French diacritics (à â ç é è ê ë î ï ô û ù ü œ) inside the new sections.
-
-**Warning signs:**
-- PR diff shows FR additions but no EN additions.
-- Key-count mismatch in i18n test.
-- `/en/` rendered HTML contains French diacritics inside `editions.*` / `testimonials.*` regions.
-
----
-
-### Pitfall 5: Deleting `venue.prev.*` keys + 2026 venue block before homepage 2026 section is verified live
-
-**Severity:** HIGH
-**Owning phase:** Phase 5 — Remove 2026 block / Phase 7 — Delete `venue.prev.*` keys
-
-**What goes wrong:**
-Venue page loses the only "previous edition" content on the site, then homepage rollout is delayed by design feedback → the site ships to prod with a content gap. Or: keys are deleted too eagerly and another page that secretly depends on them (search, sitemap, structured data) breaks at build time. `venue.prev.*` has 16 entries in `src/i18n/ui.ts` today — a big sweep.
-
-**Why it happens:**
-"Refactor while you're there" impulse. The block is right there at lines 216–283 of `src/pages/venue/index.astro` and deletion is a single hunk.
-
-**How to avoid:**
-- Sequence mandated by ARCHITECTURE.md: Phase 4 lands homepage 2026 FIRST, Phase 5 deletes venue block SECOND, Phase 7 deletes i18n keys LAST — each in its own commit.
-- Before Phase 5 PR merges: confirm `src/pages/index.astro` AND `src/pages/en/index.astro` BOTH render `<Edition2026Section />` in production preview.
-- Before Phase 7 PR merges: `grep -rn "venue.prev" src/` must return zero hits.
-- Phase 5 is a surgical commit on its own — enables clean `git revert` if the venue page looks broken.
-
-**Warning signs:**
-- PR bundles both "add homepage 2026" and "delete venue block" in one diff.
-- `pnpm build` fails on an undefined `t("venue.prev.X")` call from an overlooked consumer.
-- Staging venue page shows a blank gap where the 2026 block used to be.
-
----
-
-### Pitfall 6: Animated testimonials ship without `prefers-reduced-motion` fallback
-
-**Severity:** HIGH (accessibility / WCAG 2.2.2 failure)
-**Owning phase:** Phase 8 — Build TestimonialsStrip
-
-**What goes wrong:**
-CSS marquee or React animation runs unconditionally. Users with vestibular sensitivities get motion sickness; users with `prefers-reduced-motion: reduce` are ignored. Site fails WCAG 2.2.2 "Pause, Stop, Hide."
-
-**Why it happens:**
-STACK.md flags the repo gap: "grep across `src/` shows zero existing uses of `prefers-reduced-motion`." v1.1 is the codebase's first animated feature; no established pattern to copy.
-
-**How to avoid:**
-- Add the global reset from STACK.md §3 to the TOP of `src/styles/global.css` BEFORE any testimonial animation lands (baseline exists even if the testimonial CSS forgets the media query).
-- Inside the testimonial component, wrap the `animation:` declaration in `@media (prefers-reduced-motion: no-preference)` OR use Tailwind's `motion-safe:animate-*` variant.
-- Provide pause-on-hover AND pause-on-focus: `.marquee:hover, .marquee:focus-within { animation-play-state: paused; }`.
-- Playwright test: `await page.emulateMedia({ reducedMotion: 'reduce' })` → assert computed `animation` on the strip is `none`.
-
-**Warning signs:**
-- DevTools "Rendering → Emulate CSS media feature prefers-reduced-motion → reduce" still shows movement.
-- Hover over the strip — if it does not pause, keyboard focus will not either.
-- No `motion-safe:` or `prefers-reduced-motion` string anywhere in the testimonial component or `global.css`.
-
----
-
-### Pitfall 7: Testimonials strip not keyboard-accessible (focus trap + duplicated quotes in tab order)
-
-**Severity:** HIGH (accessibility)
-**Owning phase:** Phase 8 — Build TestimonialsStrip
-
-**What goes wrong:**
-The canonical CSS infinite-marquee pattern duplicates the quote list for seamless looping. Without `aria-hidden` + `tabindex="-1"` on the clone, each quote (and any inner focusable element) is in the tab order twice, some of them moving off-screen. Keyboard users land on invisible content.
-
-**Why it happens:**
-Copy-pasting the marquee template from Magic UI / Ryan Mulligan's CSS-only recipe without adding the clone-hiding attributes.
-
-**How to avoid:**
-- Mark the duplicated track `aria-hidden="true"` and give every focusable descendant `tabindex="-1"`.
-- Quotes are plain text + `<cite>` — no inner links in v1.1 — keeps tab order clean.
-- If autoplay is kept, provide a visible pause button (shadcn / Base UI button) reachable via Tab BEFORE entering the strip (WCAG 2.2.2).
-- Playwright: tab from the section preceding the strip → assert next focus lands on the pause button, not on a cloned quote.
-
-**Warning signs:**
-- Tabbing through `/` lands focus on content scrolling off-screen.
-- Screen reader announces each quote twice.
-- No `aria-hidden` on the duplicated track.
-
----
-
-### Pitfall 8: Fake / anonymous testimonials shipping to prod as "placeholders"
-
-**Severity:** HIGH (trust + brand)
-**Owning phase:** Phase 8 — Build TestimonialsStrip (content gate)
-
-**What goes wrong:**
-Three placeholder quotes ("Super conf !" — Alice D., Developer at Acme) land in production with fabricated attributions. Community spots them; trust damage is real and public. Alternative: quotes run without any attribution → feel fabricated anyway.
-
-**Why it happens:**
-Milestone brief explicitly allows placeholder quotes. "Temporary" content is famous for becoming permanent (see Pitfall 15).
-
-**How to avoid:**
-- Placeholders in `testimonials-data.ts` MUST use clearly non-real attribution: `author: "[Placeholder — quote pending]"`, no fabricated names, no fake companies.
-- Add a dev/staging-only badge: `{import.meta.env.DEV && <Badge>Placeholder testimonials</Badge>}`.
-- Create a tracking issue `testimonials-real-quotes` referenced in the header comment of `testimonials-data.ts`. Milestone exit criterion: "real quotes sourced OR placeholder badge visible on staging."
-- Do NOT use AI-generated attributions. Do NOT use any real community member's name without explicit written consent.
-
-**Warning signs:**
-- `testimonials-data.ts` contains a plausible-looking full `"Firstname Lastname"` pair or a `@company.com` domain with no linked consent record.
-- Placeholder still live > 2 weeks post-launch with no tracker.
+**Detection:** Build with `SPONSORS_CSV_URL` pointed at a 404 URL and an empty local fallback. The homepage must render cleanly.
 
 ---
 
 ## Moderate Pitfalls
 
-### Pitfall 9: Stitch design drift — past-edition sections do not match existing homepage rhythm
+### Pitfall 4: Removing Photos from PastEditionMinimal Breaks Component Interface
 
-**Severity:** MEDIUM
-**Owning phase:** Phase 0 — Stitch designs
+**What goes wrong:** v1.2 reduces the 2023 mini-bloc to "logo + text link only (remove photos)." But `PastEditionMinimal.astro` requires `photos: Array<{ src: ImageMetadata; alt: string }>` in its `Props` interface (line 17). Passing an empty array renders an empty `grid grid-cols-3` with allocated vertical space. The component has no conditional rendering for an empty photos array.
 
-**What goes wrong:**
-New sections are designed in a blank Stitch canvas → spacing, rail-label typography, card radius, color tokens drift from the shipped Hero / KeyNumbers / Cfp sections. Homepage feels "stitched together."
+**Why it happens:** The component was designed for the 3-photo variant. Its layout assumes photos are always present.
 
-**Why it happens:**
-Stitch prompts often start from "design a past-editions section" without loading the existing homepage context. MEMORY note warns: "Never override design system colors in Stitch prompts; use token roles."
+**Prevention:**
+1. Option A (preferred): Create a new simpler component `PastEditionLink.astro` for the logo-only variant. Leave `PastEditionMinimal` unchanged for any future consumer that needs photos.
+2. Option B: Make `photos` optional in the `Props` interface and wrap the photo grid in `{photos && photos.length > 0 && ...}`. This works but dilutes the component's original contract.
+3. Before modifying `PastEditionMinimal`, check all consumers: `grep -rn "PastEditionMinimal" src/` — currently only `index.astro` and `en/index.astro`. The `/2023` and `/en/2023` pages use the full `PastEditionSection`, not `PastEditionMinimal`.
 
-**How to avoid:**
-- Pre-load the current `/` screenshot + design-system IDs from MEMORY `reference_stitch.md` into the Stitch prompt.
-- Reuse the existing rail-label pattern verbatim: `text-xs uppercase tracking-[0.2em]` in muted/tertiary token color (used 6× in venue page today).
-- Stitch deliverable must include a full-page mock (Hero → KeyNumbers → Cfp → 2026 → 2023 → Testimonials), not per-section in isolation.
-- Tokens only (per MEMORY feedback) — no hex codes in Stitch prompts.
+**Detection:** Build and visually inspect — an empty 3-column grid leaves a visible gap.
 
-**Warning signs:**
-- Stitch mock uses section padding that does not match the existing homepage cadence.
-- Designer invents an accent color not in `components.json` / Tailwind theme.
-- Heading sizes do not match the existing `h2` scale on `/`.
+### Pitfall 5: Newsletter CTA Placeholder Creates a Dead Link
 
----
+**What goes wrong:** The hero gets a 3rd CTA "Restez informe" as a placeholder anchor. If it points to `#newsletter` with no matching `id="newsletter"` element on the page, clicking it does nothing — no scroll, no feedback, no error. This is worse than having no CTA because it erodes user trust.
 
-### Pitfall 10: Unnecessary React island for testimonials
+**Why it happens:** The newsletter backend (CLO-6) is explicitly out of scope for v1.2. The CTA is a "wire later" placeholder.
 
-**Severity:** MEDIUM
-**Owning phase:** Phase 8 — Build TestimonialsStrip
+**Prevention:**
+1. Best: use `href="#newsletter"` AND add a small "coming soon" section with `id="newsletter"` at the bottom of the page. The scroll gives users feedback that the click worked.
+2. Alternative: render the CTA as a `disabled` button with `aria-disabled="true"` and a tooltip "Bientot disponible". This communicates intent without creating a dead interaction.
+3. Never use `href="#"` alone — it scrolls to page top.
+4. Add a `<!-- TODO(CLO-6): wire newsletter signup -->` comment in the hero component to track the deferred integration.
 
-**What goes wrong:**
-A React island (`TestimonialsStrip.tsx` + `client:visible`) is created for what is a static list of 3 strings cycling via CSS. React runtime + hydration cost added for zero functional benefit.
+**Detection:** Click the CTA — if nothing visible happens, the implementation is wrong.
 
-**Why it happens:**
-ARCHITECTURE.md initially proposed `.tsx`; STACK.md subsequently recommends pure-CSS `.astro`. The gap between the two docs is where this pitfall sneaks in.
+### Pitfall 6: External PDF Link (Google Drive) — Availability, Caching, and Accessibility
 
-**How to avoid:**
-- Default: `TestimonialsStrip.astro` with CSS `@keyframes`. No island.
-- Escalate to `.tsx` + `client:visible` ONLY if Stitch mandates behavior that CSS cannot do (pointer-driven scrub, drag-to-pause, instrumentation).
-- Phase 8 kickoff checklist: "Does Stitch mock require JS behavior? If no → `.astro`."
+**What goes wrong:** "Telecharger le bilan 2026 (PDF)" links to `https://drive.google.com/file/d/1rlrY9EkulGSgeCPenyiN4ZnxWs5BXPBo/view`. This has several failure modes:
+- The `/view` URL opens the Google Drive viewer, not a direct download — confusing for users expecting a file save.
+- Google throttles heavily-shared files; unauthenticated access can be blocked.
+- File owner can revoke sharing at any time, breaking the link silently with no build error.
+- Screen readers cannot convey that the link opens a PDF in a new tab without explicit labeling.
 
-**Warning signs:**
-- `TestimonialsStrip.tsx` exists but contains no `useState` / `useEffect` / `useRef` — pure presentation that should be `.astro`.
-- Build report shows an added JS chunk for the homepage route.
+**Prevention:**
+1. Preferred: host the PDF as a static asset in `public/bilan-2026.pdf` for complete reliability and zero external dependency. File size is small (one-pager).
+2. If Google Drive is kept: use the export URL format (`/uc?export=download&id=FILE_ID`) or accept that users see the Drive viewer.
+3. Add accessible labeling: `aria-label="Telecharger le bilan 2026 (PDF, nouvelle fenetre)"` or visible text "(PDF)".
+4. Add `rel="noopener" target="_blank"`.
+5. Test the link in an incognito browser to verify public sharing is enabled.
 
----
+**Detection:** Open the link in incognito — if it shows a "request access" page, sharing is misconfigured.
 
-### Pitfall 11: Duplicate or skipped heading levels on homepage
+### Pitfall 7: Hero Background Opacity Change Causes WCAG Contrast Failure
 
-**Severity:** MEDIUM (SEO + a11y)
-**Owning phase:** Phase 4, Phase 6, Phase 8
+**What goes wrong:** The current hero uses `opacity-[0.55]` on the background image with a dark gradient overlay. Increasing to ~75% (`opacity-[0.75]`) makes the photo more visible but reduces contrast between the overlay and white text. The existing gradient wash (`color-mix(in oklch, var(--color-background) 80%, transparent)`) may not compensate enough, causing WCAG AA contrast failures (4.5:1 for body text, 3:1 for large text).
 
-**What goes wrong:**
-Three new sections each wrap their title in `<h2>`, and the internal brand-history callout uses another `<h2>` instead of `<h3>`. Homepage ends with a jumbled h1/h2/h4 hierarchy, or two `<h1>` competing.
+**Prevention:**
+1. After changing opacity, run Lighthouse or axe DevTools on the hero section. Check contrast on: title, subtitle badge, description paragraph, and CTA button text.
+2. If contrast fails, strengthen the gradient overlay — adjust `color-mix` from 80% to 85-90% — rather than reverting the opacity.
+3. Test on both a bright external monitor and a low-contrast laptop screen.
+4. The Stitch mockup is the reference — match it, but verify programmatically.
 
-**Why it happens:**
-Copy-pasting the venue page's block — which was an `<h2>` in page context — into a homepage section that now wraps yet another `<h2>`.
+**Detection:** Lighthouse accessibility audit flags contrast issues. Chrome DevTools color picker shows contrast ratio when inspecting text elements.
 
-**How to avoid:**
-- Hero stays the only `<h1>`. Every past-edition section title is `<h2>`. Brand-history callout heading is `<h3>`. Stat labels are NOT headings.
-- Run `pa11y http://localhost:4321/` (or Lighthouse a11y) — flags heading-level jumps.
-- Manual check: Chrome DevTools → "Accessibility → Headings" must read h1 → h2 → h2 → h2 → h2.
+### Pitfall 8: Merging Testimonials into Edition 2026 Section Breaks Heading Hierarchy
 
-**Warning signs:**
-- Lighthouse a11y score drops below v1.0 baseline.
-- `pa11y` reports "Heading levels should only increase by one."
-- Multiple `<h1>` in rendered `/` HTML.
+**What goes wrong:** Currently TestimonialsStrip is a standalone section with its own `<h2 id="testimonials-heading">`. Merging it into the Edition 2026 combined section means it should become `<h3>` (sub-heading under the 2026 `<h2>`). If it stays `<h2>`, the heading hierarchy is technically correct but semantically misleading. If it is removed entirely, screen readers lose the landmark.
 
----
+**Why it happens:** Copy-pasting the existing TestimonialsStrip component into the combined section preserves its original heading level.
 
-### Pitfall 12: Homepage becomes too long — CFP CTA buried below the fold on mobile
+**Prevention:**
+1. When merging, change testimonials heading from `<h2>` to `<h3>` if it becomes a sub-section of Edition 2026.
+2. Preserve `id="testimonials-heading"` on whatever element replaces it — any existing anchors or aria references still resolve.
+3. Run `pa11y` or Lighthouse accessibility — check heading hierarchy reads h1 -> h2 -> h2 -> h2 (Key Numbers -> Edition 2026 -> CFP -> Sponsors) without skipped levels.
 
-**Severity:** MEDIUM (conversion impact)
-**Owning phase:** Phase 0 — Stitch designs (ordering decision) / Phases 4 + 6 (implementation)
-
-**What goes wrong:**
-After adding 2026 + 2023 + testimonials, the CFP section (highest-value conversion asset per PROJECT.md core value) is 4–5 viewport heights down on mobile. Registration conversion drops.
-
-**Why it happens:**
-Insertion-order bias: "new stuff at the bottom." But "the bottom" in v1.0 was just after `CfpSection`. Default placement pushes CFP up-page but the past editions push it down.
-
-**How to avoid:**
-- Stitch mock MUST specify final scroll order AND validate that CFP stays within 2 viewport heights on iPhone 13 width (390×844).
-- Recommended order (from FEATURES.md): Hero → KeyNumbers → **CFP** → 2026 → 2023 → Testimonials → Footer. CFP remains above the past-edition tail.
-- Post-implementation: measure `getBoundingClientRect().top` of CFP on 390×844 viewport; target ≤ 1200 px to enter viewport.
-
-**Warning signs:**
-- On mobile staging, CFP CTA requires > 3 full swipes to reach.
-- Analytics (if present) show CFP click-through ratio dropping post v1.1.
-
----
-
-### Pitfall 13: Orphaned imports / dead constants in venue page after cleanup
-
-**Severity:** MEDIUM
-**Owning phase:** Phase 5 — Remove 2026 block from venue page
-
-**What goes wrong:**
-Section deleted (lines 216–283) but imports (lines 5–7) and stats arrays (lines 63–73) remain. TS/ESLint may only warn. Unused ambiance-*.jpg imports still feed Sharp, producing dist assets no page references.
-
-**Why it happens:**
-Jump-to-section-and-delete misses top-of-file imports and mid-file constants.
-
-**How to avoid:**
-- Enable `noUnusedLocals: true` in `tsconfig.json` (if not already) → `pnpm exec tsc --noEmit` fails on orphans.
-- Diff `dist/_astro/` output before/after cleanup; any still-present asset that is no longer referenced is an orphan.
-- Grep the file for each deleted symbol after surgery: `grep -n "ambiance03\|previousStats\|YOUTUBE_ID\|GALLERY_URL" src/pages/venue/index.astro` must return zero hits.
-
-**Warning signs:**
-- `dist/` still contains `ambiance-*.jpg` variants after cleanup.
-- ESLint `no-unused-vars` warning in `venue/index.astro`.
-
----
-
-### Pitfall 14: Broken anchor links / navigation references to venue's old 2026 block
-
-**Severity:** MEDIUM
-**Owning phase:** Phase 5 — Remove 2026 block from venue page
-
-**What goes wrong:**
-Any link like `/venue#previous-edition` (in footer, mobile menu, blog post, external sharing, social media) now scrolls nowhere. Silent UX regression with no build error.
-
-**Why it happens:**
-Anchor references do not break the build and are easy to miss.
-
-**How to avoid:**
-- Before Phase 5: `grep -rn "#previous-edition\|#prev\|#2026\|venue#" src/` to capture current references.
-- If anchors exist on the soon-deleted block, either (a) relocate the anchor ID onto the new homepage section (`/#edition-2026`) and update the links, or (b) add a server-side redirect (nginx in the Docker image / cnd-platform manifest) from `/venue#previous-edition` → `/#edition-2026`.
-- Update footer / header / mobile nav if they point to the deleted anchor.
-
-**Warning signs:**
-- After deploy, clicking an existing link scrolls to page bottom or hero instead of target.
-- Manual: open the previous edition's shared social post → click → land on wrong content.
-
----
-
-### Pitfall 15: 2026 "temporary placeholder" content shipping to prod and never being updated
-
-**Severity:** MEDIUM
-**Owning phase:** Phase 4 — Build Edition2026Section (content gate)
-
-**What goes wrong:**
-Placeholder 2026 stats and copy ship. Real 2026 recap content "comes later." Later never comes; months pass; visitors see the 2026 edition looking staler than the 2023 edition beside it.
-
-**Why it happens:**
-PROJECT.md explicitly allows placeholder content. The v1.0 venue page's numbers (1700+ / 50+ / 40+) are already placeholder-ish with no tracker.
-
-**How to avoid:**
-- Every placeholder string wrapped in a marker: `[TODO:2026-recap] 1700+`. Use a single source of truth file `editions-data.ts` with `placeholder: true` flag per field.
-- In dev/staging only, render a visible `<Badge>` on any section where `placeholder === true`.
-- Create a GitHub issue `2026-recap-final-content` with a target date; link from `editions-data.ts` header.
-- Milestone exit criterion: placeholder flag SHIPS with a tracker; not blocked on real content, blocked on *tracking*.
-
-**Warning signs:**
-- No TODO comment, no tracker issue, no staging badge — content is visually indistinguishable from final.
-- 3+ months post-launch, `placeholder: true` still true.
-
----
-
-### Pitfall 16: Over-fetching image variants (Sharp builds 40–120 variants for 10 photos)
-
-**Severity:** MEDIUM (build time)
-**Owning phase:** Phase 6 — Build Edition2023Section
-
-**What goes wrong:**
-`widths={[480, 800, 1200, 1600]}` × `formats=["avif","webp"]` × fallback JPG × 10 photos = 120 encodes per build. Sharp on CI takes minutes; container build slows.
-
-**Why it happens:**
-Defensive "support every viewport" instinct without consulting the actual rendered size from the Stitch mock.
-
-**How to avoid:**
-- Inspect Stitch mock to determine actual rendered widths. A 3-col desktop grid capped at 1280 px content width → max tile ≈ 400 CSS px = 800 px at DPR 2. `widths={[480, 800]}` is enough.
-- Target: 2 widths × 2 formats × 10 photos = 40 encodes.
-- Measure: `time pnpm build` before/after — Sharp stage target ≤ 30 s.
-
-**Warning signs:**
-- `pnpm build` Sharp phase exceeds 60 s on dev laptop.
-- CI job time jumps > 2× post v1.1.
-
----
-
-### Pitfall 17: Brand-history callout legal / brand-review gap (KCD / CNCF wording)
-
-**Severity:** MEDIUM (legal / brand)
-**Owning phase:** Phase 6 — Build Edition2023Section (content gate)
-
-**What goes wrong:**
-"Originally named Kubernetes Community Days France" + KCD logo ship without CNCF / KCD program review. Team may be asked to change wording or remove the logo post-launch.
-
-**Why it happens:**
-FEATURES.md flags this as "legal-adjacent copy." Easy to skip in dev excitement.
-
-**How to avoid:**
-- Before Phase 6 PR merges: exact FR + EN wording sent to CND board + (if affiliated) KCD program / CNCF contact for written sign-off.
-- Use the KCD logo file the organizer provides; do NOT download from KCD's public assets without confirming redistribution terms.
-- Store approval reference in `.planning/milestones/v1.1-*` with date + approver.
-
-**Warning signs:**
-- No written approval trail for the exact string.
-- KCD logo sourced "from kcd-france.fr" with no license check.
+**Detection:** Chrome DevTools Accessibility tree -> Headings view. Must show a clean descending hierarchy.
 
 ---
 
 ## Minor Pitfalls
 
-### Pitfall 18: Missing or generic image `alt` text on the 10 photos
+### Pitfall 9: Section Reorder Breaks Existing Anchor Links
 
-**Severity:** LOW (a11y + SEO)
-**Owning phase:** Phase 6
+**What goes wrong:** Moving sections changes their vertical position on the page. Any bookmarked anchors (`#edition-2026`, `#testimonials-heading`) still resolve but land at unexpected scroll positions. External links or skip-nav references may become confusing.
 
-**How to avoid:** Each photo gets a unique descriptive FR + EN alt ("Public lors de KCD France 2023 au Centre Georges Pompidou"). Centralize in `editions-data.ts` so both locales consume the same structured data. `alt=""` is only valid for decorative images — not the case here.
+**Prevention:** Audit all `id` attributes in affected sections before reordering. Preserve existing IDs even when sections move. If merging testimonials into the 2026 section, keep both `id="edition-2026"` and `id="testimonials-heading"`.
 
----
+### Pitfall 10: Sponsor Logo Images Served Unoptimized on Homepage
 
-### Pitfall 19: Section scroll anchors missing `scroll-margin-top` under sticky nav
+**What goes wrong:** The existing `SponsorCard.astro` is a full card layout (name, description, link). The homepage only needs platinum tier logos. Reusing `SponsorCard` adds unnecessary layout weight. Building a new logo-only strip without using `astro:assets` Image component serves raw PNGs/SVGs without optimization.
 
-**Severity:** LOW (UX polish)
-**Owning phase:** Phase 4, Phase 6
+**Prevention:** Create a lightweight `SponsorLogoStrip.astro` component for the homepage that uses `<Image>` from `astro:assets` (if raster logos) or simple `<img>` (if SVGs). Extract only the logo + link rendering from the existing sponsor data. Include a "Voir tous les sponsors" link to `/sponsors` (or `/en/sponsors` for EN locale).
 
-**How to avoid:** If `/#edition-2026` deep links are exposed, set `scroll-margin-top: 5rem` (or matching sticky-nav height) on section wrappers. Prevents the title being hidden behind the sticky header.
+### Pitfall 11: Orphaned Imports After Removing TestimonialsStrip from Standalone Position
 
----
+**What goes wrong:** If TestimonialsStrip is merged into the Edition 2026 combined section, the standalone `<TestimonialsStrip />` import in both `index.astro` files must be removed. If the component import stays but the JSX usage is removed, ESLint/TS may only warn (not error). If the import is removed but the JSX reference stays, the build breaks.
 
-### Pitfall 20: i18n key naming collision with existing `venue.*` tree during coexistence window
+**Prevention:** After any component removal or relocation, run `pnpm build` immediately. Check for unused import warnings with `noUnusedLocals: true` in tsconfig. Apply changes to both FR and EN homepage files atomically.
 
-**Severity:** LOW
-**Owning phase:** Phase 3 + Phase 7
+### Pitfall 12: `editions-data.ts` Photo Imports Still Bundled After Homepage Simplification
 
-**How to avoid:** New keys live under `editions.*` (per ARCHITECTURE.md). Do NOT reuse `venue.prev.*` for homepage content even briefly — keeps Phase 7 a clean sweep. Verify: `grep -c "editions\\." src/i18n/ui.ts` matches expected count for both FR and EN.
+**What goes wrong:** `EDITION_2023.thumbnails` imports 3 KCD 2023 photos used by PastEditionMinimal. If the v1.2 mini-bloc no longer shows photos, these imports remain in `editions-data.ts`, and Astro/Sharp still processes them (producing dist assets no page references). The `/2023` page uses `photos10`, not `thumbnails`, so the 3-photo array becomes dead code.
 
----
-
-### Pitfall 21: Git LFS not configured — pressure to "enable it just in case"
-
-**Severity:** LOW
-**Owning phase:** Phase 1 — Asset prep
-
-**Context:** Repo has NO `.gitattributes` / LFS config today. After Pitfall 1 mitigation (pre-optimized ~6 MB of 2023 photos total), LFS is not worth the setup cost for v1.1.
-
-**How to avoid:** Do NOT add LFS now — it introduces checkout complexity, CI runner token cost, and workflow surface for ~6 MB of savings. Re-evaluate when photo masters total > 50 MB (plausible at v2 with multiple editions).
-
-**Warning signs:** Someone proposes enabling LFS mid-milestone "to be safe" — push back; solve the real problem (pre-optimization, Pitfall 1) first.
+**Prevention:** After confirming no consumer uses `EDITION_2023.thumbnails`, remove the array and its 3 imports from `editions-data.ts`. Verify with `grep -rn "thumbnails" src/` that no other file references it (the 2026 section uses `EDITION_2026.thumbnails` which is separate). Check `dist/_astro/` output before and after — processed images for removed photos should disappear.
 
 ---
 
-## Technical Debt Patterns
+## Phase-Specific Warnings
 
-| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
-|---|---|---|---|
-| Hardcoded testimonial data in `testimonials-data.ts` instead of CSV loader | Ships in 1 PR, no Google Sheet setup | Diverges from "CSVs are single source of truth" rule in CLAUDE.md; two places to edit if real quotes arrive | Acceptable for v1.1 (explicit in PROJECT.md). Move to CSV in v1.2 when real quotes exist. |
-| Skipping EN translation pass on `editions.*` keys and relying on FR fallback | Faster Phase 3 | EN visitors get mixed-language sections; SEO sees duplicate FR content on `/en/`; erodes trust | Never. FR fallback is a safety net, not a shipping strategy. |
-| Bundling Phase 4 (add homepage 2026) + Phase 5 (delete venue block) in one PR | One review cycle | No clean rollback if homepage has bugs; venue regresses with no recovery path | Never. ARCHITECTURE.md calls this out as highest regression risk. |
-| Using `<img>` from `public/` for the 10 photos "just to prototype" | Skips Astro `<Picture>` setup | Bypasses AVIF/WebP pipeline → 10× payload + CLS + worse image SEO | Never — even prototypes must use `astro:assets`. Prototype with ONE photo, not ten. |
-| Designing testimonials in Stitch in isolation without the full homepage mock | Faster Stitch iteration | Design drifts from existing section rhythm; requires redesign later | Never per MEMORY `feedback_stitch_first.md` + `feedback_stitch_ds_tokens.md`. Always Stitch the full homepage. |
-| Leaving `placeholder: true` on 2026 content without a tracking issue | Ships the milestone | Placeholder becomes de facto permanent; site looks stale | Acceptable only if a dated tracker issue + visible (non-prod) badge exist. |
-
----
-
-## Integration Gotchas
-
-| Integration | Common Mistake | Correct Approach |
-|---|---|---|
-| YouTube aftermovie embed (2026) | Using `youtube.com` embed URL (sets cookies → GDPR banner risk) | `youtube-nocookie.com` (already the v1.0 venue pattern). Verify when relocating. |
-| Ente.io external gallery link | Hardcoding URL in component JSX | Put in `editions-data.ts` so FR + EN share the same URL and it is discoverable. |
-| `astro:assets` + Sharp in Docker container | Build works locally, fails in K8s Docker image (glibc vs musl) | STACK.md confirms current image ships glibc → Sharp works. Do NOT switch base image to alpine without testing Sharp. |
-| `tw-animate-css` utilities | Reaching for the deprecated `tailwindcss-animate` plugin (pre-Tailwind 4) | Only `tw-animate-css@1.4.0` is valid in Tailwind 4; already imported in `global.css`. |
-| Stitch → code handoff | Pasting hex colors from Stitch export instead of token names | Reject any diff introducing raw hex values in new sections; use token roles (`primary`, `muted-foreground`, etc.). |
-
----
-
-## Performance Traps
-
-| Trap | Symptoms | Prevention | When It Breaks |
-|---|---|---|---|
-| 10 photos all eager-loaded | Network tab shows 10 parallel image requests on `/` nav; mobile LCP ≥ 4s | `<Picture>` defaults `loading="lazy"` + `decoding="async"`; also `content-visibility: auto` on grid wrapper below the fold | Immediately on mobile 4G; less visible on fiber desktop |
-| React island for pure CSS animation | JS chunk added to homepage bundle; TBT creeps up | Default `.astro` + CSS keyframes (Pitfall 10) | Mid-range Android; silent on dev laptop |
-| Missing `sizes` attribute on `<Picture>` | Browser downloads the largest variant always; LCP picks wrong candidate | Explicit `sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"` on every gallery `<Picture>` | Mobile with limited bandwidth |
-| Full-bleed background image on brand-history callout via CSS `background-image` | Section render blocks on a large asset outside Sharp pipeline | If Stitch mandates a background, use `<Picture>` + `position:absolute inset-0 object-cover` on the first image; never `background-image: url()` on imported asset | Cold cache mobile loads |
-| Too many Sharp variants per build | CI build time creeps from 2 min to 8 min | Cap `widths` to 2 values based on actual Stitch layout (Pitfall 16) | When future editions add more photos |
-| Autoplay without pause-on-hover/focus | User complaints + a11y escalation | `:hover, :focus-within { animation-play-state: paused }` + optional visible pause button (Pitfalls 6, 7) | Every production page post-launch |
-
----
-
-## Phase-Owned Pitfall Map (for roadmap)
-
-| Phase | Primary Pitfalls | Gate (must pass before merge) |
-|---|---|---|
-| 0 — Stitch designs | 9, 12 | Full-page mock (all 6 sections) using design-system tokens only; CFP position validated on mobile |
-| 1 — Asset prep | 1, 21 | Every photo ≤ 1 MB (grep check); total masters < 7 MB; no LFS introduced |
-| 2 — PastEditionSection.astro | 3 | File is `.astro`; no `client:*` directive anywhere under `src/components/past-editions/` |
-| 3 — i18n keys | 4, 20 | FR and EN key counts match under `editions.*` + `testimonials.*`; no collision with `venue.*` |
-| 4 — Edition2026Section | 11, 15, 19 | h1/h2 hierarchy correct; placeholder flag + tracker issue; `scroll-margin-top` set |
-| 5 — Delete venue 2026 block | 5, 13, 14 | Separate commit; homepage 2026 already verified in preview; no orphaned imports; anchor audit done |
-| 6 — Edition2023Section | 2, 11, 16, 17, 18 | CLS delta ≤ 0.02; unique FR + EN alts; brand-history copy signed off; Sharp variant count capped |
-| 7 — Delete `venue.prev.*` keys | 5, 20 | `grep -rn "venue.prev" src/` returns zero hits; `pnpm build` passes |
-| 8 — TestimonialsStrip | 6, 7, 8, 10 | Reduced-motion + pause-on-hover/focus verified via Playwright; placeholder attributions clearly non-real; default `.astro` not `.tsx` |
+| Phase Topic | Likely Pitfall | Mitigation |
+|-------------|---------------|------------|
+| Hero CTA addition (newsletter placeholder) | Pitfall 5: Dead anchor link with no user feedback | Add `id="newsletter"` target section or use disabled button variant |
+| Hero background opacity change | Pitfall 7: WCAG contrast failure on white text | Run Lighthouse after change; strengthen gradient if contrast fails |
+| Section reorder (all sections) | Pitfall 1: Dual-file divergence between FR and EN homepage | Edit both files atomically; `diff` after every change |
+| New i18n keys (newsletter, sponsors, PDF) | Pitfall 2: Keys missing in one locale, silent FR fallback | Add to both `fr` and `en` in same commit; add key-count test |
+| Edition 2026 combined section (film + testimonials + photos) | Pitfall 8: Heading hierarchy broken when merging sections | Change testimonials `<h2>` to `<h3>` inside combined section |
+| Mini-bloc 2023 simplification (remove photos) | Pitfall 4: PastEditionMinimal requires photos prop | Create new simpler `PastEditionLink.astro` or make photos optional |
+| Mini-bloc 2023 simplification (remove photos) | Pitfall 12: Orphaned photo imports in editions-data.ts | Remove `EDITION_2023.thumbnails` array if no consumer remains |
+| Sponsors Platinum on homepage | Pitfall 3: Empty collection renders broken section | Conditional render: `{platinumSponsors.length > 0 && ...}` |
+| Sponsors Platinum on homepage | Pitfall 10: Unoptimized logos or wrong component reuse | Build lightweight logo-only component, not full SponsorCard |
+| External PDF link (bilan 2026) | Pitfall 6: Google Drive availability and a11y | Host in `public/` or add aria-label with file type indicator |
+| All homepage changes | Pitfall 1 + 2: Stale EN file + missing EN i18n keys | Diff both index files + count keys as final step of every task |
 
 ---
 
 ## Sources
 
-- Repo grep: 16 `venue.prev.*` entries in `src/i18n/ui.ts` (verified 2026-04-13) → Pitfalls 5, 20
-- Repo check: no `.gitattributes`, no LFS configured → Pitfall 21
-- `src/assets/photos/README.md` — authoritative pre-processing recipe → Pitfall 1
-- `.planning/research/ARCHITECTURE.md` — phase sequencing + 2026 block file:line refs → Pitfalls 3, 5, 13
-- `.planning/research/STACK.md` — "zero existing `prefers-reduced-motion` uses" + `<Picture>` pattern → Pitfalls 2, 6, 16
-- `.planning/research/FEATURES.md` — carousel anti-pattern + CNCF/KCD review flag + CFP prominence warning → Pitfalls 8, 12, 17
-- `CLAUDE.md` — "CSVs are single source of truth" + Stitch-first rule → Tech-debt table, Pitfall 9
-- MEMORY (Stitch-first + Stitch DS tokens) → Pitfall 9
-- WCAG 2.2.2 "Pause, Stop, Hide" — testimonial autoplay a11y → Pitfalls 6, 7
-- MDN `prefers-reduced-motion` — global reset pattern → Pitfall 6
-
----
-*Pitfalls research for: v1.1 Past Editions Showcase. Each pitfall tagged with severity + owning phase; prevention actions reference concrete files, greps, or Playwright assertions.*
-*Researched: 2026-04-13*
+- Codebase inspection: `src/pages/index.astro` (74 lines), `src/pages/en/index.astro` (73 lines) — confirmed near-identical structure with only path/href differences
+- `src/i18n/ui.ts` — ~300 keys per locale, FR fallback at `utils.ts` line 21
+- `src/i18n/utils.ts` — `useTranslations` silent fallback behavior confirmed
+- `src/components/past-editions/PastEditionMinimal.astro` — `photos` is required in Props interface (line 17), grid is `grid-cols-3` (line 45)
+- `src/components/hero/HeroSection.astro` — current opacity `opacity-[0.55]` at line 28, gradient overlay at line 32
+- `src/components/testimonials/TestimonialsStrip.astro` — standalone `<h2 id="testimonials-heading">` at line 22
+- `src/content.config.ts` lines 109-147 — sponsors collection uses csvLoader with remote URL + local fallback
+- `src/pages/sponsors.astro` — existing `hasAnySponsor` guard pattern (line 36)
+- `src/lib/editions-data.ts` — EDITION_2023.thumbnails 3-photo array (lines 76-80)
+- WCAG 2.1 AA contrast requirements (4.5:1 body text, 3:1 large text)
+- Google Drive sharing URL behavior — `/view` vs `/uc?export=download` patterns
