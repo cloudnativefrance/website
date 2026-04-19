@@ -6,10 +6,6 @@
  * No photos, no playlist link, no brand-history prose — the dedicated /2023 page
  * is the canonical deep-dive destination (this component is a pointer to it).
  *
- * Replaces PastEditionMinimal.astro on the homepage starting in Phase 26.
- * Phase 24 only BUILDS this component; Phase 26 (Homepage Wiring) mounts it,
- * removes the PastEditionMinimal import, and deletes the now-orphan file.
- *
  * Fully prop-driven so the Stitch mockup → code mapping is 1:1 with no
  * flag-driven branches. The caller (Phase 26) resolves i18n + locale-aware
  * href before passing props — see UI-SPEC §Props Interface for the caller snippet.

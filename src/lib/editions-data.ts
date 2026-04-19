@@ -83,9 +83,8 @@ export const EDITION_2023 = {
     { value: "42", labelKey: "editions.2023.stats.speakers" },
     { value: "24", labelKey: "editions.2023.stats.sessions" },
   ] as const satisfies ReadonlyArray<Stat>,
-  // Homepage minimal block (17-04) — 3 curated photos (01, 05, 08) consumed by
-  // PastEditionMinimal.astro. Full 10-photo mosaic + lightbox ships on a
-  // dedicated 2023 page in a later phase.
+  // 3 curated photos (01, 05, 08) — full 10-photo mosaic + lightbox lives on
+  // the dedicated /2023 page (see src/pages/2023.astro).
   thumbnails: [
     { src: kcd2023_01, altKey: "editions.2023.thumbnail_alt.1", size: "medium" },
     { src: kcd2023_05, altKey: "editions.2023.thumbnail_alt.5", size: "medium" },

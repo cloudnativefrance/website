@@ -84,9 +84,8 @@ const galleryCta = props.galleryCta ?? {
 const testimonials =
   props.testimonials ??
   TESTIMONIALS.slice(0, 3).map((item) => ({
-    // Casts narrow `testimonials.${number}.{quote|attribution}` template-literal
-    // type to a concrete i18n key. Matches the existing TestimonialsStrip.astro
-    // pattern but uses a tighter cast than `as any` (Phase 23 WR-01).
+    // Cast narrows `testimonials.${number}.{quote|attribution}` template-literal
+    // type to a concrete i18n key — tighter than `as any` (Phase 23 WR-01).
     quote: t(item.quoteKey as keyof typeof import("@/i18n/ui").ui.fr),
     attribution: t(item.attributionKey as keyof typeof import("@/i18n/ui").ui.fr),
   }));
