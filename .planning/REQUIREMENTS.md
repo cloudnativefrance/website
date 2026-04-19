@@ -14,17 +14,17 @@ Requirements for Homepage Restructuring milestone. Each maps to roadmap phases.
 
 ### Edition 2026
 
-- [ ] **ED26-01**: Homepage shows combined 2026 section with 3 photos, embedded film, and testimonial cards (replacing separate PastEditionSection + TestimonialsStrip)
-- [ ] **ED26-02**: 2026 section includes "Voir tous les replays →" link
-- [ ] **ED26-03**: 2026 section includes "Télécharger le bilan 2026 (PDF) →" link to one-pager
+- [x] **ED26-01**: Homepage shows combined 2026 section with 3 photos, embedded film, and testimonial cards (replacing separate PastEditionSection + TestimonialsStrip)
+- [x] **ED26-02**: 2026 section includes "Voir tous les replays →" link
+- [x] **ED26-03**: 2026 section includes "Télécharger le bilan 2026 (PDF) →" link to one-pager
 
 ### Edition 2023
 
-- [ ] **ED23-01**: Homepage 2023 bloc shows only KCD logo + text link to /2023 page (no photos)
+- [x] **ED23-01**: Homepage 2023 bloc shows only KCD logo + text link to /2023 page (no photos)
 
 ### Sponsors
 
-- [ ] **SPON-01**: Homepage shows Platinum sponsor logos with "Voir tous les sponsors →" link to /sponsors
+- [x] **SPON-01**: Homepage shows Platinum sponsor logos with "Voir tous les sponsors →" link to /sponsors
 
 ### Layout
 
@@ -61,12 +61,12 @@ Deferred to future milestones.
 |-------------|-------|--------|
 | HERO-01 | Phase 25 | Complete (live; 25-01 shipped 2026-04-18) |
 | HERO-02 | Phase 25 | Complete (live; 25-01 shipped 2026-04-18) |
-| ED26-01 | Phase 23 | Pending |
-| ED26-02 | Phase 23 | Pending |
-| ED26-03 | Phase 23 | Pending |
-| ED23-01 | Phase 24 | In progress (component shipped in 24-03; awaiting Phase 26 homepage mount) |
-| SPON-01 | Phase 24 | In progress (foundation + component shipped in 24-01 + 24-02; awaiting Phase 26 homepage mount) |
-| LAYO-01 | Phase 26 | Complete (26-01) |
+| ED26-01 | Phase 23 + 26 | Complete (component shipped in 23-02; mounted on homepage in 26-01) |
+| ED26-02 | Phase 23 + 26 | Complete (replays CTA shipped in 23-02; live on homepage via 26-01) |
+| ED26-03 | Phase 23 + 26 | Complete (PDF CTA shipped in 23-02; live on homepage via 26-01) |
+| ED23-01 | Phase 24 + 26 | Complete (component shipped in 24-03; mounted on homepage in 26-01) |
+| SPON-01 | Phase 24 + 26 | Complete (foundation + component shipped in 24-01 + 24-02; mounted on homepage in 26-01) |
+| LAYO-01 | Phase 26 | Complete (26-01 wired the order; 26-03 cleaned up orphan files) |
 | BRND-01 | Phase 26 | Complete (26-02) |
 
 **Coverage:**
@@ -76,4 +76,4 @@ Deferred to future milestones.
 
 ---
 *Requirements defined: 2026-04-18*
-*Last updated: 2026-04-18 — HERO-01 + HERO-02 marked complete after 25-01 ship*
+*Last updated: 2026-04-19 — All 9 v1.2 requirements complete after Phase 26 closeout (26-03 orphan cleanup); ready for milestone audit*

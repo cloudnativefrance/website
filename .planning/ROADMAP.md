@@ -4,7 +4,7 @@
 
 - ✅ **v1.0 MVP** - Phases 1-14 (shipped 2026-04-13)
 - ✅ **v1.1 Past Editions Showcase** - Phases 15-22 (shipped 2026-04-14)
-- 🚧 **v1.2 Homepage Restructuring** - Phases 23-26 (in progress)
+- 🚧 **v1.2 Homepage Restructuring** - Phases 23-26 (feature-complete 2026-04-19, awaiting milestone audit)
 
 ## Phases
 
@@ -22,14 +22,14 @@ See [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full phase deta
 
 </details>
 
-### 🚧 v1.2 Homepage Restructuring (In Progress)
+### ✅ v1.2 Homepage Restructuring (Feature-Complete — 2026-04-19, awaiting milestone audit)
 
 **Milestone Goal:** Restructure the homepage layout per validated Stitch mockup -- merge 2026 film+testimonials, add newsletter CTA, add sponsors platinum section, simplify 2023 bloc.
 
 - [x] **Phase 23: Edition 2026 Combined Section** - New component merging photos, film, replays link, PDF link, and testimonials into one section [completed 2026-04-18]
 - [x] **Phase 24: Sponsors Platinum & Edition 2023** - Platinum sponsor logo strip and simplified 2023 mini-bloc [plans complete 2026-04-18; awaiting Phase 26 homepage mount]
 - [x] **Phase 25: Hero Redesign** - New background image, adjusted opacity, and 3-CTA layout [completed 2026-04-18; ships LIVE on both homepages]
-- [ ] **Phase 26: Homepage Wiring** - Atomic section reorder across both locale homepages with accessibility check
+- [x] **Phase 26: Homepage Wiring** - Atomic section reorder across both locale homepages with accessibility check [completed 2026-04-19; v1.2 feature-complete, ready for milestone audit]
 
 ## Phase Details
 
@@ -92,7 +92,7 @@ Plans:
 Plans:
 - [x] 26-01-PLAN.md — Homepage rewrite (FR + EN): atomic section reorder + new component mounts + sponsor CSV filter at page boundary [completed 2026-04-18; astro check 11 -> 9; build 156 pages green]
 - [x] 26-02-PLAN.md — Favicon swap: replace public/favicon.svg with French tricolor (BRND-01) [completed 2026-04-19; modern browsers see new flag immediately, .ico legacy fallback retained]
-- [ ] 26-03-PLAN.md — Orphan cleanup: delete PastEditionSection.astro + PastEditionMinimal.astro + TestimonialsStrip.astro after re-verifying zero importers
+- [x] 26-03-PLAN.md — Orphan cleanup: delete PastEditionSection.astro + PastEditionMinimal.astro + TestimonialsStrip.astro after re-verifying zero importers [completed 2026-04-19; astro check 9 -> 5 errors; 406 LOC removed; build 156 pages green; v1.2 feature-complete]
 **UI hint**: yes
 
 ## Progress
@@ -105,4 +105,4 @@ Phases execute in numeric order: 23 → 24 → 25 → 26
 | 23. Edition 2026 Combined Section | v1.2 | 2/2 | Complete | 2026-04-18 |
 | 24. Sponsors Platinum & Edition 2023 | v1.2 | 3/3 | Complete (components) | 2026-04-18 |
 | 25. Hero Redesign | v1.2 | 1/1 | Complete (live) | 2026-04-18 |
-| 26. Homepage Wiring | v1.2 | 2/3 | In progress | - |
+| 26. Homepage Wiring | v1.2 | 3/3 | Complete | 2026-04-19 |
