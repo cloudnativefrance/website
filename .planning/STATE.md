@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Homepage Restructuring
-status: ready to execute
-stopped_at: Phase 26 planned (3 plans in 2 waves; UI-SPEC skipped — composition-only phase; plan-checker PASS with 1 informational FLAG on WCAG inheritance)
-last_updated: "2026-04-19T08:30:00.000Z"
-last_activity: 2026-04-19 -- Phase 26 plans created and verified (homepage rewrite + favicon swap + orphan cleanup)
+status: in progress
+stopped_at: Plan 26-01 complete (FR + EN homepages rewired to v1.2 section order; astro check baseline 11 -> 9; build 156 pages green). Plans 26-02 (favicon) and 26-03 (orphan cleanup) remaining.
+last_updated: "2026-04-18T08:34:00.000Z"
+last_activity: 2026-04-18 -- Plan 26-01 executed (atomic FR + EN homepage rewrite; 3 new component mounts; sponsor page-boundary filter; orphan editions.*.gallery_cta gone)
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 9
-  completed_plans: 6
-  percent: 67
+  completed_plans: 7
+  percent: 78
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 ## Current Position
 
 Phase: 26 (4 of 4 in v1.2) -- Homepage Wiring
-Plan: 0 of 3 in current phase (26-01 homepage rewrite + 26-02 favicon swap in wave 1; 26-03 orphan cleanup in wave 2)
-Status: Ready to execute
-Last activity: 2026-04-19 -- Phase 26 planned (3 plans, plan-checker PASS, calibrations endorsed: lowercase "platinum" tier filter, SVG-only favicon swap, astro-check trajectory 11→9→5)
+Plan: 1 of 3 in current phase (26-01 complete; 26-02 favicon swap and 26-03 orphan cleanup remaining)
+Status: In progress
+Last activity: 2026-04-18 -- Plan 26-01 shipped (atomic FR+EN homepage rewrite; astro check 11 -> 9; build 156 pages green)
 
-Progress: [███████░░░] 75% (6/8 plans complete in v1.2: 2 in Phase 23, 3 in Phase 24, 1 in Phase 25; Phase 26 not yet planned)
+Progress: [████████░░] 88% (7/8 plans complete in v1.2: 2 in Phase 23, 3 in Phase 24, 1 in Phase 25, 1 in Phase 26)
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Progress: [███████░░░] 75% (6/8 plans complete in v1.2: 2 in
 | 23 | 2/2 | ~19 min | ~10 min |
 | 24 | 3/3 | ~14 min | ~5 min |
 | 25 | 1/1 | ~4 min | ~4 min |
+| 26 | 1/3 | ~6 min | ~6 min |
 
 ## Accumulated Context
 
@@ -85,10 +86,14 @@ Progress: [███████░░░] 75% (6/8 plans complete in v1.2: 2 in
 - [25-01]: EN copy "Stay in the loop" chosen over alternatives — idiomatic EN matching the casual register of "Get Your Ticket" / "View Schedule".
 - [25-01]: ambiance-10.jpg KEPT on disk and in `src/lib/editions-data.ts` (still consumed by PastEditionSection / Edition2026Combined per UI-SPEC §Data Module & Asset Changes).
 - [25-01]: Hero ships LIVE with this commit chain (component already mounted on both /fr and /en homepages pre-edit; unlike Phase 23/24 deferred-mount components).
+- [26-01]: Both /fr and /en homepages rewired to v1.2 section order (Hero -> KeyNumbers -> Edition2026Combined -> Edition2023Link -> CFP -> SponsorsPlatinumStrip). Sponsor data loaded at page boundary via getCollection + tier === "platinum" filter (CSV-as-source-of-truth per CLAUDE.md). Locale-aware hrefs hardcoded (FR=/2023, EN=/en/2023) — no JSX ternaries. FR/EN diff is exactly 2 hunks (Layout depth + viewPageHref).
+- [26-01]: Edition2026Combined mounted with zero props — component resolves its own data/i18n defaults (idiomatic homepage usage per Phase 23 contract).
+- [26-01]: Belt-and-braces SponsorsPlatinumStrip empty-state guard — caller wraps with {platinumSponsors.length > 0 && ...} alongside the component's internal guard (intentional redundancy per Phase 24).
+- [26-01]: Astro check baseline 11 -> 9 (orphan editions.2026.gallery_cta and editions.2023.gallery_cta references gone). Build green at 156 pages.
 
 ### Pending Todos
 
-- Pre-existing `astro check` baseline carries 11 type errors (content.config zod loaders, Edition2023PhotoGrid implicit-any, TestimonialsStrip template-literal keys, orphan `editions.2026.gallery_cta` references in homepage files). Not in scope for plan 23-01 — see `23-01-SUMMARY.md` "Deferred Issues" for the per-file fix list.
+- Pre-existing `astro check` baseline now carries 9 type errors (down from 11 after 26-01 — orphan `editions.*.gallery_cta` references gone). Remaining: content.config zod loaders, Edition2023PhotoGrid implicit-any, TestimonialsStrip template-literal keys. Plan 26-03 will reduce further by deleting orphan components.
 
 ### Blockers/Concerns
 
@@ -98,6 +103,6 @@ Progress: [███████░░░] 75% (6/8 plans complete in v1.2: 2 in
 
 ## Session Continuity
 
-Last session: 2026-04-18T23:00:30.000Z
-Stopped at: Phase 25 complete (1 plan, 2 tasks shipped: 25-01 hero redesign live with ambiance-00 @ opacity-75 + 3-CTA row + Pink Ghost newsletter button + 2 i18n keys). Astro check baseline unchanged (11 pre-existing errors, no NEW), build green (156 pages). HERO-01 + HERO-02 satisfied; hero ships LIVE on both /fr and /en homepages (component was already mounted pre-edit). Accent Pink lockout non-regression: non-hero count holds at 9. Next: plan Phase 26 (Homepage Wiring — section reordering + PastEditionMinimal cleanup + WCAG AA contrast verification + favicon).
-Resume file: .planning/phases/25-hero-redesign/25-01-SUMMARY.md
+Last session: 2026-04-18T08:34:00.000Z
+Stopped at: Plan 26-01 complete (FR + EN homepages atomically rewired to v1.2 section order; Edition2026Combined / Edition2023Link / SponsorsPlatinumStrip mounted live for first time; sponsor page-boundary CSV filter; orphan editions.*.gallery_cta references eliminated). Astro check 11 -> 9 errors. Build green at 156 pages. LAYO-01 satisfied. Next: Plans 26-02 (favicon swap, BRND-01) and 26-03 (orphan component file cleanup).
+Resume file: .planning/phases/26-homepage-wiring/26-01-SUMMARY.md

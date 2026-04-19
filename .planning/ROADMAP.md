@@ -90,7 +90,7 @@ Plans:
 **Plans**: 3 plans (2 waves)
 
 Plans:
-- [ ] 26-01-PLAN.md — Homepage rewrite (FR + EN): atomic section reorder + new component mounts + sponsor CSV filter at page boundary
+- [x] 26-01-PLAN.md — Homepage rewrite (FR + EN): atomic section reorder + new component mounts + sponsor CSV filter at page boundary [completed 2026-04-18; astro check 11 -> 9; build 156 pages green]
 - [ ] 26-02-PLAN.md — Favicon swap: replace public/favicon.svg with French tricolor (BRND-01)
 - [ ] 26-03-PLAN.md — Orphan cleanup: delete PastEditionSection.astro + PastEditionMinimal.astro + TestimonialsStrip.astro after re-verifying zero importers
 **UI hint**: yes
@@ -105,4 +105,4 @@ Phases execute in numeric order: 23 → 24 → 25 → 26
 | 23. Edition 2026 Combined Section | v1.2 | 2/2 | Complete | 2026-04-18 |
 | 24. Sponsors Platinum & Edition 2023 | v1.2 | 3/3 | Complete (components) | 2026-04-18 |
 | 25. Hero Redesign | v1.2 | 1/1 | Complete (live) | 2026-04-18 |
-| 26. Homepage Wiring | v1.2 | 0/3 | Planned | - |
+| 26. Homepage Wiring | v1.2 | 1/3 | In progress | - |
