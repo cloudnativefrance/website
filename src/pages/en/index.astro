@@ -3,10 +3,11 @@ import Layout from "../../layouts/Layout.astro";
 import HeroSection from "@/components/hero/HeroSection.astro";
 import KeyNumbers from "@/components/hero/KeyNumbers";
 import CfpSection from "@/components/cfp/CfpSection.astro";
-import PastEditionSection from "@/components/past-editions/PastEditionSection.astro";
-import PastEditionMinimal from "@/components/past-editions/PastEditionMinimal.astro";
-import TestimonialsStrip from "@/components/testimonials/TestimonialsStrip.astro";
-import { EDITION_2026, EDITION_2023 } from "@/lib/editions-data";
+import Edition2026Combined from "@/components/past-editions/Edition2026Combined.astro";
+import Edition2023Link from "@/components/past-editions/Edition2023Link.astro";
+import SponsorsPlatinumStrip from "@/components/sponsors/SponsorsPlatinumStrip.astro";
+import { EDITION_2023 } from "@/lib/editions-data";
+import { getCollection } from "astro:content";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { eventSchemaJson } from "@/lib/event-schema";
 
@@ -16,44 +17,11 @@ const description = t("seo.default_description");
 const siteUrl = Astro.site ? Astro.site.toString() : "https://cloudnativedays.fr/";
 const schemaJson = eventSchemaJson({ lang, siteUrl, description });
 
-const edition2026Props = {
-  rail: t("editions.rail.2026"),
-  heading: t("editions.2026.heading"),
-  stats: EDITION_2026.stats.map((s) => ({ value: s.value, label: t(s.labelKey) })),
-  video: {
-    youtubeId: EDITION_2026.youtubeId,
-    caption: t("editions.2026.video_caption"),
-  },
-  photos: EDITION_2026.thumbnails.map((th) => ({
-    src: th.src,
-    alt: t(th.altKey),
-    size: th.size,
-  })),
-  galleryCta: {
-    label: t("editions.2026.gallery_cta") || t("editions.2023.gallery_cta"),
-    href: EDITION_2026.galleryUrl,
-  },
-  placeholder: EDITION_2026.placeholder,
-  id: "edition-2026",
-};
-
-// 2023-variant props — minimal homepage block (17-04): 3 photos + logo + playlist link
-const edition2023MinimalProps = {
-  id: "edition-2023",
-  title: t("editions.2023.compact_title"),
-  photos: EDITION_2023.thumbnails.map((th) => ({
-    src: th.src,
-    alt: t(th.altKey),
-  })),
-  logo: EDITION_2023.brandLogo,
-  logoAlt: "Kubernetes Community Days France 2023",
-  playlistLink: {
-    label: t("editions.2023.video_cta"),
-    href: EDITION_2023.playlistUrl,
-  },
-  viewPageHref: "/en/2023",
-  viewPageLabel: t("editions.2023.view_page_cta"),
-};
+// Sponsors loaded at the page boundary — CSV is the single source of truth (CLAUDE.md).
+// SponsorsPlatinumStrip is data-agnostic by design (Phase 24 decision); the page filter
+// keeps tier-selection logic out of the reusable component.
+const allSponsors = await getCollection("sponsors");
+const platinumSponsors = allSponsors.filter((s) => s.data.tier === "platinum");
 ---
 
 <Layout
@@ -65,9 +33,22 @@ const edition2023MinimalProps = {
   <main>
     <HeroSection />
     <KeyNumbers client:idle lang={lang} />
+    <Edition2026Combined />
+    <Edition2023Link
+      id="edition-2023"
+      heading={t("editions.2023.compact_title")}
+      logo={EDITION_2023.brandLogo}
+      logoAlt="Kubernetes Community Days France 2023"
+      viewPageLabel={t("editions.2023.view_page_cta")}
+      viewPageHref="/en/2023"
+    />
     <CfpSection />
-    <TestimonialsStrip />
-    <PastEditionSection {...edition2026Props} />
-    <PastEditionMinimal {...edition2023MinimalProps} />
+    {platinumSponsors.length > 0 && (
+      <SponsorsPlatinumStrip
+        id="sponsors-homepage"
+        sponsors={platinumSponsors}
+        lang={lang}
+      />
+    )}
   </main>
 </Layout>
