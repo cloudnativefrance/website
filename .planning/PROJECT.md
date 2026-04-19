@@ -19,27 +19,18 @@ The conference website for Cloud Native Days France, a community-driven cloud-na
 
 A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register — all within 5 seconds of landing.
 
-## Current Milestone: v1.2 Homepage Restructuring
+## Next Milestone: v1.3 (TBD)
 
-**Goal:** Restructure the homepage layout per validated Stitch mockup — merge 2026 film+testimonials, add newsletter CTA, add sponsors platinum section, simplify 2023 bloc.
+No active milestone. Run `/gsd-new-milestone` to define v1.3 goals + requirements + roadmap.
 
-**Target features:**
-- Hero: swap background image (user provides) + increase opacity ~75% + add 3rd CTA "Restez informé" (Accent Pink ghost button, mail icon, newsletter placeholder anchor)
-- Section reorder: Hero → Key Numbers → Édition 2026 → Mini-bloc 2023 → CFP → Sponsors Platinum
-- Édition 2026 combined section: 3 photos + film + "Voir tous les replays →" + "Télécharger le bilan 2026 (PDF) →" (one-pager link) + testimonials cards
-- Mini-bloc 2023: reduce to logo + text link only (remove photos)
-- Sponsors Platinum: new homepage section showing Platinum tier logos + "Voir tous les sponsors →" link
-
-**Scope notes:**
-- Stitch mockup "Homepage Mockup v2 — Restructured Sections" (Accent Pink CTA version) is the design reference
-- Newsletter backend (CLO-6) is out of scope — hero CTA is placeholder anchor for now
-- One-pager PDF: https://drive.google.com/file/d/1rlrY9EkulGSgeCPenyiN4ZnxWs5BXPBo/view
-- Linear issues: CLO-14, CLO-16, CLO-23, CLO-26, partial CLO-6
-
-**Deferred:**
-- P1: Subjective visual UATs for 7 phases (~18 tests)
-- P2: SPKR-01 fixture drift, Zod 13 `LoaderConstraint` errors, organizer content placeholders
-- Newsletter backend integration (CLO-6 full scope)
+**Candidate v1.3 themes** (from v1.2 deferred items + open Linear issues):
+- Hero pitch text rewrite (CLO-19 partial)
+- Full favicon pipeline: apple-touch-icon, manifest, multi-resolution .ico (CLO-17 partial)
+- Self-hosted photo galleries (CLO-13 — replace Ente external dependency)
+- Newsletter backend wiring beyond placeholder (CLO-6 full)
+- Social links verification + extraction to `src/lib/external-urls.ts` (CLO-15)
+- Pre-existing baseline cleanup: 9 non-hero Accent Pink usages, 5 astro-check errors (`content.config.ts` Zod regression + `Edition2023PhotoGrid.astro` implicit-any), 7 pre-existing test failures
+- CFP page (CLO-22), pricing/billetterie (CLO-9, CLO-25), FAQ (CLO-27), feature flags (CLO-5)
 
 ## Requirements
 
@@ -120,4 +111,4 @@ A first-time visitor should immediately understand what the event is, when and w
 | Single-locale schema with FR fallback | Avoids duplicating FR content when EN is missing | Validated in v1.0 |
 
 ---
-*Last updated: 2026-04-18 — v1.2 milestone initialized (Homepage Restructuring).*
+*Last updated: 2026-04-19 — v1.2 milestone shipped (Homepage Restructuring). Ready for /gsd-new-milestone v1.3.*

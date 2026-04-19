@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.2
-milestone_name: Homepage Restructuring
-status: feature-complete
-stopped_at: Plan 26-03 complete (3 orphan v1.1-era homepage components deleted via atomic git rm — PastEditionSection.astro + PastEditionMinimal.astro + TestimonialsStrip.astro, 406 LOC removed; safety-gate grep confirmed zero foreign importers; astro check baseline dropped 9 -> 5 errors; build 156 pages green; src/lib/testimonials-data.ts + Edition2023PhotoGrid.astro preserved per anti-overreach gate). Phase 26 complete; v1.2 milestone is feature-complete and ready for milestone audit.
-last_updated: "2026-04-19T06:42:32.000Z"
-last_activity: 2026-04-19 -- Plan 26-03 executed (3 orphan files deleted; 9 -> 5 astro check errors; LAYO-01 fully closed; v1.2 feature-complete)
+milestone_name: Homepage Restructuring (SHIPPED)
+status: milestone-complete
+stopped_at: v1.2 archived — milestones/v1.2-{ROADMAP,REQUIREMENTS,MILESTONE-AUDIT}.md created; ROADMAP collapsed to one-line entry; REQUIREMENTS.md removed (fresh one comes with /gsd-new-milestone); PROJECT.md evolved to mark v1.2 shipped; git tag v1.2 pushed (commit 79dc707)
+last_updated: "2026-04-19T09:50:00.000Z"
+last_activity: 2026-04-19 -- v1.2 milestone closed and archived (PR #4 merged, tag v1.2 pushed, archives written, REQUIREMENTS.md removed)
 progress:
   total_phases: 4
   completed_phases: 4

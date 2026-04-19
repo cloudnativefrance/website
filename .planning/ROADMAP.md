@@ -4,7 +4,7 @@
 
 - ✅ **v1.0 MVP** - Phases 1-14 (shipped 2026-04-13)
 - ✅ **v1.1 Past Editions Showcase** - Phases 15-22 (shipped 2026-04-14)
-- 🚧 **v1.2 Homepage Restructuring** - Phases 23-26 (feature-complete 2026-04-19, awaiting milestone audit)
+- ✅ **v1.2 Homepage Restructuring** - Phases 23-26 (shipped 2026-04-19)
 
 ## Phases
 
@@ -22,87 +22,25 @@ See [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full phase deta
 
 </details>
 
-### ✅ v1.2 Homepage Restructuring (Feature-Complete — 2026-04-19, awaiting milestone audit)
+<details>
+<summary>✅ v1.2 Homepage Restructuring (Phases 23-26) - SHIPPED 2026-04-19</summary>
 
-**Milestone Goal:** Restructure the homepage layout per validated Stitch mockup -- merge 2026 film+testimonials, add newsletter CTA, add sponsors platinum section, simplify 2023 bloc.
+See [milestones/v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md) for full phase details. Audit: [milestones/v1.2-MILESTONE-AUDIT.md](milestones/v1.2-MILESTONE-AUDIT.md). Requirements: [milestones/v1.2-REQUIREMENTS.md](milestones/v1.2-REQUIREMENTS.md).
 
-- [x] **Phase 23: Edition 2026 Combined Section** - New component merging photos, film, replays link, PDF link, and testimonials into one section [completed 2026-04-18]
-- [x] **Phase 24: Sponsors Platinum & Edition 2023** - Platinum sponsor logo strip and simplified 2023 mini-bloc [plans complete 2026-04-18; awaiting Phase 26 homepage mount]
-- [x] **Phase 25: Hero Redesign** - New background image, adjusted opacity, and 3-CTA layout [completed 2026-04-18; ships LIVE on both homepages]
-- [x] **Phase 26: Homepage Wiring** - Atomic section reorder across both locale homepages with accessibility check [completed 2026-04-19; v1.2 feature-complete, ready for milestone audit]
+</details>
 
 ## Phase Details
 
-### Phase 23: Edition 2026 Combined Section
-**Goal**: Visitors see a single, rich 2026 recap section with photos, embedded film, replay link, PDF download, and testimonial cards
-**Depends on**: Nothing (first phase of v1.2)
-**Requirements**: ED26-01, ED26-02, ED26-03
-**Success Criteria** (what must be TRUE):
-  1. Homepage displays a combined 2026 section with 3 photos and the embedded conference film
-  2. Section includes a "Voir tous les replays" link pointing to the replays page/playlist
-  3. Section includes a "Telecharger le bilan 2026 (PDF)" link that opens the one-pager PDF
-  4. Testimonial cards render within the same section (replacing the old separate TestimonialsStrip)
-**Plans**: 2 plans
-  - [x] 23-01-data-and-i18n-PLAN.md — Mutate EDITION_2026 (3 thumbnails, replaysUrl, pdfUrl; drop ambiance-08) and add 4 new editions.2026.* i18n keys to fr+en (D-04..D-08) [completed 2026-04-18]
-  - [x] 23-02-component-PLAN.md — Create src/components/past-editions/Edition2026Combined.astro with 6-block anatomy (rail, h2, mosaic, video, CTA row, testimonials) per UI-SPEC (D-01..D-03, D-11..D-14) [completed 2026-04-18]
-**UI hint**: yes
-
-### Phase 24: Sponsors Platinum & Edition 2023
-**Goal**: Homepage shows Platinum sponsor logos and the 2023 edition bloc is reduced to a minimal logo-and-link format
-**Depends on**: Phase 23
-**Requirements**: SPON-01, ED23-01
-**Success Criteria** (what must be TRUE):
-  1. Homepage displays a Sponsors Platinum section showing logos of all Platinum-tier sponsors
-  2. Sponsors section includes a "Voir tous les sponsors" link navigating to the /sponsors page
-  3. The 2023 bloc shows only the KCD logo and a text link to /2023 (no photo grid)
-  4. Sponsors section gracefully hides when no Platinum sponsors exist in the data
-**Plans**: 3 plans (2 waves)
-  - [x] 24-01-PLAN.md — Foundation: extract safeUrl + safeLogoPath into src/lib/sponsor-utils.ts, refactor SponsorCard.astro, add sponsors.homepage.{heading,cta} i18n keys in fr+en (Pattern B arrow-free) [completed 2026-04-18]
-  - [x] 24-02-PLAN.md — SponsorsPlatinumStrip.astro (NEW) — Platinum logo strip + "Voir tous les sponsors" CTA [completed 2026-04-18]
-  - [x] 24-03-PLAN.md — Edition2023Link.astro (NEW) — minimalised KCD 2023 mini-bloc (logo + heading + text link to /2023) [completed 2026-04-18]
-**UI hint**: yes
-
-### Phase 25: Hero Redesign
-**Goal**: Hero section uses the new background image at higher opacity and presents three distinct CTAs
-**Depends on**: Phase 23
-**Requirements**: HERO-01, HERO-02
-**Success Criteria** (what must be TRUE):
-  1. Hero background displays the user-provided image at approximately 75% opacity
-  2. Hero shows 3 CTAs in a row: "Reservez votre place" (Primary Blue filled), "Voir le programme" (Blue outline), "Restez informe" (Accent Pink ghost with mail icon)
-  3. The "Restez informe" CTA functions as a placeholder anchor (no backend integration required)
-  4. CTA row is responsive and stacks gracefully on mobile viewports
-**Plans**: 1 plan
-
-Plans:
-- [x] 25-01-PLAN.md — Hero redesign in place: ambiance-00.jpg @ opacity-75 background swap (HERO-01) + 3-CTA row (Register filled / Schedule outline / Newsletter ghost+mail-SVG @ #newsletter-stub anchor) + 2 new hero.cta.newsletter* i18n keys in fr+en (HERO-02) [completed 2026-04-18]
-**UI hint**: yes
-
-### Phase 26: Homepage Wiring
-**Goal**: Both FR and EN homepages display sections in the validated order and pass accessibility checks
-**Depends on**: Phase 23, Phase 24, Phase 25
-**Requirements**: LAYO-01, BRND-01
-**Success Criteria** (what must be TRUE):
-  1. Both /fr and /en homepages render sections in order: Hero, Key Numbers, Edition 2026, Mini-bloc 2023, CFP, Sponsors Platinum
-  2. Old separate PastEditionSection and TestimonialsStrip imports are removed from homepage files
-  3. WCAG AA contrast is maintained on the hero section with the new background and opacity
-  4. Build completes with zero errors and no orphaned component imports
-  5. Favicon displays the French flag
-**Plans**: 3 plans (2 waves)
-
-Plans:
-- [x] 26-01-PLAN.md — Homepage rewrite (FR + EN): atomic section reorder + new component mounts + sponsor CSV filter at page boundary [completed 2026-04-18; astro check 11 -> 9; build 156 pages green]
-- [x] 26-02-PLAN.md — Favicon swap: replace public/favicon.svg with French tricolor (BRND-01) [completed 2026-04-19; modern browsers see new flag immediately, .ico legacy fallback retained]
-- [x] 26-03-PLAN.md — Orphan cleanup: delete PastEditionSection.astro + PastEditionMinimal.astro + TestimonialsStrip.astro after re-verifying zero importers [completed 2026-04-19; astro check 9 -> 5 errors; 406 LOC removed; build 156 pages green; v1.2 feature-complete]
-**UI hint**: yes
+(No active milestone — run `/gsd-new-milestone` to start v1.3 planning.)
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 23 → 24 → 25 → 26
+Phases execute in numeric order. Active milestone work appears here once `/gsd-new-milestone` defines v1.3.
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 23. Edition 2026 Combined Section | v1.2 | 2/2 | Complete | 2026-04-18 |
-| 24. Sponsors Platinum & Edition 2023 | v1.2 | 3/3 | Complete (components) | 2026-04-18 |
-| 25. Hero Redesign | v1.2 | 1/1 | Complete (live) | 2026-04-18 |
-| 26. Homepage Wiring | v1.2 | 3/3 | Complete | 2026-04-19 |
+| 23. Edition 2026 Combined Section | v1.2 | 2/2 | Shipped | 2026-04-18 |
+| 24. Sponsors Platinum & Edition 2023 | v1.2 | 3/3 | Shipped | 2026-04-18 |
+| 25. Hero Redesign | v1.2 | 1/1 | Shipped | 2026-04-18 |
+| 26. Homepage Wiring | v1.2 | 3/3 | Shipped | 2026-04-19 |
