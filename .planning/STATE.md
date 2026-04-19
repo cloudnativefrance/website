@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Homepage Restructuring
 status: ready to execute
-stopped_at: Phase 25 complete (1 plan, 2 tasks shipped: 25-01 hero redesign live with ambiance-00 @ opacity-75 + 3-CTA row + Pink Ghost newsletter button + 2 i18n keys)
-last_updated: "2026-04-18T23:00:30.000Z"
-last_activity: 2026-04-18 -- Phase 25 plan 01 executed (HERO-01 + HERO-02 satisfied, hero ships live)
+stopped_at: Phase 26 planned (3 plans in 2 waves; UI-SPEC skipped — composition-only phase; plan-checker PASS with 1 informational FLAG on WCAG inheritance)
+last_updated: "2026-04-19T08:30:00.000Z"
+last_activity: 2026-04-19 -- Phase 26 plans created and verified (homepage rewrite + favicon swap + orphan cleanup)
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 7
+  total_plans: 9
   completed_plans: 6
-  percent: 75
+  percent: 67
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** A first-time visitor should immediately understand what the event is, when and where it happens, and feel compelled to register -- all within 5 seconds of landing.
-**Current focus:** Phase 26 - Homepage Wiring (next; Phase 25 complete and live)
+**Current focus:** Phase 26 - Homepage Wiring (planned, ready to execute — final phase of v1.2)
 
 ## Current Position
 
-Phase: 26 (4 of 4 in v1.2) -- Homepage Wiring (next)
-Plan: 0 of TBD in next phase
-Status: Phase 25 complete; Phase 26 awaits planning
-Last activity: 2026-04-18 -- Phase 25 plan 01 executed in ~4 min: HERO-01 + HERO-02 shipped LIVE on both /fr and /en homepages (ambiance-00 @ opacity-75 background, 3-CTA row with Pink Ghost newsletter button, #newsletter-stub anchor, 2 new i18n keys, fr/en parity preserved). Astro check 11/11 baseline preserved (no NEW errors), build green (156 pages). Accent Pink lockout non-regression: non-hero count holds at 9, in-hero rises 2 → 4 (Ghost CTA overlays).
+Phase: 26 (4 of 4 in v1.2) -- Homepage Wiring
+Plan: 0 of 3 in current phase (26-01 homepage rewrite + 26-02 favicon swap in wave 1; 26-03 orphan cleanup in wave 2)
+Status: Ready to execute
+Last activity: 2026-04-19 -- Phase 26 planned (3 plans, plan-checker PASS, calibrations endorsed: lowercase "platinum" tier filter, SVG-only favicon swap, astro-check trajectory 11→9→5)
 
 Progress: [███████░░░] 75% (6/8 plans complete in v1.2: 2 in Phase 23, 3 in Phase 24, 1 in Phase 25; Phase 26 not yet planned)
 
