@@ -39,6 +39,8 @@ export interface Props {
   replaysCta?: { label: string; href: string };
   /** External CTA: Google Drive one-pager PDF. */
   pdfCta?: { label: string; href: string; ariaLabel: string };
+  /** External CTA: Ente photo gallery. */
+  galleryCta?: { label: string; href: string; ariaLabel: string };
   /** Testimonials list. Component slices to first 3 if longer. */
   testimonials?: ReadonlyArray<{ quote: string; attribution: string }>;
 }
@@ -73,6 +75,11 @@ const pdfCta = props.pdfCta ?? {
   label: t("editions.2026.pdf_cta"),
   href: EDITION_2026.pdfUrl,
   ariaLabel: t("editions.2026.pdf_cta_aria"),
+};
+const galleryCta = props.galleryCta ?? {
+  label: t("editions.2026.gallery_cta"),
+  href: EDITION_2026.galleryUrl,
+  ariaLabel: t("editions.2026.gallery_cta_aria"),
 };
 const testimonials =
   props.testimonials ??
@@ -149,8 +156,8 @@ const cellClass = {
     </figure>
   )}
 
-  {/* 5. CTA row — replays + PDF; stacked mobile, side-by-side desktop */}
-  <div class="mt-8 flex flex-col sm:flex-row gap-4 sm:gap-8 max-w-2xl mx-auto">
+  {/* 5. CTA row — replays + gallery + PDF; stacked mobile, side-by-side desktop */}
+  <div class="mt-8 flex flex-col sm:flex-row sm:flex-wrap justify-center gap-4 sm:gap-8 max-w-3xl mx-auto">
     <a
       href={replaysCta.href}
       class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
@@ -158,6 +165,15 @@ const cellClass = {
       target="_blank"
     >
       {replaysCta.label} <span aria-hidden="true">→</span>
+    </a>
+    <a
+      href={galleryCta.href}
+      class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+      rel="noopener noreferrer"
+      target="_blank"
+      aria-label={galleryCta.ariaLabel}
+    >
+      {galleryCta.label} <span aria-hidden="true">→</span>
     </a>
     <a
       href={pdfCta.href}
