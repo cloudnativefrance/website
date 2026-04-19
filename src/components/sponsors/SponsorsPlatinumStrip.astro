@@ -59,14 +59,14 @@ const cardClasses =
       {heading}
     </h2>
 
-    {/* 2. Logo grid — 2 cols mobile / 3 cols sm / 4 cols lg */}
-    <ul class="mt-12 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 max-w-5xl mx-auto list-none p-0">
+    {/* 2. Logo grid — flex-wrap centered (handles 1..N sponsors gracefully) */}
+    <ul class="mt-12 flex flex-wrap justify-center gap-6 md:gap-8 max-w-5xl mx-auto list-none p-0">
       {sponsors.map((s) => {
         const safeHref = safeUrl(s.data.url);
         const logoSrc = safeLogoPath(s.data.logo);
         const ariaLabel = t("sponsors.card.aria").replace("{name}", s.data.name);
         return (
-          <li>
+          <li class="w-full sm:w-[calc((100%-1.5rem)/2)] md:w-[calc((100%-3rem)/3)] lg:w-[calc((100%-4.5rem)/3)] max-w-xs">
             {safeHref ? (
               <a
                 href={safeHref}
