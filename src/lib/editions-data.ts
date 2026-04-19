@@ -12,6 +12,8 @@
  */
 import type { ImageMetadata } from "astro";
 
+import { ui } from "@/i18n/ui";
+
 import kcd2023_01 from "@/assets/photos/kcd2023/01.jpg";
 import kcd2023_02 from "@/assets/photos/kcd2023/02.jpg";
 import kcd2023_03 from "@/assets/photos/kcd2023/03.jpg";
@@ -24,14 +26,18 @@ import kcd2023_09 from "@/assets/photos/kcd2023/09.jpg";
 import kcd2023_10 from "@/assets/photos/kcd2023/10.jpg";
 import ambiance03 from "@/assets/photos/ambiance/ambiance-03.jpg";
 import ambiance06 from "@/assets/photos/ambiance/ambiance-06.jpg";
-import ambiance08 from "@/assets/photos/ambiance/ambiance-08.jpg";
 import ambiance10 from "@/assets/photos/ambiance/ambiance-10.jpg";
 import kcdLogo from "@/assets/logos/kcd2023/logo-color.png";
 
 type Stat = { value: string; labelKey: string };
 type Thumbnail = {
   src: ImageMetadata;
-  altKey: string;
+  /**
+   * i18n key for the alt text. Narrowed to `keyof typeof ui.fr` so that
+   * `t(thumbnail.altKey)` typechecks at call sites without an `as any` cast
+   * (Phase 23 WR-01 — match testimonials-data.ts template-literal pattern).
+   */
+  altKey: keyof typeof ui.fr;
   size?: "hero" | "medium" | "small";
 };
 
@@ -39,18 +45,25 @@ export const EDITION_2026 = {
   youtubeId: "qyMGuU2-w8o",
   galleryUrl:
     "https://albums.ente.io/?t=QRX4L3WBSD#5jsodRK1mQbqS83qJMd2sVBZr9oW4Bzgm9DuVP6MowY5",
+  // NEW (D-05) — 2026 replays YouTube playlist
+  replaysUrl:
+    "https://www.youtube.com/playlist?list=PLmZ3gFl2Aqt_4_F40zEoUEweEctmtx4p2",
+  // NEW (D-06) — one-pager bilan 2026 PDF on Google Drive
+  pdfUrl:
+    "https://drive.google.com/file/d/1rlrY9EkulGSgeCPenyiN4ZnxWs5BXPBo/view",
   stats: [
     { value: "1700+", labelKey: "editions.2026.stats.participants" },
     { value: "50+", labelKey: "editions.2026.stats.speakers" },
     { value: "40+", labelKey: "editions.2026.stats.sessions" },
   ] as const satisfies ReadonlyArray<Stat>,
-  // 4 real 2026 ambiance photos (ported from venue/index.astro).
-  // Rendered as a clean 2×2 grid via size: "hero" (col-span-12 md:col-span-6).
+  // CHANGED (D-04 + UI-SPEC §3) — 3 entries, sized for asymmetric mosaic
+  // Slot 1 (hero): ambiance-03 main hall ambiance.
+  // Slot 2 (medium): ambiance-06 networking moment.
+  // Slot 3 (medium): ambiance-10 overall venue view.
   thumbnails: [
     { src: ambiance03, altKey: "editions.2026.thumbnail_alt.1", size: "hero" },
-    { src: ambiance08, altKey: "editions.2026.thumbnail_alt.2", size: "hero" },
-    { src: ambiance06, altKey: "editions.2026.thumbnail_alt.3", size: "hero" },
-    { src: ambiance10, altKey: "editions.2026.thumbnail_alt.4", size: "hero" },
+    { src: ambiance06, altKey: "editions.2026.thumbnail_alt.2", size: "medium" },
+    { src: ambiance10, altKey: "editions.2026.thumbnail_alt.3", size: "medium" },
   ] as const satisfies ReadonlyArray<Thumbnail>,
   placeholder: false,
 } as const;

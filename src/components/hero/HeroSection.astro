@@ -6,7 +6,7 @@ import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logos/dark/logo.svg";
-import ambiance from "@/assets/photos/ambiance/ambiance-10.jpg";
+import ambiance00 from "@/assets/photos/ambiance/ambiance-00.jpg";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -20,12 +20,12 @@ const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
 >
   <!-- Venue atmosphere photo as a very subtle backdrop -->
   <img
-    src={ambiance.src}
+    src={ambiance00.src}
     alt=""
     aria-hidden="true"
     loading="eager"
     decoding="async"
-    class="absolute inset-0 w-full h-full object-cover opacity-[0.55] pointer-events-none"
+    class="absolute inset-0 w-full h-full object-cover opacity-75 pointer-events-none"
   />
   <!-- Dark gradient wash keeps text readable over the photo -->
   <div
@@ -67,7 +67,7 @@ const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
 
     <CountdownTimer client:load lang={lang} />
 
-    <div class="flex flex-col gap-3 sm:flex-row sm:gap-4">
+    <div class="flex flex-col gap-3 sm:flex-row sm:gap-4 md:gap-6">
       <a
         href={TICKETING_URL}
         target="_blank"
@@ -90,6 +90,39 @@ const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
           {t("hero.cta.schedule")}
         </a>
       )}
+      <a
+        href="https://d820b57b.sibforms.com/serve/MUIFAMhQae0KzNYxFvx6QSRhBI9sMf8V95ghzeac7poMILWncQNi6r_1yx56s6zfRIyfhiGqhx24CmxsMTthOrreePBCipj7yL0_QdwgtcZxfkzzebIQKjwCga2lb7IOvyDV9qZBzHh-wJVW5k8zHIKorqxmkJDZ3-wxP_jPo7z-0nQBCgoiXjTLPwEAMI52iPoy5OLEibdt3bnF"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={t("hero.cta.newsletter_aria")}
+        class={cn(
+          buttonVariants({ variant: "ghost", size: "lg" }),
+          "h-[52px] px-8 text-lg font-bold",
+          "text-accent",
+          "hover:bg-accent/10 hover:text-accent",
+          "focus-visible:ring-accent/50",
+          "gap-2"
+        )}
+      >
+        <svg
+          aria-hidden="true"
+          focusable="false"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="shrink-0"
+        >
+          <rect width="20" height="16" x="2" y="4" rx="2" />
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+        </svg>
+        {t("hero.cta.newsletter")}
+      </a>
     </div>
   </div>
 </section>
