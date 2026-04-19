@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Homepage Restructuring
 status: in progress
-stopped_at: Plan 26-01 complete (FR + EN homepages rewired to v1.2 section order; astro check baseline 11 -> 9; build 156 pages green). Plans 26-02 (favicon) and 26-03 (orphan cleanup) remaining.
-last_updated: "2026-04-18T08:34:00.000Z"
-last_activity: 2026-04-18 -- Plan 26-01 executed (atomic FR + EN homepage rewrite; 3 new component mounts; sponsor page-boundary filter; orphan editions.*.gallery_cta gone)
+stopped_at: Plan 26-02 complete (favicon.svg swapped to French tricolor; BRND-01 satisfied; build 156 pages green; Layout.astro and favicon.ico untouched). Plan 26-03 (orphan cleanup) remaining.
+last_updated: "2026-04-19T06:37:00.000Z"
+last_activity: 2026-04-19 -- Plan 26-02 executed (favicon.svg → French tricolor 3-band SVG; BRND-01 satisfied; 347 bytes; zero plumbing changes)
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 9
-  completed_plans: 7
-  percent: 78
+  completed_plans: 8
+  percent: 89
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 ## Current Position
 
 Phase: 26 (4 of 4 in v1.2) -- Homepage Wiring
-Plan: 1 of 3 in current phase (26-01 complete; 26-02 favicon swap and 26-03 orphan cleanup remaining)
+Plan: 2 of 3 in current phase (26-01 + 26-02 complete; 26-03 orphan cleanup remaining)
 Status: In progress
-Last activity: 2026-04-18 -- Plan 26-01 shipped (atomic FR+EN homepage rewrite; astro check 11 -> 9; build 156 pages green)
+Last activity: 2026-04-19 -- Plan 26-02 shipped (favicon.svg → French tricolor; BRND-01 satisfied; build 156 pages green)
 
-Progress: [████████░░] 88% (7/8 plans complete in v1.2: 2 in Phase 23, 3 in Phase 24, 1 in Phase 25, 1 in Phase 26)
+Progress: [█████████░] 89% (8/9 plans complete in v1.2: 2 in Phase 23, 3 in Phase 24, 1 in Phase 25, 2 in Phase 26)
 
 ## Performance Metrics
 
@@ -47,7 +47,7 @@ Progress: [████████░░] 88% (7/8 plans complete in v1.2: 2 in
 | 23 | 2/2 | ~19 min | ~10 min |
 | 24 | 3/3 | ~14 min | ~5 min |
 | 25 | 1/1 | ~4 min | ~4 min |
-| 26 | 1/3 | ~6 min | ~6 min |
+| 26 | 2/3 | ~9 min | ~4.5 min |
 
 ## Accumulated Context
 
@@ -90,6 +90,9 @@ Progress: [████████░░] 88% (7/8 plans complete in v1.2: 2 in
 - [26-01]: Edition2026Combined mounted with zero props — component resolves its own data/i18n defaults (idiomatic homepage usage per Phase 23 contract).
 - [26-01]: Belt-and-braces SponsorsPlatinumStrip empty-state guard — caller wraps with {platinumSponsors.length > 0 && ...} alongside the component's internal guard (intentional redundancy per Phase 24).
 - [26-01]: Astro check baseline 11 -> 9 (orphan editions.2026.gallery_cta and editions.2023.gallery_cta references gone). Build green at 156 pages.
+- [26-02]: favicon.svg replaced with 3-band French tricolor SVG (#002654 / #FFFFFF / #ED2939). Square 1:1 viewBox (3x3) chosen over real-flag 2:3 — browsers render favicons into a square slot. shape-rendering=crispEdges keeps band boundaries pixel-sharp. No prefers-color-scheme variant (national flag has no dark-mode form). 347 bytes.
+- [26-02]: public/favicon.ico left untouched as legacy fallback (modern browsers prefer SVG via Layout.astro line 92; .ico declared on line 93 stays for IE/Edge < 79). User can later regenerate .ico from new SVG via ImageMagick if pixel-perfect legacy parity matters.
+- [26-02]: src/layouts/Layout.astro untouched — existing <link rel="icon" type="image/svg+xml" href="/favicon.svg" /> already pointed at the right path; swap is purely the file body (zero plumbing changes).
 
 ### Pending Todos
 
@@ -103,6 +106,6 @@ Progress: [████████░░] 88% (7/8 plans complete in v1.2: 2 in
 
 ## Session Continuity
 
-Last session: 2026-04-18T08:34:00.000Z
-Stopped at: Plan 26-01 complete (FR + EN homepages atomically rewired to v1.2 section order; Edition2026Combined / Edition2023Link / SponsorsPlatinumStrip mounted live for first time; sponsor page-boundary CSV filter; orphan editions.*.gallery_cta references eliminated). Astro check 11 -> 9 errors. Build green at 156 pages. LAYO-01 satisfied. Next: Plans 26-02 (favicon swap, BRND-01) and 26-03 (orphan component file cleanup).
-Resume file: .planning/phases/26-homepage-wiring/26-01-SUMMARY.md
+Last session: 2026-04-19T06:37:00.000Z
+Stopped at: Plan 26-02 complete (favicon.svg swapped to French tricolor; BRND-01 satisfied at the asset layer; modern browsers see new flag immediately on next page load; .ico legacy fallback retained for IE/Edge < 79; Layout.astro untouched). Build green at 156 pages. Next: Plan 26-03 (orphan component file cleanup — PastEditionSection.astro + PastEditionMinimal.astro + TestimonialsStrip.astro deletion after re-verifying zero importers).
+Resume file: .planning/phases/26-homepage-wiring/26-02-SUMMARY.md

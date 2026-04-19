@@ -32,7 +32,7 @@ Requirements for Homepage Restructuring milestone. Each maps to roadmap phases.
 
 ### Branding
 
-- [ ] **BRND-01**: Favicon displays the French flag instead of current icon
+- [x] **BRND-01**: Favicon displays the French flag instead of current icon
 
 ## v2 Requirements
 
@@ -67,7 +67,7 @@ Deferred to future milestones.
 | ED23-01 | Phase 24 | In progress (component shipped in 24-03; awaiting Phase 26 homepage mount) |
 | SPON-01 | Phase 24 | In progress (foundation + component shipped in 24-01 + 24-02; awaiting Phase 26 homepage mount) |
 | LAYO-01 | Phase 26 | Complete (26-01) |
-| BRND-01 | Phase 26 | Pending |
+| BRND-01 | Phase 26 | Complete (26-02) |
 
 **Coverage:**
 - v1.2 requirements: 9 total
