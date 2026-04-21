@@ -87,12 +87,12 @@ export default function CountdownTimer({ lang }: CountdownTimerProps) {
     <div
       role="timer"
       aria-label={ariaLabel}
-      className="flex flex-row items-center justify-center gap-3 sm:gap-4"
+      className="flex w-full max-w-full flex-row items-stretch justify-center gap-2 sm:gap-4"
     >
       {UNITS.map((unit) => (
         <div
           key={unit}
-          className="min-w-[60px] rounded-lg border border-border bg-card px-2 py-3 text-center sm:min-w-[72px]"
+          className="flex min-w-0 flex-1 flex-col items-center justify-center rounded-lg border border-border bg-card px-1 py-3 text-center sm:min-w-[72px] sm:flex-none sm:px-2"
         >
           <span
             className="block text-xl font-bold text-foreground sm:text-5xl"
@@ -100,7 +100,7 @@ export default function CountdownTimer({ lang }: CountdownTimerProps) {
           >
             {String(timeLeft[unit]).padStart(2, "0")}
           </span>
-          <span className="mt-1 block text-base font-normal uppercase tracking-widest text-muted-foreground">
+          <span className="mt-1 block text-[10px] font-normal uppercase tracking-wider text-muted-foreground sm:text-base sm:tracking-widest">
             {t(`countdown.${unit}`)}
           </span>
         </div>

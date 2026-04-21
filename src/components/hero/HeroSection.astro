@@ -38,27 +38,27 @@ const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
     class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--color-background)_0%,_var(--color-secondary)_100%)] opacity-40 pointer-events-none"
   />
 
-  <div class="relative z-10 mx-auto flex max-w-4xl flex-col items-center gap-8 md:gap-10">
+  <div class="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center gap-8 md:gap-10">
     <h1 class="sr-only">{t("hero.title")}</h1>
     <img
       src={logo.src}
       alt={t("hero.logo_alt")}
       width={400}
       height={(400 * logo.height) / logo.width}
-      class="w-[320px] md:w-[400px] h-auto"
+      class="w-full max-w-[260px] sm:max-w-[320px] md:max-w-[400px] h-auto"
       loading="eager"
       decoding="async"
     />
 
     <p
-      class="flex flex-wrap items-center justify-center gap-3 text-lg md:text-xl text-muted-foreground"
+      class="flex w-full flex-wrap items-center justify-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl text-muted-foreground"
       style="line-height:1.4;"
     >
-      <Badge className="bg-accent/15 text-accent text-base font-normal uppercase tracking-widest rounded-full px-3 py-1">
+      <Badge className="bg-accent/15 text-accent text-sm sm:text-base font-normal uppercase tracking-widest rounded-full px-3 py-1">
         {t("hero.subtitle")}
       </Badge>
       <span>&mdash;</span>
-      <span>{t("hero.venue")}</span>
+      <span class="break-words">{t("hero.venue")}</span>
     </p>
 
     <p class="max-w-[720px] text-balance text-lg md:text-xl text-foreground" style="line-height:1.55;">
