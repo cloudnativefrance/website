@@ -1,0 +1,38 @@
+# Daily feature-flag transition check.
+# Runs at 22:05 UTC (~00:05 Europe/Paris in summer) and 23:05 UTC (~00:05 CET in winter)
+# to cover DST. Invokes build-image.yml only when a flag transition is detected.
+name: Feature flag transition check
+
+on:
+  schedule:
+    - cron: "5 22 * * *"   # 22:05 UTC = 00:05 CEST (summer)
+    - cron: "5 23 * * *"   # 23:05 UTC = 00:05 CET  (winter)
+  workflow_dispatch:
+
+jobs:
+  check-transitions:
+    runs-on: ubuntu-latest
+    outputs:
+      should-rebuild: ${{ steps.check.outputs.should-rebuild }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - id: check
+        run: pnpm tsx scripts/check-flag-transitions.ts
+
+  rebuild:
+    needs: check-transitions
+    if: needs.check-transitions.outputs.should-rebuild == 'true'
+    uses: ./.github/workflows/build-image.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
