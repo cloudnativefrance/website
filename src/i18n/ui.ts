@@ -303,6 +303,17 @@ export const ui = {
       "Vivement la prochaine édition pour retrouver cette communauté.",
     "testimonials.5.attribution":
       "F. Bernard — Tech Lead, organisation placeholder",
+    // --- Feature flags (coming-soon layout) ---
+    "flags.soon.notify_cta": "Être prévenu·e",
+    "flags.soon.opens_on": "Ouverture le {date}",
+    "flags.cfp.soon.title": "L'appel à propositions arrive",
+    "flags.cfp.soon.body":
+      "Inscrivez-vous à la newsletter pour être alerté·e dès l'ouverture.",
+    "flags.tickets.soon.title": "La billetterie arrive",
+    "flags.tickets.soon.body": "Les inscriptions ouvrent le 15 janvier 2027.",
+    "flags.programme.soon.title": "Le programme arrive",
+    "flags.programme.soon.body":
+      "Le programme complet sera dévoilé en avril 2027.",
   },
   en: {
     "nav.home": "Home",
@@ -600,5 +611,16 @@ export const ui = {
       "Already looking forward to next edition to reconnect with this community.",
     "testimonials.5.attribution":
       "F. Bernard — Tech Lead, placeholder organization",
+    // --- Feature flags (coming-soon layout) ---
+    "flags.soon.notify_cta": "Notify me",
+    "flags.soon.opens_on": "Opens on {date}",
+    "flags.cfp.soon.title": "The Call for Proposals is coming",
+    "flags.cfp.soon.body":
+      "Subscribe to the newsletter and we'll let you know as soon as it opens.",
+    "flags.tickets.soon.title": "Ticketing is coming",
+    "flags.tickets.soon.body": "Registration opens on 15 January 2027.",
+    "flags.programme.soon.title": "The programme is coming",
+    "flags.programme.soon.body":
+      "The full programme will be unveiled in April 2027.",
   },
 } as const;

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { FLAGS, type FlagDefinition, type FlagName } from "@/config/flags";
 import { generateFlagEnvSchema } from "@/config/flags-env";
+import { ui } from "@/i18n/ui";
 
 describe("flag registry", () => {
   it("exports FLAGS as a non-empty record", () => {
@@ -75,6 +76,35 @@ describe("generateFlagEnvSchema", () => {
     for (const key of Object.keys(schema)) {
       expect(schema[key].optional).toBe(true);
       expect(schema[key].default).toBe("");
+    }
+  });
+});
+
+describe("i18n completeness (page-kind flags)", () => {
+  const LOCALES = ["fr", "en"] as const;
+
+  it("every page-kind flag has matching soon.title and soon.body in every locale", () => {
+    for (const [name, flag] of Object.entries(FLAGS)) {
+      if (flag.kind !== "page") continue;
+      for (const locale of LOCALES) {
+        const titleKey = `flags.${name}.soon.title`;
+        const bodyKey = `flags.${name}.soon.body`;
+        expect(
+          ui[locale][titleKey as keyof (typeof ui)[typeof locale]],
+          `Missing ${titleKey} in locale ${locale}`,
+        ).toBeTruthy();
+        expect(
+          ui[locale][bodyKey as keyof (typeof ui)[typeof locale]],
+          `Missing ${bodyKey} in locale ${locale}`,
+        ).toBeTruthy();
+      }
+    }
+  });
+
+  it("shared coming-soon chrome keys exist in every locale", () => {
+    for (const locale of LOCALES) {
+      expect(ui[locale]["flags.soon.notify_cta" as keyof (typeof ui)[typeof locale]]).toBeTruthy();
+      expect(ui[locale]["flags.soon.opens_on" as keyof (typeof ui)[typeof locale]]).toBeTruthy();
     }
   });
 });
