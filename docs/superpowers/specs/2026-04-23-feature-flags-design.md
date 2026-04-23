@@ -387,6 +387,33 @@ One non-blocking item to confirm during `writing-plans`:
 - Vitest suite passes: Layer 1 (boundaries), Layer 2 (registry integrity, i18n completeness), Layer 3 (route branching).
 - `scripts/check-flag-transitions.ts --dry-run` exits 0.
 - `flag-cron.yml` is present and passes a manual `workflow_dispatch` run without triggering a deploy (no transitions pending at test time).
+- `docs/feature-flags.md` is present and accurate: describes registry location, flag anatomy, add-a-flag checklist (page vs element), env overrides, CI cron behavior, local testing recipes, and troubleshooting. Kept in lockstep with the shipped code — any deviation during implementation must be reflected in the guide.
+
+## Deliverables (must ship in the same PR)
+
+Code:
+- `src/config/flags.ts` — registry + `FlagDefinition` type.
+- `src/config/flags-env.ts` — `generateFlagEnvSchema()` helper consumed by `astro.config.mjs`.
+- `src/lib/flags.ts` — `getFlagState`, `isFlagActive`, `FlagState` type.
+- `src/components/flags/ComingSoonLayout.astro`, `src/components/flags/FeatureGate.astro`.
+- `scripts/check-flag-transitions.ts`.
+- `.github/workflows/flag-cron.yml`.
+
+Code migration:
+- `src/lib/cfp.ts` renamed to `src/lib/event.ts`, with `getCfpState` / `CFP_OPENS` / `CFP_CLOSES` / `CfpState` removed and `NEWSLETTER_URL` added.
+- All three consumers (`HeroSection.astro`, `Navigation.astro`, `CfpSection.astro`) updated to the new API.
+- `cfp.cta.notify` button in `CfpSection.astro` repointed to `NEWSLETTER_URL`.
+- Inline Brevo URL in `HeroSection.astro` replaced by import of `NEWSLETTER_URL`.
+
+Tests:
+- `src/lib/__tests__/flags.test.ts` (boundaries), `src/lib/__tests__/flags-registry.test.ts` (integrity + i18n completeness).
+- Route integration tests per gated route × state.
+
+i18n:
+- New `flags.*` keys in both `fr` and `en` blocks of `src/i18n/ui.ts`.
+
+Docs:
+- `docs/feature-flags.md` — comprehensive configuration guide (already drafted alongside this spec; kept in sync during implementation).
 
 ## References
 
