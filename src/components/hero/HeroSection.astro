@@ -1,6 +1,7 @@
 ---
 import GeoBackground from "@/components/patterns/GeoBackground.astro";
 import CountdownTimer from "./CountdownTimer";
+import FeatureGate from "@/components/flags/FeatureGate.astro";
 import { Badge } from "@/components/ui/badge";
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -66,7 +67,9 @@ const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
       {t("hero.description")}
     </p>
 
-    <CountdownTimer client:load lang={lang} />
+    <FeatureGate flag="homepage_countdown">
+      <CountdownTimer client:load lang={lang} />
+    </FeatureGate>
 
     <div class="flex flex-col gap-3 sm:flex-row sm:gap-4 md:gap-6">
       <a
