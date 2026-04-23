@@ -1,8 +1,11 @@
 // @ts-check
-import { defineConfig, fontProviders } from "astro/config";
+import { defineConfig, envField, fontProviders } from "astro/config";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
+
+// Use relative import to resolve @ alias at config load time
+import { generateFlagEnvSchema } from "./src/config/flags-env.ts";
 
 // https://astro.build/config
 export default defineConfig({
@@ -46,4 +49,12 @@ export default defineConfig({
       fallbacks: ["sans-serif"],
     },
   ],
+  env: {
+    schema: Object.fromEntries(
+      Object.entries(generateFlagEnvSchema()).map(([key, entry]) => [
+        key,
+        envField.enum(entry),
+      ]),
+    ),
+  },
 });
