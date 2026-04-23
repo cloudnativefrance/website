@@ -369,3 +369,15 @@ The `homepage_countdown` flag gates the element, but if the flag is mis-wired (e
 - **CI cron:** `.github/workflows/flag-cron.yml`
 - **Transition script:** `scripts/check-flag-transitions.ts`
 - **Tests:** `src/lib/__tests__/flags.test.ts`, `src/lib/__tests__/flags-registry.test.ts`, route tests per page
+
+### Stitch mockups (approved 2026-04-23)
+
+Design system: CND France 2027 (project `14858529831105057917`, DS asset `3926684191749761173`).
+
+| Flag | Desktop | Mobile |
+|---|---|---|
+| CFP | `de33933bf91f468b86dc0e30bd78d4b3` | `d45aad98eab74977b8748dd8a3656233` |
+| Tickets | `a1707a1c2aaa4c46ba39f5d329c09760` | `0b5848cd51bd4a9ab7093a3cdfac802c` |
+| Programme | `651e93b6e6af45398ed96499fd65ecc1` | `859a969b510f4a8a8cd2c4882c20da37` |
+
+All six screens share a single reusable shell: full-width hero with H1 + body + "Ouverture le {date}" line + accent-pink "Être prévenu·e" CTA on the site's existing hex-mesh background. `ComingSoonLayout.astro` implements this shell; only i18n copy varies between flags.
