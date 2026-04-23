@@ -42,10 +42,19 @@ export function isFlagActive(name: FlagName, now: Date = new Date()): boolean {
   return getFlagState(flag, now, override) === "active";
 }
 
+/**
+ * Read from node's `process.env` at build time — safe in server contexts,
+ * returns undefined in client contexts where `process` is not defined.
+ *
+ * Astro 5's typed env vars declared with `context: "server"` are not
+ * exposed via `import.meta.env`; they are only reachable through the
+ * `astro:env/server` module (which requires static per-variable imports).
+ * Reading `process.env` directly avoids that constraint and works for any
+ * dynamically-derived key such as `FLAG_${name.toUpperCase()}`.
+ */
 export function readEnvOverride(name: FlagName): "on" | "off" | undefined {
   const key = `FLAG_${name.toUpperCase()}`;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raw = (import.meta.env as any)[key];
+  const raw = typeof process !== "undefined" ? process.env[key] : undefined;
   if (raw === "on") return "on";
   if (raw === "off") return "off";
   return undefined;
