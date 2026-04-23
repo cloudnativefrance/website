@@ -210,7 +210,7 @@ The env schema is generated from the registry via `generateFlagEnvSchema()` in `
 override arg (used in tests) > env var > date window
 ```
 
-If `FLAG_CFP=on` is set AND `CFP_OPENS` is in the future, the flag is `active`. The env var always wins unless a test explicitly passes an override argument to `getFlagState`.
+If `FLAG_CFP=on` is set AND `FLAGS.cfp.opens` is in the future, the flag is `active`. The env var always wins unless a test explicitly passes an override argument to `getFlagState`.
 
 ---
 

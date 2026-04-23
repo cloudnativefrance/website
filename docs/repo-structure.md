@@ -36,7 +36,7 @@ Local CSV fallbacks that stand in when the production Google Sheet env vars are 
 
 ## src/lib
 
-Framework-free helpers. `remote-csv.ts` fetches the Google Sheet CSVs (with the local files as fallbacks). `schedule.ts`, `speakers.ts`, `sponsors.ts`, `team.ts` parse and expose typed data (`loadSessions`, `getAllSpeakers`, etc.). `cfp.ts` holds the event lifecycle constants (`TARGET_DATE`, `CFP_OPENS`, `getCfpState`). `event-schema.ts` builds the JSON-LD structured-data payload.
+Framework-free helpers. `remote-csv.ts` fetches the Google Sheet CSVs (with the local files as fallbacks). `schedule.ts`, `speakers.ts`, `sponsors.ts`, `team.ts` parse and expose typed data (`loadSessions`, `getAllSpeakers`, etc.). `event.ts` holds the event anchor (`TARGET_DATE`, `isPostEvent`) and outbound URLs (`CONFERENCE_HALL_URL`, `NEWSLETTER_URL`, `getReplaysPath`). `flags.ts` holds the pure flag-state evaluator (`getFlagState`, `isFlagActive`) — CFP date logic moved to `src/config/flags.ts`. `event-schema.ts` builds the JSON-LD structured-data payload.
 
 ## src/i18n
 
