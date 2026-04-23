@@ -1,0 +1,21 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import CfpSection from "@/components/cfp/CfpSection.astro";
+import ComingSoonLayout from "@/components/flags/ComingSoonLayout.astro";
+import { isFlagActive } from "@/lib/flags";
+import { useTranslations } from "@/i18n/utils";
+
+const lang = "en";
+const t = useTranslations(lang);
+const active = isFlagActive("cfp");
+---
+
+{active ? (
+  <Layout title={t("cfp.heading")} description={t("cfp.description.open")} lang={lang}>
+    <main>
+      <CfpSection />
+    </main>
+  </Layout>
+) : (
+  <ComingSoonLayout flag="cfp" lang={lang} />
+)}

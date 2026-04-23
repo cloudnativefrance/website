@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ui, type Locale } from "@/i18n/ui";
-import { getReplaysPath, TARGET_DATE } from "@/lib/cfp";
+import { getReplaysPath, TARGET_DATE } from "@/lib/event";
 
 interface CountdownTimerProps {
   lang: Locale;

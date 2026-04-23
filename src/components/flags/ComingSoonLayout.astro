@@ -1,0 +1,97 @@
+---
+/**
+ * Shared "coming soon" layout for page-kind flags.
+ *
+ * Used by route files when a page-kind flag is not `active`:
+ *
+ *   {isFlagActive("cfp")
+ *     ? <RealCfpPage />
+ *     : <ComingSoonLayout flag="cfp" lang={lang} />}
+ *
+ * Reads copy from src/i18n/ui.ts under the flags.<name>.soon.{title,body}
+ * namespace. Formats the opens date in the requested locale. Renders a
+ * newsletter CTA pointing at the hosted Brevo form.
+ *
+ * Approved Stitch mockups: see docs/feature-flags.md "Stitch mockups" section.
+ */
+import Layout from "@/layouts/Layout.astro";
+import GeoBackground from "@/components/patterns/GeoBackground.astro";
+import { FLAGS, type FlagName } from "@/config/flags";
+import { useTranslations } from "@/i18n/utils";
+import { NEWSLETTER_URL } from "@/lib/event";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+
+interface Props {
+  flag: FlagName;
+  lang: "fr" | "en";
+}
+
+const { flag, lang } = Astro.props;
+const t = useTranslations(lang);
+const flagDef = FLAGS[flag];
+
+if (flagDef.kind !== "page") {
+  throw new Error(
+    `<ComingSoonLayout> received non-page flag "${flag}". Only page-kind flags may be used.`,
+  );
+}
+
+const title = t(`flags.${flag}.soon.title` as Parameters<typeof t>[0]);
+const body = t(`flags.${flag}.soon.body` as Parameters<typeof t>[0]);
+const notifyCta = t("flags.soon.notify_cta");
+
+const localeTag = lang === "fr" ? "fr-FR" : "en-US";
+const opensDate = flagDef.opens ? new Date(flagDef.opens) : null;
+const formattedOpens = opensDate
+  ? new Intl.DateTimeFormat(localeTag, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(opensDate)
+  : null;
+const opensLine = formattedOpens
+  ? t("flags.soon.opens_on").replace("{date}", formattedOpens)
+  : null;
+---
+
+<Layout title={title} description={body} lang={lang}>
+  <main>
+    <section
+      class="relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden px-4 py-16 md:py-24"
+    >
+      <GeoBackground class="absolute inset-0" />
+      <div
+        class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--color-background)_0%,_var(--color-secondary)_100%)] opacity-40 pointer-events-none"
+      ></div>
+      <div
+        class="relative z-10 mx-auto flex w-full max-w-2xl flex-col items-center gap-6 text-center"
+      >
+        <h1
+          class="text-3xl font-bold leading-tight tracking-[-0.02em] text-foreground md:text-4xl"
+        >
+          {title}
+        </h1>
+        <p
+          class="max-w-[60ch] text-base leading-[1.6] text-muted-foreground md:text-lg"
+        >
+          {body}
+        </p>
+        {opensLine && (
+          <p class="text-sm text-muted-foreground">{opensLine}</p>
+        )}
+        <a
+          href={NEWSLETTER_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          class={cn(
+            buttonVariants({ variant: "default", size: "lg" }),
+            "h-[52px] px-8 text-lg font-bold",
+          )}
+        >
+          {notifyCta}
+        </a>
+      </div>
+    </section>
+  </main>
+</Layout>

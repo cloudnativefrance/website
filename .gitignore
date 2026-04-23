@@ -11,3 +11,6 @@ drive-download-*.zip
 
 # Phase 16: KCD 2023 photo originals (not committed; only ≤1 MB JPG masters are)
 _photo-drop/
+
+# Superpowers runtime artifacts (brainstorm screens, transient state)
+.superpowers/

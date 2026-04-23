@@ -1,0 +1,26 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import ComingSoonLayout from "@/components/flags/ComingSoonLayout.astro";
+import { isFlagActive } from "@/lib/flags";
+import { useTranslations } from "@/i18n/utils";
+
+const lang = "en";
+const t = useTranslations(lang);
+const active = isFlagActive("tickets");
+const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
+---
+
+{active ? (
+  <Layout title={t("hero.cta.register")} description={t("flags.tickets.soon.body")} lang={lang}>
+    <main class="flex min-h-[50vh] flex-col items-center justify-center p-8 text-center gap-4">
+      <meta http-equiv="refresh" content={`0; url=${TICKETING_URL}`} />
+      <p class="text-base text-muted-foreground">
+        <a href={TICKETING_URL} target="_blank" rel="noopener noreferrer" class="underline">
+          {TICKETING_URL}
+        </a>
+      </p>
+    </main>
+  </Layout>
+) : (
+  <ComingSoonLayout flag="tickets" lang={lang} />
+)}
