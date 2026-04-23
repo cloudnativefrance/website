@@ -1,0 +1,24 @@
+---
+/**
+ * Conditional render wrapper driven by a feature flag.
+ *
+ * Usage:
+ *   <FeatureGate flag="homepage_countdown">
+ *     <CountdownTimer client:idle />
+ *   </FeatureGate>
+ *
+ * Renders the slot only when `isFlagActive(flag)` returns true. Resolves
+ * the flag at build time via the registry + any FLAG_<NAME> env override.
+ */
+import { isFlagActive } from "@/lib/flags";
+import type { FlagName } from "@/config/flags";
+
+interface Props {
+  flag: FlagName;
+}
+
+const { flag } = Astro.props;
+const show = isFlagActive(flag);
+---
+
+{show && <slot />}
