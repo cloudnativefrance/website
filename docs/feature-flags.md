@@ -116,7 +116,9 @@ Example: adding `sponsorship_pack` to gate a `/sponsorship` page until 2026-10-0
      : <ComingSoonLayout flag="sponsorship_pack" lang={lang} />}
    ```
 
-4. **Add a Layer 3 route test** in the matching `__tests__/` dir — one assertion per state (pending and active).
+   > **Design note — external-redirect pages (e.g. `/tickets`):** When the active state redirects to an external URL, use `<meta http-equiv="refresh">` placed inside `<main>` (not in `<head>`). `Layout.astro` does not expose a `<head>` slot, so injecting elements into `<head>` from a page file is not supported. The shipped `/tickets` route uses this pattern.
+
+4. **Route test (deferred):** Vitest cannot import `.astro` files without the Astro Vite plugin. Use a Playwright E2E test with env overrides instead (see Known gaps).
 
 5. **Commit** — the CI cron picks up the new flag automatically. No workflow file edits needed.
 
@@ -384,7 +386,7 @@ Filed as a follow-up; does not block the feature-flag landing.
 - **Element wrapper:** `src/components/flags/FeatureGate.astro`
 - **CI cron:** `.github/workflows/flag-cron.yml`
 - **Transition script:** `scripts/check-flag-transitions.ts`
-- **Tests:** `src/lib/__tests__/flags.test.ts`, `src/lib/__tests__/flags-registry.test.ts`, route tests per page
+- **Tests:** `src/lib/__tests__/flags.test.ts`, `src/lib/__tests__/flags-registry.test.ts` (route tests deferred — see Known gaps)
 
 ### Stitch mockups (approved 2026-04-23)
 
