@@ -359,6 +359,22 @@ The `homepage_countdown` flag gates the element, but if the flag is mis-wired (e
 
 ---
 
+## Known gaps
+
+### Route-level integration tests (deferred)
+
+The plan originally called for Vitest route-rendering tests using Astro's experimental `astro/container` API. Attempting this revealed that Vitest cannot import `.astro` files without the Astro Vite plugin configured, and wiring that plugin into `vitest.config.ts` is non-trivial in Astro 6. Unit-level coverage is strong (state machine boundaries, registry integrity, i18n completeness), so the practical fix is Playwright E2E tests driven by env overrides:
+
+```
+FLAG_CFP=on pnpm build && pnpm preview
+# Then a Playwright spec visits /cfp and asserts real CFP content renders.
+# Repeat with FLAG_CFP unset to assert the coming-soon branch.
+```
+
+Filed as a follow-up; does not block the feature-flag landing.
+
+---
+
 ## Reference
 
 - **Design spec:** `docs/superpowers/specs/2026-04-23-feature-flags-design.md`
