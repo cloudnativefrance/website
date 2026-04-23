@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { NEWSLETTER_URL } from "@/lib/event";
 import logo from "@/assets/logos/dark/logo.svg";
 import ambiance00 from "@/assets/photos/ambiance/ambiance-00.jpg";
 
@@ -91,7 +92,7 @@ const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
         </a>
       )}
       <a
-        href="https://d820b57b.sibforms.com/serve/MUIFAMhQae0KzNYxFvx6QSRhBI9sMf8V95ghzeac7poMILWncQNi6r_1yx56s6zfRIyfhiGqhx24CmxsMTthOrreePBCipj7yL0_QdwgtcZxfkzzebIQKjwCga2lb7IOvyDV9qZBzHh-wJVW5k8zHIKorqxmkJDZ3-wxP_jPo7z-0nQBCgoiXjTLPwEAMI52iPoy5OLEibdt3bnF"
+        href={NEWSLETTER_URL}
         target="_blank"
         rel="noopener noreferrer"
         aria-label={t("hero.cta.newsletter_aria")}

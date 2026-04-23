@@ -1,14 +1,13 @@
 ---
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
-import {
-  getCfpState,
-  CFP_CLOSES,
-  CONFERENCE_HALL_URL,
-} from "@/lib/cfp";
+import { CONFERENCE_HALL_URL, NEWSLETTER_URL } from "@/lib/event";
+import { FLAGS } from "@/config/flags";
+import { getFlagState } from "@/lib/flags";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-const state = getCfpState();
+const state = getFlagState(FLAGS.cfp);
+const CFP_CLOSES = new Date(FLAGS.cfp.closes!);
 const localeTag = lang === "fr" ? "fr-FR" : "en-US";
 const deadline = new Intl.DateTimeFormat(localeTag, {
   year: "numeric",
@@ -23,7 +22,7 @@ const ariaComing = `${t("cfp.status.coming_soon")} — ${t("cfp.description.comi
 
 <section id="cfp" class="relative w-full py-12 md:py-16 bg-background">
   <div class="mx-auto max-w-[1280px] px-4 md:px-6">
-    {state === "open" && (
+    {state === "active" && (
       <div class="flex flex-col items-center text-center md:items-start md:text-left gap-6 max-w-2xl md:mx-0 mx-auto">
         <span
           class="inline-flex items-center gap-2 rounded-full bg-accent text-accent-foreground px-[10px] py-1 text-xs font-normal uppercase tracking-[0.05em]"
@@ -83,7 +82,7 @@ const ariaComing = `${t("cfp.status.coming_soon")} — ${t("cfp.description.comi
       </div>
     )}
 
-    {state === "coming-soon" && (
+    {state === "pending" && (
       <div class="flex flex-col items-center text-center md:items-start md:text-left gap-6 max-w-2xl md:mx-0 mx-auto">
         <span
           class="inline-flex items-center gap-2 rounded-full bg-secondary text-muted-foreground px-[10px] py-1 text-xs font-normal uppercase tracking-[0.05em]"
@@ -116,7 +115,9 @@ const ariaComing = `${t("cfp.status.coming_soon")} — ${t("cfp.description.comi
         </p>
         {hasRealConferenceHall && (
           <a
-            href={CONFERENCE_HALL_URL}
+            href={NEWSLETTER_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             class="inline-flex items-center gap-2 h-[44px] rounded-md border border-border text-foreground px-6 text-base font-medium hover:bg-secondary transition-colors"
           >
             {t("cfp.cta.notify")}
@@ -125,7 +126,7 @@ const ariaComing = `${t("cfp.status.coming_soon")} — ${t("cfp.description.comi
       </div>
     )}
 
-    {state === "closed" && (
+    {state === "ended" && (
       <p class="text-base text-muted-foreground text-center">
         {t("cfp.closed.note")}
       </p>
