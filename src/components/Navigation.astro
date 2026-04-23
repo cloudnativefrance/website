@@ -165,7 +165,7 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
   }
 
   // Reveal post-event-only nav entries (e.g. /replays) once TARGET_DATE has passed.
-  // TARGET_DATE is the single source of truth in src/lib/cfp.ts — read via the
+  // TARGET_DATE is the single source of truth in src/lib/event.ts — read via the
   // header's data-target-date attribute to avoid inlining a drift-prone literal.
   const targetDate = Number(
     document.getElementById("site-header")?.dataset.targetDate,
