@@ -86,6 +86,7 @@ export const ui = {
       "Merci aux organisations qui rendent Cloud Native Days France possible.",
     "sponsors.page.empty":
       "La liste des partenaires sera annoncée prochainement.",
+    "sponsors.empty_state": "Les partenaires de cette édition seront annoncés prochainement.",
     "sponsors.tier.platinum": "Platinum",
     "sponsors.tier.gold": "Gold",
     "sponsors.tier.silver": "Silver",
@@ -369,6 +370,7 @@ export const ui = {
       "Thank you to the organizations making Cloud Native Days France possible.",
     "sponsors.page.empty":
       "The sponsor list will be announced soon.",
+    "sponsors.empty_state": "The sponsors for this edition will be announced soon.",
     "sponsors.tier.platinum": "Platinum",
     "sponsors.tier.gold": "Gold",
     "sponsors.tier.silver": "Silver",
