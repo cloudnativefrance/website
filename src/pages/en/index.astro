@@ -2,7 +2,6 @@
 import Layout from "../../layouts/Layout.astro";
 import HeroSection from "@/components/hero/HeroSection.astro";
 import KeyNumbers from "@/components/hero/KeyNumbers";
-import CfpSection from "@/components/cfp/CfpSection.astro";
 import Edition2026Combined from "@/components/past-editions/Edition2026Combined.astro";
 import SponsorsPlatinumStrip from "@/components/sponsors/SponsorsPlatinumStrip.astro";
 import { getCollection } from "astro:content";
@@ -32,7 +31,6 @@ const platinumSponsors = allSponsors.filter((s) => s.data.tier === "platinum");
     <HeroSection />
     <KeyNumbers client:idle lang={lang} />
     <Edition2026Combined />
-    <CfpSection />
     {platinumSponsors.length > 0 && (
       <SponsorsPlatinumStrip
         id="sponsors-homepage"
