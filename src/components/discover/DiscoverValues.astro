@@ -1,0 +1,59 @@
+---
+interface Stats {
+  participants: string;
+  talks: string;
+  speakers: string;
+  tracks: string;
+}
+
+interface Props {
+  title: string;
+  body: string;
+  stats: Stats;
+}
+
+const { title, body, stats } = Astro.props;
+---
+
+<section id="values" class="bg-card">
+  <div class="mx-auto max-w-7xl px-4 md:px-6 py-16">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <h2 class="text-3xl font-bold text-foreground mb-6">{title}</h2>
+        <p class="text-muted-foreground leading-relaxed">{body}</p>
+      </div>
+      <div class="flex flex-wrap gap-8 justify-center md:justify-end">
+        {[
+          { emoji: "🌐", label: "Open Source" },
+          { emoji: "🤝", label: "Communauté" },
+          { emoji: "🌱", label: "Souveraineté" },
+          { emoji: "♾️", label: "Inclusion" },
+        ].map(({ emoji, label }) => (
+          <div class="flex flex-col items-center gap-2">
+            <span class="text-5xl" aria-hidden="true">{emoji}</span>
+            <span class="text-sm font-medium text-muted-foreground">{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-8 border-t border-border pt-8">
+      <div class="text-center">
+        <div class="text-4xl font-bold text-primary">2 000</div>
+        <div class="text-sm text-muted-foreground mt-1">{stats.participants}</div>
+      </div>
+      <div class="text-center">
+        <div class="text-4xl font-bold text-primary">50+</div>
+        <div class="text-sm text-muted-foreground mt-1">{stats.talks}</div>
+      </div>
+      <div class="text-center">
+        <div class="text-4xl font-bold text-primary">30+</div>
+        <div class="text-sm text-muted-foreground mt-1">{stats.speakers}</div>
+      </div>
+      <div class="text-center">
+        <div class="text-4xl font-bold text-primary">2</div>
+        <div class="text-sm text-muted-foreground mt-1">{stats.tracks}</div>
+      </div>
+    </div>
+  </div>
+</section>
