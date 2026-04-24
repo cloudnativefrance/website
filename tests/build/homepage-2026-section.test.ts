@@ -1,16 +1,8 @@
 /**
- * Phase 17 EDIT-01 / EDIT-07 guard, retargeted in Phase 26 for the v1.2 homepage,
- * pruned again on `feat/light-dark-mode` after the homepage rework:
- *   - Testimonials section was removed entirely.
- *   - Edition 2023 photo block + Edition2023Link pointer were removed from the homepage.
- *   - CFP section was removed from the homepage.
- *   - Edition 2026 was reworked: heading copy changed, PDF CTA removed, 3-link CTA row
- *     became 2 outlined buttons (replays + gallery), no rail label.
+ * Asserts the 2026 edition section renders on `/` (FR) and `/en/` (EN)
+ * with anchor + iframe + main mount.
  *
- * What this file still asserts:
- *   - 2026 edition section renders on `/` (FR) and `/en/` (EN) with anchor + iframe + main mount.
- *
- * Reads committed `dist/` HTML produced by `bun run build`. Skips if dist is missing.
+ * Reads built `dist/` HTML produced by `pnpm build`. Skips if dist is missing.
  */
 import { describe, it, expect } from "vitest";
 import { existsSync, readFileSync } from "node:fs";

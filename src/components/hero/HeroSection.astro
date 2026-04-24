@@ -15,8 +15,7 @@ const t = useTranslations(lang);
 const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
 const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
 
-// Both variants share dimensions today; pin to dark (the active variant pre-Phase B)
-// so a single height calculation drives both <img> tags.
+// Both logo variants share intrinsic dimensions, so one ratio drives both <img> tags.
 const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width);
 ---
 
@@ -37,7 +36,7 @@ const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width)
       width={400}
       height={LOGO_HEIGHT}
       class="dark:hidden w-full max-w-[260px] sm:max-w-[320px] md:max-w-[400px] h-auto"
-      loading="lazy"
+      loading="eager"
       decoding="async"
     />
     <img
@@ -46,7 +45,7 @@ const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width)
       width={400}
       height={LOGO_HEIGHT}
       class="hidden dark:block w-full max-w-[260px] sm:max-w-[320px] md:max-w-[400px] h-auto"
-      loading="eager"
+      loading="lazy"
       decoding="async"
     />
 
@@ -77,7 +76,7 @@ const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width)
         rel="noopener noreferrer"
         class={cn(
           buttonVariants({ variant: "default", size: "lg" }),
-          "h-[52px] px-8 text-lg font-bold shadow-[0_0_20px_oklch(62.5%_0.162_259.9_/_0.3)] hover:translate-y-[-1px] transition-all duration-150"
+          "h-[52px] px-8 text-lg font-bold shadow-[var(--shadow-glow-primary)] hover:translate-y-[-1px] transition-all duration-150"
         )}
       >
         {t("hero.cta.register")}

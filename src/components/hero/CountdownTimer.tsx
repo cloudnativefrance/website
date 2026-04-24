@@ -75,7 +75,7 @@ export default function CountdownTimer({ lang }: CountdownTimerProps) {
         </p>
         <a
           href={getReplaysPath(lang)}
-          className="inline-flex h-[52px] items-center justify-center rounded-lg bg-primary px-8 text-lg font-bold text-primary-foreground shadow-[0_0_20px_oklch(62.5%_0.162_259.9_/_0.3)] transition-all duration-150 hover:translate-y-[-1px] hover:bg-primary/90"
+          className="inline-flex h-[52px] items-center justify-center rounded-lg bg-primary px-8 text-lg font-bold text-primary-foreground shadow-[var(--shadow-glow-primary)] transition-all duration-150 hover:translate-y-[-1px] hover:bg-primary/90"
         >
           {t("hero.cta.replays")}
         </a>

@@ -11,8 +11,6 @@
  * Pure Astro SSR. Zero hydration directives. DS tokens only.
  * Resolves its own i18n + data so consumers can mount it with no props,
  * but exports a Props interface for future flexibility.
- *
- * The vertical rail label and PDF CTA were removed in the 2027-edition refresh.
  */
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
@@ -77,7 +75,6 @@ const cellClass = {
   id={id}
   class="relative max-w-6xl mx-auto px-4 md:px-6 lg:px-8 pt-8 md:pt-12 pb-16 md:pb-24"
 >
-  {/* Section heading (single h2 per Pitfall 8 mitigation) */}
   <h2
     class="text-3xl md:text-4xl font-bold text-foreground tracking-tight"
     style="letter-spacing:-0.02em;"

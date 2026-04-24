@@ -1,13 +1,12 @@
 /**
- * Phase 19 — dedicated `/2023` (FR) + `/en/2023` (EN) page regression harness.
+ * Dedicated `/2023` (FR) + `/en/2023` (EN) page regression harness.
  *
- * Scope (per roadmap SC1-SC5):
- *   SC1 — rail + h1 + 10-photo grid + gallery CTA, CLS-safe tiles
- *   SC2 — KCD brand-history callout (REMOVED in feat/light-dark-mode, commit 07b2c50)
- *   SC3 — lightbox present with role=dialog + aria-label (static presence only;
- *         keyboard behaviour covered by manual UAT)
- *   SC4 — 10 unique descriptive alts per locale (no "photo 1/2" pattern)
- *   SC5 — PLACEHOLDER badge linking to tracker (EDIT-07)
+ * Asserts:
+ *   - rail + h1 + 10-photo grid + gallery CTA, CLS-safe tiles
+ *   - lightbox present with role=dialog + aria-label (static presence only;
+ *     keyboard behaviour covered by manual UAT)
+ *   - 10 unique descriptive alts per locale (no "photo 1/2" pattern)
+ *   - PLACEHOLDER badge linking to tracker
  */
 import { describe, it, expect } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
