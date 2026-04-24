@@ -2,16 +2,13 @@ import { defineCollection } from "astro:content";
 import { z } from "astro/zod";
 import {
   fetchCsvOrFallback,
-  SPEAKERS_CSV_URL,
-  SPONSORS_CSV_URL,
-  TEAM_CSV_URL,
+  CSV_URLS,
+  EDITIONS,
 } from "./lib/remote-csv";
+import type { Edition } from "./lib/editions";
 
-/**
- * Minimal CSV parser — handles RFC-4180 quoted fields with escaped `""`.
- * Duplicated here (and in src/lib/schedule.ts) to keep the content loader
- * self-contained — the content pipeline runs before user-facing modules.
- */
+// -- CSV parser (unchanged) ------------------------------------------------
+
 function parseCsv(text: string): string[][] {
   const rows: string[][] = [];
   let i = 0;
@@ -44,12 +41,8 @@ function parseCsv(text: string): string[][] {
   return rows;
 }
 
-/**
- * Custom CSV loader for Astro content collections.
- * The CSV's `slug` column becomes the entry id.
- * Fetches the published Google Sheet at build time; falls back to the
- * repo-committed CSV when the remote is unreachable.
- */
+// -- csvLoader (unchanged) -------------------------------------------------
+
 function csvLoader({ url, fallback, label }: { url?: string; fallback: string; label: string }) {
   return {
     name: `csv:${label}`,
@@ -61,15 +54,13 @@ function csvLoader({ url, fallback, label }: { url?: string; fallback: string; l
       const rows = parseCsv(raw);
       if (rows.length === 0) return;
       const [header, ...body] = rows;
-      const normalizeKey = (s: string) => s.trim();
-      const keys = header.map(normalizeKey);
+      const keys = header.map((s) => s.trim());
       store.clear();
       for (const row of body) {
         const obj: Record<string, string> = {};
         keys.forEach((k, i) => { obj[k] = (row[i] ?? "").trim(); });
         const id = obj.slug || obj.id;
         if (!id) continue;
-        // Coerce booleans where relevant — Sheets emits 'TRUE' uppercase.
         const data: Record<string, unknown> = { ...obj };
         if ("keynote" in obj) {
           const v = String(obj.keynote || "").toLowerCase();
@@ -82,66 +73,92 @@ function csvLoader({ url, fallback, label }: { url?: string; fallback: string; l
   };
 }
 
+// -- Schemas ---------------------------------------------------------------
+
 const socialUrl = z.string().url().optional().or(z.literal("").transform(() => undefined));
 
-const speakers = defineCollection({
-  loader: csvLoader({
-    url: SPEAKERS_CSV_URL,
-    fallback: "src/content/schedule/speakers.csv",
-    label: "speakers.csv",
-  }),
-  schema: z.object({
-    slug: z.string(),
-    name: z.string(),
-    photo_url: z.string().optional(),
-    company: z.string().optional(),
-    role: z.string().optional(),
-    bio: z.string().optional(),
-    twitter: socialUrl,
-    linkedin: socialUrl,
-    github: socialUrl,
-    bluesky: socialUrl,
-    website: socialUrl,
-    keynote: z.boolean().optional(),
-  }),
+const speakerSchema = z.object({
+  slug: z.string(),
+  name: z.string(),
+  photo_url: z.string().optional(),
+  company: z.string().optional(),
+  role: z.string().optional(),
+  bio: z.string().optional(),
+  twitter: socialUrl,
+  linkedin: socialUrl,
+  github: socialUrl,
+  bluesky: socialUrl,
+  website: socialUrl,
+  keynote: z.boolean().optional(),
 });
 
-const sponsors = defineCollection({
-  loader: csvLoader({
-    url: SPONSORS_CSV_URL,
-    fallback: "src/content/sponsors/sponsors.csv",
-    label: "sponsors.csv",
-  }),
-  schema: z.object({
-    id: z.string(),
-    name: z.string(),
-    tier: z.enum(["platinum", "gold", "silver", "community"]),
-    logo: z.string(),
-    url: z.string().url(),
-    description_fr: z.string(),
-    description_en: z.string(),
-  }),
+const sponsorSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  tier: z.enum(["platinum", "gold", "silver", "community"]),
+  logo: z.string(),
+  url: z.string().url(),
+  description_fr: z.string(),
+  description_en: z.string(),
 });
+
+const teamSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  role_fr: z.string(),
+  role_en: z.string(),
+  group: z.enum(["core", "program-committee", "volunteers"]),
+  photo: z.string().optional().or(z.literal("").transform(() => undefined)),
+  social_linkedin: socialUrl,
+  social_github: socialUrl,
+  social_bluesky: socialUrl,
+  social_twitter: socialUrl,
+  social_website: socialUrl,
+});
+
+// -- Per-year collection factories -----------------------------------------
+
+function speakersCollection(year: Edition) {
+  return defineCollection({
+    loader: csvLoader({
+      url: CSV_URLS.speakers[year],
+      fallback: `src/content/schedule/speakers-${year}.csv`,
+      label: `speakers-${year}.csv`,
+    }),
+    schema: speakerSchema,
+  });
+}
+
+function sponsorsCollection(year: Edition) {
+  return defineCollection({
+    loader: csvLoader({
+      url: CSV_URLS.sponsors[year],
+      fallback: `src/content/sponsors/sponsors-${year}.csv`,
+      label: `sponsors-${year}.csv`,
+    }),
+    schema: sponsorSchema,
+  });
+}
 
 const team = defineCollection({
   loader: csvLoader({
-    url: TEAM_CSV_URL,
+    url: CSV_URLS.team,
     fallback: "src/content/team/team.csv",
     label: "team.csv",
   }),
-  schema: z.object({
-    id: z.string(),
-    name: z.string(),
-    role_fr: z.string(),
-    role_en: z.string(),
-    group: z.enum(["core", "program-committee", "volunteers"]),
-    photo: z.string().optional().or(z.literal("").transform(() => undefined)),
-    social_linkedin: socialUrl,
-    social_github: socialUrl,
-    social_bluesky: socialUrl,
-    social_twitter: socialUrl,
-    social_website: socialUrl,
-  }),
+  schema: teamSchema,
 });
 
-export const collections = { speakers, sponsors, team };
+// Collections must be statically keyed so Astro can type-check getCollection().
+export const collections = {
+  "speakers-2023": speakersCollection(2023),
+  "speakers-2026": speakersCollection(2026),
+  "speakers-2027": speakersCollection(2027),
+  "sponsors-2023": sponsorsCollection(2023),
+  "sponsors-2026": sponsorsCollection(2026),
+  "sponsors-2027": sponsorsCollection(2027),
+  team,
+};
+
+// Re-export for convenience at call sites.
+export { EDITIONS };
