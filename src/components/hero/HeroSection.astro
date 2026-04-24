@@ -7,8 +7,8 @@ import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NEWSLETTER_URL } from "@/lib/event";
-import logoDark from "@/assets/logos/dark/logo.svg";
-import logoLight from "@/assets/logos/principal/logo.svg";
+import logoFullDark from "@/assets/logos/dark/logo.svg";
+import logoFullLight from "@/assets/logos/principal/logo.svg";
 import ambiance00 from "@/assets/photos/ambiance/ambiance-00.jpg";
 
 const lang = getLangFromUrl(Astro.url);
@@ -16,6 +16,10 @@ const t = useTranslations(lang);
 
 const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
 const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
+
+// Both variants share dimensions today; pin to dark (the active variant pre-Phase B)
+// so a single height calculation drives both <img> tags.
+const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width);
 ---
 
 <section
@@ -44,19 +48,19 @@ const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
   <div class="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center gap-8 md:gap-10">
     <h1 class="sr-only">{t("hero.title")}</h1>
     <img
-      src={logoLight.src}
+      src={logoFullLight.src}
       alt={t("hero.logo_alt")}
       width={400}
-      height={(400 * logoLight.height) / logoLight.width}
+      height={LOGO_HEIGHT}
       class="dark:hidden w-full max-w-[260px] sm:max-w-[320px] md:max-w-[400px] h-auto"
-      loading="eager"
+      loading="lazy"
       decoding="async"
     />
     <img
-      src={logoDark.src}
+      src={logoFullDark.src}
       alt={t("hero.logo_alt")}
       width={400}
-      height={(400 * logoDark.height) / logoDark.width}
+      height={LOGO_HEIGHT}
       class="hidden dark:block w-full max-w-[260px] sm:max-w-[320px] md:max-w-[400px] h-auto"
       loading="eager"
       decoding="async"

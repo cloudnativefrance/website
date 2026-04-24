@@ -57,8 +57,8 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
     <a href={homeHref} class="shrink-0 flex items-center" aria-label="CND France">
       <!-- Light theme: shown when <html> has no .dark class -->
       <span class="dark:hidden flex items-center">
-        <img src={logoCompactLight.src} alt="CND France" class="h-8 md:hidden" />
-        <img src={logoFullLight.src} alt="CND France" class="hidden md:block h-8 md:h-10" />
+        <img src={logoCompactLight.src} alt="CND France" class="h-8 md:hidden" loading="lazy" />
+        <img src={logoFullLight.src} alt="CND France" class="hidden md:block h-8 md:h-10" loading="lazy" />
       </span>
       <!-- Dark theme: shown when <html> has .dark class -->
       <span class="hidden dark:flex items-center">
