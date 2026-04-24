@@ -43,8 +43,8 @@ const links = navItems.map(({ key, path, dead, postEventOnly }) => ({
 const editionsDesc = [...EDITIONS].sort((a, b) => b - a);
 
 function sectionDropdown(
-  section: "programme" | "sponsors" | "speakers",
-  labelKey: "nav.programme.label" | "nav.sponsors.label" | "nav.speakers.label",
+  section: "programme" | "sponsors",
+  labelKey: "nav.programme.label" | "nav.sponsors.label",
 ) {
   const basePath = `/${section}`;
   const localizedBase = getLocalePath(lang, basePath);
@@ -63,7 +63,6 @@ function sectionDropdown(
 
 const programmeDD = sectionDropdown("programme", "nav.programme.label");
 const sponsorsDD  = sectionDropdown("sponsors",  "nav.sponsors.label");
-const speakersDD  = sectionDropdown("speakers",  "nav.speakers.label");
 
 const homeHref = getLocalePath(lang, "/");
 const ctaLabel = t("hero.cta.register");
@@ -105,7 +104,6 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
         </li>
       ))}
       <NavDropdown {...programmeDD} />
-      <NavDropdown {...speakersDD} />
       <NavDropdown {...sponsorsDD} />
     </ul>
 
@@ -159,7 +157,7 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
           </a>
         </li>
       ))}
-      {[programmeDD, speakersDD, sponsorsDD].map((dd) => (
+      {[programmeDD, sponsorsDD].map((dd) => (
         <li>
           <p class="px-2 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{dd.label}</p>
           <ul class="pl-2">

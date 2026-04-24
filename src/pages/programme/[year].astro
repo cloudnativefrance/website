@@ -3,7 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import ScheduleGrid from "@/components/schedule/ScheduleGrid.astro";
 import { loadSessions } from "@/lib/schedule";
 import { getSpeakersByLocale, getSlug } from "@/lib/speakers";
-import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import ComingSoonLayout from "@/components/flags/ComingSoonLayout.astro";
 import { isFlagActive } from "@/lib/flags";
 import { EDITIONS, isEdition, CURRENT_EDITION, type Edition } from "@/lib/editions";
@@ -64,6 +64,13 @@ const active = isFlagActive("programme");
             <p class="mt-3 text-base md:text-lg text-muted-foreground max-w-2xl">
               {t("schedule.subtitle")}
             </p>
+            <a
+              href={getLocalePath(lang, `/speakers/${year}`)}
+              class="mt-6 inline-flex items-center gap-2 rounded-md border border-primary/40 bg-card px-4 h-10 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              {t("schedule.view_speakers")}
+              <span aria-hidden="true">→</span>
+            </a>
           </section>
           <section class="max-w-7xl mx-auto pb-20">
             <ScheduleGrid sessions={sessions} lang={lang} speakerNames={speakerNames} />

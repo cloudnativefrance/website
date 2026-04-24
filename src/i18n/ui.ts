@@ -148,6 +148,7 @@ export const ui = {
     "schedule.subtitle":
       "50+ conferences sur 5 salles en parallele. Construisez votre agenda personnel, exportez-le en .ics.",
     "schedule.empty_state": "Le programme de cette édition sera publié prochainement.",
+    "schedule.view_speakers": "Voir les speakers",
     "schedule.filter.toolbar": "Filtres du programme",
     "schedule.filter.label_room": "Salle",
     "schedule.filter.label_format": "Format",
@@ -435,6 +436,7 @@ export const ui = {
     "schedule.subtitle":
       "50+ talks across 5 parallel tracks. Build your personal agenda and export it as .ics.",
     "schedule.empty_state": "The programme for this edition will be published soon.",
+    "schedule.view_speakers": "View speakers",
     "schedule.filter.toolbar": "Schedule filters",
     "schedule.filter.label_room": "Room",
     "schedule.filter.label_format": "Format",
