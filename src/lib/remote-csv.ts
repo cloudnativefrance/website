@@ -71,23 +71,65 @@ export async function fetchCsvOrFallback({
   return promise;
 }
 
+import { EDITIONS, type Edition } from "./editions";
+
 /**
- * Environment-overridable URLs. Set via
- *   SCHEDULE_SESSIONS_CSV_URL, SCHEDULE_SPEAKERS_CSV_URL, SPONSORS_CSV_URL, TEAM_CSV_URL
- * to point at a staging sheet; unset defaults to the production publish-to-web URLs
- * (or empty string for collections whose sheet has not yet been provisioned — the
- * loader then reads the committed local CSV directly).
+ * Per-year CSV URLs for each editable data type. Each entry points at a
+ * published-to-web tab in the single upstream Google Sheet.
+ *
+ * Override via env in staging/preview:
+ *   SESSIONS_CSV_URL_2023 / _2026 / _2027
+ *   SPEAKERS_CSV_URL_2023 / _2026 / _2027
+ *   SPONSORS_CSV_URL_2023 / _2026 / _2027
+ *   TEAM_CSV_URL
+ *
+ * Empty string → the content loader falls back to the committed local CSV.
  */
-export const SESSIONS_CSV_URL =
-  process.env.SCHEDULE_SESSIONS_CSV_URL ||
+const SESSIONS_2026_DEFAULT =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdET7nAGsbCoHlOzCICGvGHKOB6OYeqgiJPiWtXBjUCg818TFJ2-pQnEtMzyBaAsGaIQr475Q50mkM/pub?gid=178765557&single=true&output=csv";
 
-export const SPEAKERS_CSV_URL =
-  process.env.SCHEDULE_SPEAKERS_CSV_URL ||
+const SPEAKERS_2026_DEFAULT =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdET7nAGsbCoHlOzCICGvGHKOB6OYeqgiJPiWtXBjUCg818TFJ2-pQnEtMzyBaAsGaIQr475Q50mkM/pub?gid=124864767&single=true&output=csv";
 
-export const SPONSORS_CSV_URL =
-  process.env.SPONSORS_CSV_URL || "";
+export const CSV_URLS: {
+  sessions: Record<Edition, string>;
+  speakers: Record<Edition, string>;
+  sponsors: Record<Edition, string>;
+  team: string;
+} = {
+  sessions: {
+    2023: process.env.SESSIONS_CSV_URL_2023 || "",
+    2026: process.env.SESSIONS_CSV_URL_2026 || SESSIONS_2026_DEFAULT,
+    2027: process.env.SESSIONS_CSV_URL_2027 || "",
+  },
+  speakers: {
+    2023: process.env.SPEAKERS_CSV_URL_2023 || "",
+    2026: process.env.SPEAKERS_CSV_URL_2026 || SPEAKERS_2026_DEFAULT,
+    2027: process.env.SPEAKERS_CSV_URL_2027 || "",
+  },
+  sponsors: {
+    2023: process.env.SPONSORS_CSV_URL_2023 || "",
+    2026: process.env.SPONSORS_CSV_URL_2026 || "",
+    2027: process.env.SPONSORS_CSV_URL_2027 || "",
+  },
+  team: process.env.TEAM_CSV_URL || "",
+};
 
-export const TEAM_CSV_URL =
-  process.env.TEAM_CSV_URL || "";
+export type EditionScopedType = "sessions" | "speakers" | "sponsors";
+
+export function getCsvUrl(type: EditionScopedType, year: Edition): string {
+  return CSV_URLS[type][year];
+}
+
+/**
+ * Legacy convenience — current-edition (2026) URLs for callers that have not
+ * yet been migrated to `getCsvUrl(type, year)`. These back-compat shims are
+ * removed by Task 5 (loadSessions) and Task 4 (content.config.ts).
+ */
+export const SESSIONS_CSV_URL = CSV_URLS.sessions[2026];
+export const SPEAKERS_CSV_URL = CSV_URLS.speakers[2026];
+export const SPONSORS_CSV_URL = CSV_URLS.sponsors[2026];
+export const TEAM_CSV_URL = CSV_URLS.team;
+
+// Exported for iteration in collections config.
+export { EDITIONS };
