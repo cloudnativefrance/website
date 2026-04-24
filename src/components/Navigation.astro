@@ -1,8 +1,10 @@
 ---
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { TARGET_DATE } from "@/lib/event";
+import { EDITIONS } from "@/lib/editions";
 import LanguageToggle from "@/components/LanguageToggle.astro";
 import ThemeToggle from "@/components/ThemeToggle.astro";
+import NavDropdown from "@/components/NavDropdown.astro";
 import logoCompactDark from "@/assets/logos/dark/logo-notext.svg";
 import logoCompactLight from "@/assets/logos/principal/logo-notext.svg";
 
@@ -11,17 +13,14 @@ const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
 
 const navItems: Array<{
-  key: "nav.home" | "nav.speakers" | "nav.schedule" | "nav.replays" | "nav.sponsors" | "nav.venue" | "nav.team";
+  key: "nav.home" | "nav.replays" | "nav.venue" | "nav.team";
   path: string;
   dead: boolean;
   postEventOnly?: boolean;
 }> = [
   { key: "nav.home",     path: "/",          dead: false },
-  { key: "nav.speakers", path: "/speakers",  dead: false },
-  { key: "nav.schedule", path: "/programme", dead: false }, // Phase 7
-  { key: "nav.replays",  path: "/replays",   dead: false, postEventOnly: true }, // Phase 8
-  { key: "nav.sponsors", path: "/sponsors",  dead: false },
-  { key: "nav.venue",    path: "/venue",     dead: false }, // Phase 6
+  { key: "nav.replays",  path: "/replays",   dead: false, postEventOnly: true },
+  { key: "nav.venue",    path: "/venue",     dead: false },
   { key: "nav.team",     path: "/team",      dead: false },
 ];
 
@@ -40,6 +39,31 @@ const links = navItems.map(({ key, path, dead, postEventOnly }) => ({
   active: isActive(currentPath, getLocalePath(lang, path), dead),
   postEventOnly: !!postEventOnly,
 }));
+
+const editionsDesc = [...EDITIONS].sort((a, b) => b - a);
+
+function sectionDropdown(
+  section: "programme" | "sponsors" | "speakers",
+  labelKey: "nav.programme.label" | "nav.sponsors.label" | "nav.speakers.label",
+) {
+  const basePath = `/${section}`;
+  const localizedBase = getLocalePath(lang, basePath);
+  return {
+    key: labelKey,
+    label: t(labelKey),
+    active: currentPath.startsWith(localizedBase),
+    items: editionsDesc.map((year) => ({
+      year,
+      href: getLocalePath(lang, `${basePath}/${year}`),
+      label: `${t(labelKey)} ${year}`,
+      current: currentPath === getLocalePath(lang, `${basePath}/${year}`),
+    })),
+  };
+}
+
+const programmeDD = sectionDropdown("programme", "nav.programme.label");
+const sponsorsDD  = sectionDropdown("sponsors",  "nav.sponsors.label");
+const speakersDD  = sectionDropdown("speakers",  "nav.speakers.label");
 
 const homeHref = getLocalePath(lang, "/");
 const ctaLabel = t("hero.cta.register");
@@ -80,6 +104,9 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
           </a>
         </li>
       ))}
+      <NavDropdown {...programmeDD} />
+      <NavDropdown {...speakersDD} />
+      <NavDropdown {...sponsorsDD} />
     </ul>
 
     <!-- Right side -->
@@ -130,6 +157,27 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
           >
             {label}
           </a>
+        </li>
+      ))}
+      {[programmeDD, speakersDD, sponsorsDD].map((dd) => (
+        <li>
+          <p class="px-2 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{dd.label}</p>
+          <ul class="pl-2">
+            {dd.items.map((it) => (
+              <li>
+                <a
+                  href={it.href}
+                  aria-current={it.current ? "page" : undefined}
+                  class:list={[
+                    "flex items-center min-h-11 px-2 py-3 text-sm font-medium rounded-md",
+                    it.current ? "text-primary" : "text-foreground hover:bg-muted",
+                  ]}
+                >
+                  {it.label}
+                </a>
+              </li>
+            ))}
+          </ul>
         </li>
       ))}
       <li>

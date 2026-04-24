@@ -13,6 +13,9 @@ export const ui = {
     "nav.venue": "Lieu",
     "nav.team": "Equipe",
     "nav.replays": "Replays",
+    "nav.programme.label": "Programme",
+    "nav.sponsors.label": "Partenaires",
+    "nav.speakers.label": "Speakers",
     "site.title": "Cloud Native Days France 2027",
     "site.description": "3 juin 2027 — CENTQUATRE-PARIS",
     "seo.default_description":
@@ -297,6 +300,9 @@ export const ui = {
     "nav.venue": "Venue",
     "nav.team": "Team",
     "nav.replays": "Replays",
+    "nav.programme.label": "Programme",
+    "nav.sponsors.label": "Partners",
+    "nav.speakers.label": "Speakers",
     "site.title": "Cloud Native Days France 2027",
     "site.description": "June 3, 2027 — CENTQUATRE-PARIS",
     "seo.default_description":
