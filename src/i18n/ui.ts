@@ -21,6 +21,8 @@ export const ui = {
     "seo.og_image_alt":
       "Cloud Native Days France — 3 juin 2027 au CENTQUATRE-PARIS",
     "toggle.aria": "Selecteur de langue",
+    "theme.toggle.aria.to_dark": "Basculer en mode sombre",
+    "theme.toggle.aria.to_light": "Basculer en mode clair",
     "fallback.heading": "Contenu non disponible en francais",
     "fallback.body":
       "Cette page n'a pas encore ete traduite. Consulter la version originale.",
@@ -331,6 +333,8 @@ export const ui = {
     "seo.og_image_alt":
       "Cloud Native Days France — June 3, 2027 at CENTQUATRE-PARIS",
     "toggle.aria": "Language selector",
+    "theme.toggle.aria.to_dark": "Switch to dark mode",
+    "theme.toggle.aria.to_light": "Switch to light mode",
     "fallback.heading": "Content not available in English",
     "fallback.body":
       "This page has not been translated yet. View the original version.",
