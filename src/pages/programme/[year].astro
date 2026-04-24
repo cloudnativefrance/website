@@ -4,8 +4,6 @@ import ScheduleGrid from "@/components/schedule/ScheduleGrid.astro";
 import { loadSessions } from "@/lib/schedule";
 import { getSpeakersByLocale, getSlug } from "@/lib/speakers";
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
-import ComingSoonLayout from "@/components/flags/ComingSoonLayout.astro";
-import { isFlagActive } from "@/lib/flags";
 import { EDITIONS, isEdition, CURRENT_EDITION, type Edition } from "@/lib/editions";
 
 export async function getStaticPaths() {
@@ -24,11 +22,9 @@ const t = useTranslations(lang);
 const sessions = await loadSessions(year);
 const speakerEntries = await getSpeakersByLocale(lang, year);
 const speakerNames = new Map(speakerEntries.map((s) => [getSlug(s.id), s.data.name]));
-const active = isFlagActive("programme");
 ---
 
-{active ? (
-  <Layout title={`${t("schedule.heading")} ${year} | ${t("site.title")}`}>
+<Layout title={`${t("schedule.heading")} ${year} | ${t("site.title")}`}>
     <main
       class="px-4 md:px-6 lg:px-8"
       data-schedule-active-singular={t("schedule.filter.active_singular")}
@@ -78,7 +74,4 @@ const active = isFlagActive("programme");
         </>
       )}
     </main>
-  </Layout>
-) : (
-  <ComingSoonLayout flag="programme" lang={lang} />
-)}
+</Layout>
