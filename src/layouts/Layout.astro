@@ -57,10 +57,17 @@ const ogLocale = resolvedLang === "fr" ? "fr_FR" : "en_US";
 const siteName = t("seo.og_site_name");
 const ogImageAlt = t("seo.og_image_alt");
 ---
-<html lang={resolvedLang} class="dark">
+<html lang={resolvedLang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      try {
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (_) {}
+    </script>
     <title>{title}</title>
     <meta name="description" content={metaDescription} />
 
