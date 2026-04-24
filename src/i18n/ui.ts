@@ -211,7 +211,7 @@ export const ui = {
     "footer.landmark_aria": "Pied de page",
     "editions.rail.2026": "EDITION 2026",
     "editions.rail.2023": "EDITION 2023",
-    "editions.2026.heading": "Edition 2026 — replay et bilan",
+    "editions.2026.heading": "Revivez l'édition 2026",
     "editions.2026.video_caption":
       "Aftermovie officiel de Cloud Native Days France 2026",
     "editions.2026.stats.participants": "1\u00a0850+ participants",
@@ -522,7 +522,7 @@ export const ui = {
     "footer.landmark_aria": "Site footer",
     "editions.rail.2026": "2026 EDITION",
     "editions.rail.2023": "2023 EDITION",
-    "editions.2026.heading": "2026 edition — recap and replays",
+    "editions.2026.heading": "Relive the 2026 edition",
     "editions.2026.video_caption":
       "Official aftermovie of Cloud Native Days France 2026",
     "editions.2026.stats.participants": "1,850+ attendees",

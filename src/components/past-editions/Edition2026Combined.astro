@@ -1,19 +1,18 @@
 ---
 /**
- * Edition2026Combined.astro (Phase 23, D-01..D-14)
+ * Edition2026Combined.astro
  *
- * Purpose-built homepage section that merges the 2026 recap into one block:
- *   1. Rotated rail label
- *   2. Section heading (h2)
+ * Homepage section that wraps the 2026 recap into one block:
+ *   1. Section heading (h2)
+ *   2. YouTube aftermovie embed (youtube-nocookie per D-12)
  *   3. 3-photo asymmetric mosaic (1 hero + 2 medium)
- *   4. YouTube aftermovie embed (youtube-nocookie per D-12)
- *   5. CTA row — "Voir tous les replays" + "Télécharger le bilan 2026 (PDF)"
+ *   4. CTA row — outlined "Voir les replays" + "Voir la galerie photo"
  *
- * Pure Astro SSR. Zero hydration directives (D-02). DS tokens only (D-13).
- * Resolves its own i18n + data so Phase 26 can mount it with no props,
+ * Pure Astro SSR. Zero hydration directives. DS tokens only.
+ * Resolves its own i18n + data so consumers can mount it with no props,
  * but exports a Props interface for future flexibility.
  *
- * NOT mounted to any page in Phase 23 — Phase 26 owns homepage wiring.
+ * The vertical rail label and PDF CTA were removed in the 2027-edition refresh.
  */
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
@@ -23,8 +22,6 @@ import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 export interface Props {
   /** Anchor id for deep-linking. Recommended: "edition-2026". */
   id?: string;
-  /** Localised rail label, e.g. t("editions.rail.2026"). */
-  rail?: string;
   /** Localised h2 copy, e.g. t("editions.2026.heading"). */
   heading?: string;
   /** 3 photos in render order. Size assignments per UI-SPEC §3. */
@@ -33,8 +30,6 @@ export interface Props {
   video?: { youtubeId: string; caption: string };
   /** External CTA: 2026 replays YouTube playlist. */
   replaysCta?: { label: string; href: string };
-  /** External CTA: Google Drive one-pager PDF. */
-  pdfCta?: { label: string; href: string; ariaLabel: string };
   /** External CTA: Ente photo gallery. */
   galleryCta?: { label: string; href: string; ariaLabel: string };
 }
@@ -46,7 +41,6 @@ const props = Astro.props as Props;
 
 // Default anchor id="edition-2026" enables deep-linking and matches Phase 26 expectations.
 const id = props.id ?? "edition-2026";
-const rail = props.rail ?? t("editions.rail.2026");
 const heading = props.heading ?? t("editions.2026.heading");
 const photos =
   props.photos ??
@@ -62,11 +56,6 @@ const video = props.video ?? {
 const replaysCta = props.replaysCta ?? {
   label: t("editions.2026.replays_cta"),
   href: EDITION_2026.replaysUrl,
-};
-const pdfCta = props.pdfCta ?? {
-  label: t("editions.2026.pdf_cta"),
-  href: EDITION_2026.pdfUrl,
-  ariaLabel: t("editions.2026.pdf_cta_aria"),
 };
 const galleryCta = props.galleryCta ?? {
   label: t("editions.2026.gallery_cta"),
@@ -88,22 +77,32 @@ const cellClass = {
   id={id}
   class="relative max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24"
 >
-  {/* 1. Rotated rail (decorative, hidden on mobile) */}
-  <p
-    class="absolute left-0 top-24 hidden md:block rotate-[-90deg] origin-top-left text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
-  >
-    {rail}
-  </p>
-
-  {/* 2. Section heading (single h2 per Pitfall 8 mitigation) */}
+  {/* Section heading (single h2 per Pitfall 8 mitigation) */}
   <h2
-    class="text-3xl md:text-4xl font-bold text-foreground tracking-tight"
+    class="text-3xl md:text-4xl font-bold text-foreground tracking-tight uppercase"
     style="letter-spacing:-0.02em;"
   >
     {heading}
   </h2>
 
-  {/* 3. Photo mosaic — 3 thumbnails, 1 hero + 2 medium */}
+  {/* YouTube video embed (youtube-nocookie per D-12) */}
+  {video && (
+    <figure class="mt-12 max-w-4xl mx-auto">
+      <div class="relative aspect-video w-full overflow-hidden rounded-md bg-card">
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}`}
+          title={video.caption}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          class="absolute inset-0 h-full w-full"
+        ></iframe>
+      </div>
+      <figcaption class="mt-3 text-sm text-muted-foreground">{video.caption}</figcaption>
+    </figure>
+  )}
+
+  {/* Photo mosaic — 3 thumbnails, 1 hero + 2 medium */}
   {photos && photos.length > 0 && (
     <div class="mt-12 grid grid-cols-12 gap-3 md:gap-4 [grid-auto-rows:12rem] md:[grid-auto-rows:14rem]">
       {photos.map((p) => (
@@ -122,50 +121,24 @@ const cellClass = {
     </div>
   )}
 
-  {/* 4. YouTube video embed (youtube-nocookie per D-12) */}
-  {video && (
-    <figure class="mt-12 max-w-4xl mx-auto">
-      <div class="relative aspect-video w-full overflow-hidden rounded-md bg-card">
-        <iframe
-          src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}`}
-          title={video.caption}
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-          class="absolute inset-0 h-full w-full"
-        ></iframe>
-      </div>
-      <figcaption class="mt-3 text-sm text-muted-foreground">{video.caption}</figcaption>
-    </figure>
-  )}
-
-  {/* 5. CTA row — replays + gallery + PDF; stacked mobile, side-by-side desktop */}
-  <div class="mt-8 flex flex-col sm:flex-row sm:flex-wrap justify-center gap-4 sm:gap-8 max-w-3xl mx-auto">
+  {/* CTA buttons — replays + gallery; stacked mobile, side-by-side desktop */}
+  <div class="mt-12 flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 max-w-3xl mx-auto">
     <a
       href={replaysCta.href}
-      class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
-      rel="noopener noreferrer"
       target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex items-center justify-center h-[52px] px-8 text-lg font-bold rounded-md border-2 border-primary text-primary bg-transparent hover:bg-primary/10 hover:shadow-[0_0_0_4px_oklch(62.5%_0.162_259.9_/_0.15)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-150"
     >
-      {replaysCta.label} <span aria-hidden="true">→</span>
+      {replaysCta.label}
     </a>
     <a
       href={galleryCta.href}
-      class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
-      rel="noopener noreferrer"
       target="_blank"
+      rel="noopener noreferrer"
       aria-label={galleryCta.ariaLabel}
+      class="inline-flex items-center justify-center h-[52px] px-8 text-lg font-bold rounded-md border-2 border-primary text-primary bg-transparent hover:bg-primary/10 hover:shadow-[0_0_0_4px_oklch(62.5%_0.162_259.9_/_0.15)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-150"
     >
-      {galleryCta.label} <span aria-hidden="true">→</span>
-    </a>
-    <a
-      href={pdfCta.href}
-      class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
-      rel="noopener noreferrer"
-      target="_blank"
-      aria-label={pdfCta.ariaLabel}
-    >
-      {pdfCta.label} <span aria-hidden="true">→</span>
+      {galleryCta.label}
     </a>
   </div>
 
