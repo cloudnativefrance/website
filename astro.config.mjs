@@ -11,12 +11,12 @@ import { generateFlagEnvSchema } from "./src/config/flags-env.ts";
 export default defineConfig({
   site: "https://cloudnativedays.fr",
   redirects: {
-    "/programme":    "/programme/2027",
-    "/sponsors":     "/sponsors/2027",
-    "/speakers":     "/speakers/2027",
-    "/en/programme": "/en/programme/2027",
-    "/en/sponsors":  "/en/sponsors/2027",
-    "/en/speakers":  "/en/speakers/2027",
+    "/programme":    "/programme/2026",
+    "/sponsors":     "/sponsors/2026",
+    "/speakers":     "/speakers/2026",
+    "/en/programme": "/en/programme/2026",
+    "/en/sponsors":  "/en/sponsors/2026",
+    "/en/speakers":  "/en/speakers/2026",
   },
   integrations: [
     react(),

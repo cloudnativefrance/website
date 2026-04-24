@@ -12,8 +12,8 @@ describe("EDITIONS", () => {
 });
 
 describe("CURRENT_EDITION", () => {
-  it("is 2027", () => {
-    expect(CURRENT_EDITION).toBe(2027);
+  it("is 2026", () => {
+    expect(CURRENT_EDITION).toBe(2026);
   });
 
   it("is included in EDITIONS", () => {
