@@ -11,13 +11,13 @@ const entries = Object.entries(languages) as Array<[Locale, string]>;
 <nav aria-label={t("toggle.aria")} class="inline-flex items-center gap-0 text-xs font-medium tracking-wide">
   {entries.map(([lang, label], i) => (
     <>
-      {i > 0 && <span aria-hidden="true" class="px-1 text-white/40">/</span>}
+      {i > 0 && <span aria-hidden="true" class="px-1 text-muted-foreground">/</span>}
       <a
         href={getLocalePath(lang, currentPath)}
         aria-current={lang === currentLang ? "true" : undefined}
         class:list={[
           "uppercase rounded-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
-          lang === currentLang ? "text-white" : "text-white/40 hover:text-white/80",
+          lang === currentLang ? "text-foreground" : "text-muted-foreground hover:text-foreground",
         ]}
       >
         {label}
