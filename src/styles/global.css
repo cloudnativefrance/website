@@ -4,42 +4,84 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Design tokens from DESIGN.md -- single source of truth */
+/* Design tokens from DESIGN.md -- single source of truth.
+   Light is the default; dark is opt-in via the .dark class on <html>.
+
+   v1 placeholder LIGHT palette: derived from the brand's deep-purple hue
+   family (286°) so light + dark feel like one design system. The Stitch
+   palette winner will replace these :root values without touching any
+   other rule. Brand hues (primary blue, accent pink, destructive red,
+   chart colors) live ONCE here and are unchanged across modes. */
 :root {
+  /* Mode-specific surface/text/border tokens — LIGHT defaults */
+  --background: oklch(98.4% 0.005 286);
+  --foreground: oklch(15.0% 0.045 286);
+  --card: oklch(100% 0 0);
+  --card-foreground: oklch(15.0% 0.045 286);
+  --popover: oklch(100% 0 0);
+  --popover-foreground: oklch(15.0% 0.045 286);
+  --secondary: oklch(95.0% 0.012 286);
+  --secondary-foreground: oklch(20.0% 0.060 286);
+  --muted: oklch(95.0% 0.012 286);
+  --muted-foreground: oklch(45.0% 0.030 286);
+  --border: oklch(88.0% 0.020 286);
+  --input: oklch(88.0% 0.020 286);
+  --ring: oklch(62.5% 0.162 259.9);
+
+  --sidebar: oklch(98.4% 0.005 286);
+  --sidebar-foreground: oklch(15.0% 0.045 286);
+  --sidebar-primary: oklch(62.5% 0.162 259.9);
+  --sidebar-primary-foreground: oklch(100% 0 0);
+  --sidebar-accent: oklch(95.0% 0.012 286);
+  --sidebar-accent-foreground: oklch(20.0% 0.060 286);
+  --sidebar-border: oklch(88.0% 0.020 286);
+  --sidebar-ring: oklch(62.5% 0.162 259.9);
+
+  /* Brand hues — same in light and dark, never overridden */
+  --primary: oklch(62.5% 0.162 259.9);
+  --primary-foreground: oklch(100% 0 0);
+  --accent: oklch(76.6% 0.142 10.1);
+  --accent-foreground: oklch(16.8% 0.052 286.4);
+  --destructive: oklch(54.0% 0.216 25.2);
+  --destructive-foreground: oklch(100% 0 0);
+  --chart-1: oklch(62.5% 0.162 259.9);
+  --chart-2: oklch(54.0% 0.216 25.2);
+  --chart-3: oklch(76.6% 0.142 10.1);
+  --chart-4: oklch(88.4% 0.061 244.8);
+  --chart-5: oklch(24.6% 0.101 286.7);
+
+  /* Light-mode shadows: drop glows. Dark-mode adds them back via .dark below. */
+  --shadow-glow-primary: none;
+  --shadow-glow-accent: none;
+
+  --radius: 6px;
+}
+
+/* Dark opt-in — preserves the v1.0 dark palette verbatim from previous :root */
+.dark {
   --background: oklch(16.8% 0.052 286.4);
   --foreground: oklch(95.6% 0.023 291.3);
   --card: oklch(22.5% 0.083 285.5);
   --card-foreground: oklch(95.6% 0.023 291.3);
   --popover: oklch(22.5% 0.083 285.5);
   --popover-foreground: oklch(95.6% 0.023 291.3);
-  --primary: oklch(62.5% 0.162 259.9);
-  --primary-foreground: oklch(100.0% 0.000 0);
   --secondary: oklch(27.1% 0.091 286.5);
   --secondary-foreground: oklch(95.6% 0.023 291.3);
   --muted: oklch(27.1% 0.091 286.5);
   --muted-foreground: oklch(66.8% 0.047 290.8);
-  --accent: oklch(76.6% 0.142 10.1);
-  --accent-foreground: oklch(16.8% 0.052 286.4);
-  --destructive: oklch(54.0% 0.216 25.2);
-  --destructive-foreground: oklch(100.0% 0.000 0);
   --border: oklch(30.8% 0.102 285.5);
   --input: oklch(30.8% 0.102 285.5);
   --ring: oklch(62.5% 0.162 259.9);
-  --radius: 6px;
-  --chart-1: oklch(62.5% 0.162 259.9);
-  --chart-2: oklch(54.0% 0.216 25.2);
-  --chart-3: oklch(76.6% 0.142 10.1);
-  --chart-4: oklch(88.4% 0.061 244.8);
-  --chart-5: oklch(24.6% 0.101 286.7);
-  --sidebar-background: oklch(16.8% 0.052 286.4);
+
+  --sidebar: oklch(16.8% 0.052 286.4);
   --sidebar-foreground: oklch(95.6% 0.023 291.3);
-  --sidebar-primary: oklch(62.5% 0.162 259.9);
-  --sidebar-primary-foreground: oklch(100.0% 0.000 0);
   --sidebar-accent: oklch(27.1% 0.091 286.5);
   --sidebar-accent-foreground: oklch(95.6% 0.023 291.3);
   --sidebar-border: oklch(30.8% 0.102 285.5);
-  --sidebar-ring: oklch(62.5% 0.162 259.9);
-  --sidebar: oklch(16.8% 0.052 286.4);
+
+  /* Dark-mode glows on CTAs */
+  --shadow-glow-primary: 0 0 20px oklch(62.5% 0.162 259.9 / 0.3);
+  --shadow-glow-accent: 0 0 20px oklch(76.6% 0.142 10.1 / 0.25);
 }
 
 @theme inline {
