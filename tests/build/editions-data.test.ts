@@ -37,14 +37,16 @@ describe("EDIT-01: EDITION_2026 data module (real 2026 recap)", () => {
     ]);
   });
 
-  it("has 4 ambiance thumbnails for the 2026 section in a 2x2 grid", () => {
-    expect(EDITION_2026.thumbnails).toHaveLength(4);
+  it("has 3 ambiance thumbnails for the 2026 asymmetric mosaic (1 hero + 2 medium)", () => {
+    expect(EDITION_2026.thumbnails).toHaveLength(3);
     EDITION_2026.thumbnails.forEach((thumb) => {
       expect(thumb.src).toBeDefined();
       const s = srcString(thumb.src);
       expect(s).toContain("ambiance");
-      expect(thumb.size).toBe("hero");
     });
+    expect(EDITION_2026.thumbnails[0].size).toBe("hero");
+    expect(EDITION_2026.thumbnails[1].size).toBe("medium");
+    expect(EDITION_2026.thumbnails[2].size).toBe("medium");
   });
 });
 
