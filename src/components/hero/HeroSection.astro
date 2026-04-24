@@ -2,7 +2,6 @@
 import GeoBackground from "@/components/patterns/GeoBackground.astro";
 import CountdownTimer from "./CountdownTimer";
 import FeatureGate from "@/components/flags/FeatureGate.astro";
-import { Badge } from "@/components/ui/badge";
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -51,16 +50,17 @@ const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width)
       decoding="async"
     />
 
-    <p
-      class="flex w-full flex-wrap items-center justify-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl text-muted-foreground"
-      style="line-height:1.4;"
-    >
-      <Badge className="bg-accent/15 text-accent text-sm sm:text-base font-normal uppercase tracking-widest rounded-full px-3 py-1">
+    <div class="flex flex-col items-center gap-2">
+      <p
+        class="text-3xl sm:text-4xl md:text-5xl font-bold uppercase text-accent"
+        style="letter-spacing: 0.05em;"
+      >
         {t("hero.subtitle")}
-      </Badge>
-      <span>&mdash;</span>
-      <span class="break-words">{t("hero.venue")}</span>
-    </p>
+      </p>
+      <p class="text-sm sm:text-base font-medium uppercase text-muted-foreground" style="letter-spacing: 0.05em;">
+        {t("hero.venue")}
+      </p>
+    </div>
 
     <p class="max-w-[720px] text-balance text-lg md:text-xl text-foreground" style="line-height:1.55;">
       {t("hero.description")}
@@ -99,10 +99,10 @@ const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width)
         rel="noopener noreferrer"
         aria-label={t("hero.cta.newsletter_aria")}
         class={cn(
-          buttonVariants({ variant: "ghost", size: "lg" }),
+          buttonVariants({ variant: "outline", size: "lg" }),
           "h-[52px] px-8 text-lg font-bold",
-          "text-accent",
-          "hover:bg-accent/10 hover:text-accent",
+          "border-2 border-accent text-accent bg-transparent",
+          "hover:bg-accent/10 hover:text-accent hover:border-accent hover:shadow-[0_0_0_4px_oklch(76.6%_0.142_10.1_/_0.15)]",
           "focus-visible:ring-accent/50",
           "gap-2"
         )}
