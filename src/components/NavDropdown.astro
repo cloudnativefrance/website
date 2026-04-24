@@ -51,8 +51,8 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
           href={item.href}
           aria-current={item.current ? "page" : undefined}
           class:list={[
-            "block px-4 py-2 text-sm hover:bg-muted focus-visible:bg-muted focus-visible:outline-none",
-            item.current && "font-semibold text-primary",
+            "block px-4 py-2 text-base font-semibold hover:bg-muted focus-visible:bg-muted focus-visible:outline-none",
+            item.current && "text-primary",
           ]}
         >
           {item.label}
@@ -73,23 +73,42 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
       menu.classList.add("hidden");
       btn.setAttribute("aria-expanded", "false");
     };
-    const open = () => {
+    const open = (focusFirst = false) => {
       menu.classList.remove("hidden");
       btn.setAttribute("aria-expanded", "true");
-      const first = menu.querySelector<HTMLAnchorElement>('[role="menuitem"]');
-      first?.focus();
+      if (focusFirst) {
+        const first = menu.querySelector<HTMLAnchorElement>('[role="menuitem"]');
+        first?.focus();
+      }
     };
     const toggle = () => {
-      menu.classList.contains("hidden") ? open() : close();
+      menu.classList.contains("hidden") ? open(true) : close();
     };
 
     btn.addEventListener("click", (e) => { e.preventDefault(); toggle(); });
     btn.addEventListener("keydown", (e) => {
       if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        open();
+        open(true);
       }
     });
+
+    // Hover to open on pointer devices. A short close delay lets the cursor
+    // travel from the trigger across the gap onto the menu without it
+    // flickering shut. Touch devices fire no mouseenter, so click still works.
+    let closeTimer: number | undefined;
+    const cancelClose = () => {
+      if (closeTimer !== undefined) {
+        window.clearTimeout(closeTimer);
+        closeTimer = undefined;
+      }
+    };
+    const deferredClose = () => {
+      cancelClose();
+      closeTimer = window.setTimeout(() => { close(); closeTimer = undefined; }, 150);
+    };
+    wrap.addEventListener("mouseenter", () => { cancelClose(); open(); });
+    wrap.addEventListener("mouseleave", deferredClose);
     menu.addEventListener("keydown", (e) => {
       const items = Array.from(menu.querySelectorAll<HTMLAnchorElement>('[role="menuitem"]'));
       const idx = items.indexOf(document.activeElement as HTMLAnchorElement);
