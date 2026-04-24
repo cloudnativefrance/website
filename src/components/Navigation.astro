@@ -69,7 +69,7 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
             data-nav-key={key}
             aria-current={active ? "page" : undefined}
             class:list={[
-              "text-sm font-medium text-white transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
+              "text-sm font-medium text-foreground transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
               active
                 ? "border-b-2 border-primary"
                 : "border-b-2 border-transparent hover:border-primary/60",
@@ -156,7 +156,7 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
   if (header) {
     const onScroll = () => {
       const scrolled = window.scrollY > 0;
-      header.classList.toggle("border-white/15", scrolled);
+      header.classList.toggle("border-border", scrolled);
       header.classList.toggle("shadow-[0_4px_12px_rgba(0,0,0,0.2)]", scrolled);
       header.classList.toggle("border-transparent", !scrolled);
     };
