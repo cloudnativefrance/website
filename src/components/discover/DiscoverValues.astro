@@ -10,9 +10,25 @@ interface Props {
   title: string;
   body: string;
   stats: Stats;
+  lang: "fr" | "en";
 }
 
-const { title, body, stats } = Astro.props;
+const { title, body, stats, lang } = Astro.props;
+
+const valueLabels = {
+  fr: [
+    { emoji: "🌐", label: "Open Source" },
+    { emoji: "🤝", label: "Communauté" },
+    { emoji: "🌱", label: "Souveraineté" },
+    { emoji: "♾️", label: "Inclusion" },
+  ],
+  en: [
+    { emoji: "🌐", label: "Open Source" },
+    { emoji: "🤝", label: "Community" },
+    { emoji: "🌱", label: "Sovereignty" },
+    { emoji: "♾️", label: "Inclusion" },
+  ],
+} as const;
 ---
 
 <section id="values" class="bg-card">
@@ -23,12 +39,7 @@ const { title, body, stats } = Astro.props;
         <p class="text-muted-foreground leading-relaxed">{body}</p>
       </div>
       <div class="flex flex-wrap gap-8 justify-center md:justify-end">
-        {[
-          { emoji: "🌐", label: "Open Source" },
-          { emoji: "🤝", label: "Communauté" },
-          { emoji: "🌱", label: "Souveraineté" },
-          { emoji: "♾️", label: "Inclusion" },
-        ].map(({ emoji, label }) => (
+        {valueLabels[lang].map(({ emoji, label }) => (
           <div class="flex flex-col items-center gap-2">
             <span class="text-5xl" aria-hidden="true">{emoji}</span>
             <span class="text-sm font-medium text-muted-foreground">{label}</span>

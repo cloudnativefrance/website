@@ -70,13 +70,13 @@ const photos = [
       >&#x2715;</button>
       <button
         id="lb-prev"
-        class="absolute left-4 text-white text-4xl w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
+        class="absolute left-4 top-1/2 -translate-y-1/2 text-white text-4xl w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
         aria-label={prevLabel}
       >&#x2039;</button>
       <img id="lb-img" src="" alt="" class="max-h-[90vh] max-w-[90vw] object-contain rounded-lg" />
       <button
         id="lb-next"
-        class="absolute right-4 text-white text-4xl w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-white text-4xl w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
         aria-label={nextLabel}
       >&#x203a;</button>
     </div>
@@ -88,7 +88,7 @@ const photos = [
   const dialog = document.getElementById("gallery-lightbox") as HTMLDialogElement | null;
   const lbImg = document.getElementById("lb-img") as HTMLImageElement | null;
 
-  if (!dialog || !lbImg) throw new Error("Lightbox elements not found");
+  if (!dialog || !lbImg) return;
 
   const srcs = btns.map((btn) => (btn.querySelector("img") as HTMLImageElement).src);
   const alts = btns.map((btn) => (btn.querySelector("img") as HTMLImageElement).alt);
