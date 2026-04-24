@@ -23,34 +23,34 @@ Values are expressed in OKLCH for Tailwind CSS 4 compatibility.
 
 ### Semantic Token Map
 
-These are the CSS custom properties wired into Tailwind 4 via `@theme` in `src/styles/global.css`.
+These are the CSS custom properties wired into Tailwind 4 via `@theme inline` in `src/styles/global.css`. Light is the default; dark is opt-in via `.dark` on `<html>`.
 
-| Token | OKLCH Value | Hex Approx | Usage |
-|-------|-------------|------------|-------|
-| `--color-background` | oklch(16.8% 0.052 286.4) | #0e0a24 | Page background |
-| `--color-foreground` | oklch(95.6% 0.023 291.3) | #f0eeff | Primary text |
-| `--color-card` | oklch(22.5% 0.083 285.5) | #1a1240 | Card and surface backgrounds |
-| `--color-card-foreground` | oklch(95.6% 0.023 291.3) | #f0eeff | Text on cards |
-| `--color-primary` | oklch(62.5% 0.162 259.9) | #4985e8 | Buttons, links, interactive elements |
-| `--color-primary-foreground` | oklch(100.0% 0.000 0) | #ffffff | Text on primary backgrounds |
-| `--color-accent` | oklch(76.6% 0.142 10.1) | #ff8a9e | Warm highlights, badges, special CTAs |
-| `--color-accent-foreground` | oklch(16.8% 0.052 286.4) | #0e0a24 | Text on accent backgrounds |
-| `--color-secondary` | oklch(27.1% 0.091 286.5) | #251c50 | Secondary surfaces, hover states |
-| `--color-secondary-foreground` | oklch(95.6% 0.023 291.3) | #f0eeff | Text on secondary surfaces |
-| `--color-muted` | oklch(27.1% 0.091 286.5) | #251c50 | Muted backgrounds |
-| `--color-muted-foreground` | oklch(66.8% 0.047 290.8) | #9490b0 | Secondary text, captions |
-| `--color-destructive` | oklch(54.0% 0.216 25.2) | #cf0822 | Error states, destructive actions |
-| `--color-destructive-foreground` | oklch(100.0% 0.000 0) | #ffffff | Text on destructive backgrounds |
-| `--color-border` | oklch(30.8% 0.102 285.5) | #2d2460 | Borders, dividers |
-| `--color-input` | oklch(30.8% 0.102 285.5) | #2d2460 | Input field borders |
-| `--color-ring` | oklch(62.5% 0.162 259.9) | #4985e8 | Focus rings |
-| `--color-popover` | oklch(22.5% 0.083 285.5) | #1a1240 | Dropdown/popover backgrounds |
-| `--color-popover-foreground` | oklch(95.6% 0.023 291.3) | #f0eeff | Text in popovers |
-| `--color-chart-1` | oklch(62.5% 0.162 259.9) | #4985e8 | Chart color 1 (blue) |
-| `--color-chart-2` | oklch(54.0% 0.216 25.2) | #cf0822 | Chart color 2 (red) |
-| `--color-chart-3` | oklch(76.6% 0.142 10.1) | #ff8a9e | Chart color 3 (pink) |
-| `--color-chart-4` | oklch(88.4% 0.061 244.8) | #b8deff | Chart color 4 (light blue) |
-| `--color-chart-5` | oklch(24.6% 0.101 286.7) | #20134d | Chart color 5 (deep purple) |
+| Token | Light value | Dark value | Usage |
+|-------|-------------|-----------|-------|
+| `--color-background` | oklch(97.5% 0.006 250) ≈ #f5f7fa | oklch(16.8% 0.052 286.4) ≈ #0e0a24 | Page background |
+| `--color-foreground` | oklch(15.5% 0.040 268) ≈ #14182b | oklch(95.6% 0.023 291.3) ≈ #f0eeff | Primary text |
+| `--color-card` | oklch(100% 0 0) ≈ #ffffff | oklch(22.5% 0.083 285.5) ≈ #1a1240 | Card and surface backgrounds |
+| `--color-card-foreground` | oklch(15.5% 0.040 268) ≈ #14182b | oklch(95.6% 0.023 291.3) ≈ #f0eeff | Text on cards |
+| `--color-popover` | oklch(100% 0 0) ≈ #ffffff | oklch(22.5% 0.083 285.5) ≈ #1a1240 | Dropdown/popover backgrounds |
+| `--color-popover-foreground` | oklch(15.5% 0.040 268) ≈ #14182b | oklch(95.6% 0.023 291.3) ≈ #f0eeff | Text in popovers |
+| `--color-secondary` | oklch(94.5% 0.011 250) ≈ #ebeff5 | oklch(27.1% 0.091 286.5) ≈ #251c50 | Secondary surfaces, hover states |
+| `--color-secondary-foreground` | oklch(15.5% 0.040 268) ≈ #14182b | oklch(95.6% 0.023 291.3) ≈ #f0eeff | Text on secondary surfaces |
+| `--color-muted` | oklch(94.5% 0.011 250) ≈ #ebeff5 | oklch(27.1% 0.091 286.5) ≈ #251c50 | Muted backgrounds |
+| `--color-muted-foreground` | oklch(54.0% 0.025 257) ≈ #6b7280 | oklch(66.8% 0.047 290.8) ≈ #9490b0 | Secondary text, captions |
+| `--color-border` | oklch(87.8% 0.014 250) ≈ #d8dde6 | oklch(30.8% 0.102 285.5) ≈ #2d2460 | Borders, dividers |
+| `--color-input` | oklch(87.8% 0.014 250) ≈ #d8dde6 | oklch(30.8% 0.102 285.5) ≈ #2d2460 | Input field borders |
+| `--color-ring` | oklch(62.5% 0.162 259.9) ≈ #4985e8 | (same — brand) | Focus rings |
+| `--color-primary` | oklch(62.5% 0.162 259.9) ≈ #4985e8 | (same — brand) | Buttons, links, interactive elements |
+| `--color-primary-foreground` | oklch(100% 0 0) ≈ #ffffff | (same — brand) | Text on primary backgrounds |
+| `--color-accent` | oklch(76.6% 0.142 10.1) ≈ #ff8a9e | (same — brand) | Warm highlights, badges, special CTAs |
+| `--color-accent-foreground` | oklch(16.8% 0.052 286.4) ≈ #0e0a24 | (same — brand) | Text on accent backgrounds |
+| `--color-destructive` | oklch(54.0% 0.216 25.2) ≈ #cf0822 | (same — brand) | Error states, destructive actions |
+| `--color-destructive-foreground` | oklch(100% 0 0) ≈ #ffffff | (same — brand) | Text on destructive backgrounds |
+| `--color-chart-1` | oklch(62.5% 0.162 259.9) | (same — brand) | Chart color 1 (blue) |
+| `--color-chart-2` | oklch(54.0% 0.216 25.2) | (same — brand) | Chart color 2 (red) |
+| `--color-chart-3` | oklch(76.6% 0.142 10.1) | (same — brand) | Chart color 3 (pink) |
+| `--color-chart-4` | oklch(88.4% 0.061 244.8) | (same — brand) | Chart color 4 (light blue) |
+| `--color-chart-5` | oklch(24.6% 0.101 286.7) | (same — brand) | Chart color 5 (deep purple) |
 
 ### Color Usage Guidelines
 
@@ -158,15 +158,15 @@ Default `--radius`: **6px** -- slightly rounded, modern but not bubbly. Consiste
 
 ## Shadows
 
-Dark themes need subtle shadows. Use elevation through lighter surfaces rather than traditional drop shadows.
+Shadow style depends on mode. Light mode uses traditional drop shadows (subtle dark shadows on lighter surfaces). Dark mode uses elevation through lighter surfaces and optional glow effects on CTAs.
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--shadow-sm` | `0 1px 2px oklch(0% 0 0 / 0.3)` | Subtle lift for small elements |
-| `--shadow-md` | `0 4px 12px oklch(0% 0 0 / 0.4)` | Cards, dropdowns |
-| `--shadow-lg` | `0 8px 24px oklch(0% 0 0 / 0.5)` | Modals, elevated panels |
-| `--shadow-glow-primary` | `0 0 20px oklch(62.5% 0.162 259.9 / 0.3)` | Glow effect on primary CTAs |
-| `--shadow-glow-accent` | `0 0 20px oklch(76.6% 0.142 10.1 / 0.25)` | Glow effect on accent elements |
+| Token | Light value | Dark value | Usage |
+|-------|-------------|-----------|-------|
+| `--shadow-sm` | `0 1px 2px rgba(20, 24, 43, 0.05)` | `0 1px 2px oklch(0% 0 0 / 0.3)` | Subtle lift for small elements |
+| `--shadow-md` | `0 4px 12px rgba(20, 24, 43, 0.07)` | `0 4px 12px oklch(0% 0 0 / 0.4)` | Cards, dropdowns |
+| `--shadow-lg` | `0 8px 24px rgba(20, 24, 43, 0.09)` | `0 8px 24px oklch(0% 0 0 / 0.5)` | Modals, elevated panels |
+| `--shadow-glow-primary` | `none` (light has no glows) | `0 0 20px oklch(62.5% 0.162 259.9 / 0.3)` | Glow effect on primary CTAs (dark only) |
+| `--shadow-glow-accent` | `none` (light has no glows) | `0 0 20px oklch(76.6% 0.142 10.1 / 0.25)` | Glow effect on accent elements (dark only) |
 
 ---
 
@@ -289,17 +289,20 @@ A subtle, low-opacity pattern of hexagonal cells connected by thin lines, remini
 
 ---
 
-## Dark Theme Rationale
+## Light Default + Dark Opt-in Rationale
 
-The dark theme is chosen for the following reasons:
+The 2027 edition refreshes the brand to a light-default visual identity, with dark preserved as an opt-in choice via the navigation toggle. Reasoning:
 
-1. **Developer audience**: Cloud-native professionals overwhelmingly prefer dark interfaces. A dark conference site signals "this is for you."
-2. **Color vibrancy**: The CND logo colors (blue, red, pink) are more vivid and impactful against dark backgrounds than light ones.
-3. **Visual hierarchy**: Dark backgrounds with bright foreground elements create strong natural contrast, directing the eye to content.
-4. **KubeCon energy**: The bold/energetic mood requested aligns with high-contrast dark themes used by KubeCon, GitHub Universe, and similar tech events.
-5. **Brand alignment**: The deepest logo color (#20134d, deep purple) naturally extends into a rich dark background that feels native to the brand rather than arbitrary.
+1. **Brand refresh.** A lighter visual identity reads as a deliberate evolution from the v1.0 dark-only site — fresh, current, and distinct from prior editions.
+2. **Reader comfort.** Dark sites are harder to read in bright environments — outdoor venues, daylight, projector views, bright lobbies. Light mode covers these reading contexts.
+3. **Inclusivity.** Not every visitor prefers dark; offering a choice is a baseline UX courtesy.
+4. **Accessibility maintained.** Brand hues (`--color-primary`, `--color-accent`, `--color-destructive`) are unchanged across modes — they meet WCAG AA contrast against both backgrounds. Mode-specific tokens are tuned to keep all text combinations at AA or above.
 
-The background is not pure black but a deep purple-tinted dark (`#0e0a24`), maintaining the brand's color DNA even in the darkest surfaces. Every surface layer shifts toward the purple family, creating a cohesive tonal system.
+The light palette is the **Cool Gray** direction, validated in Stitch screen `caa965ee0b4c4aed9278c4222779a1da`. It pairs cool blue-gray surfaces (`#f5f7fa` background, `#d8dde6` borders) with deep cool blue-black text (`#14182b`) — crisp, modern, developer-tooling adjacent. The primary brand blue (`#4985e8`) feels native against the cool surface family.
+
+Dark mode is preserved verbatim from v1.0: deep purple-tinted background (`#0e0a24`), card surfaces stepping up the purple lightness ladder. Visitors who prefer it click the sun/moon button in the navigation; their choice is persisted in `localStorage` and survives across the FR ↔ EN locale switch.
+
+The OS `prefers-color-scheme` media query is intentionally NOT honored on first visit — the new light brand is what every visitor sees by default. Per-user override is via the toggle, not via OS detection.
 
 ---
 
@@ -322,37 +325,61 @@ For `src/styles/global.css`, wire these values into Tailwind 4's `@theme` direct
 
 ```css
 @theme {
-  --color-background: oklch(16.8% 0.052 286.4);
-  --color-foreground: oklch(95.6% 0.023 291.3);
-  --color-card: oklch(22.5% 0.083 285.5);
-  --color-card-foreground: oklch(95.6% 0.023 291.3);
-  --color-popover: oklch(22.5% 0.083 285.5);
-  --color-popover-foreground: oklch(95.6% 0.023 291.3);
+  /* Light is the default — :root holds the light palette */
+  --color-background: oklch(97.5% 0.006 250);
+  --color-foreground: oklch(15.5% 0.040 268);
+  --color-card: oklch(100% 0 0);
+  --color-card-foreground: oklch(15.5% 0.040 268);
+  --color-popover: oklch(100% 0 0);
+  --color-popover-foreground: oklch(15.5% 0.040 268);
+  --color-secondary: oklch(94.5% 0.011 250);
+  --color-secondary-foreground: oklch(15.5% 0.040 268);
+  --color-muted: oklch(94.5% 0.011 250);
+  --color-muted-foreground: oklch(54.0% 0.025 257);
+  --color-border: oklch(87.8% 0.014 250);
+  --color-input: oklch(87.8% 0.014 250);
+  --color-ring: oklch(62.5% 0.162 259.9);
+
+  /* Brand hues — same in light and dark, defined once */
   --color-primary: oklch(62.5% 0.162 259.9);
-  --color-primary-foreground: oklch(100.0% 0.000 0);
-  --color-secondary: oklch(27.1% 0.091 286.5);
-  --color-secondary-foreground: oklch(95.6% 0.023 291.3);
-  --color-muted: oklch(27.1% 0.091 286.5);
-  --color-muted-foreground: oklch(66.8% 0.047 290.8);
+  --color-primary-foreground: oklch(100% 0 0);
   --color-accent: oklch(76.6% 0.142 10.1);
   --color-accent-foreground: oklch(16.8% 0.052 286.4);
   --color-destructive: oklch(54.0% 0.216 25.2);
-  --color-destructive-foreground: oklch(100.0% 0.000 0);
-  --color-border: oklch(30.8% 0.102 285.5);
-  --color-input: oklch(30.8% 0.102 285.5);
-  --color-ring: oklch(62.5% 0.162 259.9);
+  --color-destructive-foreground: oklch(100% 0 0);
   --color-chart-1: oklch(62.5% 0.162 259.9);
   --color-chart-2: oklch(54.0% 0.216 25.2);
   --color-chart-3: oklch(76.6% 0.142 10.1);
   --color-chart-4: oklch(88.4% 0.061 244.8);
   --color-chart-5: oklch(24.6% 0.101 286.7);
+
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 12px;
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }
+
+/* Dark opt-in — overrides the mode-specific tokens; brand hues inherit */
+.dark {
+  --color-background: oklch(16.8% 0.052 286.4);
+  --color-foreground: oklch(95.6% 0.023 291.3);
+  --color-card: oklch(22.5% 0.083 285.5);
+  --color-card-foreground: oklch(95.6% 0.023 291.3);
+  --color-popover: oklch(22.5% 0.083 285.5);
+  --color-popover-foreground: oklch(95.6% 0.023 291.3);
+  --color-secondary: oklch(27.1% 0.091 286.5);
+  --color-secondary-foreground: oklch(95.6% 0.023 291.3);
+  --color-muted: oklch(27.1% 0.091 286.5);
+  --color-muted-foreground: oklch(66.8% 0.047 290.8);
+  --color-border: oklch(30.8% 0.102 285.5);
+  --color-input: oklch(30.8% 0.102 285.5);
+}
 ```
+
+All visual decisions in this file ship as token pairs (light value + dark value) for mode-specific tokens, and as single values for brand-stable hues. Never introduce a hardcoded color in component code that doesn't have a semantic token — use `text-foreground`, `border-border`, `bg-card`, etc. The shadcn `@custom-variant dark (&:is(.dark *))` is wired in `global.css`, so any Tailwind utility prefixed with `dark:` will work as expected.
+
+The only intentional exception is overlays whose dark scrim is the design (image lightboxes, modal backdrops). These keep their hardcoded `bg-black/N` and `text-white` because the scrim color is independent of the page theme. See `src/components/past-editions/Edition2023Lightbox.astro` for the canonical example.
 
 ---
 
@@ -372,7 +399,7 @@ Three canonical variants live in `src/assets/logos/`:
 
 **Clear space:** maintain a margin around the logo equal to the height of the "F" in "FRANCE" (the shortest uppercase letter in the wordmark). No text, photo, or UI element inside that margin.
 
-**Backgrounds:** `dark/` variant on the site's deep-purple Background token. `principal/` variant only on light backgrounds (press decks, invoices). Never recolor, add strokes, stretch, or rotate the logo.
+**Backgrounds:** the site renders the `principal/` (light-bg) variant by default. The `dark/` variant renders when a visitor opts into dark mode via the navigation toggle, and on dark surfaces in press kits, slide decks, and email signatures. Components consume both via the dual-render `dark:hidden` / `hidden dark:block` pattern (see `Navigation.astro`, `Footer.astro`, `HeroSection.astro` for examples) — never hardcode a single variant. Never recolor, add strokes, stretch, or rotate the logo.
 
 **Prohibited:** drop shadows, gradients, outlines, opacity below 1.0, background plates with non-DS colors, AI-generated "reimaginings".
 
