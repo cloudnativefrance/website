@@ -21,6 +21,8 @@ export const ui = {
     "seo.og_image_alt":
       "Cloud Native Days France — 3 juin 2027 au CENTQUATRE-PARIS",
     "toggle.aria": "Selecteur de langue",
+    "theme.toggle.aria.to_dark": "Basculer en mode sombre",
+    "theme.toggle.aria.to_light": "Basculer en mode clair",
     "fallback.heading": "Contenu non disponible en francais",
     "fallback.body":
       "Cette page n'a pas encore ete traduite. Consulter la version originale.",
@@ -196,6 +198,7 @@ export const ui = {
     "footer.association": "Organisé par Cloud Native France (loi 1901)",
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Suivez-nous",
+    "footer.newsletter.heading": "Restez informé",
     "footer.legal.heading": "Légal",
     "footer.legal.coc": "Code de conduite",
     "footer.legal.privacy": "Confidentialité",
@@ -206,9 +209,7 @@ export const ui = {
     "footer.social.bluesky_aria": "Bluesky Cloud Native France (nouvelle fenêtre)",
     "footer.social.twitter_aria": "X Cloud Native France (nouvelle fenêtre)",
     "footer.landmark_aria": "Pied de page",
-    "editions.rail.2026": "EDITION 2026",
-    "editions.rail.2023": "EDITION 2023",
-    "editions.2026.heading": "Edition 2026 — replay et bilan",
+    "editions.2026.heading": "Revivez l'édition 2026",
     "editions.2026.video_caption":
       "Aftermovie officiel de Cloud Native Days France 2026",
     "editions.2026.stats.participants": "1\u00a0850+ participants",
@@ -219,11 +220,8 @@ export const ui = {
     "editions.2026.thumbnail_alt.2": "Photo CND France 2026 — moment de networking",
     "editions.2026.thumbnail_alt.3": "Photo CND France 2026 — vue générale de l'événement",
     "editions.2026.replays_cta": "Voir tous les replays",
-    "editions.2026.pdf_cta": "Présentation de l'événement (OnePager PDF)",
-    "editions.2026.pdf_cta_aria": "Présentation de l'événement (OnePager PDF, nouvelle fenêtre)",
     "editions.2026.gallery_cta": "Voir la galerie photo",
     "editions.2026.gallery_cta_aria": "Voir la galerie photo CND France 2026 (nouvelle fenêtre)",
-    "editions.2026.testimonials_heading": "Ils en parlent mieux que nous",
     "editions.placeholder_badge_aria": "Contenu placeholder — voir le ticket de suivi (nouvelle fenêtre)",
     "editions.2023.compact_title": "Édition 2023 (Kubernetes Community Days France)",
     "editions.2023.heading": "Souvenirs de l'édition 2023",
@@ -277,32 +275,6 @@ export const ui = {
     "editions.2023.page.heading": "KCD France 2023 — notre première édition au Pompidou",
     "editions.2023.page.intro":
       "Retour en images sur la première édition francophone, organisée au Centre Georges Pompidou sous le nom Kubernetes Community Days France.",
-    "testimonials.heading": "Ils en parlent mieux que nous",
-    "testimonials.pause_hint": "Survolez pour mettre en pause",
-    "testimonials.0.quote":
-      "Une journée riche en rencontres et en partages techniques de haut niveau.",
-    "testimonials.0.attribution":
-      "A. Morel — SRE, startup fictive",
-    "testimonials.1.quote":
-      "Le meilleur évènement cloud-native francophone, sans aucun pitch commercial.",
-    "testimonials.1.attribution":
-      "B. Lefèvre — Platform Engineer, organisation fictive",
-    "testimonials.2.quote":
-      "J'ai appris plus en une journée qu'en six mois de veille technique.",
-    "testimonials.2.attribution":
-      "C. Dubois — DevOps, scale-up imaginaire",
-    "testimonials.3.quote":
-      "L'ambiance hallway-track est exactement ce qu'il manque aux confs traditionnelles.",
-    "testimonials.3.attribution":
-      "D. Garnier — Architecte cloud, employeur fictif",
-    "testimonials.4.quote":
-      "Des talks pointus, des speakers accessibles, une organisation au cordeau.",
-    "testimonials.4.attribution":
-      "E. Petit — Engineering Manager, structure fictive",
-    "testimonials.5.quote":
-      "Vivement la prochaine édition pour retrouver cette communauté.",
-    "testimonials.5.attribution":
-      "F. Bernard — Tech Lead, organisation placeholder",
     // --- Feature flags (coming-soon layout) ---
     "flags.soon.notify_cta": "Être prévenu·e",
     "flags.soon.opens_on": "Ouverture le {date}",
@@ -331,6 +303,8 @@ export const ui = {
     "seo.og_image_alt":
       "Cloud Native Days France — June 3, 2027 at CENTQUATRE-PARIS",
     "toggle.aria": "Language selector",
+    "theme.toggle.aria.to_dark": "Switch to dark mode",
+    "theme.toggle.aria.to_light": "Switch to light mode",
     "fallback.heading": "Content not available in English",
     "fallback.body":
       "This page has not been translated yet. View the original version.",
@@ -504,6 +478,7 @@ export const ui = {
     "footer.association": "Organized by Cloud Native France (loi 1901 non-profit)",
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Follow us",
+    "footer.newsletter.heading": "Stay informed",
     "footer.legal.heading": "Legal",
     "footer.legal.coc": "Code of Conduct",
     "footer.legal.privacy": "Privacy",
@@ -514,9 +489,7 @@ export const ui = {
     "footer.social.bluesky_aria": "Cloud Native France on Bluesky (new window)",
     "footer.social.twitter_aria": "Cloud Native France on X (new window)",
     "footer.landmark_aria": "Site footer",
-    "editions.rail.2026": "2026 EDITION",
-    "editions.rail.2023": "2023 EDITION",
-    "editions.2026.heading": "2026 edition — recap and replays",
+    "editions.2026.heading": "Relive the 2026 edition",
     "editions.2026.video_caption":
       "Official aftermovie of Cloud Native Days France 2026",
     "editions.2026.stats.participants": "1,850+ attendees",
@@ -527,11 +500,8 @@ export const ui = {
     "editions.2026.thumbnail_alt.2": "CND France 2026 photo — networking moment",
     "editions.2026.thumbnail_alt.3": "CND France 2026 photo — overall venue view",
     "editions.2026.replays_cta": "Watch all replays",
-    "editions.2026.pdf_cta": "Event overview (OnePager PDF)",
-    "editions.2026.pdf_cta_aria": "Event overview (OnePager PDF, new window)",
     "editions.2026.gallery_cta": "View the photo gallery",
     "editions.2026.gallery_cta_aria": "View the CND France 2026 photo gallery (new window)",
-    "editions.2026.testimonials_heading": "They said it better than we could",
     "editions.placeholder_badge_aria": "Placeholder content — open tracker issue (new window)",
     "editions.2023.compact_title": "2023 Edition (Kubernetes Community Days France)",
     "editions.2023.heading": "Highlights from the 2023 edition",
@@ -585,32 +555,6 @@ export const ui = {
     "editions.2023.page.heading": "KCD France 2023 — our first edition at Pompidou",
     "editions.2023.page.intro":
       "A visual recap of the first French-language edition, hosted at Centre Georges Pompidou under the name Kubernetes Community Days France.",
-    "testimonials.heading": "They said it better than we could",
-    "testimonials.pause_hint": "Hover to pause",
-    "testimonials.0.quote":
-      "A day packed with high-quality technical exchanges and meaningful encounters.",
-    "testimonials.0.attribution":
-      "A. Morel — SRE, placeholder startup",
-    "testimonials.1.quote":
-      "The best French-speaking cloud-native event, with zero sales pitch.",
-    "testimonials.1.attribution":
-      "B. Lefèvre — Platform Engineer, placeholder org",
-    "testimonials.2.quote":
-      "I learned more in one day than during six months of solo tech watch.",
-    "testimonials.2.attribution":
-      "C. Dubois — DevOps, placeholder scale-up",
-    "testimonials.3.quote":
-      "The hallway-track vibe is exactly what mainstream conferences are missing.",
-    "testimonials.3.attribution":
-      "D. Garnier — Cloud Architect, placeholder employer",
-    "testimonials.4.quote":
-      "Deep technical talks, approachable speakers, flawless organization.",
-    "testimonials.4.attribution":
-      "E. Petit — Engineering Manager, placeholder company",
-    "testimonials.5.quote":
-      "Already looking forward to next edition to reconnect with this community.",
-    "testimonials.5.attribution":
-      "F. Bernard — Tech Lead, placeholder organization",
     // --- Feature flags (coming-soon layout) ---
     "flags.soon.notify_cta": "Notify me",
     "flags.soon.opens_on": "Opens on {date}",

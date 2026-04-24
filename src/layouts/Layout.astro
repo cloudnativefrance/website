@@ -57,10 +57,17 @@ const ogLocale = resolvedLang === "fr" ? "fr_FR" : "en_US";
 const siteName = t("seo.og_site_name");
 const ogImageAlt = t("seo.og_image_alt");
 ---
-<html lang={resolvedLang} class="dark">
+<html lang={resolvedLang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      try {
+        if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (_) {}
+    </script>
     <title>{title}</title>
     <meta name="description" content={metaDescription} />
 
@@ -88,9 +95,9 @@ const ogImageAlt = t("seo.og_image_alt");
     <meta name="twitter:description" content={metaDescription} />
     <meta name="twitter:image" content={ogImageUrl} />
 
-    <!-- Favicon (v2 = French tricolor, replaces Astro default; cache-bust to evict old .ico) -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
-    <link rel="shortcut icon" type="image/svg+xml" href="/favicon.svg?v=2" />
+    <!-- Favicon: CND no-text logo. ?v=3 cache-busts the prior tricolor SVG. -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
+    <link rel="shortcut icon" type="image/svg+xml" href="/favicon.svg?v=3" />
 
     <Font cssVariable="--font-dm-sans" preload />
   </head>

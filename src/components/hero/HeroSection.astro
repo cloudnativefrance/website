@@ -2,38 +2,26 @@
 import GeoBackground from "@/components/patterns/GeoBackground.astro";
 import CountdownTimer from "./CountdownTimer";
 import FeatureGate from "@/components/flags/FeatureGate.astro";
-import { Badge } from "@/components/ui/badge";
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { NEWSLETTER_URL } from "@/lib/event";
-import logo from "@/assets/logos/dark/logo.svg";
-import ambiance00 from "@/assets/photos/ambiance/ambiance-00.jpg";
+import logoFullDark from "@/assets/logos/dark/logo.svg";
+import logoFullLight from "@/assets/logos/principal/logo.svg";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
 const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
 const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
+
+// Both logo variants share intrinsic dimensions, so one ratio drives both <img> tags.
+const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width);
 ---
 
 <section
-  class="relative flex min-h-[80vh] lg:min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-16 lg:py-24 text-center"
+  class="relative flex flex-col items-center justify-center overflow-hidden px-4 pt-4 pb-16 lg:pt-6 lg:pb-24 text-center"
 >
-  <!-- Venue atmosphere photo as a very subtle backdrop -->
-  <img
-    src={ambiance00.src}
-    alt=""
-    aria-hidden="true"
-    loading="eager"
-    decoding="async"
-    class="absolute inset-0 w-full h-full object-cover opacity-75 pointer-events-none"
-  />
-  <!-- Dark gradient wash keeps text readable over the photo -->
-  <div
-    class="absolute inset-0 bg-[linear-gradient(to_bottom,_var(--color-background)_0%,_color-mix(in_oklch,_var(--color-background)_80%,_transparent)_50%,_var(--color-background)_100%)] pointer-events-none"
-  ></div>
-
   <GeoBackground class="absolute inset-0" />
 
   <div
@@ -43,25 +31,35 @@ const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
   <div class="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center gap-8 md:gap-10">
     <h1 class="sr-only">{t("hero.title")}</h1>
     <img
-      src={logo.src}
+      src={logoFullLight.src}
       alt={t("hero.logo_alt")}
       width={400}
-      height={(400 * logo.height) / logo.width}
-      class="w-full max-w-[260px] sm:max-w-[320px] md:max-w-[400px] h-auto"
+      height={LOGO_HEIGHT}
+      class="dark:hidden w-full max-w-[260px] sm:max-w-[320px] md:max-w-[400px] h-auto"
       loading="eager"
       decoding="async"
     />
+    <img
+      src={logoFullDark.src}
+      alt={t("hero.logo_alt")}
+      width={400}
+      height={LOGO_HEIGHT}
+      class="hidden dark:block w-full max-w-[260px] sm:max-w-[320px] md:max-w-[400px] h-auto"
+      loading="lazy"
+      decoding="async"
+    />
 
-    <p
-      class="flex w-full flex-wrap items-center justify-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl text-muted-foreground"
-      style="line-height:1.4;"
-    >
-      <Badge className="bg-accent/15 text-accent text-sm sm:text-base font-normal uppercase tracking-widest rounded-full px-3 py-1">
+    <div class="flex flex-col items-center gap-2">
+      <p
+        class="text-2xl sm:text-3xl md:text-4xl font-bold uppercase text-destructive"
+        style="letter-spacing: 0.05em;"
+      >
         {t("hero.subtitle")}
-      </Badge>
-      <span>&mdash;</span>
-      <span class="break-words">{t("hero.venue")}</span>
-    </p>
+      </p>
+      <p class="text-sm sm:text-base font-medium uppercase text-muted-foreground" style="letter-spacing: 0.05em;">
+        {t("hero.venue")}
+      </p>
+    </div>
 
     <p class="max-w-[720px] text-balance text-lg md:text-xl text-foreground" style="line-height:1.55;">
       {t("hero.description")}
@@ -78,7 +76,7 @@ const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
         rel="noopener noreferrer"
         class={cn(
           buttonVariants({ variant: "default", size: "lg" }),
-          "h-[52px] px-8 text-lg font-bold shadow-[0_0_20px_oklch(62.5%_0.162_259.9_/_0.3)] hover:translate-y-[-1px] transition-all duration-150"
+          "h-[52px] px-8 text-lg font-bold shadow-[var(--shadow-glow-primary)] hover:translate-y-[-1px] transition-all duration-150"
         )}
       >
         {t("hero.cta.register")}
@@ -100,11 +98,11 @@ const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
         rel="noopener noreferrer"
         aria-label={t("hero.cta.newsletter_aria")}
         class={cn(
-          buttonVariants({ variant: "ghost", size: "lg" }),
+          buttonVariants({ variant: "outline", size: "lg" }),
           "h-[52px] px-8 text-lg font-bold",
-          "text-accent",
-          "hover:bg-accent/10 hover:text-accent",
-          "focus-visible:ring-accent/50",
+          "border-2 border-destructive text-destructive bg-transparent",
+          "hover:bg-destructive/10 hover:text-destructive hover:border-destructive hover:shadow-[0_0_0_4px_oklch(54.0%_0.216_25.2_/_0.15)]",
+          "focus-visible:ring-destructive/50",
           "gap-2"
         )}
       >

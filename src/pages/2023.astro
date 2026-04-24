@@ -15,7 +15,6 @@ import Layout from "@/layouts/Layout.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { EDITION_2023 } from "@/lib/editions-data";
 import Edition2023PhotoGrid from "@/components/past-editions/Edition2023PhotoGrid.astro";
-import KcdBrandHistoryCallout from "@/components/past-editions/KcdBrandHistoryCallout.astro";
 import Edition2023Lightbox from "@/components/past-editions/Edition2023Lightbox.astro";
 
 const lang = getLangFromUrl(Astro.url);
@@ -57,15 +56,6 @@ const photos = EDITION_2023.photos10.map((p) => ({
       <Edition2023PhotoGrid
         photos={photos}
         openLabelTemplate={t("editions.2023.photo_open_label")}
-      />
-
-      {/* KCD brand-history callout */}
-      <KcdBrandHistoryCallout
-        logo={EDITION_2023.brandHistory.logo}
-        logoAlt={t(EDITION_2023.brandHistory.logoAltKey)}
-        heading={t(EDITION_2023.brandHistory.headingKey)}
-        body={t(EDITION_2023.brandHistory.bodyKey)}
-        venue={t(EDITION_2023.brandHistory.venueKey)}
       />
 
       {/* Gallery CTA (placeholder URL — tracker #19) */}

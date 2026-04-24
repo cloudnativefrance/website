@@ -1,13 +1,12 @@
 /**
- * Phase 19 — dedicated `/2023` (FR) + `/en/2023` (EN) page regression harness.
+ * Dedicated `/2023` (FR) + `/en/2023` (EN) page regression harness.
  *
- * Scope (per roadmap SC1-SC5):
- *   SC1 — rail + h1 + 10-photo grid + gallery CTA, CLS-safe tiles
- *   SC2 — KCD brand-history callout with Pompidou mention + "originally named"
- *   SC3 — lightbox present with role=dialog + aria-label (static presence only;
- *         keyboard behaviour covered by manual UAT)
- *   SC4 — 10 unique descriptive alts per locale (no "photo 1/2" pattern)
- *   SC5 — PLACEHOLDER badge linking to tracker (EDIT-07)
+ * Asserts:
+ *   - rail + h1 + 10-photo grid + gallery CTA, CLS-safe tiles
+ *   - lightbox present with role=dialog + aria-label (static presence only;
+ *     keyboard behaviour covered by manual UAT)
+ *   - 10 unique descriptive alts per locale (no "photo 1/2" pattern)
+ *   - PLACEHOLDER badge linking to tracker
  */
 import { describe, it, expect } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
@@ -59,37 +58,6 @@ describe("Phase 19 / SC1: /2023 structure (rail + h1 + photo grid + CTA)", () =>
         const html = readFileSync(path, "utf8");
         if (locale === "fr") expect(html).toMatch(/Voir la galerie complète/);
         else expect(html).toMatch(/View the full gallery/);
-      });
-    });
-  }
-});
-
-describe("Phase 19 / SC2: KCD brand-history callout", () => {
-  for (const { label, path, locale } of pages) {
-    describe(label, () => {
-      it.skipIf(!distExists)("mentions Centre Georges Pompidou", () => {
-        const html = readFileSync(path, "utf8");
-        expect(html).toMatch(/Centre Georges Pompidou/);
-      });
-
-      it.skipIf(!distExists)("includes the 'originally named Kubernetes Community Days France' phrase", () => {
-        const html = readFileSync(path, "utf8");
-        if (locale === "fr") {
-          // Astro HTML-escapes `'` to `&#39;` in rendered output.
-          expect(html).toMatch(/à l(&#39;|')origine Kubernetes Community Days France/);
-        } else {
-          expect(html).toMatch(/originally named Kubernetes Community Days France/);
-        }
-      });
-
-      it.skipIf(!distExists)("renders the KCD 2023 logo with descriptive alt", () => {
-        const html = readFileSync(path, "utf8");
-        expect(html).toMatch(/Kubernetes Community Days France 2023/);
-      });
-
-      it.skipIf(!distExists)("uses <aside> landmark with aria-labelledby", () => {
-        const html = readFileSync(path, "utf8");
-        expect(html).toMatch(/<aside[^>]+aria-labelledby="kcd-brand-history-heading"/);
       });
     });
   }

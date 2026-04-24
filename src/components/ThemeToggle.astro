@@ -1,0 +1,69 @@
+---
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const labelToDark = t("theme.toggle.aria.to_dark");
+const labelToLight = t("theme.toggle.aria.to_light");
+---
+
+<button
+  type="button"
+  class="theme-toggle inline-flex items-center justify-center w-9 h-9 md:w-10 md:h-10 rounded-md text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+  aria-label={labelToDark}
+  aria-pressed="false"
+  data-label-to-dark={labelToDark}
+  data-label-to-light={labelToLight}
+>
+  <!-- Sun: visible in light mode (current = light → next action = dark) -->
+  <svg
+    class="dark:hidden"
+    xmlns="http://www.w3.org/2000/svg"
+    width="20" height="20" viewBox="0 0 24 24"
+    fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="4"/>
+    <path d="M12 2v2"/><path d="M12 20v2"/>
+    <path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/>
+    <path d="M2 12h2"/><path d="M20 12h2"/>
+    <path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+  </svg>
+  <!-- Moon: visible in dark mode (current = dark → next action = light) -->
+  <svg
+    class="hidden dark:block"
+    xmlns="http://www.w3.org/2000/svg"
+    width="20" height="20" viewBox="0 0 24 24"
+    fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+  </svg>
+</button>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>(".theme-toggle").forEach((btn) => {
+    const toDark = btn.dataset.labelToDark ?? "Switch to dark mode";
+    const toLight = btn.dataset.labelToLight ?? "Switch to light mode";
+
+    // Sync initial aria state in case the FOUC script applied .dark before this script ran.
+    const startDark = document.documentElement.classList.contains("dark");
+    btn.setAttribute("aria-pressed", String(startDark));
+    btn.setAttribute("aria-label", startDark ? toLight : toDark);
+
+    btn.addEventListener("click", () => {
+      const isDark = document.documentElement.classList.toggle("dark");
+      try {
+        if (isDark) localStorage.setItem("theme", "dark");
+        else localStorage.removeItem("theme");
+      } catch (_) {}
+      // Update ALL toggle buttons on the page (desktop + mobile) to stay in sync
+      document.querySelectorAll<HTMLButtonElement>(".theme-toggle").forEach((b) => {
+        b.setAttribute("aria-pressed", String(isDark));
+        b.setAttribute("aria-label", isDark ? toLight : toDark);
+      });
+    });
+  });
+</script>
