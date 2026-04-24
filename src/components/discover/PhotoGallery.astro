@@ -1,0 +1,122 @@
+---
+import { Image } from "astro:assets";
+import amb00 from "@/assets/photos/ambiance/ambiance-00.jpg";
+import amb01 from "@/assets/photos/ambiance/ambiance-01.jpg";
+import amb02 from "@/assets/photos/ambiance/ambiance-02.jpg";
+import amb03 from "@/assets/photos/ambiance/ambiance-03.jpg";
+import amb04 from "@/assets/photos/ambiance/ambiance-04.jpg";
+import amb05 from "@/assets/photos/ambiance/ambiance-05.jpg";
+import amb06 from "@/assets/photos/ambiance/ambiance-06.jpg";
+import amb07 from "@/assets/photos/ambiance/ambiance-07.jpg";
+import amb08 from "@/assets/photos/ambiance/ambiance-08.jpg";
+import amb09 from "@/assets/photos/ambiance/ambiance-09.jpg";
+import amb10 from "@/assets/photos/ambiance/ambiance-10.jpg";
+
+interface Props {
+  title: string;
+  closeLabel: string;
+  prevLabel: string;
+  nextLabel: string;
+}
+
+const { title, closeLabel, prevLabel, nextLabel } = Astro.props;
+
+const photos = [
+  { src: amb00, alt: "Ambiance CND France 2026 — photo 1" },
+  { src: amb01, alt: "Ambiance CND France 2026 — photo 2" },
+  { src: amb02, alt: "Ambiance CND France 2026 — photo 3" },
+  { src: amb03, alt: "Ambiance CND France 2026 — photo 4" },
+  { src: amb04, alt: "Ambiance CND France 2026 — photo 5" },
+  { src: amb05, alt: "Ambiance CND France 2026 — photo 6" },
+  { src: amb06, alt: "Ambiance CND France 2026 — photo 7" },
+  { src: amb07, alt: "Ambiance CND France 2026 — photo 8" },
+  { src: amb08, alt: "Ambiance CND France 2026 — photo 9" },
+  { src: amb09, alt: "Ambiance CND France 2026 — photo 10" },
+  { src: amb10, alt: "Ambiance CND France 2026 — photo 11" },
+];
+---
+
+<section id="photos" class="mx-auto max-w-7xl px-4 md:px-6 py-16">
+  <h2 class="text-3xl font-bold text-foreground mb-8 text-center">{title}</h2>
+
+  <div class="columns-1 sm:columns-2 lg:columns-3 gap-4">
+    {photos.map(({ src, alt }, i) => (
+      <button
+        class="gallery-btn w-full mb-4 rounded-lg overflow-hidden block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        data-index={String(i)}
+        aria-label={alt}
+      >
+        <Image
+          src={src}
+          alt={alt}
+          widths={[400, 800]}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          class="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
+        />
+      </button>
+    ))}
+  </div>
+
+  <dialog
+    id="gallery-lightbox"
+    class="fixed inset-0 z-50 bg-black/90 w-full max-w-none h-full m-0 p-0 backdrop:bg-transparent"
+    aria-label={title}
+  >
+    <div class="flex items-center justify-center w-full h-full relative p-4">
+      <button
+        id="lb-close"
+        class="absolute top-4 right-4 text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
+        aria-label={closeLabel}
+      >&#x2715;</button>
+      <button
+        id="lb-prev"
+        class="absolute left-4 text-white text-4xl w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
+        aria-label={prevLabel}
+      >&#x2039;</button>
+      <img id="lb-img" src="" alt="" class="max-h-[90vh] max-w-[90vw] object-contain rounded-lg" />
+      <button
+        id="lb-next"
+        class="absolute right-4 text-white text-4xl w-12 h-12 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
+        aria-label={nextLabel}
+      >&#x203a;</button>
+    </div>
+  </dialog>
+</section>
+
+<script>
+  const btns = Array.from(document.querySelectorAll<HTMLButtonElement>(".gallery-btn"));
+  const dialog = document.getElementById("gallery-lightbox") as HTMLDialogElement | null;
+  const lbImg = document.getElementById("lb-img") as HTMLImageElement | null;
+
+  if (!dialog || !lbImg) throw new Error("Lightbox elements not found");
+
+  const srcs = btns.map((btn) => (btn.querySelector("img") as HTMLImageElement).src);
+  const alts = btns.map((btn) => (btn.querySelector("img") as HTMLImageElement).alt);
+  let current = 0;
+
+  function showSlide(i: number) {
+    current = (i + srcs.length) % srcs.length;
+    lbImg!.src = srcs[current];
+    lbImg!.alt = alts[current];
+  }
+
+  btns.forEach((btn, i) => {
+    btn.addEventListener("click", () => {
+      showSlide(i);
+      dialog!.showModal();
+    });
+  });
+
+  document.getElementById("lb-close")?.addEventListener("click", () => dialog!.close());
+  document.getElementById("lb-prev")?.addEventListener("click", () => showSlide(current - 1));
+  document.getElementById("lb-next")?.addEventListener("click", () => showSlide(current + 1));
+
+  dialog.addEventListener("click", (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+
+  dialog.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") showSlide(current - 1);
+    if (e.key === "ArrowRight") showSlide(current + 1);
+  });
+</script>
