@@ -161,7 +161,7 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
     document.body.classList.toggle("overflow-hidden", !!isHidden);
   });
 
-  // Scroll divider + subtle shadow — visible 15% white line over deep purple bg
+  // Scroll divider + subtle shadow — visible border + drop shadow when page is scrolled.
   const header = document.getElementById("site-header");
   if (header) {
     const onScroll = () => {
