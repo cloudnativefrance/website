@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 import { NEWSLETTER_URL } from "@/lib/event";
 import logoFullDark from "@/assets/logos/dark/logo.svg";
 import logoFullLight from "@/assets/logos/principal/logo.svg";
-import ambiance00 from "@/assets/photos/ambiance/ambiance-00.jpg";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -23,22 +22,8 @@ const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width)
 ---
 
 <section
-  class="relative flex min-h-[80vh] lg:min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-16 lg:py-24 text-center"
+  class="relative flex flex-col items-center justify-center overflow-hidden px-4 pt-4 pb-16 lg:pt-6 lg:pb-24 text-center"
 >
-  <!-- Venue atmosphere photo as a very subtle backdrop -->
-  <img
-    src={ambiance00.src}
-    alt=""
-    aria-hidden="true"
-    loading="eager"
-    decoding="async"
-    class="absolute inset-0 w-full h-full object-cover opacity-75 pointer-events-none"
-  />
-  <!-- Dark gradient wash keeps text readable over the photo -->
-  <div
-    class="absolute inset-0 bg-[linear-gradient(to_bottom,_var(--color-background)_0%,_color-mix(in_oklch,_var(--color-background)_80%,_transparent)_50%,_var(--color-background)_100%)] pointer-events-none"
-  ></div>
-
   <GeoBackground class="absolute inset-0" />
 
   <div
