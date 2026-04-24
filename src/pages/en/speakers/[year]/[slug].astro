@@ -1,0 +1,117 @@
+---
+import Layout from "../../../../layouts/Layout.astro";
+import SpeakerProfile from "@/components/speakers/SpeakerProfile.astro";
+import {
+  getAllSpeakers,
+  getSlug,
+  getTalksForSpeaker,
+  getCoSpeakersForTalk,
+} from "@/lib/speakers";
+import { useTranslations, getLocalePath, getLangFromUrl } from "@/i18n/utils";
+import { EDITIONS, type Edition } from "@/lib/editions";
+
+export async function getStaticPaths() {
+  const entries: Array<{
+    params: { year: string; slug: string };
+    props: { speaker: Awaited<ReturnType<typeof getAllSpeakers>>[number]; year: Edition };
+  }> = [];
+  for (const year of EDITIONS) {
+    const speakers = await getAllSpeakers(year);
+    for (const speaker of speakers) {
+      entries.push({
+        params: { year: String(year), slug: getSlug(speaker.id) },
+        props: { speaker, year },
+      });
+    }
+  }
+  return entries;
+}
+
+const { speaker, year } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const slug = getSlug(speaker.id);
+const talks = await getTalksForSpeaker(lang, slug, year);
+
+const allSpeakers = await getAllSpeakers(year);
+const speakerNameBySlug = new Map(allSpeakers.map((s) => [getSlug(s.id), s.data.name]));
+const social = {
+  twitter: speaker.data.twitter,
+  linkedin: speaker.data.linkedin,
+  github: speaker.data.github,
+  bluesky: speaker.data.bluesky,
+  website: speaker.data.website,
+};
+---
+
+<Layout title={`${speaker.data.name} | ${t("site.title")}`}>
+  <main class="px-4 md:px-6 lg:px-8 pt-8 md:pt-12 pb-16 md:pb-24">
+    <SpeakerProfile
+      name={speaker.data.name}
+      company={speaker.data.company}
+      role={speaker.data.role}
+      photo={speaker.data.photo_url}
+      social={social}
+      lang={lang}
+    >
+      {speaker.data.bio && (
+        <article class="prose prose-invert max-w-none">
+          <p>{speaker.data.bio}</p>
+        </article>
+      )}
+
+      <section slot="talks" class="mt-10">
+        {talks.length > 0 ? (
+          <>
+            <h2 class="text-2xl font-bold text-foreground mb-4">
+              {t("speakers.talks_heading")}
+            </h2>
+            <ul role="list" class="flex flex-col gap-3">
+              {talks.map((talk) => {
+                const coSlugs = getCoSpeakersForTalk(talk, slug);
+                const coNames = coSlugs.map((cs) => ({
+                  slug: cs,
+                  name: speakerNameBySlug.get(cs) ?? cs,
+                }));
+                return (
+                  <li>
+                    <a
+                      href={`${getLocalePath(lang, `/programme/${year}`)}#session-${talk.id}`}
+                      aria-label={t("speakers.schedule_link")}
+                      class="group block rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <h3 class="text-base font-bold text-foreground group-hover:text-primary">
+                        {talk.title}
+                        <span aria-hidden="true" class="inline-block ml-1 text-primary opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                      </h3>
+                      <p class="mt-1 text-sm text-muted-foreground">
+                        {t(`schedule.format.${talk.format}` as any)} · {talk.durationMin} min
+                        {talk.room && <span> · {talk.room}</span>}
+                        {talk.track && <span> · {talk.track}</span>}
+                      </p>
+                      {coNames.length > 0 && (
+                        <p class="mt-2 text-sm text-muted-foreground">
+                          {t("speakers.cospeaker_prefix")}{" "}
+                          {coNames.map((cs, i) => (
+                            <>
+                              <span class="text-primary">{cs.name}</span>
+                              {i < coNames.length - 1 && ", "}
+                            </>
+                          ))}
+                        </p>
+                      )}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        ) : (
+          <p class="text-sm text-muted-foreground mt-8">
+            {t("speakers.no_talks")}
+          </p>
+        )}
+      </section>
+    </SpeakerProfile>
+  </main>
+</Layout>
