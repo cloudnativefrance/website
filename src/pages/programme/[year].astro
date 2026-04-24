@@ -4,6 +4,8 @@ import ScheduleGrid from "@/components/schedule/ScheduleGrid.astro";
 import { loadSessions } from "@/lib/schedule";
 import { getSpeakersByLocale, getSlug } from "@/lib/speakers";
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
+import ComingSoonLayout from "@/components/flags/ComingSoonLayout.astro";
+import { isFlagActive } from "@/lib/flags";
 import { EDITIONS, isEdition, CURRENT_EDITION, type Edition } from "@/lib/editions";
 
 export async function getStaticPaths() {
@@ -22,8 +24,15 @@ const t = useTranslations(lang);
 const sessions = await loadSessions(year);
 const speakerEntries = await getSpeakersByLocale(lang, year);
 const speakerNames = new Map(speakerEntries.map((s) => [getSlug(s.id), s.data.name]));
+
+// Future editions (year > CURRENT_EDITION) stay behind the `programme` flag.
+// Past/current editions always render — 2026 has real archive data, 2023 etc.
+// fall through to the empty-state until their Sheet tab lands.
+const isUpcomingEdition = year > CURRENT_EDITION;
+const programmeReady = !isUpcomingEdition || isFlagActive("programme");
 ---
 
+{programmeReady ? (
 <Layout title={`${t("schedule.heading")} ${year} | ${t("site.title")}`}>
     <main
       class="px-4 md:px-6 lg:px-8"
@@ -75,3 +84,6 @@ const speakerNames = new Map(speakerEntries.map((s) => [getSlug(s.id), s.data.na
       )}
     </main>
 </Layout>
+) : (
+  <ComingSoonLayout flag="programme" lang={lang} />
+)}
