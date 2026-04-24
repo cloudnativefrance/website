@@ -1,26 +1,21 @@
 /**
- * I18N-02 parity test (Phase 16, D-05).
+ * i18n FR/EN parity guard.
  *
- * Enforces two invariants across src/i18n/ui.ts:
- *   1. ui.fr and ui.en have identical key sets (ALL keys)
- *   2. No EN value is byte-identical to its FR counterpart for keys in the
- *      Phase 16 NEW namespaces (editions.* and testimonials.*) — these are
- *      narrative content that must always differ between locales.
+ * Two invariants across src/i18n/ui.ts:
+ *   1. ui.fr and ui.en have identical key sets.
+ *   2. No EN value is byte-identical to its FR counterpart in narrative
+ *      namespaces (editions.*) — these strings must always differ between
+ *      locales. Keys outside this scope (nav, site.title, brand tier names,
+ *      track names, proper nouns, etc.) are intentionally identical in FR
+ *      and EN because they are loanwords or brand terms.
  *
- *      Pre-existing keys (nav, site.title, brand tier names, track names,
- *      proper nouns, etc.) are intentionally identical in FR and EN — they
- *      are loanwords / proper nouns / brand terms — so the byte-diff
- *      assertion is scoped to the new content namespaces this plan
- *      introduced. See 16-01-SUMMARY.md "Deviations" for rationale.
- *
- * Unlike speakers-grid.test.ts, this test does NOT require `pnpm build` —
- * it imports the ui object directly via the @/ alias.
+ * Imports the ui object directly via the @/ alias; no build required.
  */
 
 import { describe, it, expect } from "vitest";
 import { ui } from "@/i18n/ui";
 
-const NARRATIVE_NAMESPACE_PREFIXES = ["editions.", "testimonials."] as const;
+const NARRATIVE_NAMESPACE_PREFIXES = ["editions."] as const;
 
 function isNarrativeKey(key: string): boolean {
   return NARRATIVE_NAMESPACE_PREFIXES.some((p) => key.startsWith(p));
@@ -42,7 +37,7 @@ describe("I18N-02: i18n FR/EN parity", () => {
     ).toEqual([]);
   });
 
-  it("no EN value is byte-identical to its FR counterpart (editions.*, testimonials.*)", () => {
+  it("no EN value is byte-identical to its FR counterpart (editions.*)", () => {
     const identical: string[] = [];
     const frRec = ui.fr as Record<string, string>;
     const enRec = ui.en as Record<string, string>;

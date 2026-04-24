@@ -34,8 +34,7 @@ type Thumbnail = {
   src: ImageMetadata;
   /**
    * i18n key for the alt text. Narrowed to `keyof typeof ui.fr` so that
-   * `t(thumbnail.altKey)` typechecks at call sites without an `as any` cast
-   * (Phase 23 WR-01 — match testimonials-data.ts template-literal pattern).
+   * `t(thumbnail.altKey)` typechecks at call sites without an `as any` cast.
    */
   altKey: keyof typeof ui.fr;
   size?: "hero" | "medium" | "small";
@@ -45,12 +44,9 @@ export const EDITION_2026 = {
   youtubeId: "qyMGuU2-w8o",
   galleryUrl:
     "https://albums.ente.io/?t=QRX4L3WBSD#5jsodRK1mQbqS83qJMd2sVBZr9oW4Bzgm9DuVP6MowY5",
-  // NEW (D-05) — 2026 replays YouTube playlist
+  // 2026 replays YouTube playlist
   replaysUrl:
     "https://www.youtube.com/playlist?list=PLmZ3gFl2Aqt_4_F40zEoUEweEctmtx4p2",
-  // NEW (D-06) — one-pager bilan 2026 PDF on Google Drive
-  pdfUrl:
-    "https://drive.google.com/file/d/1rlrY9EkulGSgeCPenyiN4ZnxWs5BXPBo/view",
   stats: [
     { value: "1700+", labelKey: "editions.2026.stats.participants" },
     { value: "50+", labelKey: "editions.2026.stats.speakers" },
