@@ -17,7 +17,10 @@ import { describe, it, expect, vi } from "vitest";
 // The speakers module imports astro:content for getCollection, but the three
 // helpers under test are pure and never touch it. Stub the specifier so Node
 // can resolve the import graph without the Astro runtime.
-vi.mock("astro:content", () => ({ getCollection: async () => [] }));
+vi.mock("astro:content", () => ({
+  // Any per-year collection name returns empty; only pure helpers are tested here.
+  getCollection: async (_name: string) => [],
+}));
 
 import {
   getSlug,
