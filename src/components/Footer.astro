@@ -1,6 +1,7 @@
 ---
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
-import logoFull from "@/assets/logos/dark/logo.svg";
+import logoFullDark from "@/assets/logos/dark/logo.svg";
+import logoFullLight from "@/assets/logos/principal/logo.svg";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -67,7 +68,8 @@ const socials = [
 
       <!-- Column 1: Brand -->
       <div>
-        <img src={logoFull.src} alt="Cloud Native Days France" class="h-8" />
+        <img src={logoFullLight.src} alt="Cloud Native Days France" class="dark:hidden h-8" />
+        <img src={logoFullDark.src} alt="Cloud Native Days France" class="hidden dark:block h-8" />
         <p class="text-sm text-muted-foreground mt-4">{t("footer.tagline")}</p>
         <p class="text-sm text-muted-foreground mt-3">{t("footer.association")}</p>
       </div>
