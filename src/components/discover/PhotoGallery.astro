@@ -84,39 +84,41 @@ const photos = [
 </section>
 
 <script>
-  const btns = Array.from(document.querySelectorAll<HTMLButtonElement>(".gallery-btn"));
-  const dialog = document.getElementById("gallery-lightbox") as HTMLDialogElement | null;
-  const lbImg = document.getElementById("lb-img") as HTMLImageElement | null;
+  (function () {
+    const btns = Array.from(document.querySelectorAll<HTMLButtonElement>(".gallery-btn"));
+    const dialog = document.getElementById("gallery-lightbox") as HTMLDialogElement | null;
+    const lbImg = document.getElementById("lb-img") as HTMLImageElement | null;
 
-  if (!dialog || !lbImg) return;
+    if (!dialog || !lbImg) return;
 
-  const srcs = btns.map((btn) => (btn.querySelector("img") as HTMLImageElement).src);
-  const alts = btns.map((btn) => (btn.querySelector("img") as HTMLImageElement).alt);
-  let current = 0;
+    const srcs = btns.map((btn) => (btn.querySelector("img") as HTMLImageElement).src);
+    const alts = btns.map((btn) => (btn.querySelector("img") as HTMLImageElement).alt);
+    let current = 0;
 
-  function showSlide(i: number) {
-    current = (i + srcs.length) % srcs.length;
-    lbImg!.src = srcs[current];
-    lbImg!.alt = alts[current];
-  }
+    function showSlide(i: number) {
+      current = (i + srcs.length) % srcs.length;
+      lbImg!.src = srcs[current];
+      lbImg!.alt = alts[current];
+    }
 
-  btns.forEach((btn, i) => {
-    btn.addEventListener("click", () => {
-      showSlide(i);
-      dialog!.showModal();
+    btns.forEach((btn, i) => {
+      btn.addEventListener("click", () => {
+        showSlide(i);
+        dialog!.showModal();
+      });
     });
-  });
 
-  document.getElementById("lb-close")?.addEventListener("click", () => dialog!.close());
-  document.getElementById("lb-prev")?.addEventListener("click", () => showSlide(current - 1));
-  document.getElementById("lb-next")?.addEventListener("click", () => showSlide(current + 1));
+    document.getElementById("lb-close")?.addEventListener("click", () => dialog!.close());
+    document.getElementById("lb-prev")?.addEventListener("click", () => showSlide(current - 1));
+    document.getElementById("lb-next")?.addEventListener("click", () => showSlide(current + 1));
 
-  dialog.addEventListener("click", (e) => {
-    if (e.target === dialog) dialog.close();
-  });
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) dialog.close();
+    });
 
-  dialog.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowLeft") showSlide(current - 1);
-    if (e.key === "ArrowRight") showSlide(current + 1);
-  });
+    dialog.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") showSlide(current - 1);
+      if (e.key === "ArrowRight") showSlide(current + 1);
+    });
+  })();
 </script>
