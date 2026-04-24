@@ -42,12 +42,12 @@ const ANCHORS: ReadonlyArray<{ slug: string; name: string }> = [
 describe("SPKR-02: FR speaker profile pages exist for each anchor", () => {
   for (const anchor of ANCHORS) {
     it(`${anchor.slug}: FR page contains speaker name`, () => {
-      const html = readPage(`speakers/${anchor.slug}/index.html`);
+      const html = readPage(`speakers/2026/${anchor.slug}/index.html`);
       expect(html).toContain(anchor.name);
     });
 
     it(`${anchor.slug}: FR page contains back-nav "Retour aux speakers"`, () => {
-      const html = readPage(`speakers/${anchor.slug}/index.html`);
+      const html = readPage(`speakers/2026/${anchor.slug}/index.html`);
       expect(html).toContain("Retour aux speakers");
     });
   }
@@ -56,12 +56,12 @@ describe("SPKR-02: FR speaker profile pages exist for each anchor", () => {
 describe("SPKR-02: EN speaker profile pages exist for each anchor", () => {
   for (const anchor of ANCHORS) {
     it(`${anchor.slug}: EN page contains speaker name`, () => {
-      const html = readPage(`en/speakers/${anchor.slug}/index.html`);
+      const html = readPage(`en/speakers/2026/${anchor.slug}/index.html`);
       expect(html).toContain(anchor.name);
     });
 
     it(`${anchor.slug}: EN page contains back-nav "Back to speakers"`, () => {
-      const html = readPage(`en/speakers/${anchor.slug}/index.html`);
+      const html = readPage(`en/speakers/2026/${anchor.slug}/index.html`);
       expect(html).toContain("Back to speakers");
     });
   }
