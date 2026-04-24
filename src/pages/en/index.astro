@@ -4,7 +4,7 @@ import HeroSection from "@/components/hero/HeroSection.astro";
 import KeyNumbers from "@/components/hero/KeyNumbers";
 import Edition2026Combined from "@/components/past-editions/Edition2026Combined.astro";
 import SponsorsPlatinumStrip from "@/components/sponsors/SponsorsPlatinumStrip.astro";
-import { getCollection } from "astro:content";
+import { getSponsors } from "@/lib/sponsor-utils";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { eventSchemaJson } from "@/lib/event-schema";
 
@@ -17,7 +17,7 @@ const schemaJson = eventSchemaJson({ lang, siteUrl, description });
 // Sponsors loaded at the page boundary — CSV is the single source of truth (CLAUDE.md).
 // SponsorsPlatinumStrip is data-agnostic by design (Phase 24 decision); the page filter
 // keeps tier-selection logic out of the reusable component.
-const allSponsors = await getCollection("sponsors");
+const allSponsors = await getSponsors();
 const platinumSponsors = allSponsors.filter((s) => s.data.tier === "platinum");
 ---
 
