@@ -2,6 +2,7 @@
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { TARGET_DATE } from "@/lib/event";
 import LanguageToggle from "@/components/LanguageToggle.astro";
+import ThemeToggle from "@/components/ThemeToggle.astro";
 import logoCompactDark from "@/assets/logos/dark/logo-notext.svg";
 import logoCompactLight from "@/assets/logos/principal/logo-notext.svg";
 
@@ -97,6 +98,7 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
       >
         {ctaLabel}
       </a>
+      <ThemeToggle />
       <LanguageToggle />
       <button
         id="mobile-menu-btn"
@@ -115,6 +117,10 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
   <!-- Mobile menu panel -->
   <div id="mobile-menu" class="hidden md:hidden border-t border-border bg-background/95 backdrop-blur-sm">
     <ul class="px-4 py-2" role="list">
+      <li class="flex items-center justify-end gap-3 py-3 border-b border-border">
+        <ThemeToggle />
+        <LanguageToggle />
+      </li>
       {links.map(({ label, href, active, postEventOnly }) => (
         <li
           data-post-event={postEventOnly ? "true" : undefined}
