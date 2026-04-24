@@ -1,5 +1,6 @@
 ---
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
+import { NEWSLETTER_URL } from "@/lib/event";
 import logoFullDark from "@/assets/logos/dark/logo.svg";
 import logoFullLight from "@/assets/logos/principal/logo.svg";
 
@@ -70,7 +71,7 @@ const socials = [
           {t("footer.newsletter.heading")}
         </h2>
         <a
-          href="https://d820b57b.sibforms.com/serve/MUIFAMhQae0KzNYxFvx6QSRhBI9sMf8V95ghzeac7poMILWncQNi6r_1yx56s6zfRIyfhiGqhx24CmxsMTthOrreePBCipj7yL0_QdwgtcZxfkzzebIQKjwCga2lb7IOvyDV9qZBzHh-wJVW5k8zHIKorqxmkJDZ3-wxP_jPo7z-0nQBCgoiXjTLPwEAMI52iPoy5OLEibdt3bnF"
+          href={NEWSLETTER_URL}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={t("hero.cta.newsletter_aria")}
