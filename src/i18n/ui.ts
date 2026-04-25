@@ -235,6 +235,7 @@ export const ui = {
     "editions.2026.heading": "Revivez l'édition 2026",
     "editions.2026.video_caption":
       "Aftermovie officiel de Cloud Native Days France 2026",
+    "editions.2026.video_play_aria": "Lire la vidéo : {title}",
     "editions.2026.stats.participants": "1\u00a0850+ participants",
     "editions.2026.stats.speakers": "48 intervenants invités",
     "editions.2026.stats.sessions": "32 conférences",
@@ -538,6 +539,7 @@ export const ui = {
     "editions.2026.heading": "Relive the 2026 edition",
     "editions.2026.video_caption":
       "Official aftermovie of Cloud Native Days France 2026",
+    "editions.2026.video_play_aria": "Play video: {title}",
     "editions.2026.stats.participants": "1,850+ attendees",
     "editions.2026.stats.speakers": "48 invited speakers",
     "editions.2026.stats.sessions": "32 talks",

@@ -86,7 +86,11 @@ const cellClass = {
   {/* YouTube video embed via click-to-play facade (saves ~700 KiB on initial load) */}
   {video && (
     <figure class="mt-12 max-w-4xl mx-auto">
-      <YouTubeFacade videoId={video.youtubeId} title={video.caption} />
+      <YouTubeFacade
+        videoId={video.youtubeId}
+        title={video.caption}
+        playAriaLabel={t("editions.2026.video_play_aria").replace("{title}", video.caption)}
+      />
       <figcaption class="mt-3 text-sm text-muted-foreground">{video.caption}</figcaption>
     </figure>
   )}

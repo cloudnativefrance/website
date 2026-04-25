@@ -3,11 +3,11 @@ import Layout from "../../layouts/Layout.astro";
 import ScheduleGrid from "@/components/schedule/ScheduleGrid.astro";
 import { loadSessions } from "@/lib/schedule";
 import { getSpeakersByLocale, getSlug } from "@/lib/speakers";
-import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import ComingSoonLayout from "@/components/flags/ComingSoonLayout.astro";
 import { isFlagActive } from "@/lib/flags";
 import { EDITIONS, isEdition, CURRENT_EDITION, type Edition } from "@/lib/editions";
-import { YOUTUBE_2026_PLAYLIST_URL } from "@/lib/event";
+import { EDITION_2026 } from "@/lib/editions-data";
 
 export async function getStaticPaths() {
   return EDITIONS.map((year) => ({ params: { year: String(year) } }));
@@ -62,7 +62,7 @@ const programmeReady = !isUpcomingEdition || isFlagActive("programme");
               <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-foreground">
                 <span class="flex-1">{t("schedule.notice.2027_coming")}</span>
                 <a
-                  href={YOUTUBE_2026_PLAYLIST_URL}
+                  href={EDITION_2026.replaysUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   class="shrink-0 inline-flex items-center gap-1.5 font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"

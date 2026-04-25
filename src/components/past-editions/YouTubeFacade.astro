@@ -12,13 +12,14 @@
 interface Props {
   videoId: string;
   title: string;
+  /** Localised aria-label for the play button (e.g. "Play video: {title}"). */
+  playAriaLabel: string;
   /** Optional CSS class applied to the wrapper. */
   class?: string;
 }
-const { videoId, title, class: extraClass = "" } = Astro.props as Props;
+const { videoId, title, playAriaLabel, class: extraClass = "" } = Astro.props as Props;
 
-// YouTube provides predictable thumbnail URLs. hqdefault is 480x360 (~25 KiB)
-// and is reliably available for every video; maxresdefault is not.
+// hqdefault (480x360) is reliably present for every video; maxresdefault is not.
 const posterUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 ---
 
@@ -29,8 +30,8 @@ const posterUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 >
   <button
     type="button"
-    class="group absolute inset-0 flex items-center justify-center cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
-    aria-label={`Lire la vidéo : ${title}`}
+    class="group absolute inset-0 flex items-center justify-center focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
+    aria-label={playAriaLabel}
   >
     <img
       src={posterUrl}
@@ -53,8 +54,6 @@ const posterUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 </div>
 
 <script>
-  // Swap the poster for the real iframe on click. Module-scoped so it loads
-  // once even if multiple facades exist on the page.
   const facades = document.querySelectorAll<HTMLElement>(".yt-facade");
   facades.forEach((facade) => {
     const btn = facade.querySelector("button");

@@ -61,20 +61,20 @@ function sectionDropdown(
 const sponsorsDD  = sectionDropdown("sponsors",  "nav.sponsors.label");
 
 const programmeDD = (() => {
-  const programmePath = getLocalePath(lang, `/programme/${CURRENT_EDITION}`);
+  const programmeBase = getLocalePath(lang, "/programme");
+  const speakersBase  = getLocalePath(lang, "/speakers");
   const cfpPath       = getLocalePath(lang, "/cfp");
-  const speakersPath  = getLocalePath(lang, `/speakers/${CURRENT_EDITION}`);
+  const onProgramme   = currentPath.startsWith(programmeBase);
+  const onSpeakers    = currentPath.startsWith(speakersBase);
+  const onCfp         = currentPath.startsWith(cfpPath);
   return {
     key: "nav.programme.label",
     label: t("nav.programme.label"),
-    active:
-      currentPath.startsWith(getLocalePath(lang, "/programme")) ||
-      currentPath.startsWith(cfpPath) ||
-      currentPath.startsWith(getLocalePath(lang, "/speakers")),
+    active: onProgramme || onCfp || onSpeakers,
     items: [
-      { href: programmePath, label: t("nav.programme.submenu.programme"), current: currentPath.startsWith(getLocalePath(lang, "/programme")) },
-      { href: cfpPath,       label: t("nav.programme.submenu.cfp"),        current: currentPath.startsWith(cfpPath) },
-      { href: speakersPath,  label: t("nav.programme.submenu.intervenants"), current: currentPath.startsWith(getLocalePath(lang, "/speakers")) },
+      { href: `${programmeBase}/${CURRENT_EDITION}`, label: t("nav.programme.submenu.programme"),    current: onProgramme },
+      { href: cfpPath,                                label: t("nav.programme.submenu.cfp"),          current: onCfp },
+      { href: `${speakersBase}/${CURRENT_EDITION}`,   label: t("nav.programme.submenu.intervenants"), current: onSpeakers },
     ],
   };
 })();
