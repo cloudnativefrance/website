@@ -2,14 +2,15 @@
 import Layout from "../layouts/Layout.astro";
 import SocialLinks from "@/components/SocialLinks.astro";
 import { useTranslations, getLangFromUrl } from "@/i18n/utils";
+import { CONTACT_EMAILS } from "@/lib/event";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
 const audiences = [
-  { key: "participants", email: "contact@cloudnativedays.fr",  icon: "ticket" },
-  { key: "speakers",     email: "speakers@cloudnativedays.fr", icon: "mic" },
-  { key: "sponsors",     email: "sponsors@cloudnativedays.fr", icon: "handshake" },
+  { email: CONTACT_EMAILS.participants, icon: "ticket",    titleKey: "contact.participants.title", bodyKey: "contact.participants.body" },
+  { email: CONTACT_EMAILS.speakers,     icon: "mic",       titleKey: "contact.speakers.title",     bodyKey: "contact.speakers.body" },
+  { email: CONTACT_EMAILS.sponsors,     icon: "handshake", titleKey: "contact.sponsors.title",     bodyKey: "contact.sponsors.body" },
 ] as const;
 ---
 
@@ -34,7 +35,7 @@ const audiences = [
     </section>
 
     <section class="mt-12 grid gap-6 md:grid-cols-3">
-      {audiences.map(({ key, email, icon }) => (
+      {audiences.map(({ email, icon, titleKey, bodyKey }) => (
         <article class="rounded-lg border border-border bg-card p-6 flex flex-col gap-4">
           <span
             aria-hidden="true"
@@ -61,8 +62,8 @@ const audiences = [
             )}
           </span>
           <div>
-            <h2 class="text-xl font-semibold text-foreground">{t(`contact.${key}.title`)}</h2>
-            <p class="mt-2 text-sm text-muted-foreground">{t(`contact.${key}.body`)}</p>
+            <h2 class="text-xl font-semibold text-foreground">{t(titleKey)}</h2>
+            <p class="mt-2 text-sm text-muted-foreground">{t(bodyKey)}</p>
           </div>
           <a
             href={`mailto:${email}`}

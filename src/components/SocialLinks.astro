@@ -5,6 +5,7 @@
  * and renders one icon per active link.
  */
 import { SOCIAL_LINKS } from "@/lib/event";
+import { safeUrl } from "@/lib/sponsor-utils";
 import { useTranslations, getLangFromUrl } from "@/i18n/utils";
 
 export interface Props {
@@ -15,19 +16,6 @@ export interface Props {
 const { class: className = "" } = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-
-function safeUrl(raw: string | undefined): string | null {
-  if (!raw) return null;
-  const trimmed = raw.trim();
-  if (!trimmed) return null;
-  try {
-    const u = new URL(trimmed);
-    if (u.protocol === "http:" || u.protocol === "https:") return u.toString();
-    return null;
-  } catch {
-    return null;
-  }
-}
 
 const socials = [
   { key: "linkedin", url: safeUrl(SOCIAL_LINKS.linkedin), ariaKey: "footer.social.linkedin_aria" as const },
