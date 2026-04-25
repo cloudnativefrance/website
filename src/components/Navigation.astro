@@ -63,19 +63,18 @@ const programmeDD = sectionDropdown("programme", "nav.programme.label");
 const sponsorsDD  = sectionDropdown("sponsors",  "nav.sponsors.label");
 
 const aboutDD = (() => {
-  const homePath = getLocalePath(lang, "/");
+  const aboutPath = getLocalePath(lang, "/about");
   const venuePath = getLocalePath(lang, "/venue");
   const teamPath = getLocalePath(lang, "/team");
   return {
     key: "nav.home",
     label: t("nav.home"),
     active:
-      currentPath === homePath ||
-      currentPath === homePath + "/" ||
+      currentPath.startsWith(aboutPath) ||
       currentPath.startsWith(venuePath) ||
       currentPath.startsWith(teamPath),
     items: [
-      { href: homePath,  label: t("about.subnav.discover"), current: currentPath === homePath || currentPath === homePath + "/" },
+      { href: aboutPath, label: t("about.subnav.discover"), current: currentPath.startsWith(aboutPath) },
       { href: venuePath, label: t("about.subnav.venue"),    current: currentPath.startsWith(venuePath) },
       { href: teamPath,  label: t("about.subnav.team"),     current: currentPath.startsWith(teamPath) },
     ],
