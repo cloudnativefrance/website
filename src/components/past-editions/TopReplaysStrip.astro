@@ -18,24 +18,18 @@ export interface Props {
   replays: ReadonlyArray<{ youtubeId: string; titleKey: keyof typeof ui.fr }>;
   /** Full YouTube playlist URL (the "View all replays" target). */
   playlistUrl: string;
-  /** i18n key for the small uppercase eyebrow above the strip. */
-  eyebrowKey: keyof typeof ui.fr;
-  /** i18n key for the "View all replays" link below the strip. */
+  /** i18n key for the "View all replays" button below the strip. */
   viewAllKey: keyof typeof ui.fr;
   /** Extra classes for the outer wrapper (e.g. "mt-12"). */
   class?: string;
 }
 
-const { replays, playlistUrl, eyebrowKey, viewAllKey, class: className = "" } = Astro.props;
+const { replays, playlistUrl, viewAllKey, class: className = "" } = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 ---
 
 <section class:list={["max-w-6xl mx-auto px-4 md:px-6 lg:px-8", className]}>
-  <p class="mb-6 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-    {t(eyebrowKey)}
-  </p>
-
   <ul
     class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 md:grid md:grid-cols-4 md:gap-4 md:overflow-visible md:mx-0 md:px-0 md:pb-0"
     role="list"
@@ -77,12 +71,12 @@ const t = useTranslations(lang);
     ))}
   </ul>
 
-  <div class="mt-6 text-center">
+  <div class="mt-8 text-center">
     <a
       href={playlistUrl}
       target="_blank"
       rel="noopener noreferrer"
-      class="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
+      class="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-md border-2 border-primary text-primary bg-transparent text-base font-semibold hover:bg-primary/10 hover:shadow-[0_0_0_4px_oklch(62.5%_0.162_259.9_/_0.15)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-150"
     >
       {t(viewAllKey)}
       <span aria-hidden="true">→</span>
