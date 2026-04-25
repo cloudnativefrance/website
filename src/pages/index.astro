@@ -7,6 +7,7 @@ import SponsorsPlatinumStrip from "@/components/sponsors/SponsorsPlatinumStrip.a
 import { getSponsors } from "@/lib/sponsor-utils";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import { eventSchemaJson } from "@/lib/event-schema";
+import { isFlagActive } from "@/lib/flags";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -17,7 +18,8 @@ const schemaJson = eventSchemaJson({ lang, siteUrl, description });
 // Sponsors loaded at the page boundary — CSV is the single source of truth (CLAUDE.md).
 // SponsorsPlatinumStrip is data-agnostic by design (Phase 24 decision); the page filter
 // keeps tier-selection logic out of the reusable component.
-const allSponsors = await getSponsors();
+const showHomepageSponsors = isFlagActive("homepage_sponsors");
+const allSponsors = showHomepageSponsors ? await getSponsors() : [];
 const platinumSponsors = allSponsors.filter((s) => s.data.tier === "platinum");
 ---
 
@@ -31,7 +33,7 @@ const platinumSponsors = allSponsors.filter((s) => s.data.tier === "platinum");
     <HeroSection />
     <KeyNumbers client:idle lang={lang} />
     <Edition2026Combined />
-    {platinumSponsors.length > 0 && (
+    {showHomepageSponsors && platinumSponsors.length > 0 && (
       <SponsorsPlatinumStrip
         id="sponsors-homepage"
         sponsors={platinumSponsors}

@@ -6,213 +6,300 @@ const lang = "fr";
 const t = useTranslations(lang);
 
 const CFP_URL = "https://cfp.cloudnativedays.fr/2026/";
+
+const audiencePills = [
+  "Developers",
+  "Quality Engineers",
+  "SREs",
+  "Architectes",
+  "Software Engineers",
+  "Cloud Engineers",
+  "Platform Engineers",
+  "Product Managers",
+  "Project Managers",
+  "CTOs",
+];
+
+const formats = [
+  {
+    duration: "10 min",
+    title: "Présentation éclair",
+    body: "Un format court et synthétique pour aller droit au but. Le temps est votre principal challenge — assurez-vous que votre contenu soit concis et percutant.",
+  },
+  {
+    duration: "30 min",
+    title: "Retour d'expérience",
+    body: "Idéal pour partager des cas concrets en entreprise, des retours sur des projets open source, ou une expérience personnelle. Q&A incluses.",
+  },
+  {
+    duration: "45 min",
+    title: "Conférence",
+    body: "Pour approfondir un sujet complexe, entrer dans les détails techniques, avec éventuellement des démonstrations. Q&A incluses.",
+  },
+];
+
+const themes = [
+  {
+    emoji: "🛠️",
+    title: "Infrastructure & Opérations",
+    body: "Orchestration, automatisation, gestion des coûts, supervision. Mise à l'échelle, résilience et optimisation de l'infrastructure Cloud.",
+  },
+  {
+    emoji: "🎯",
+    title: "Developer Experience",
+    body: "Outils, pratiques innovantes et plateformes internes. Le Platform Engineering pour rendre les équipes plus autonomes.",
+  },
+  {
+    emoji: "🛡️",
+    title: "Réseau & Sécurité",
+    body: "Connectivité, conformité, protection des données dans le cloud. Risques cyber et solutions associées.",
+  },
+  {
+    emoji: "🤖",
+    title: "AI & Data",
+    body: "Intégration de l'IA dans nos outils et plateformes. Traitement des données dans les architectures Cloud Native.",
+  },
+  {
+    emoji: "🚀",
+    title: "Autres sujets & Crazy Stuff",
+    body: "Une idée hors des sentiers battus ? Une expérimentation audacieuse ? Surprenez-nous !",
+    accent: true,
+  },
+];
+
+const values = [
+  { emoji: "❤️", label: "Communautés", body: "Entraide et bienveillance." },
+  { emoji: "🌍", label: "Inclusion & diversité", body: "Toutes les voix comptent." },
+  { emoji: "🌱", label: "Écologie", body: "Pratiques plus durables." },
+  { emoji: "🇫🇷", label: "Autonomie numérique", body: "Open source et souveraineté." },
+];
+
+const criteria = [
+  { key: "Retours d'expérience", body: "concrets sur l'application des technologies Cloud Native." },
+  { key: "Open source", body: "moteurs d'innovation et de collaboration." },
+  { key: "Innovation et expertise technique", body: "qui repoussent les limites de votre domaine." },
+  { key: "Projets francophones et locaux", body: "valorisant notre écosystème." },
+  { key: "Contenu inédit", body: "ou rarement présenté lors d'autres conférences." },
+  { key: "Diversité", body: "des profils et des approches." },
+];
 ---
 
 <Layout title="Appel à conférences (CFP)" description="Proposez une intervention pour Cloud Native Days France 2026." lang={lang}>
-  <main class="mx-auto max-w-3xl px-4 md:px-6 py-16 md:py-24">
-    <header class="text-center">
-      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+  <main>
+    <!-- Section 1 — Hero -->
+    <section class="mx-auto max-w-3xl px-4 md:px-6 pt-16 md:pt-24 pb-12 md:pb-16 text-center">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em]" style="color: var(--color-tertiary, #b8deff);">
         Call for Papers
       </p>
-      <h1 class="mt-3 text-4xl md:text-5xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
-        Appel à conférences
+      <h1 class="mt-4 text-4xl md:text-6xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+        Proposez une intervention
       </h1>
-      <a
-        href={CFP_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="mt-8 inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-base font-semibold px-6 h-12 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      >
-        Proposer une intervention →
-      </a>
-    </header>
-
-    <article class="mt-16
-      [&>p]:mt-4 [&>p]:text-base md:[&>p]:text-lg [&>p]:leading-relaxed [&>p]:text-muted-foreground
-      [&>h3]:mt-12 [&>h3]:mb-4 [&>h3]:text-2xl [&>h3]:font-bold [&>h3]:tracking-tight [&>h3]:text-foreground
-      [&>ul]:mt-4 [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:space-y-3 [&>ul]:text-base md:[&>ul]:text-lg [&>ul]:leading-relaxed [&>ul]:text-muted-foreground
-      [&>hr]:my-12 [&>hr]:border-border
-      [&_strong]:font-semibold [&_strong]:text-foreground
-      [&_em]:font-medium [&_em]:text-foreground [&_em]:not-italic">
-      <p>
-        Nous sommes ravi(e)s de vous ouvrir les portes de notre <strong>CFP</strong>
-        pour le <em>Cloud Native Days France 2026</em> ! 🎉
+      <p class="mt-5 text-base md:text-lg text-muted-foreground">
+        Une journée. 5 thèmes. 3 formats. Et votre voix.
       </p>
-      <p>
-        Cet événement est avant tout une célébration de la communauté
-        francophone du <em>Cloud Native</em>, un lieu d'échange et de partage
-        où chacun(e) peut apprendre et s'inspirer.
+      <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <a
+          href={CFP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-base font-semibold px-6 h-12 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          Soumettre une proposition <span aria-hidden="true">→</span>
+        </a>
+        <a
+          href="#formats"
+          class="inline-flex items-center justify-center rounded-md border border-border bg-card text-foreground text-base font-semibold px-6 h-12 transition-colors hover:border-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          Voir les formats
+        </a>
+      </div>
+    </section>
+
+    <!-- Section 2 — Intro -->
+    <section class="mx-auto max-w-3xl px-4 md:px-6 py-10 md:py-14 text-center">
+      <p class="text-base md:text-lg leading-relaxed text-muted-foreground">
+        Nous sommes ravi(e)s de vous ouvrir les portes de notre <span class="font-semibold text-foreground">CFP</span>
+        pour le <span class="font-semibold text-foreground">Cloud Native Days France 2026</span> ! 🎉
       </p>
-
-      <hr />
-
-      <h3>Le public de l'événement 🎯</h3>
-      <p>
-        Le <em>Cloud Native Days France</em> s'adresse à une <strong>audience
-        variée du secteur technologique</strong>, incluant notamment les :
-        <strong>Developers, Quality Engineers, Site Reliability Engineers,
-        Architectes, Software Engineers, Cloud Engineers, Platform Engineers,
-        Product Managers, Project Managers, CTOs</strong>, et bien d'autres !
+      <p class="mt-4 text-base md:text-lg leading-relaxed text-muted-foreground">
+        Cet événement est avant tout une célébration de la communauté francophone du <span class="font-semibold text-foreground">Cloud Native</span> —
+        un lieu d'échange et de partage où chacun(e) peut apprendre et s'inspirer.
       </p>
-      <p>
-        Notre public est principalement composé de professionnels travaillant
-        dans des environnements d'entreprise divers, des
-        <strong>start-ups dynamiques aux grands groupes établis</strong>, en
-        passant par les <strong>PME innovantes</strong>. Votre présentation
-        sera donc entendue par des pairs qui rencontrent des défis similaires
-        et qui sont avides de nouvelles solutions.
+    </section>
+
+    <!-- Section 3 — Audience -->
+    <section class="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
+        Pour qui
       </p>
-
-      <hr />
-
-      <h3>Les formats de présentation 🎙️</h3>
-      <p>Choisissez le format qui convient le mieux à votre sujet :</p>
-      <ul>
-        <li>
-          <strong>Présentation éclair (10 min)</strong> : Un format court et
-          synthétique pour aller droit au but ! Le temps est votre principal
-          challenge, assurez-vous que votre contenu soit concis et percutant.
-        </li>
-        <li>
-          <strong>Retour d'expérience et outils (30 min)</strong> : Idéal pour
-          partager des cas concrets en entreprise, des retours sur des projets
-          open source, ou même une expérience personnelle ou une contribution.
-          (Q&amp;A incluses).
-        </li>
-        <li>
-          <strong>Conférence (45 min)</strong> : Pour approfondir un sujet
-          complexe, entrer dans les détails techniques, avec éventuellement
-          des démonstrations. Ce format convient parfaitement aux sujets
-          complexes ou approfondis. (Q&amp;A incluses).
-        </li>
+      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight text-center" style="letter-spacing:-0.02em;">
+        Une audience tech variée
+      </h2>
+      <ul role="list" class="mt-8 flex flex-wrap items-center justify-center gap-2 md:gap-3 max-w-4xl mx-auto">
+        {audiencePills.map((label) => (
+          <li>
+            <span class="inline-flex items-center rounded-full bg-secondary text-secondary-foreground px-4 py-2 text-sm font-medium">
+              {label}
+            </span>
+          </li>
+        ))}
       </ul>
-      <p>Quel que soit le format choisi, votre enthousiasme sera contagieux !</p>
+      <p class="mt-8 text-base md:text-lg text-muted-foreground text-center max-w-3xl mx-auto leading-relaxed">
+        Des <span class="font-semibold text-foreground">start-ups dynamiques</span> aux <span class="font-semibold text-foreground">grands groupes établis</span>,
+        en passant par les <span class="font-semibold text-foreground">PME innovantes</span> — votre présentation sera entendue par des pairs qui rencontrent des défis similaires et qui sont avides de nouvelles solutions.
+      </p>
+    </section>
 
-      <hr />
+    <!-- Section 4 — Formats -->
+    <section id="formats" class="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
+        Formats
+      </p>
+      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight text-center" style="letter-spacing:-0.02em;">
+        Choisissez votre format
+      </h2>
+      <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+        {formats.map((f) => (
+          <article class="group flex flex-col rounded-lg border border-border bg-card p-6 md:p-8 transition-colors hover:border-primary/60">
+            <span class="self-start inline-flex items-center rounded-full bg-accent/15 text-accent px-3 py-1 text-xs font-bold uppercase tracking-wider">
+              {f.duration}
+            </span>
+            <h3 class="mt-4 text-xl md:text-2xl font-bold text-foreground tracking-tight">
+              {f.title}
+            </h3>
+            <p class="mt-3 text-base text-muted-foreground leading-relaxed">
+              {f.body}
+            </p>
+          </article>
+        ))}
+      </div>
+      <p class="mt-8 text-center text-sm md:text-base text-muted-foreground italic">
+        Quel que soit le format choisi, votre enthousiasme sera contagieux.
+      </p>
+    </section>
 
-      <h3>Des thèmes variés 🚀</h3>
-      <ul>
-        <li>
-          <strong>Infrastructure et Opérations</strong> : Partagez vos retours
-          sur l'orchestration, l'automatisation, la gestion des coûts ou la
-          supervision de vos systèmes. Ce thème couvre la mise à l'échelle,
-          la résilience et l'optimisation de votre infrastructure
-          <em>Cloud</em>.
-        </li>
-        <li>
-          <strong>Developer Experience</strong> : Comment optimisez-vous le
-          quotidien des équipes de développement avec des outils, des
-          pratiques innovantes et des plateformes internes ? Ce thème inclut
-          les retours d'expériences sur la mise en place et l'impact du
-          <em>Platform Engineering</em> pour améliorer l'autonomie et
-          l'efficacité des équipes de développement.
-        </li>
-        <li>
-          <strong>Réseau et sécurité</strong> : Quels sont les défis et les
-          solutions autour de la connectivité, de la conformité et de la
-          protection des données dans le cloud ? Discutez des risques cyber
-          et des solutions associées.
-        </li>
-        <li>
-          <strong>AI &amp; Data</strong> : Explorez l'intégration de
-          l'intelligence artificielle et comment celle-ci transforme nos
-          méthodes de travail et l'outillage autour de nos plateformes. Mais
-          aussi explorez le traitement des données dans les architectures
-          <em>Cloud Native</em>.
-        </li>
-        <li>
-          <strong>Autres sujets &amp; Crazy Stuff</strong> : Vous avez une
-          idée qui sort des sentiers battus ? Une expérimentation audacieuse ?
-          Surprenez-nous !
-        </li>
+    <!-- Section 5 — Thèmes -->
+    <section class="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
+        Thèmes
+      </p>
+      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight text-center" style="letter-spacing:-0.02em;">
+        Cinq territoires
+      </h2>
+      <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {themes.map((th) => (
+          <article
+            class:list={[
+              "flex flex-col rounded-lg border bg-card p-6 transition-colors",
+              th.accent
+                ? "border-accent/60 hover:border-accent"
+                : "border-border hover:border-primary/60",
+            ]}
+          >
+            <div
+              class:list={[
+                "inline-flex items-center justify-center w-12 h-12 rounded-full text-2xl",
+                th.accent ? "bg-accent/15" : "bg-primary/10",
+              ]}
+              aria-hidden="true"
+            >
+              {th.emoji}
+            </div>
+            <h3 class="mt-4 text-lg md:text-xl font-bold text-foreground tracking-tight">
+              {th.title}
+            </h3>
+            <p class="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">
+              {th.body}
+            </p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- Section 6 — Valeurs -->
+    <section class="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
+        Nos valeurs
+      </p>
+      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight text-center" style="letter-spacing:-0.02em;">
+        Au cœur de l'événement
+      </h2>
+      <ul role="list" class="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {values.map((v) => (
+          <li class="flex flex-col items-center text-center px-2">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-2xl" aria-hidden="true">
+              {v.emoji}
+            </div>
+            <p class="mt-3 text-base font-semibold text-foreground">{v.label}</p>
+            <p class="mt-1 text-sm text-muted-foreground leading-snug">{v.body}</p>
+          </li>
+        ))}
       </ul>
+    </section>
 
-      <hr />
-
-      <h3>Nos valeurs au cœur de l'événement ❤️</h3>
-      <p>
-        Le <em>Cloud Native Days France</em> est fondé sur des principes qui
-        nous tiennent à cœur :
+    <!-- Section 7 — Critères de sélection -->
+    <section class="mx-auto max-w-3xl px-4 md:px-6 py-16 md:py-20">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        Ce que nous recherchons
       </p>
-      <ul>
-        <li>
-          Un événement où les <strong>communautés</strong> sont au centre de
-          nos préoccupations, où l'entraide et la bienveillance sont reines.
-        </li>
-        <li>
-          L'<strong>inclusion</strong> et la <strong>diversité</strong> sont
-          primordiales : nous encourageons toutes les voix, quels que soient
-          leur origine, leur genre, leur âge ou leur expérience.
-        </li>
-        <li>
-          La sensibilité à l'<strong>écologie</strong> : nous cherchons à
-          promouvoir des pratiques plus durables dans nos domaines.
-        </li>
-        <li>
-          L'<strong>autonomie numérique</strong> est un enjeu majeur : nous
-          soutenons vivement toutes les initiatives qui permettent aux
-          organisations de disposer de leur indépendance et de renforcer leur
-          souveraineté technologique : open source, mise en avant des acteurs
-          🇫🇷 ou francophones, design multi-fournisseurs, etc.
-        </li>
+      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+        Nos critères
+      </h2>
+      <p class="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">
+        Notre comité de sélection — bénévoles de l'organisation CND France et représentant(e)s des communautés francophones de nombreuses régions françaises et du Luxembourg — privilégiera les propositions qui&nbsp;:
+      </p>
+      <ul role="list" class="mt-8 space-y-4">
+        {criteria.map((c) => (
+          <li class="flex items-start gap-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="shrink-0 mt-0.5 text-primary"
+              aria-hidden="true"
+            >
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-base md:text-lg text-muted-foreground leading-relaxed">
+              <span class="font-semibold text-foreground">{c.key}</span> — {c.body}
+            </span>
+          </li>
+        ))}
       </ul>
+      <div class="mt-10 rounded-lg border border-accent/40 bg-accent/10 px-5 py-4 flex items-start gap-3">
+        <span aria-hidden="true" class="text-2xl shrink-0">🇫🇷</span>
+        <p class="text-sm md:text-base text-foreground leading-relaxed">
+          Toutes les présentations se déroulent <span class="font-semibold">en français</span>.
+          Slides en anglais acceptés si cela facilite votre préparation.
+        </p>
+      </div>
+    </section>
 
-      <hr />
-
-      <h3>Nos critères de sélection 👇</h3>
-      <p>
-        Notre comité de sélection composé de bénévoles membres de
-        l'organisation CND France et de représentant(e)s des communautés
-        francophones de nombreuses régions Françaises et du Luxembourg
-        privilégiera les propositions de conférences qui :
-      </p>
-      <ul>
-        <li>
-          Présentent des <strong>retours d'expérience</strong> concrets sur
-          l'application des technologies <em>Cloud Native</em>.
-        </li>
-        <li>
-          Mettent en lumière les projets <strong>open source</strong>,
-          moteurs d'innovation et de collaboration.
-        </li>
-        <li>
-          Témoignent d'une forte <strong>innovation</strong> et d'une grande
-          <strong>expertise technique</strong>.
-        </li>
-        <li>
-          Soutiennent les projets <strong>francophones et locaux</strong>,
-          valorisant notre écosystème.
-        </li>
-        <li>
-          Proposent un contenu <strong>inédit ou rarement présenté</strong>
-          lors d'autres conférences.
-        </li>
-        <li>
-          Reflètent la <strong>diversité</strong> des profils et des
-          approches.
-        </li>
-      </ul>
-      <p>
-        Toutes les présentations se dérouleront <strong>en français</strong>.
-        🇫🇷 Nous acceptons néanmoins des supports de présentation (slides) en
-        anglais si cela facilite votre préparation.
-      </p>
-      <p>
-        N'attendez plus, partagez votre passion et votre savoir ! Nous avons
-        hâte de découvrir vos propositions et de vous accueillir pour une
-        édition mémorable du <em>CND France</em> !
-      </p>
-    </article>
-
-    <div class="mt-12 text-center">
-      <a
-        href={CFP_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-base font-semibold px-8 h-14 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      >
-        Proposer une intervention →
-      </a>
-    </div>
+    <!-- Section 8 — Final CTA strip -->
+    <section class="mt-8 bg-card border-y border-border">
+      <div class="mx-auto max-w-3xl px-4 md:px-6 py-16 md:py-20 text-center">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em]" style="color: var(--color-tertiary, #b8deff);">
+          Prêt à partager ?
+        </p>
+        <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+          Soumettez votre proposition
+        </h2>
+        <a
+          href={CFP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-8 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-base md:text-lg font-semibold px-8 h-14 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          Proposer une intervention <span aria-hidden="true">→</span>
+        </a>
+        <p class="mt-4 text-xs text-muted-foreground">cfp.cloudnativedays.fr/2026</p>
+      </div>
+    </section>
   </main>
 </Layout>
