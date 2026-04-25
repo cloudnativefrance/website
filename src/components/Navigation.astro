@@ -1,7 +1,7 @@
 ---
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { TARGET_DATE } from "@/lib/event";
-import { EDITIONS } from "@/lib/editions";
+import { EDITIONS, CURRENT_EDITION } from "@/lib/editions";
 import LanguageToggle from "@/components/LanguageToggle.astro";
 import ThemeToggle from "@/components/ThemeToggle.astro";
 import NavDropdown from "@/components/NavDropdown.astro";
@@ -13,13 +13,12 @@ const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
 
 const navItems: Array<{
-  key: "nav.replays" | "nav.tickets" | "nav.cfp";
+  key: "nav.replays" | "nav.tickets";
   path: string;
   dead: boolean;
   postEventOnly?: boolean;
 }> = [
   { key: "nav.tickets",  path: "/tickets",   dead: false },
-  { key: "nav.cfp",      path: "/cfp",       dead: false },
   { key: "nav.replays",  path: "/replays",   dead: false, postEventOnly: true },
 ];
 
@@ -59,8 +58,26 @@ function sectionDropdown(
   };
 }
 
-const programmeDD = sectionDropdown("programme", "nav.programme.label");
 const sponsorsDD  = sectionDropdown("sponsors",  "nav.sponsors.label");
+
+const programmeDD = (() => {
+  const programmeBase = getLocalePath(lang, "/programme");
+  const speakersBase  = getLocalePath(lang, "/speakers");
+  const cfpPath       = getLocalePath(lang, "/cfp");
+  const onProgramme   = currentPath.startsWith(programmeBase);
+  const onSpeakers    = currentPath.startsWith(speakersBase);
+  const onCfp         = currentPath.startsWith(cfpPath);
+  return {
+    key: "nav.programme.label",
+    label: t("nav.programme.label"),
+    active: onProgramme || onCfp || onSpeakers,
+    items: [
+      { href: `${programmeBase}/${CURRENT_EDITION}`, label: t("nav.programme.submenu.programme"),    current: onProgramme },
+      { href: cfpPath,                                label: t("nav.programme.submenu.cfp"),          current: onCfp },
+      { href: `${speakersBase}/${CURRENT_EDITION}`,   label: t("nav.programme.submenu.intervenants"), current: onSpeakers },
+    ],
+  };
+})();
 
 const aboutDD = (() => {
   const aboutPath = getLocalePath(lang, "/decouvrir");
@@ -92,7 +109,6 @@ const linkByKey = Object.fromEntries(links.map((l) => [l.key, l])) as Record<
   (typeof links)[number]
 >;
 const ticketsLink = linkByKey["nav.tickets"];
-const cfpLink = linkByKey["nav.cfp"];
 const replaysLink = linkByKey["nav.replays"];
 ---
 
@@ -108,34 +124,41 @@ const replaysLink = linkByKey["nav.replays"];
       <img src={logoCompactDark.src} alt="CND France" class="hidden dark:block h-8 md:h-10" loading="lazy" />
     </a>
 
-    <!-- Desktop links — explicit order: À propos, Partenaires, Billetterie, Programme, CFP, Replays. -->
+    <!-- Desktop links — order: À propos, Programme, Billetterie, Partenaires, Replays. -->
     <ul class="hidden md:flex items-center justify-center flex-1 gap-10" role="list">
       <NavDropdown {...aboutDD} />
+      <NavDropdown {...programmeDD} />
+      <li>
+        <a
+          href={ticketsLink.href}
+          data-nav-key={ticketsLink.key}
+          aria-current={ticketsLink.active ? "page" : undefined}
+          class:list={[
+            "text-lg font-medium text-foreground transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
+            ticketsLink.active
+              ? "border-b-2 border-primary"
+              : "border-b-2 border-transparent hover:border-primary/60",
+          ]}
+        >
+          {ticketsLink.label}
+        </a>
+      </li>
       <NavDropdown {...sponsorsDD} />
-      {[ticketsLink, cfpLink, replaysLink].map(({ key, label, href, active, postEventOnly }, i) => (
-        <Fragment>
-          {/* Insert the Programme dropdown between Billetterie and CFP. */}
-          {i === 1 && <NavDropdown {...programmeDD} />}
-          <li
-            data-post-event={postEventOnly ? "true" : undefined}
-            class:list={[postEventOnly && "hidden"]}
-          >
-            <a
-              href={href}
-              data-nav-key={key}
-              aria-current={active ? "page" : undefined}
-              class:list={[
-                "text-lg font-medium text-foreground transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
-                active
-                  ? "border-b-2 border-primary"
-                  : "border-b-2 border-transparent hover:border-primary/60",
-              ]}
-            >
-              {label}
-            </a>
-          </li>
-        </Fragment>
-      ))}
+      <li data-post-event="true" class="hidden">
+        <a
+          href={replaysLink.href}
+          data-nav-key={replaysLink.key}
+          aria-current={replaysLink.active ? "page" : undefined}
+          class:list={[
+            "text-lg font-medium text-foreground transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
+            replaysLink.active
+              ? "border-b-2 border-primary"
+              : "border-b-2 border-transparent hover:border-primary/60",
+          ]}
+        >
+          {replaysLink.label}
+        </a>
+      </li>
     </ul>
 
     <!-- Right side -->
@@ -170,17 +193,15 @@ const replaysLink = linkByKey["nav.replays"];
         <LanguageToggle />
       </li>
       {(() => {
-        // Same order as desktop. JSX-in-callback so we can interleave dropdowns
-        // with plain links in a single ordered render.
+        // Same order as desktop: À propos, Programme, Billetterie, Partenaires, Replays.
         const order: Array<
           | { kind: "dd"; dd: typeof aboutDD }
           | { kind: "link"; link: typeof ticketsLink }
         > = [
           { kind: "dd",   dd: aboutDD },
-          { kind: "dd",   dd: sponsorsDD },
-          { kind: "link", link: ticketsLink },
           { kind: "dd",   dd: programmeDD },
-          { kind: "link", link: cfpLink },
+          { kind: "link", link: ticketsLink },
+          { kind: "dd",   dd: sponsorsDD },
           { kind: "link", link: replaysLink },
         ];
         return order.map((entry) =>
@@ -193,7 +214,7 @@ const replaysLink = linkByKey["nav.replays"];
                 href={entry.link.href}
                 aria-current={entry.link.active ? "page" : undefined}
                 class:list={[
-                  "flex items-center min-h-11 px-2 py-3 text-sm font-medium rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "flex items-center min-h-11 px-2 py-3 text-xs font-semibold uppercase tracking-[0.2em] rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   entry.link.active ? "text-primary" : "text-foreground hover:bg-muted",
                 ]}
               >

@@ -16,6 +16,7 @@ import { Picture } from "astro:assets";
 import type { ImageMetadata } from "astro";
 import { EDITION_2026 } from "@/lib/editions-data";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import YouTubeFacade from "./YouTubeFacade.astro";
 
 export interface Props {
   /** Anchor id for deep-linking. Recommended: "edition-2026". */
@@ -82,19 +83,14 @@ const cellClass = {
     {heading}
   </h2>
 
-  {/* YouTube video embed (youtube-nocookie per D-12) */}
+  {/* YouTube video embed via click-to-play facade (saves ~700 KiB on initial load) */}
   {video && (
     <figure class="mt-12 max-w-4xl mx-auto">
-      <div class="relative aspect-video w-full overflow-hidden rounded-md bg-card">
-        <iframe
-          src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}`}
-          title={video.caption}
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-          class="absolute inset-0 h-full w-full"
-        ></iframe>
-      </div>
+      <YouTubeFacade
+        videoId={video.youtubeId}
+        title={video.caption}
+        playAriaLabel={t("editions.2026.video_play_aria").replace("{title}", video.caption)}
+      />
       <figcaption class="mt-3 text-sm text-muted-foreground">{video.caption}</figcaption>
     </figure>
   )}
