@@ -29,6 +29,21 @@ export const NEWSLETTER_URL =
   "https://d820b57b.sibforms.com/serve/MUIFAMhQae0KzNYxFvx6QSRhBI9sMf8V95ghzeac7poMILWncQNi6r_1yx56s6zfRIyfhiGqhx24CmxsMTthOrreePBCipj7yL0_QdwgtcZxfkzzebIQKjwCga2lb7IOvyDV9qZBzHh-wJVW5k8zHIKorqxmkJDZ3-wxP_jPo7z-0nQBCgoiXjTLPwEAMI52iPoy5OLEibdt3bnF";
 
 /**
+ * Public social profiles for Cloud Native France.
+ *
+ * Surfaced in the footer and (potentially) anywhere we want to point at the
+ * organisation. Centralised here so a handle change is a one-file edit.
+ * The trust boundary (http(s)-only allowlist) is enforced where these are
+ * rendered (see safeUrl() in Footer.astro).
+ */
+export const SOCIAL_LINKS = {
+  linkedin: "https://www.linkedin.com/company/cloud-native-france/",
+  youtube: "https://www.youtube.com/@cloudnativedays",
+  bluesky: "https://bsky.app/profile/cloudnativedays.fr",
+  twitter: "https://x.com/cloudnativedays",
+} as const;
+
+/**
  * Return the locale-aware path to the /replays page.
  *
  * Kept dependency-free (no import from @/i18n/utils) so this module stays

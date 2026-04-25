@@ -87,6 +87,8 @@ const { photos, dialogLabel, closeLabel, prevLabel, nextLabel, counterTemplate }
             data-lightbox-photo={i}
             widths={[800, 1200, 1600]}
             sizes="(min-width: 1024px) 80vw, 100vw"
+            loading="lazy"
+            decoding="async"
             class:list={[
               "max-h-[75vh] w-auto h-auto object-contain",
               i === 0 ? "block" : "hidden",

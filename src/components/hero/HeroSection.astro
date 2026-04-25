@@ -12,7 +12,7 @@ import logoFullLight from "@/assets/logos/principal/logo.svg";
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
+const TICKETS_HREF = getLocalePath(lang, "/tickets");
 const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
 
 // Both logo variants share intrinsic dimensions, so one ratio drives both <img> tags.
@@ -38,6 +38,7 @@ const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width)
       class="dark:hidden w-full max-w-[260px] sm:max-w-[320px] md:max-w-[400px] h-auto"
       loading="eager"
       decoding="async"
+      fetchpriority="high"
     />
     <img
       src={logoFullDark.src}
@@ -66,14 +67,12 @@ const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width)
     </p>
 
     <FeatureGate flag="homepage_countdown">
-      <CountdownTimer client:load lang={lang} />
+      <CountdownTimer client:idle lang={lang} />
     </FeatureGate>
 
     <div class="flex flex-col gap-3 sm:flex-row sm:gap-4 md:gap-6">
       <a
-        href={TICKETING_URL}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={TICKETS_HREF}
         class={cn(
           buttonVariants({ variant: "default", size: "lg" }),
           "h-[52px] px-8 text-lg font-bold shadow-[var(--shadow-glow-primary)] hover:translate-y-[-1px] transition-all duration-150"
