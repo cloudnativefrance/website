@@ -1,6 +1,6 @@
 ---
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
-import { NEWSLETTER_URL } from "@/lib/event";
+import { NEWSLETTER_URL, SOCIAL_LINKS } from "@/lib/event";
 import logoFullDark from "@/assets/logos/dark/logo.svg";
 import logoFullLight from "@/assets/logos/principal/logo.svg";
 
@@ -52,10 +52,10 @@ function safeUrl(raw: string | undefined): string | null {
 }
 
 const socials = [
-  { key: "linkedin", url: safeUrl("https://www.linkedin.com/company/cloud-native-france/"), ariaKey: "footer.social.linkedin_aria" as const },
-  { key: "youtube",  url: safeUrl("https://www.youtube.com/@cloudnativedays"),              ariaKey: "footer.social.youtube_aria"  as const },
-  { key: "bluesky",  url: safeUrl("https://bsky.app/profile/cloudnativedays.fr"),           ariaKey: "footer.social.bluesky_aria"  as const },
-  { key: "twitter",  url: safeUrl("https://x.com/cloudnativedays"),                         ariaKey: "footer.social.twitter_aria"  as const },
+  { key: "linkedin", url: safeUrl(SOCIAL_LINKS.linkedin), ariaKey: "footer.social.linkedin_aria" as const },
+  { key: "youtube",  url: safeUrl(SOCIAL_LINKS.youtube),  ariaKey: "footer.social.youtube_aria"  as const },
+  { key: "bluesky",  url: safeUrl(SOCIAL_LINKS.bluesky),  ariaKey: "footer.social.bluesky_aria"  as const },
+  { key: "twitter",  url: safeUrl(SOCIAL_LINKS.twitter),  ariaKey: "footer.social.twitter_aria"  as const },
 ];
 ---
 
