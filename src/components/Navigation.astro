@@ -109,7 +109,7 @@ const replaysLink = linkByKey["nav.replays"];
     </a>
 
     <!-- Desktop links — explicit order: À propos, Partenaires, Billetterie, Programme, CFP, Replays. -->
-    <ul class="hidden md:flex items-center gap-10" role="list">
+    <ul class="hidden md:flex items-center justify-center flex-1 gap-10" role="list">
       <NavDropdown {...aboutDD} />
       <NavDropdown {...sponsorsDD} />
       {[ticketsLink, cfpLink, replaysLink].map(({ key, label, href, active, postEventOnly }, i) => (
