@@ -36,10 +36,6 @@ export const ui = {
     "toggle.aria": "Selecteur de langue",
     "theme.toggle.aria.to_dark": "Basculer en mode sombre",
     "theme.toggle.aria.to_light": "Basculer en mode clair",
-    "fallback.heading": "Contenu non disponible en francais",
-    "fallback.body":
-      "Cette page n'a pas encore ete traduite. Consulter la version originale.",
-    "fallback.cta": "Voir en anglais",
     "hero.title": "Cloud Native Days France",
     "hero.subtitle": "3 juin 2027",
     "hero.venue": "CENTQUATRE-PARIS",
@@ -334,10 +330,6 @@ export const ui = {
     "toggle.aria": "Language selector",
     "theme.toggle.aria.to_dark": "Switch to dark mode",
     "theme.toggle.aria.to_light": "Switch to light mode",
-    "fallback.heading": "Content not available in English",
-    "fallback.body":
-      "This page has not been translated yet. View the original version.",
-    "fallback.cta": "View in French",
     "hero.title": "Cloud Native Days France",
     "hero.subtitle": "June 3, 2027",
     "hero.venue": "CENTQUATRE-PARIS",

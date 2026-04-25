@@ -46,8 +46,6 @@ export const FLAGS = {
     kind: "element",
   },
   homepage_sponsors: {
-    // Hide the platinum sponsor strip on the homepage until the 2027 sponsor
-    // line-up is firm enough to feature publicly.
     opens: "2026-12-01T00:00:00+01:00",
     kind: "element",
   },

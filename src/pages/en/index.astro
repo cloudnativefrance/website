@@ -15,11 +15,7 @@ const description = t("seo.default_description");
 const siteUrl = Astro.site ? Astro.site.toString() : "https://cloudnativedays.fr/";
 const schemaJson = eventSchemaJson({ lang, siteUrl, description });
 
-// Sponsors loaded at the page boundary — CSV is the single source of truth (CLAUDE.md).
-// SponsorsPlatinumStrip is data-agnostic by design (Phase 24 decision); the page filter
-// keeps tier-selection logic out of the reusable component.
-const showHomepageSponsors = isFlagActive("homepage_sponsors");
-const allSponsors = showHomepageSponsors ? await getSponsors() : [];
+const allSponsors = isFlagActive("homepage_sponsors") ? await getSponsors() : [];
 const platinumSponsors = allSponsors.filter((s) => s.data.tier === "platinum");
 ---
 
@@ -33,7 +29,7 @@ const platinumSponsors = allSponsors.filter((s) => s.data.tier === "platinum");
     <HeroSection />
     <KeyNumbers client:idle lang={lang} />
     <Edition2026Combined />
-    {showHomepageSponsors && platinumSponsors.length > 0 && (
+    {platinumSponsors.length > 0 && (
       <SponsorsPlatinumStrip
         id="sponsors-homepage"
         sponsors={platinumSponsors}
