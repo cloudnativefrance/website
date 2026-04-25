@@ -85,11 +85,10 @@ import { EDITIONS, type Edition } from "./editions";
  *
  * Empty string → the content loader falls back to the committed local CSV.
  */
-const SESSIONS_2026_DEFAULT =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdET7nAGsbCoHlOzCICGvGHKOB6OYeqgiJPiWtXBjUCg818TFJ2-pQnEtMzyBaAsGaIQr475Q50mkM/pub?gid=178765557&single=true&output=csv";
+const SHEET_BASE =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdET7nAGsbCoHlOzCICGvGHKOB6OYeqgiJPiWtXBjUCg818TFJ2-pQnEtMzyBaAsGaIQr475Q50mkM/pub";
 
-const SPEAKERS_2026_DEFAULT =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdET7nAGsbCoHlOzCICGvGHKOB6OYeqgiJPiWtXBjUCg818TFJ2-pQnEtMzyBaAsGaIQr475Q50mkM/pub?gid=124864767&single=true&output=csv";
+const csv = (gid: number) => `${SHEET_BASE}?gid=${gid}&single=true&output=csv`;
 
 export const CSV_URLS: {
   sessions: Record<Edition, string>;
@@ -98,21 +97,21 @@ export const CSV_URLS: {
   team: string;
 } = {
   sessions: {
-    2023: process.env.SESSIONS_CSV_URL_2023 || "",
-    2026: process.env.SESSIONS_CSV_URL_2026 || SESSIONS_2026_DEFAULT,
-    2027: process.env.SESSIONS_CSV_URL_2027 || "",
+    2023: process.env.SESSIONS_CSV_URL_2023 || csv(985867274),
+    2026: process.env.SESSIONS_CSV_URL_2026 || csv(178765557),
+    2027: process.env.SESSIONS_CSV_URL_2027 || csv(299000330),
   },
   speakers: {
-    2023: process.env.SPEAKERS_CSV_URL_2023 || "",
-    2026: process.env.SPEAKERS_CSV_URL_2026 || SPEAKERS_2026_DEFAULT,
-    2027: process.env.SPEAKERS_CSV_URL_2027 || "",
+    2023: process.env.SPEAKERS_CSV_URL_2023 || csv(762540077),
+    2026: process.env.SPEAKERS_CSV_URL_2026 || csv(124864767),
+    2027: process.env.SPEAKERS_CSV_URL_2027 || csv(1713930040),
   },
   sponsors: {
-    2023: process.env.SPONSORS_CSV_URL_2023 || "",
-    2026: process.env.SPONSORS_CSV_URL_2026 || "",
-    2027: process.env.SPONSORS_CSV_URL_2027 || "",
+    2023: process.env.SPONSORS_CSV_URL_2023 || csv(1892473186),
+    2026: process.env.SPONSORS_CSV_URL_2026 || csv(1833117198),
+    2027: process.env.SPONSORS_CSV_URL_2027 || csv(1121832483),
   },
-  team: process.env.TEAM_CSV_URL || "",
+  team: process.env.TEAM_CSV_URL || csv(440809363),
 };
 
 export type EditionScopedType = "sessions" | "speakers" | "sponsors";
