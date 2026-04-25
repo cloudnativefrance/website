@@ -13,13 +13,14 @@ const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
 
 const navItems: Array<{
-  key: "nav.replays" | "nav.tickets";
+  key: "nav.replays" | "nav.tickets" | "nav.contact";
   path: string;
   dead: boolean;
   postEventOnly?: boolean;
 }> = [
   { key: "nav.tickets",  path: "/tickets",   dead: false },
   { key: "nav.replays",  path: "/replays",   dead: false, postEventOnly: true },
+  { key: "nav.contact",  path: "/contact",   dead: false },
 ];
 
 function isActive(currentPath: string, href: string, dead: boolean): boolean {
@@ -110,6 +111,7 @@ const linkByKey = Object.fromEntries(links.map((l) => [l.key, l])) as Record<
 >;
 const ticketsLink = linkByKey["nav.tickets"];
 const replaysLink = linkByKey["nav.replays"];
+const contactLink = linkByKey["nav.contact"];
 ---
 
 <header
@@ -159,6 +161,21 @@ const replaysLink = linkByKey["nav.replays"];
           {replaysLink.label}
         </a>
       </li>
+      <li>
+        <a
+          href={contactLink.href}
+          data-nav-key={contactLink.key}
+          aria-current={contactLink.active ? "page" : undefined}
+          class:list={[
+            "text-lg font-medium text-foreground transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
+            contactLink.active
+              ? "border-b-2 border-primary"
+              : "border-b-2 border-transparent hover:border-primary/60",
+          ]}
+        >
+          {contactLink.label}
+        </a>
+      </li>
     </ul>
 
     <!-- Right side -->
@@ -203,6 +220,7 @@ const replaysLink = linkByKey["nav.replays"];
           { kind: "link", link: ticketsLink },
           { kind: "dd",   dd: sponsorsDD },
           { kind: "link", link: replaysLink },
+          { kind: "link", link: contactLink },
         ];
         return order.map((entry) =>
           entry.kind === "link" ? (
