@@ -61,6 +61,14 @@ export const EDITION_2026 = {
     { src: ambiance06, altKey: "editions.2026.thumbnail_alt.2", size: "medium" },
     { src: ambiance10, altKey: "editions.2026.thumbnail_alt.3", size: "medium" },
   ] as const satisfies ReadonlyArray<Thumbnail>,
+  // Top 4 most-watched talks from the 2026 edition (manually curated).
+  // YouTube thumbnails fetched at runtime from i.ytimg.com — no build step needed.
+  topReplays: [
+    { youtubeId: "lJXUhqHWCDo", titleKey: "editions.2026.top_replay.1" },
+    { youtubeId: "LaOq7x-nGM4", titleKey: "editions.2026.top_replay.2" },
+    { youtubeId: "F8x6DBeNeqg", titleKey: "editions.2026.top_replay.3" },
+    { youtubeId: "Wb3cNKyJtCY", titleKey: "editions.2026.top_replay.4" },
+  ] as const satisfies ReadonlyArray<{ youtubeId: string; titleKey: keyof typeof ui.fr }>,
   placeholder: false,
 } as const;
 

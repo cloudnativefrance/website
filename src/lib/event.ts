@@ -7,6 +7,8 @@
  * and locale-aware path helpers. CFP date logic lives in FLAGS.cfp.
  */
 
+import { EDITION_2026 } from "@/lib/editions-data";
+
 /**
  * Epoch ms for 2027-06-03T09:00:00+02:00 (Cloud Native Days France 2027 start).
  *
@@ -34,13 +36,24 @@ export const NEWSLETTER_URL =
  * Surfaced in the footer and (potentially) anywhere we want to point at the
  * organisation. Centralised here so a handle change is a one-file edit.
  * The trust boundary (http(s)-only allowlist) is enforced where these are
- * rendered (see safeUrl() in Footer.astro).
+ * rendered (see safeUrl() in @/lib/sponsor-utils).
  */
 export const SOCIAL_LINKS = {
   linkedin: "https://www.linkedin.com/company/cloud-native-france/",
   youtube: "https://www.youtube.com/@cloudnativedays",
   bluesky: "https://bsky.app/profile/cloudnativedays.fr",
   twitter: "https://x.com/cloudnativedays",
+  gallery: EDITION_2026.galleryUrl,
+} as const;
+
+/**
+ * Audience-specific contact emails surfaced on /contact.
+ * Renaming the domain or splitting an inbox is a one-file change here.
+ */
+export const CONTACT_EMAILS = {
+  participants: "contact@cloudnativedays.fr",
+  speakers: "speakers@cloudnativedays.fr",
+  sponsors: "sponsors@cloudnativedays.fr",
 } as const;
 
 /**

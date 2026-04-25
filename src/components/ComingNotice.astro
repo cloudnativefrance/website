@@ -1,0 +1,38 @@
+---
+/**
+ * ComingNotice — banner shown on /programme/{CURRENT_EDITION} and
+ * /speakers/{CURRENT_EDITION} signalling that the next edition's content is
+ * being prepared, with a button to the latest YouTube playlist.
+ *
+ * Pure Astro, zero client JS. Pulls copy from `schedule.notice.*` i18n keys
+ * and the playlist URL from EDITION_2026.replaysUrl.
+ */
+import { useTranslations, getLangFromUrl } from "@/i18n/utils";
+import { EDITION_2026 } from "@/lib/editions-data";
+
+export interface Props {
+  /** Extra classes for the outer wrapper (e.g. "mb-8" or "mx-auto max-w-6xl pt-8"). */
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<div class:list={[className, "flex flex-col gap-4 rounded-lg border-2 border-primary/40 bg-primary/10 px-5 py-5 md:flex-row md:items-center md:px-6"]}>
+  <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-primary">
+    <rect width="18" height="18" x="3" y="4" rx="2"/>
+    <path d="M16 2v4M8 2v4M3 10h18"/>
+  </svg>
+  <p class="flex-1 text-base md:text-lg text-foreground">{t("schedule.notice.2027_coming")}</p>
+  <a
+    href={EDITION_2026.replaysUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="shrink-0 inline-flex items-center justify-center gap-2 h-11 px-5 rounded-md bg-primary text-primary-foreground text-base font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+  >
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    {t("schedule.notice.watch_playlist")}
+  </a>
+</div>

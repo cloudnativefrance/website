@@ -6,7 +6,7 @@
  *   1. Section heading (h2)
  *   2. YouTube aftermovie embed (youtube-nocookie per D-12)
  *   3. 3-photo asymmetric mosaic (1 hero + 2 medium)
- *   4. CTA row — outlined "Voir les replays" + "Voir la galerie photo"
+ *   4. Most-watched talks strip — 4 YouTube thumbnails + "View all replays" link
  *
  * Pure Astro SSR. Zero hydration directives. DS tokens only.
  * Resolves its own i18n + data so consumers can mount it with no props,
@@ -17,6 +17,7 @@ import type { ImageMetadata } from "astro";
 import { EDITION_2026 } from "@/lib/editions-data";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import YouTubeFacade from "./YouTubeFacade.astro";
+import TopReplaysStrip from "./TopReplaysStrip.astro";
 
 export interface Props {
   /** Anchor id for deep-linking. Recommended: "edition-2026". */
@@ -27,10 +28,6 @@ export interface Props {
   photos?: ReadonlyArray<{ src: ImageMetadata; alt: string; size: "hero" | "medium" }>;
   /** YouTube embed config — uses youtube-nocookie. */
   video?: { youtubeId: string; caption: string };
-  /** External CTA: 2026 replays YouTube playlist. */
-  replaysCta?: { label: string; href: string };
-  /** External CTA: Ente photo gallery. */
-  galleryCta?: { label: string; href: string; ariaLabel: string };
 }
 
 const lang = getLangFromUrl(Astro.url);
@@ -52,16 +49,6 @@ const video = props.video ?? {
   youtubeId: EDITION_2026.youtubeId,
   caption: t("editions.2026.video_caption"),
 };
-const replaysCta = props.replaysCta ?? {
-  label: t("editions.2026.replays_cta"),
-  href: EDITION_2026.replaysUrl,
-};
-const galleryCta = props.galleryCta ?? {
-  label: t("editions.2026.gallery_cta"),
-  href: EDITION_2026.galleryUrl,
-  ariaLabel: t("editions.2026.gallery_cta_aria"),
-};
-
 /**
  * Tailwind grid classes — UI-SPEC §3 ("1 large left + 2 stacked-equivalent right on desktop").
  * Hero: full width on mobile, left 2/3 on desktop spanning both rows.
@@ -117,25 +104,12 @@ const cellClass = {
     </div>
   )}
 
-  {/* CTA buttons — replays + gallery; stacked mobile, side-by-side desktop */}
-  <div class="mt-12 flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 max-w-3xl mx-auto">
-    <a
-      href={replaysCta.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="inline-flex items-center justify-center h-[52px] px-8 text-lg font-bold rounded-md border-2 border-primary text-primary bg-transparent hover:bg-primary/10 hover:shadow-[0_0_0_4px_oklch(62.5%_0.162_259.9_/_0.15)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-150"
-    >
-      {replaysCta.label}
-    </a>
-    <a
-      href={galleryCta.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={galleryCta.ariaLabel}
-      class="inline-flex items-center justify-center h-[52px] px-8 text-lg font-bold rounded-md border-2 border-primary text-primary bg-transparent hover:bg-primary/10 hover:shadow-[0_0_0_4px_oklch(62.5%_0.162_259.9_/_0.15)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-150"
-    >
-      {galleryCta.label}
-    </a>
-  </div>
+  {/* Most-watched talks — 4-thumbnail strip (replaces former replays + gallery CTAs). */}
+  <TopReplaysStrip
+    replays={EDITION_2026.topReplays}
+    playlistUrl={EDITION_2026.replaysUrl}
+    viewAllKey="editions.2026.view_all_replays"
+    class="mt-12"
+  />
 
 </section>

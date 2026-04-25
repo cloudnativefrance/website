@@ -7,7 +7,7 @@ import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import ComingSoonLayout from "@/components/flags/ComingSoonLayout.astro";
 import { isFlagActive } from "@/lib/flags";
 import { EDITIONS, isEdition, CURRENT_EDITION, type Edition } from "@/lib/editions";
-import { EDITION_2026 } from "@/lib/editions-data";
+import ComingNotice from "@/components/ComingNotice.astro";
 
 export async function getStaticPaths() {
   return EDITIONS.map((year) => ({ params: { year: String(year) } }));
@@ -58,20 +58,7 @@ const programmeReady = !isUpcomingEdition || isFlagActive("programme");
       ) : (
         <>
           <section class="max-w-7xl mx-auto pt-16 md:pt-20 pb-6">
-            {year === CURRENT_EDITION && (
-              <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-foreground">
-                <span class="flex-1">{t("schedule.notice.2027_coming")}</span>
-                <a
-                  href={EDITION_2026.replaysUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="shrink-0 inline-flex items-center gap-1.5 font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                >
-                  {t("schedule.notice.watch_playlist")}
-                  <span aria-hidden="true">↗</span>
-                </a>
-              </div>
-            )}
+            {year === CURRENT_EDITION && <ComingNotice class="mb-8" />}
             <p
               class="text-xs font-semibold uppercase tracking-[0.2em]"
               style="color: var(--color-tertiary, #b8deff);"

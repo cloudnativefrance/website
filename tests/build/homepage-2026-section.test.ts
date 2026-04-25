@@ -25,9 +25,12 @@ describe("EDIT-01 / EDIT-06: 2026 edition section on homepage", () => {
         expect(html).toMatch(/id="edition-2026"/);
       });
 
-      it.skipIf(!distExists)("renders youtube-nocookie iframe with EDITION_2026.youtubeId", () => {
+      it.skipIf(!distExists)("renders YouTube facade with EDITION_2026.youtubeId", () => {
         const html = readFileSync(path, "utf8");
-        expect(html).toMatch(/youtube-nocookie\.com\/embed\/qyMGuU2-w8o/);
+        // The aftermovie uses a click-to-play facade — iframe is injected on
+        // interaction, not in static HTML. The data-video-id attribute is the
+        // reliable SSR signal that the facade is present.
+        expect(html).toMatch(/data-video-id="qyMGuU2-w8o"/);
       });
 
       it.skipIf(!distExists)("mounts within main landmark", () => {

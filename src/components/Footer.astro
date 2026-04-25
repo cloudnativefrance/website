@@ -1,8 +1,9 @@
 ---
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
-import { NEWSLETTER_URL, SOCIAL_LINKS } from "@/lib/event";
+import { NEWSLETTER_URL } from "@/lib/event";
 import logoFullDark from "@/assets/logos/dark/logo.svg";
 import logoFullLight from "@/assets/logos/principal/logo.svg";
+import SocialLinks from "@/components/SocialLinks.astro";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -16,6 +17,7 @@ const navItems = [
   { key: "nav.sponsors" as const, path: "/sponsors" },
   { key: "nav.venue"    as const, path: "/informations-utiles" },
   { key: "nav.team"     as const, path: "/team" },
+  { key: "nav.contact"  as const, path: "/contact" },
 ];
 
 function isActive(currentPath: string, href: string): boolean {
@@ -36,33 +38,12 @@ const legalLinks = [
   { key: "footer.legal.terms"   as const, path: "/terms" },
 ].map(({ key, path }) => ({ key, label: t(key), href: getLocalePath(lang, path) }));
 
-// Social URLs — placeholders per D-04 / UI-SPEC; user fills before production.
-// safeUrl() is the trust boundary — anything non-http(s) → hidden.
-function safeUrl(raw: string | undefined): string | null {
-  if (!raw) return null;
-  const trimmed = raw.trim();
-  if (!trimmed) return null;
-  try {
-    const u = new URL(trimmed);
-    if (u.protocol === "http:" || u.protocol === "https:") return u.toString();
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-const socials = [
-  { key: "linkedin", url: safeUrl(SOCIAL_LINKS.linkedin), ariaKey: "footer.social.linkedin_aria" as const },
-  { key: "youtube",  url: safeUrl(SOCIAL_LINKS.youtube),  ariaKey: "footer.social.youtube_aria"  as const },
-  { key: "bluesky",  url: safeUrl(SOCIAL_LINKS.bluesky),  ariaKey: "footer.social.bluesky_aria"  as const },
-  { key: "twitter",  url: safeUrl(SOCIAL_LINKS.twitter),  ariaKey: "footer.social.twitter_aria"  as const },
-];
 ---
 
 <footer
   role="contentinfo"
   aria-label={t("footer.landmark_aria")}
-  class="bg-background text-muted-foreground mt-24"
+  class="bg-background text-muted-foreground mt-12"
 >
   <div class="mx-auto max-w-7xl px-4 md:px-6 py-12">
       <!-- Newsletter CTA -->
@@ -131,43 +112,7 @@ const socials = [
       <!-- Column 3: Community + Legal -->
       <div>
         <h2 class="text-sm font-semibold uppercase tracking-wider text-foreground">{t("footer.community.heading")}</h2>
-        <ul class="mt-4 flex items-center gap-2" role="list">
-          {socials.map(({ key, url, ariaKey }) => url && (
-            <li>
-              <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={t(ariaKey)}
-                class="p-2 text-muted-foreground hover:text-primary transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-sm inline-flex"
-              >
-                {key === "linkedin" && (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                    <rect width="4" height="12" x="2" y="9" />
-                    <circle cx="4" cy="4" r="2" />
-                  </svg>
-                )}
-                {key === "youtube" && (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
-                    <path d="m10 15 5-3-5-3z" />
-                  </svg>
-                )}
-                {key === "bluesky" && (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.785 2.645 3.597 3.326 6.133 2.897-4.477.762-8.44 3.052-5.34 8.591 2.585 4.614 9.652.904 10.58-3.204.017-.076.032-.119.046-.038.923 4.108 7.995 7.818 10.58 3.204 3.1-5.539-.863-7.83-5.34-8.591 2.536.429 5.348-.252 6.133-2.897C23.622 9.419 24 4.459 24 3.768c0-.688-.139-1.86-.902-2.203-.659-.299-1.664-.621-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8" />
-                  </svg>
-                )}
-                {key === "twitter" && (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                  </svg>
-                )}
-              </a>
-            </li>
-          ))}
-        </ul>
+        <SocialLinks class="mt-4" />
 
         <h2 class="text-sm font-semibold uppercase tracking-wider text-foreground mt-8">{t("footer.legal.heading")}</h2>
         <ul class="mt-4 space-y-3" role="list">
