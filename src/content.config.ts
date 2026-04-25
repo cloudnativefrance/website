@@ -95,7 +95,16 @@ const speakerSchema = z.object({
 const sponsorSchema = z.object({
   id: z.string(),
   name: z.string(),
-  tier: z.enum(["platinum", "gold", "silver", "community"]),
+  tier: z.enum([
+    "platinum",
+    "gold",
+    "silver",
+    "end_user",
+    "community",
+    "experiences",
+    "media",
+    "institutional",
+  ]),
   logo: z.string(),
   url: z.string().url(),
   description_fr: z.string(),

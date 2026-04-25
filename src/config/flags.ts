@@ -49,6 +49,10 @@ export const FLAGS = {
     opens: "2026-12-01T00:00:00+01:00",
     kind: "element",
   },
+  sponsors_2027: {
+    opens: "2027-03-01T00:00:00+01:00",
+    kind: "element",
+  },
 } as const satisfies Record<string, FlagDefinition>;
 
 export type FlagName = keyof typeof FLAGS;

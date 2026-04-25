@@ -5,6 +5,7 @@ import SponsorTierSection from "@/components/sponsors/SponsorTierSection.astro";
 import SponsorCTA from "@/components/sponsors/SponsorCTA.astro";
 import { getSponsors, type SponsorEntry } from "@/lib/sponsor-utils";
 import { EDITIONS, isEdition, CURRENT_EDITION, type Edition } from "@/lib/editions";
+import { isFlagActive } from "@/lib/flags";
 
 export async function getStaticPaths() {
   return EDITIONS.map((year) => ({ params: { year: String(year) } }));
@@ -20,8 +21,19 @@ const year: Edition = yearNum;
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-const all = await getSponsors(year);
-const TIER_ORDER = ["platinum", "gold", "silver", "community"] as const;
+const isPending = year === 2027 && !isFlagActive("sponsors_2027");
+
+const all = isPending ? [] : await getSponsors(year);
+const TIER_ORDER = [
+  "platinum",
+  "gold",
+  "silver",
+  "end_user",
+  "community",
+  "experiences",
+  "media",
+  "institutional",
+] as const;
 const byTier = Object.fromEntries(
   TIER_ORDER.map((tier) => [tier, all.filter((s) => s.data.tier === tier)])
 ) as Record<(typeof TIER_ORDER)[number], SponsorEntry[]>;
@@ -32,7 +44,11 @@ const tierTitles = {
   platinum: t("sponsors.tier.platinum"),
   gold: t("sponsors.tier.gold"),
   silver: t("sponsors.tier.silver"),
+  end_user: t("sponsors.tier.end_user"),
   community: t("sponsors.tier.community"),
+  experiences: t("sponsors.tier.experiences"),
+  media: t("sponsors.tier.media"),
+  institutional: t("sponsors.tier.institutional"),
 } as const;
 ---
 
@@ -40,22 +56,27 @@ const tierTitles = {
   <main class="mx-auto max-w-7xl px-4 md:px-6 py-24">
     <header class="text-center">
       <h1 class="text-4xl font-bold text-foreground">{t("sponsors.page.title")} {year}</h1>
-      <p class="mt-4 text-base text-muted-foreground max-w-2xl mx-auto">
-        {hasAnySponsor ? t("sponsors.page.intro") : t("sponsors.empty_state")}
-      </p>
+      {!isPending && (
+        <p class="mt-4 text-base text-muted-foreground max-w-2xl mx-auto">
+          {hasAnySponsor ? t("sponsors.page.intro") : t("sponsors.empty_state")}
+        </p>
+      )}
     </header>
 
-    {hasAnySponsor &&
-      TIER_ORDER.map((tier) =>
-        byTier[tier].length > 0 ? (
-          <SponsorTierSection
-            tier={tier}
-            sponsors={byTier[tier]}
-            lang={lang}
-            title={tierTitles[tier]}
-          />
-        ) : null
-      )}
+    {isPending ? (
+      <section class="mt-12 rounded-lg border border-border bg-card p-12 text-center max-w-2xl mx-auto">
+        <p class="text-lg text-muted-foreground">{t("sponsors.year_pending")}</p>
+      </section>
+    ) : (
+      TIER_ORDER.map((tier) => (
+        <SponsorTierSection
+          tier={tier}
+          sponsors={byTier[tier]}
+          lang={lang}
+          title={tierTitles[tier]}
+        />
+      ))
+    )}
 
     <SponsorCTA lang={lang} />
   </main>

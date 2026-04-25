@@ -6,7 +6,15 @@ import { safeUrl, safeLogoPath, type SponsorEntry } from "@/lib/sponsor-utils";
 interface Props {
   sponsor: SponsorEntry;
   lang: Locale;
-  tier: "platinum" | "gold" | "silver" | "community";
+  tier:
+    | "platinum"
+    | "gold"
+    | "silver"
+    | "end_user"
+    | "community"
+    | "experiences"
+    | "media"
+    | "institutional";
 }
 
 const { sponsor, lang, tier } = Astro.props;
@@ -22,15 +30,23 @@ const tierPadding: Record<Props["tier"], string> = {
   platinum: "p-8",
   gold: "p-6",
   silver: "p-4",
+  end_user: "p-4",
   community: "p-3",
+  experiences: "p-3",
+  media: "p-3",
+  institutional: "p-3",
 };
 
 // Tier-specific logo dimensions
 const tierLogoSize: Record<Props["tier"], string> = {
-  platinum: "max-w-[220px] max-h-20",
+  platinum: "max-w-[300px] max-h-28",
   gold: "max-w-[160px] max-h-16",
   silver: "max-w-[120px] max-h-14",
+  end_user: "max-w-[140px] max-h-14",
   community: "max-w-[88px] max-h-10",
+  experiences: "max-w-[100px] max-h-12",
+  media: "max-w-[100px] max-h-12",
+  institutional: "max-w-[88px] max-h-10",
 };
 
 const baseCardClass = `bg-card border border-border rounded-lg ${tierPadding[tier]} flex flex-col items-center justify-center gap-2`;
