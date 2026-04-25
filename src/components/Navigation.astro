@@ -13,15 +13,15 @@ const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
 
 const navItems: Array<{
-  key: "nav.home" | "nav.replays" | "nav.venue" | "nav.team";
+  key: "nav.home" | "nav.replays" | "nav.tickets" | "nav.cfp";
   path: string;
   dead: boolean;
   postEventOnly?: boolean;
 }> = [
   { key: "nav.home",     path: "/",          dead: false },
+  { key: "nav.tickets",  path: "/tickets",   dead: false },
+  { key: "nav.cfp",      path: "/cfp",       dead: false },
   { key: "nav.replays",  path: "/replays",   dead: false, postEventOnly: true },
-  { key: "nav.venue",    path: "/venue",     dead: false },
-  { key: "nav.team",     path: "/team",      dead: false },
 ];
 
 function isActive(currentPath: string, href: string, dead: boolean): boolean {
@@ -82,7 +82,7 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
     </a>
 
     <!-- Desktop links -->
-    <ul class="hidden md:flex items-center gap-6" role="list">
+    <ul class="hidden md:flex items-center gap-10" role="list">
       {links.map(({ key, label, href, active, postEventOnly }) => (
         <li
           data-post-event={postEventOnly ? "true" : undefined}

@@ -5,7 +5,7 @@ import KeyNumbers from "@/components/hero/KeyNumbers";
 import Edition2026Combined from "@/components/past-editions/Edition2026Combined.astro";
 import SponsorsPlatinumStrip from "@/components/sponsors/SponsorsPlatinumStrip.astro";
 import { getSponsors } from "@/lib/sponsor-utils";
-import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { eventSchemaJson } from "@/lib/event-schema";
 
 const lang = getLangFromUrl(Astro.url);
@@ -31,6 +31,27 @@ const platinumSponsors = allSponsors.filter((s) => s.data.tier === "platinum");
     <HeroSection />
     <KeyNumbers client:idle lang={lang} />
     <Edition2026Combined />
+    <section class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
+        {t("about.subnav.heading")}
+      </p>
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+        <a
+          href={getLocalePath(lang, "/venue")}
+          class="group flex items-center justify-between gap-4 rounded-lg border border-border bg-card px-6 py-5 text-base font-semibold text-foreground transition-colors hover:border-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          {t("about.subnav.venue")}
+          <span aria-hidden="true" class="text-primary">→</span>
+        </a>
+        <a
+          href={getLocalePath(lang, "/team")}
+          class="group flex items-center justify-between gap-4 rounded-lg border border-border bg-card px-6 py-5 text-base font-semibold text-foreground transition-colors hover:border-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          {t("about.subnav.team")}
+          <span aria-hidden="true" class="text-primary">→</span>
+        </a>
+      </div>
+    </section>
     {platinumSponsors.length > 0 && (
       <SponsorsPlatinumStrip
         id="sponsors-homepage"

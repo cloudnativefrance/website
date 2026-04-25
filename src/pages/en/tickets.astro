@@ -1,26 +1,27 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import ComingSoonLayout from "@/components/flags/ComingSoonLayout.astro";
-import { isFlagActive } from "@/lib/flags";
 import { useTranslations } from "@/i18n/utils";
+import { NEWSLETTER_URL } from "@/lib/event";
 
 const lang = "en";
 const t = useTranslations(lang);
-const active = isFlagActive("tickets");
-const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
 ---
 
-{active ? (
-  <Layout title={t("hero.cta.register")} description={t("flags.tickets.soon.body")} lang={lang}>
-    <main class="flex min-h-[50vh] flex-col items-center justify-center p-8 text-center gap-4">
-      <meta http-equiv="refresh" content={`0; url=${TICKETING_URL}`} />
-      <p class="text-base text-muted-foreground">
-        <a href={TICKETING_URL} target="_blank" rel="noopener noreferrer" class="underline">
-          {TICKETING_URL}
-        </a>
-      </p>
-    </main>
-  </Layout>
-) : (
-  <ComingSoonLayout flag="tickets" lang={lang} />
-)}
+<Layout title={t("nav.tickets")} description={t("tickets.coming_soon.body")} lang={lang}>
+  <main class="mx-auto max-w-3xl px-4 md:px-6 py-24 md:py-32 text-center">
+    <h1 class="text-4xl md:text-5xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+      {t("tickets.coming_soon.title")}
+    </h1>
+    <p class="mt-6 text-base md:text-lg text-muted-foreground">
+      {t("tickets.coming_soon.body")}
+    </p>
+    <a
+      href={NEWSLETTER_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="mt-8 inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-base font-semibold px-6 h-12 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    >
+      {t("tickets.coming_soon.cta")}
+    </a>
+  </main>
+</Layout>
