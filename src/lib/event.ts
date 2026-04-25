@@ -7,6 +7,8 @@
  * and locale-aware path helpers. CFP date logic lives in FLAGS.cfp.
  */
 
+import { EDITION_2026 } from "@/lib/editions-data";
+
 /**
  * Epoch ms for 2027-06-03T09:00:00+02:00 (Cloud Native Days France 2027 start).
  *
@@ -41,6 +43,7 @@ export const SOCIAL_LINKS = {
   youtube: "https://www.youtube.com/@cloudnativedays",
   bluesky: "https://bsky.app/profile/cloudnativedays.fr",
   twitter: "https://x.com/cloudnativedays",
+  gallery: EDITION_2026.galleryUrl,
 } as const;
 
 /**
