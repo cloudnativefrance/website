@@ -10,6 +10,19 @@ import { generateFlagEnvSchema } from "./src/config/flags-env.ts";
 // https://astro.build/config
 export default defineConfig({
   site: "https://cloudnativedays.fr",
+  redirects: {
+    "/programme":    "/programme/2026",
+    "/sponsors":     "/sponsors/2026",
+    "/speakers":     "/speakers/2026",
+    "/en/programme": "/en/programme/2026",
+    "/en/sponsors":  "/en/sponsors/2026",
+    "/en/speakers":  "/en/speakers/2026",
+    // Slug renames — keep old URLs alive for SEO + inbound links.
+    "/venue":            "/informations-utiles",
+    "/en/venue":         "/en/informations-utiles",
+    "/about":            "/decouvrir",
+    "/en/about":         "/en/decouvrir",
+  },
   integrations: [
     react(),
     sitemap({

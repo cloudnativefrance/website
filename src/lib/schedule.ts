@@ -1,4 +1,5 @@
-import { fetchCsvOrFallback, SESSIONS_CSV_URL } from "./remote-csv";
+import { fetchCsvOrFallback, getCsvUrl } from "./remote-csv";
+import { CURRENT_EDITION, type Edition } from "./editions";
 
 export type SessionFormat = "keynote" | "talk" | "lightning" | "workshop";
 export type SessionStatus = "confirmed" | "tentative" | "cancelled" | "hidden";
@@ -104,11 +105,13 @@ function parseCsv(text: string): string[][] {
  * falls back to the repo-committed CSV on network failure. Result is cached
  * for the process lifetime (see src/lib/remote-csv.ts).
  */
-export async function loadSessions(): Promise<SessionRow[]> {
+export async function loadSessions(
+  year: Edition = CURRENT_EDITION,
+): Promise<SessionRow[]> {
   const raw = await fetchCsvOrFallback({
-    url: SESSIONS_CSV_URL,
-    fallbackRelPath: "src/content/schedule/sessions.csv",
-    label: "sessions.csv",
+    url: getCsvUrl("sessions", year),
+    fallbackRelPath: `src/content/schedule/sessions-${year}.csv`,
+    label: `sessions-${year}.csv`,
   });
   const rows = parseCsv(raw);
   if (rows.length === 0) return [];

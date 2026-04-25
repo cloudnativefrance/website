@@ -49,31 +49,31 @@ const B = { slug: "quentin-swiech", name: "Quentin Swiech" };
 
 describe("SPKR-03: FR co-speaker cross-references are bidirectional (session S3SPP8)", () => {
   it(`${A.slug} FR profile references ${B.name}`, () => {
-    const html = readPage(`speakers/${A.slug}/index.html`);
+    const html = readPage(`speakers/2026/${A.slug}/index.html`);
     expect(html).toContain(B.name);
   });
 
   it(`${B.slug} FR profile references ${A.name}`, () => {
-    const html = readPage(`speakers/${B.slug}/index.html`);
+    const html = readPage(`speakers/2026/${B.slug}/index.html`);
     expect(html).toContain(A.name);
   });
 });
 
 describe("SPKR-03: EN co-speaker cross-references are bidirectional (session S3SPP8)", () => {
   it(`${A.slug} EN profile references ${B.name}`, () => {
-    const html = readPage(`en/speakers/${A.slug}/index.html`);
+    const html = readPage(`en/speakers/2026/${A.slug}/index.html`);
     expect(html).toContain(B.name);
   });
 
   it(`${B.slug} EN profile references ${A.name}`, () => {
-    const html = readPage(`en/speakers/${B.slug}/index.html`);
+    const html = readPage(`en/speakers/2026/${B.slug}/index.html`);
     expect(html).toContain(A.name);
   });
 });
 
 describe("SPKR-03: Speaker profile lists their session from sessions.csv (single-talk anchor)", () => {
   it("petazzoni FR profile contains the keynote session title fragment", () => {
-    const html = readPage("speakers/petazzoni/index.html");
+    const html = readPage("speakers/2026/petazzoni/index.html");
     // Apostrophe is HTML-entity encoded in the built output — check for both fragments instead.
     expect(html).toMatch(/Keynote d[&#39;']+ouverture/);
   });

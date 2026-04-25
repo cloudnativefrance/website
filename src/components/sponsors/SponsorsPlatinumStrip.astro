@@ -5,7 +5,7 @@
  * Renders all Platinum-tier sponsor logos in a responsive grid (2/3/4 cols)
  * plus a centred CTA to the dedicated /sponsors page.
  *
- * Data is supplied by the caller (Phase 26 homepage) via getCollection("sponsors")
+ * Data is supplied by the caller (Phase 26 homepage) via getSponsors()
  * filtered on tier === "platinum" — see UI-SPEC §Props Interface for the
  * canonical caller snippet. CSVs are the single source of truth (CLAUDE.md).
  *
@@ -19,16 +19,15 @@
  *
  * Not mounted in Phase 24 — Phase 26 owns the homepage swap.
  */
-import type { CollectionEntry } from "astro:content";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
-import { safeUrl, safeLogoPath } from "@/lib/sponsor-utils";
+import { safeUrl, safeLogoPath, type SponsorEntry } from "@/lib/sponsor-utils";
 
 export interface Props {
   /** Anchor id for deep-linking. Recommended: "sponsors-homepage". */
   id?: string;
-  /** Platinum-tier sponsors (already filtered by caller from getCollection("sponsors")). */
-  sponsors: ReadonlyArray<CollectionEntry<"sponsors">>;
+  /** Platinum-tier sponsors (already filtered by caller from getSponsors()). */
+  sponsors: ReadonlyArray<SponsorEntry>;
   /** Active locale — drives CTA href ("/sponsors" vs "/en/sponsors"). */
   lang: Locale;
 }

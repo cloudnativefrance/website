@@ -1,0 +1,9 @@
+id,name,tier,logo,url,description_fr,description_en
+altitude-cloud,Altitude Cloud,platinum,/sponsors/placeholder.svg,https://example.com/altitude-cloud,"Cloud souverain européen optimisé pour les charges Kubernetes.","Sovereign European cloud optimised for Kubernetes workloads."
+bedrock-platform,Bedrock Platform,platinum,/sponsors/placeholder.svg,https://example.com/bedrock-platform,"Plateforme interne clé en main pour les équipes platform engineering.","Turnkey internal developer platform for platform-engineering teams."
+contour-mesh,Contour Mesh,gold,/sponsors/placeholder.svg,https://example.com/contour-mesh,"Service mesh allégé, observabilité native.","Lightweight service mesh with native observability."
+daemonset-co,DaemonSet Co,gold,/sponsors/placeholder.svg,https://example.com/daemonset-co,"Agents node-level pour la collecte de métriques et logs.","Node-level agents for metrics and log collection."
+envoy-runtime,Envoy Runtime,silver,/sponsors/placeholder.svg,https://example.com/envoy-runtime,"Runtime conteneur sécurisé prêt pour la production.","Production-ready, security-hardened container runtime."
+fluxcd-partners,FluxCD Partners,silver,/sponsors/placeholder.svg,https://example.com/fluxcd-partners,"Conseil et support entreprise autour de Flux CD.","Consulting and enterprise support around Flux CD."
+cncf-paris-2026,CNCF Paris,community,/sponsors/placeholder.svg,https://community.cncf.io/paris,"Antenne francophone de la Cloud Native Computing Foundation.","French-speaking chapter of the Cloud Native Computing Foundation."
+kcd-organizers-fr,KCD Organisers France,community,/sponsors/placeholder.svg,https://kcdfrance.fr,"Bénévoles organisateurs des Kubernetes Community Days en France.","Volunteer organisers of Kubernetes Community Days in France."

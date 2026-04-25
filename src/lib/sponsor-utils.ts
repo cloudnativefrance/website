@@ -1,3 +1,6 @@
+import { getCollection, type CollectionEntry } from "astro:content";
+import { CURRENT_EDITION, type Edition } from "./editions";
+
 /**
  * Sponsor URL & logo-path allowlist helpers.
  *
@@ -49,3 +52,15 @@ export function safeLogoPath(raw: string | undefined): string | null {
   }
   return null;
 }
+
+type SponsorsCollection = "sponsors-2023" | "sponsors-2026" | "sponsors-2027";
+
+function sponsorsCollectionName(year: Edition): SponsorsCollection {
+  return `sponsors-${year}` as SponsorsCollection;
+}
+
+export async function getSponsors(year: Edition = CURRENT_EDITION) {
+  return await getCollection(sponsorsCollectionName(year));
+}
+
+export type SponsorEntry = CollectionEntry<SponsorsCollection>;

@@ -1,0 +1,9 @@
+id,name,tier,logo,url,description_fr,description_en
+horizon-stack,Horizon Stack,platinum,/sponsors/placeholder.svg,https://example.com/horizon-stack,"Plateforme PaaS multi-cloud pour les workloads IA.","Multi-cloud PaaS for AI workloads."
+ignite-cloud,Ignite Cloud,platinum,/sponsors/placeholder.svg,https://example.com/ignite-cloud,"Provisioning Kubernetes en 60 secondes sur n'importe quel cloud.","60-second Kubernetes provisioning on any cloud."
+jetstream-ai,JetStream AI,gold,/sponsors/placeholder.svg,https://example.com/jetstream-ai,"Inférence de modèles à grande échelle sur GPU partagés.","Large-scale model inference on shared GPUs."
+kepler-watt,Kepler Watt,gold,/sponsors/placeholder.svg,https://example.com/kepler-watt,"Mesure et optimisation de la consommation énergétique des clusters.","Cluster energy measurement and optimisation."
+lattice-runtime,Lattice Runtime,silver,/sponsors/placeholder.svg,https://example.com/lattice-runtime,"Runtime WebAssembly pour edge computing.","WebAssembly runtime for edge computing."
+mosaic-platform,Mosaic Platform,silver,/sponsors/placeholder.svg,https://example.com/mosaic-platform,"Composition de plateformes internes via templates Backstage.","Internal platform composition via Backstage templates."
+gophers-paris,Gophers Paris,community,/sponsors/placeholder.svg,https://meetup.com/golang-paris,"Communauté Go parisienne, talks et workshops trimestriels.","Paris Go community, quarterly talks and workshops."
+platform-engineers-fr,Platform Engineers FR,community,/sponsors/placeholder.svg,https://platformengineers.fr,"Réseau francophone d'ingénieurs plateforme.","French-speaking network of platform engineers."

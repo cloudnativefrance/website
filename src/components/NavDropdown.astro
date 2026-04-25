@@ -1,0 +1,124 @@
+---
+/**
+ * Accessible disclosure dropdown for nav items with year sub-links.
+ *
+ * Pure Astro + a tiny inline <script>. No React island. Tab/Escape close
+ * the menu, arrow keys move focus through items.
+ */
+interface Item {
+  href: string;
+  label: string;
+  current?: boolean;
+}
+interface Props {
+  key: string;      // i18n key used for the trigger label; used to build DOM ids
+  label: string;    // visible trigger label
+  items: Item[];    // rendered in the order given
+  active?: boolean; // currentPath is within this section
+}
+const { key, label, items, active = false } = Astro.props as Props;
+const buttonId = `nav-dd-btn-${key.replace(/\W/g, "-")}`;
+const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
+---
+
+<li class="relative" data-nav-dropdown>
+  <button
+    id={buttonId}
+    type="button"
+    aria-haspopup="menu"
+    aria-expanded="false"
+    aria-controls={menuId}
+    data-nav-key={key}
+    class:list={[
+      "inline-flex items-center gap-1 text-lg font-medium text-foreground transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
+      active ? "border-b-2 border-primary" : "border-b-2 border-transparent hover:border-primary/60",
+    ]}
+  >
+    {label}
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+  <ul
+    id={menuId}
+    role="menu"
+    aria-labelledby={buttonId}
+    class="hidden absolute right-0 mt-2 min-w-48 rounded-md border border-border bg-popover text-popover-foreground shadow-lg py-1 z-50"
+  >
+    {items.map((item) => (
+      <li role="none">
+        <a
+          role="menuitem"
+          href={item.href}
+          aria-current={item.current ? "page" : undefined}
+          class:list={[
+            "block px-4 py-2 text-base font-semibold hover:bg-muted focus-visible:bg-muted focus-visible:outline-none",
+            item.current && "text-primary",
+          ]}
+        >
+          {item.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</li>
+
+<script>
+  const wrappers = document.querySelectorAll<HTMLElement>("[data-nav-dropdown]");
+  wrappers.forEach((wrap) => {
+    const btn = wrap.querySelector<HTMLButtonElement>('button[aria-haspopup="menu"]');
+    const menu = wrap.querySelector<HTMLUListElement>('[role="menu"]');
+    if (!btn || !menu) return;
+
+    const close = () => {
+      menu.classList.add("hidden");
+      btn.setAttribute("aria-expanded", "false");
+    };
+    const open = (focusFirst = false) => {
+      menu.classList.remove("hidden");
+      btn.setAttribute("aria-expanded", "true");
+      if (focusFirst) {
+        const first = menu.querySelector<HTMLAnchorElement>('[role="menuitem"]');
+        first?.focus();
+      }
+    };
+    const toggle = () => {
+      menu.classList.contains("hidden") ? open(true) : close();
+    };
+
+    btn.addEventListener("click", (e) => { e.preventDefault(); toggle(); });
+    btn.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        open(true);
+      }
+    });
+
+    // Hover to open on pointer devices. A short close delay lets the cursor
+    // travel from the trigger across the gap onto the menu without it
+    // flickering shut. Touch devices fire no mouseenter, so click still works.
+    let closeTimer: number | undefined;
+    const cancelClose = () => {
+      if (closeTimer !== undefined) {
+        window.clearTimeout(closeTimer);
+        closeTimer = undefined;
+      }
+    };
+    const deferredClose = () => {
+      cancelClose();
+      closeTimer = window.setTimeout(() => { close(); closeTimer = undefined; }, 150);
+    };
+    wrap.addEventListener("mouseenter", () => { cancelClose(); open(); });
+    wrap.addEventListener("mouseleave", deferredClose);
+    menu.addEventListener("keydown", (e) => {
+      const items = Array.from(menu.querySelectorAll<HTMLAnchorElement>('[role="menuitem"]'));
+      const idx = items.indexOf(document.activeElement as HTMLAnchorElement);
+      if (e.key === "Escape") { e.preventDefault(); close(); btn.focus(); }
+      else if (e.key === "ArrowDown") { e.preventDefault(); items[(idx + 1) % items.length]?.focus(); }
+      else if (e.key === "ArrowUp")   { e.preventDefault(); items[(idx - 1 + items.length) % items.length]?.focus(); }
+      else if (e.key === "Home")      { e.preventDefault(); items[0]?.focus(); }
+      else if (e.key === "End")       { e.preventDefault(); items[items.length - 1]?.focus(); }
+    });
+    document.addEventListener("click", (e) => {
+      if (!wrap.contains(e.target as Node)) close();
+    });
+  });
+</script>

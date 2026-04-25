@@ -26,7 +26,7 @@ Schema changes that span the CSV pipeline (Sheet column → parser → Zod schem
 
 - **Astro** for pages/components; **React** only for interactive islands.
 - **Tailwind 4** + **shadcn/ui** for styling. Design tokens live in the Stitch design system (CND France 2027) — source of truth for colors/spacing/type.
-- **Data pipeline**: `src/lib/remote-csv.ts` fetches published CSVs at build time. Env var overrides: `SCHEDULE_SESSIONS_CSV_URL`, `SCHEDULE_SPEAKERS_CSV_URL`, `SPONSORS_CSV_URL`, `TEAM_CSV_URL`. Local fallbacks in `src/content/{schedule,sponsors,team}/*.csv` for offline/CI only.
+- **Data pipeline**: `src/lib/remote-csv.ts` fetches published CSVs at build time. Env var overrides: `SESSIONS_CSV_URL_{2023,2026,2027}`, `SPEAKERS_CSV_URL_{2023,2026,2027}`, `SPONSORS_CSV_URL_{2023,2026,2027}`, `TEAM_CSV_URL`. Local fallbacks in `src/content/{schedule,sponsors,team}/*.csv` for offline/CI only.
 - **Testing**: `pnpm test` (Vitest). Component tests may mock `astro:content` via `vi.mock`.
 - **Build/dev**: `pnpm build` / `pnpm dev`. Hosted in Docker + nginx (see `Dockerfile`, `nginx/`).
 

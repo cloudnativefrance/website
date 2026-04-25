@@ -1,0 +1,9 @@
+id,name,tier,logo,url,description_fr,description_en
+kube-helm-corp,KubeHelm Corp,platinum,/sponsors/placeholder.svg,https://example.com/kube-helm-corp,"Pionnier du packaging Kubernetes pour l'entreprise.","Pioneering Kubernetes packaging for the enterprise."
+octopod-systems,Octopod Systems,platinum,/sponsors/placeholder.svg,https://example.com/octopod-systems,"Plateforme d'orchestration multi-clusters historique.","Long-standing multi-cluster orchestration platform."
+nimbus-relay,Nimbus Relay,gold,/sponsors/placeholder.svg,https://example.com/nimbus-relay,"Réseau d'edge cloud pour conteneurs.","Edge cloud network for containers."
+gitops-collective,GitOps Collective,gold,/sponsors/placeholder.svg,https://example.com/gitops-collective,"Outils GitOps open-source maintenus par la communauté.","Community-maintained open-source GitOps tooling."
+skopeo-labs,Skopeo Labs,silver,/sponsors/placeholder.svg,https://example.com/skopeo-labs,"Distribution d'images de conteneurs sécurisée.","Secure container image distribution."
+ingress-house,Ingress House,silver,/sponsors/placeholder.svg,https://example.com/ingress-house,"Ingress et load balancing managés.","Managed ingress and load balancing."
+meetup-kube-paris,Meetup Kubernetes Paris,community,/sponsors/placeholder.svg,https://meetup.com/Paris-Kubernetes-Meetup,"Communauté Kubernetes parisienne, événements mensuels.","Paris Kubernetes community, monthly meetups."
+linuxfr-asso,LinuxFR Association,community,/sponsors/placeholder.svg,https://linuxfr.org,"Promotion du logiciel libre en France depuis 1998.","Promoting free software in France since 1998."

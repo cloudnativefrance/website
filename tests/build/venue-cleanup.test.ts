@@ -23,11 +23,11 @@ import { resolve } from "node:path";
 
 const ROOT = resolve(import.meta.dirname, "../..");
 
-const SRC_FR = resolve(ROOT, "src/pages/venue/index.astro");
-const SRC_EN = resolve(ROOT, "src/pages/en/venue/index.astro");
+const SRC_FR = resolve(ROOT, "src/pages/informations-utiles/index.astro");
+const SRC_EN = resolve(ROOT, "src/pages/en/informations-utiles/index.astro");
 const I18N_UI = resolve(ROOT, "src/i18n/ui.ts");
-const DIST_FR = resolve(ROOT, "dist/venue/index.html");
-const DIST_EN = resolve(ROOT, "dist/en/venue/index.html");
+const DIST_FR = resolve(ROOT, "dist/informations-utiles/index.html");
+const DIST_EN = resolve(ROOT, "dist/en/informations-utiles/index.html");
 
 const distExists = existsSync(DIST_FR) && existsSync(DIST_EN);
 
@@ -41,8 +41,8 @@ const DIST_FRAGMENTS: Array<{ label: string; pattern: RegExp }> = [
 ];
 
 const sources: Array<{ label: string; path: string }> = [
-  { label: "FR src/pages/venue/index.astro", path: SRC_FR },
-  { label: "EN src/pages/en/venue/index.astro", path: SRC_EN },
+  { label: "FR src/pages/informations-utiles/index.astro", path: SRC_FR },
+  { label: "EN src/pages/en/informations-utiles/index.astro", path: SRC_EN },
 ];
 
 const dists: Array<{ label: string; path: string }> = [

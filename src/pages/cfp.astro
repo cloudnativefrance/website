@@ -1,21 +1,297 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import CfpSection from "@/components/cfp/CfpSection.astro";
-import ComingSoonLayout from "@/components/flags/ComingSoonLayout.astro";
-import { isFlagActive } from "@/lib/flags";
 import { useTranslations } from "@/i18n/utils";
 
 const lang = "fr";
 const t = useTranslations(lang);
-const active = isFlagActive("cfp");
+
+const CFP_URL = "https://cfp.cloudnativedays.fr/2026/";
+
+const audiencePills = [
+  "Developers",
+  "Quality Engineers",
+  "SREs",
+  "Architectes",
+  "Software Engineers",
+  "Cloud Engineers",
+  "Platform Engineers",
+  "Product Managers",
+  "Project Managers",
+  "CTOs",
+];
+
+const formats = [
+  {
+    duration: "10 min",
+    title: "Présentation éclair",
+    body: "Un format court et synthétique pour aller droit au but. Le temps est votre principal challenge — assurez-vous que votre contenu soit concis et percutant.",
+  },
+  {
+    duration: "30 min",
+    title: "Retour d'expérience",
+    body: "Idéal pour partager des cas concrets en entreprise, des retours sur des projets open source, ou une expérience personnelle. Q&A incluses.",
+  },
+  {
+    duration: "45 min",
+    title: "Conférence",
+    body: "Pour approfondir un sujet complexe, entrer dans les détails techniques, avec éventuellement des démonstrations. Q&A incluses.",
+  },
+];
+
+const themes = [
+  {
+    emoji: "🛠️",
+    title: "Infrastructure & Opérations",
+    body: "Orchestration, automatisation, gestion des coûts, supervision. Mise à l'échelle, résilience et optimisation de l'infrastructure Cloud.",
+  },
+  {
+    emoji: "🎯",
+    title: "Developer Experience",
+    body: "Outils, pratiques innovantes et plateformes internes. Le Platform Engineering pour rendre les équipes plus autonomes.",
+  },
+  {
+    emoji: "🛡️",
+    title: "Réseau & Sécurité",
+    body: "Connectivité, conformité, protection des données dans le cloud. Risques cyber et solutions associées.",
+  },
+  {
+    emoji: "🤖",
+    title: "AI & Data",
+    body: "Intégration de l'IA dans nos outils et plateformes. Traitement des données dans les architectures Cloud Native.",
+  },
+  {
+    emoji: "🚀",
+    title: "Autres sujets & Crazy Stuff",
+    body: "Une idée hors des sentiers battus ? Une expérimentation audacieuse ? Surprenez-nous !",
+    accent: true,
+  },
+];
+
+const values = [
+  { emoji: "❤️", label: "Communautés", body: "Entraide et bienveillance." },
+  { emoji: "🌍", label: "Inclusion & diversité", body: "Toutes les voix comptent." },
+  { emoji: "🌱", label: "Écologie", body: "Pratiques plus durables." },
+  { emoji: "🇫🇷", label: "Autonomie numérique", body: "Open source et souveraineté." },
+];
+
+const criteria = [
+  { key: "Retours d'expérience", body: "concrets sur l'application des technologies Cloud Native." },
+  { key: "Open source", body: "moteurs d'innovation et de collaboration." },
+  { key: "Innovation et expertise technique", body: "qui repoussent les limites de votre domaine." },
+  { key: "Projets francophones et locaux", body: "valorisant notre écosystème." },
+  { key: "Contenu inédit", body: "ou rarement présenté lors d'autres conférences." },
+  { key: "Diversité", body: "des profils et des approches." },
+];
 ---
 
-{active ? (
-  <Layout title={t("cfp.heading")} description={t("cfp.description.open")} lang={lang}>
-    <main>
-      <CfpSection />
-    </main>
-  </Layout>
-) : (
-  <ComingSoonLayout flag="cfp" lang={lang} />
-)}
+<Layout title="Appel à conférences (CFP)" description="Proposez une intervention pour Cloud Native Days France 2026." lang={lang}>
+  <main>
+    <section class="mx-auto max-w-3xl px-4 md:px-6 pt-16 md:pt-24 pb-12 md:pb-16 text-center">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em]" style="color: var(--color-tertiary, #b8deff);">
+        Call for Papers
+      </p>
+      <h1 class="mt-4 text-4xl md:text-6xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+        Proposez une intervention
+      </h1>
+      <p class="mt-5 text-base md:text-lg text-muted-foreground">
+        Une journée. 5 thèmes. 3 formats. Et votre voix.
+      </p>
+      <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <a
+          href={CFP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-base font-semibold px-6 h-12 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          Soumettre une proposition <span aria-hidden="true">→</span>
+        </a>
+        <a
+          href="#formats"
+          class="inline-flex items-center justify-center rounded-md border border-border bg-card text-foreground text-base font-semibold px-6 h-12 transition-colors hover:border-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          Voir les formats
+        </a>
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-3xl px-4 md:px-6 py-10 md:py-14 text-center">
+      <p class="text-base md:text-lg leading-relaxed text-muted-foreground">
+        Nous sommes ravi(e)s de vous ouvrir les portes de notre <span class="font-semibold text-foreground">CFP</span>
+        pour le <span class="font-semibold text-foreground">Cloud Native Days France 2026</span> ! 🎉
+      </p>
+      <p class="mt-4 text-base md:text-lg leading-relaxed text-muted-foreground">
+        Cet événement est avant tout une célébration de la communauté francophone du <span class="font-semibold text-foreground">Cloud Native</span> —
+        un lieu d'échange et de partage où chacun(e) peut apprendre et s'inspirer.
+      </p>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
+        Pour qui
+      </p>
+      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight text-center" style="letter-spacing:-0.02em;">
+        Une audience tech variée
+      </h2>
+      <ul role="list" class="mt-8 flex flex-wrap items-center justify-center gap-2 md:gap-3 max-w-4xl mx-auto">
+        {audiencePills.map((label) => (
+          <li>
+            <span class="inline-flex items-center rounded-full bg-secondary text-secondary-foreground px-4 py-2 text-sm font-medium">
+              {label}
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p class="mt-8 text-base md:text-lg text-muted-foreground text-center max-w-3xl mx-auto leading-relaxed">
+        Des <span class="font-semibold text-foreground">start-ups dynamiques</span> aux <span class="font-semibold text-foreground">grands groupes établis</span>,
+        en passant par les <span class="font-semibold text-foreground">PME innovantes</span> — votre présentation sera entendue par des pairs qui rencontrent des défis similaires et qui sont avides de nouvelles solutions.
+      </p>
+    </section>
+
+    <section id="formats" class="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
+        Formats
+      </p>
+      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight text-center" style="letter-spacing:-0.02em;">
+        Choisissez votre format
+      </h2>
+      <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+        {formats.map((f) => (
+          <article class="group flex flex-col rounded-lg border border-border bg-card p-6 md:p-8 transition-colors hover:border-primary/60">
+            <span class="self-start inline-flex items-center rounded-full bg-accent/15 text-accent px-3 py-1 text-xs font-bold uppercase tracking-wider">
+              {f.duration}
+            </span>
+            <h3 class="mt-4 text-xl md:text-2xl font-bold text-foreground tracking-tight">
+              {f.title}
+            </h3>
+            <p class="mt-3 text-base text-muted-foreground leading-relaxed">
+              {f.body}
+            </p>
+          </article>
+        ))}
+      </div>
+      <p class="mt-8 text-center text-sm md:text-base text-muted-foreground italic">
+        Quel que soit le format choisi, votre enthousiasme sera contagieux.
+      </p>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
+        Thèmes
+      </p>
+      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight text-center" style="letter-spacing:-0.02em;">
+        Cinq territoires
+      </h2>
+      <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {themes.map((th) => (
+          <article
+            class:list={[
+              "flex flex-col rounded-lg border bg-card p-6 transition-colors",
+              th.accent
+                ? "border-accent/60 hover:border-accent"
+                : "border-border hover:border-primary/60",
+            ]}
+          >
+            <div
+              class:list={[
+                "inline-flex items-center justify-center w-12 h-12 rounded-full text-2xl",
+                th.accent ? "bg-accent/15" : "bg-primary/10",
+              ]}
+              aria-hidden="true"
+            >
+              {th.emoji}
+            </div>
+            <h3 class="mt-4 text-lg md:text-xl font-bold text-foreground tracking-tight">
+              {th.title}
+            </h3>
+            <p class="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">
+              {th.body}
+            </p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
+        Nos valeurs
+      </p>
+      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight text-center" style="letter-spacing:-0.02em;">
+        Au cœur de l'événement
+      </h2>
+      <ul role="list" class="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {values.map((v) => (
+          <li class="flex flex-col items-center text-center px-2">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-2xl" aria-hidden="true">
+              {v.emoji}
+            </div>
+            <p class="mt-3 text-base font-semibold text-foreground">{v.label}</p>
+            <p class="mt-1 text-sm text-muted-foreground leading-snug">{v.body}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="mx-auto max-w-3xl px-4 md:px-6 py-16 md:py-20">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        Ce que nous recherchons
+      </p>
+      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+        Nos critères
+      </h2>
+      <p class="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">
+        Notre comité de sélection — bénévoles de l'organisation CND France et représentant(e)s des communautés francophones de nombreuses régions françaises et du Luxembourg — privilégiera les propositions qui&nbsp;:
+      </p>
+      <ul role="list" class="mt-8 space-y-4">
+        {criteria.map((c) => (
+          <li class="flex items-start gap-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="shrink-0 mt-0.5 text-primary"
+              aria-hidden="true"
+            >
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span class="text-base md:text-lg text-muted-foreground leading-relaxed">
+              <span class="font-semibold text-foreground">{c.key}</span> — {c.body}
+            </span>
+          </li>
+        ))}
+      </ul>
+      <div class="mt-10 rounded-lg border border-accent/40 bg-accent/10 px-5 py-4 flex items-start gap-3">
+        <span aria-hidden="true" class="text-2xl shrink-0">🇫🇷</span>
+        <p class="text-sm md:text-base text-foreground leading-relaxed">
+          Toutes les présentations se déroulent <span class="font-semibold">en français</span>.
+          Slides en anglais acceptés si cela facilite votre préparation.
+        </p>
+      </div>
+    </section>
+
+    <section class="mt-8 bg-card border-y border-border">
+      <div class="mx-auto max-w-3xl px-4 md:px-6 py-16 md:py-20 text-center">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em]" style="color: var(--color-tertiary, #b8deff);">
+          Prêt à partager ?
+        </p>
+        <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+          Soumettez votre proposition
+        </h2>
+        <a
+          href={CFP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-8 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-base md:text-lg font-semibold px-8 h-14 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          Proposer une intervention <span aria-hidden="true">→</span>
+        </a>
+        <p class="mt-4 text-xs text-muted-foreground">cfp.cloudnativedays.fr/2026</p>
+      </div>
+    </section>
+  </main>
+</Layout>

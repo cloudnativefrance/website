@@ -1,42 +1,60 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import type { Locale } from "@/i18n/ui";
 import { loadSessions, type SessionRow } from "./schedule";
+import { CURRENT_EDITION, type Edition } from "./editions";
+
+/** Year-scoped speaker collection name (must match keys in src/content.config.ts). */
+type SpeakersCollection = "speakers-2023" | "speakers-2026" | "speakers-2027";
+
+function speakersCollectionName(year: Edition): SpeakersCollection {
+  return `speakers-${year}` as SpeakersCollection;
+}
 
 /**
- * Extract the slug from a speaker collection entry id.
- * After the speakers.csv migration, id === slug (no locale prefix).
+ * Extract the slug from a speaker collection entry id. After the speakers.csv
+ * migration, id === slug (no locale prefix); still true per-year.
  */
 export function getSlug(entryId: string): string {
   return entryId;
 }
 
-/** Get every speaker. The collection is locale-agnostic. */
-export async function getAllSpeakers() {
-  return await getCollection("speakers");
+/** Get every speaker for the given year. The collection is locale-agnostic. */
+export async function getAllSpeakers(year: Edition = CURRENT_EDITION) {
+  return await getCollection(speakersCollectionName(year));
 }
 
 /**
- * Back-compat: used to return FR/EN-filtered collections.
- * The schema is now single-source; we just return every speaker regardless of locale.
+ * Back-compat wrapper. FR/EN are served from the same collection — the `locale`
+ * param is kept to avoid churning every call site, but it has no effect.
  */
-export async function getSpeakersByLocale(_locale: Locale) {
-  return await getAllSpeakers();
+export async function getSpeakersByLocale(
+  _locale: Locale,
+  year: Edition = CURRENT_EDITION,
+) {
+  return await getAllSpeakers(year);
 }
 
-/** Get all sessions for a locale (currently locale-agnostic — sessions.csv holds one copy). */
-export async function getTalksByLocale(_locale: Locale): Promise<SessionRow[]> {
-  return await loadSessions();
+export async function getTalksByLocale(
+  _locale: Locale,
+  year: Edition = CURRENT_EDITION,
+): Promise<SessionRow[]> {
+  return await loadSessions(year);
 }
 
-/** Return the sessions that feature a given speaker slug (primary or co-speaker). */
-export async function getTalksForSpeaker(_locale: Locale, speakerSlug: string): Promise<SessionRow[]> {
-  const sessions = await loadSessions();
+export async function getTalksForSpeaker(
+  _locale: Locale,
+  speakerSlug: string,
+  year: Edition = CURRENT_EDITION,
+): Promise<SessionRow[]> {
+  const sessions = await loadSessions(year);
   return sessions.filter((s) => s.speakers.includes(speakerSlug));
 }
 
-/** Sort speakers with keynote holders first, then alphabetically by name. */
-export async function getSortedSpeakers(_locale: Locale) {
-  const speakers = await getAllSpeakers();
+export async function getSortedSpeakers(
+  _locale: Locale,
+  year: Edition = CURRENT_EDITION,
+) {
+  const speakers = await getAllSpeakers(year);
   return [...speakers].sort((a, b) => {
     const aKey = !!a.data.keynote;
     const bKey = !!b.data.keynote;
@@ -46,7 +64,6 @@ export async function getSortedSpeakers(_locale: Locale) {
   });
 }
 
-/** Other speaker slugs on the same session, excluding the current one. */
 export function getCoSpeakersForTalk(
   session: SessionRow,
   currentSpeakerSlug: string,
@@ -74,4 +91,5 @@ export function getPrimaryTalk(
   })[0];
 }
 
-export type SpeakerEntry = CollectionEntry<"speakers">;
+/** Generic — matches whichever year was requested. */
+export type SpeakerEntry = CollectionEntry<SpeakersCollection>;
