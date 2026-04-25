@@ -17,6 +17,19 @@ import { ui } from "@/i18n/ui";
 
 const NARRATIVE_NAMESPACE_PREFIXES = ["editions."] as const;
 
+/**
+ * Keys that are intentionally byte-identical in FR and EN.
+ * These are verbatim strings (e.g. YouTube video titles) that should not be
+ * translated — they are proper titles in French regardless of locale.
+ */
+const KNOWN_IDENTICAL_KEYS = new Set<string>([
+  // Verbatim French YouTube titles — intentionally not translated.
+  "editions.2026.top_replay.1",
+  "editions.2026.top_replay.2",
+  "editions.2026.top_replay.3",
+  "editions.2026.top_replay.4",
+]);
+
 function isNarrativeKey(key: string): boolean {
   return NARRATIVE_NAMESPACE_PREFIXES.some((p) => key.startsWith(p));
 }
@@ -43,6 +56,7 @@ describe("I18N-02: i18n FR/EN parity", () => {
     const enRec = ui.en as Record<string, string>;
     for (const k of Object.keys(frRec)) {
       if (!isNarrativeKey(k)) continue;
+      if (KNOWN_IDENTICAL_KEYS.has(k)) continue;
       if (frRec[k] === enRec[k]) identical.push(k);
     }
     expect(
