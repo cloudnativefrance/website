@@ -1,7 +1,6 @@
 ---
 import type { Replay } from "@/data/replays";
 import { REPLAYS_PLAYLIST_ID } from "@/data/replays";
-import { getLocalePath } from "@/i18n/utils";
 import type { Locale } from "@/i18n/ui";
 
 interface Props {
@@ -11,8 +10,8 @@ interface Props {
   lang: Locale;
 }
 
-const { title, cta, replays, lang } = Astro.props;
-const replaysHref = getLocalePath(lang, "/replays");
+const { title, cta, replays } = Astro.props;
+const replaysHref = `https://www.youtube.com/playlist?list=${REPLAYS_PLAYLIST_ID}`;
 ---
 
 <section id="replays" class="bg-muted/30">
@@ -51,6 +50,8 @@ const replaysHref = getLocalePath(lang, "/replays");
     <div class="mt-10 text-center">
       <a
         href={replaysHref}
+        target="_blank"
+        rel="noopener noreferrer"
         class="inline-flex items-center gap-2 text-primary font-semibold hover:underline underline-offset-4 text-lg"
       >
         {cta}
