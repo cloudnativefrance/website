@@ -1,0 +1,76 @@
+---
+/**
+ * YouTubeFacade.astro
+ *
+ * Lightweight click-to-play replacement for an embedded YouTube iframe.
+ * Renders a poster image + play button until the user activates it; only
+ * then injects the actual iframe. Saves ~700 KiB of YouTube JS on initial
+ * load and protects LCP/TTI on mobile.
+ *
+ * Privacy: uses youtube-nocookie.com on activation (matches D-12).
+ */
+interface Props {
+  videoId: string;
+  title: string;
+  /** Optional CSS class applied to the wrapper. */
+  class?: string;
+}
+const { videoId, title, class: extraClass = "" } = Astro.props as Props;
+
+// YouTube provides predictable thumbnail URLs. hqdefault is 480x360 (~25 KiB)
+// and is reliably available for every video; maxresdefault is not.
+const posterUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+---
+
+<div
+  class:list={["yt-facade relative aspect-video w-full overflow-hidden rounded-md bg-card", extraClass]}
+  data-video-id={videoId}
+  data-title={title}
+>
+  <button
+    type="button"
+    class="group absolute inset-0 flex items-center justify-center cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
+    aria-label={`Lire la vidéo : ${title}`}
+  >
+    <img
+      src={posterUrl}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      width="480"
+      height="360"
+      class="absolute inset-0 h-full w-full object-cover"
+    />
+    <span
+      aria-hidden="true"
+      class="relative z-10 flex h-16 w-16 md:h-20 md:w-20 items-center justify-center rounded-full bg-black/60 transition-transform group-hover:scale-110 group-focus-visible:scale-110"
+    >
+      <svg viewBox="0 0 24 24" class="h-8 w-8 md:h-10 md:w-10 fill-white translate-x-0.5" aria-hidden="true">
+        <path d="M8 5v14l11-7z" />
+      </svg>
+    </span>
+  </button>
+</div>
+
+<script>
+  // Swap the poster for the real iframe on click. Module-scoped so it loads
+  // once even if multiple facades exist on the page.
+  const facades = document.querySelectorAll<HTMLElement>(".yt-facade");
+  facades.forEach((facade) => {
+    const btn = facade.querySelector("button");
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+      const id = facade.dataset.videoId;
+      const title = facade.dataset.title || "";
+      if (!id) return;
+      const iframe = document.createElement("iframe");
+      iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`;
+      iframe.title = title;
+      iframe.allow =
+        "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      iframe.allowFullscreen = true;
+      iframe.className = "absolute inset-0 h-full w-full border-0";
+      facade.replaceChildren(iframe);
+    }, { once: true });
+  });
+</script>

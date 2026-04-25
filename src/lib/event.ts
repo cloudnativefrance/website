@@ -43,6 +43,9 @@ export const SOCIAL_LINKS = {
   twitter: "https://x.com/cloudnativedays",
 } as const;
 
+export const YOUTUBE_2026_PLAYLIST_URL =
+  "https://www.youtube.com/@cloudnativedays";
+
 /**
  * Return the locale-aware path to the /replays page.
  *
