@@ -1,0 +1,86 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SocialLinks from "@/components/SocialLinks.astro";
+import { useTranslations, getLangFromUrl } from "@/i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const audiences = [
+  { key: "participants", email: "contact@cloudnativedays.fr",  icon: "ticket" },
+  { key: "speakers",     email: "speakers@cloudnativedays.fr", icon: "mic" },
+  { key: "sponsors",     email: "sponsors@cloudnativedays.fr", icon: "handshake" },
+] as const;
+---
+
+<Layout
+  title={`${t("contact.heading")} | ${t("site.title")}`}
+  description={t("contact.lead")}
+>
+  <main class="mx-auto max-w-6xl px-4 md:px-6 lg:px-8 py-16 md:py-24">
+    <section class="text-center max-w-2xl mx-auto">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+        {t("contact.eyebrow")}
+      </p>
+      <h1
+        class="mt-4 text-4xl md:text-5xl font-bold text-foreground tracking-tight"
+        style="letter-spacing:-0.02em"
+      >
+        {t("contact.heading")}
+      </h1>
+      <p class="mt-5 text-base md:text-lg text-muted-foreground">
+        {t("contact.lead")}
+      </p>
+    </section>
+
+    <section class="mt-12 grid gap-6 md:grid-cols-3">
+      {audiences.map(({ key, email, icon }) => (
+        <article class="rounded-lg border border-border bg-card p-6 flex flex-col gap-4">
+          <span
+            aria-hidden="true"
+            class="inline-flex w-12 h-12 items-center justify-center rounded-full bg-primary/15 text-primary"
+          >
+            {icon === "ticket" && (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/>
+                <path d="M13 5v2M13 17v2M13 11v2"/>
+              </svg>
+            )}
+            {icon === "mic" && (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="6" height="12" x="9" y="2" rx="3"/>
+                <path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3"/>
+              </svg>
+            )}
+            {icon === "handshake" && (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m11 17 2 2a1 1 0 1 0 3-3"/>
+                <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/>
+                <path d="m21 3 1 11h-2M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3M3 4h8"/>
+              </svg>
+            )}
+          </span>
+          <div>
+            <h2 class="text-xl font-semibold text-foreground">{t(`contact.${key}.title`)}</h2>
+            <p class="mt-2 text-sm text-muted-foreground">{t(`contact.${key}.body`)}</p>
+          </div>
+          <a
+            href={`mailto:${email}`}
+            class="mt-auto inline-flex items-center gap-2 self-start rounded-full bg-muted px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="20" height="16" x="2" y="4" rx="2"/>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+            {email}
+          </a>
+        </article>
+      ))}
+    </section>
+
+    <section class="mt-16 text-center">
+      <p class="text-sm text-muted-foreground">{t("contact.community.helper")}</p>
+      <SocialLinks class="mt-4 justify-center" />
+    </section>
+  </main>
+</Layout>
