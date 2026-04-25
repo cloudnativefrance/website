@@ -85,6 +85,16 @@ const aboutDD = (() => {
 const homeHref = getLocalePath(lang, "/");
 const ctaLabel = t("hero.cta.register");
 const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
+
+// Lookup so the JSX can render links in an explicit order, interleaved with
+// dropdowns. Mobile menu reuses the same map below.
+const linkByKey = Object.fromEntries(links.map((l) => [l.key, l])) as Record<
+  (typeof links)[number]["key"],
+  (typeof links)[number]
+>;
+const ticketsLink = linkByKey["nav.tickets"];
+const cfpLink = linkByKey["nav.cfp"];
+const replaysLink = linkByKey["nav.replays"];
 ---
 
 <header
@@ -99,31 +109,34 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
       <img src={logoCompactDark.src} alt="CND France" class="hidden dark:block h-8 md:h-10" loading="lazy" />
     </a>
 
-    <!-- Desktop links -->
+    <!-- Desktop links — explicit order: À propos, Partenaires, Billetterie, Programme, CFP, Replays. -->
     <ul class="hidden md:flex items-center gap-10" role="list">
-      {links.map(({ key, label, href, active, postEventOnly }) => (
-        <li
-          data-post-event={postEventOnly ? "true" : undefined}
-          class:list={[postEventOnly && "hidden"]}
-        >
-          <a
-            href={href}
-            data-nav-key={key}
-            aria-current={active ? "page" : undefined}
-            class:list={[
-              "text-lg font-medium text-foreground transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
-              active
-                ? "border-b-2 border-primary"
-                : "border-b-2 border-transparent hover:border-primary/60",
-            ]}
-          >
-            {label}
-          </a>
-        </li>
-      ))}
       <NavDropdown {...aboutDD} />
-      <NavDropdown {...programmeDD} />
       <NavDropdown {...sponsorsDD} />
+      {[ticketsLink, cfpLink, replaysLink].map(({ key, label, href, active, postEventOnly }, i) => (
+        <Fragment>
+          {/* Insert the Programme dropdown between Billetterie and CFP. */}
+          {i === 1 && <NavDropdown {...programmeDD} />}
+          <li
+            data-post-event={postEventOnly ? "true" : undefined}
+            class:list={[postEventOnly && "hidden"]}
+          >
+            <a
+              href={href}
+              data-nav-key={key}
+              aria-current={active ? "page" : undefined}
+              class:list={[
+                "text-lg font-medium text-foreground transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
+                active
+                  ? "border-b-2 border-primary"
+                  : "border-b-2 border-transparent hover:border-primary/60",
+              ]}
+            >
+              {label}
+            </a>
+          </li>
+        </Fragment>
+      ))}
     </ul>
 
     <!-- Right side -->
@@ -159,44 +172,60 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
         <ThemeToggle />
         <LanguageToggle />
       </li>
-      {links.map(({ label, href, active, postEventOnly }) => (
-        <li
-          data-post-event={postEventOnly ? "true" : undefined}
-          class:list={[postEventOnly && "hidden"]}
-        >
-          <a
-            href={href}
-            aria-current={active ? "page" : undefined}
-            class:list={[
-              "flex items-center min-h-11 px-2 py-3 text-sm font-medium rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              active ? "text-primary" : "text-foreground hover:bg-muted",
-            ]}
-          >
-            {label}
-          </a>
-        </li>
-      ))}
-      {[aboutDD, programmeDD, sponsorsDD].map((dd) => (
-        <li>
-          <p class="px-2 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{dd.label}</p>
-          <ul class="pl-2">
-            {dd.items.map((it) => (
-              <li>
-                <a
-                  href={it.href}
-                  aria-current={it.current ? "page" : undefined}
-                  class:list={[
-                    "flex items-center min-h-11 px-2 py-3 text-sm font-medium rounded-md",
-                    it.current ? "text-primary" : "text-foreground hover:bg-muted",
-                  ]}
-                >
-                  {it.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </li>
-      ))}
+      {(() => {
+        // Same order as desktop. JSX-in-callback so we can interleave dropdowns
+        // with plain links in a single ordered render.
+        const order: Array<
+          | { kind: "dd"; dd: typeof aboutDD }
+          | { kind: "link"; link: typeof ticketsLink }
+        > = [
+          { kind: "dd",   dd: aboutDD },
+          { kind: "dd",   dd: sponsorsDD },
+          { kind: "link", link: ticketsLink },
+          { kind: "dd",   dd: programmeDD },
+          { kind: "link", link: cfpLink },
+          { kind: "link", link: replaysLink },
+        ];
+        return order.map((entry) =>
+          entry.kind === "link" ? (
+            <li
+              data-post-event={entry.link.postEventOnly ? "true" : undefined}
+              class:list={[entry.link.postEventOnly && "hidden"]}
+            >
+              <a
+                href={entry.link.href}
+                aria-current={entry.link.active ? "page" : undefined}
+                class:list={[
+                  "flex items-center min-h-11 px-2 py-3 text-sm font-medium rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  entry.link.active ? "text-primary" : "text-foreground hover:bg-muted",
+                ]}
+              >
+                {entry.link.label}
+              </a>
+            </li>
+          ) : (
+            <li>
+              <p class="px-2 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{entry.dd.label}</p>
+              <ul class="pl-2">
+                {entry.dd.items.map((it) => (
+                  <li>
+                    <a
+                      href={it.href}
+                      aria-current={it.current ? "page" : undefined}
+                      class:list={[
+                        "flex items-center min-h-11 px-2 py-3 text-sm font-medium rounded-md",
+                        it.current ? "text-primary" : "text-foreground hover:bg-muted",
+                      ]}
+                    >
+                      {it.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ),
+        );
+      })()}
       <li>
         <a href="#" class="flex items-center justify-center min-h-11 mx-2 my-3 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium">
           {ctaLabel}
