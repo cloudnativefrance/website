@@ -84,7 +84,7 @@ const programmeDD = (() => {
 })();
 
 const aboutDD = (() => {
-  const aboutPath = getLocalePath(lang, "/decouvrir");
+  const aboutPath = getLocalePath(lang, lang === "en" ? "/discover" : "/decouvrir");
   const venuePath = getLocalePath(lang, "/informations-utiles");
   const teamPath = getLocalePath(lang, "/team");
   return {
