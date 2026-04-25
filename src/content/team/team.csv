@@ -1,6 +1,14 @@
 id,name,role_fr,role_en,group,photo,social_linkedin,social_github,social_bluesky,social_twitter,social_website
-alice-martin,Alice Martin,Directrice de conférence,Conference Director,core,/team/alice-martin.jpg,https://linkedin.com/in/alicemartin,https://github.com/alicemartin,,,
-bob-dupont,Bob Dupont,Responsable programme,Program Chair,core,/team/bob-dupont.jpg,https://linkedin.com/in/bobdupont,,,,
-chloe-leroy,Chloé Leroy,Responsable sponsors,Sponsor Lead,program-committee,,https://linkedin.com/in/chloeleroy,,https://bsky.app/profile/chloeleroy.bsky.social,,
-dan-fischer,Dan Fischer,Membre comité,Committee Member,program-committee,/team/dan-fischer.jpg,,https://github.com/danfischer,,,https://danfischer.example.com
-erin-garcia,Erin Garcia,Bénévole,Volunteer,volunteers,,,,,,
+thomas-bernard,Thomas Bernard,Président / Conference Chair,President / Conference Chair,core,,https://linkedin.com/in/thomas-bernard,,,,
+marie-laurent,Marie Laurent,Vice-présidente,Vice-Chair,core,,https://linkedin.com/in/marie-laurent,,https://bsky.app/profile/marielaurent.bsky.social,,
+julien-moreau,Julien Moreau,Trésorier,Treasurer,core,,https://linkedin.com/in/julien-moreau,,,,
+sophie-dupont,Sophie Dupont,Responsable communication,Communications Lead,core,,https://linkedin.com/in/sophie-dupont,,,,
+nathalie-petit,Nathalie Petit,Co-responsable programme,Co-Program Chair,program-committee,,https://linkedin.com/in/nathalie-petit,https://github.com/npetit,,,
+antoine-girard,Antoine Girard,Track lead Platform Engineering,Track Lead — Platform Engineering,program-committee,,https://linkedin.com/in/antoine-girard,https://github.com/agirard,,,
+camille-dupuis,Camille Dupuis,Track lead IA/ML,Track Lead — AI/ML,program-committee,,https://linkedin.com/in/camille-dupuis,,,,https://camille-dupuis.dev
+raphael-roux,Raphaël Roux,Track lead Sécurité,Track Lead — Security,program-committee,,https://linkedin.com/in/raphael-roux,https://github.com/rroux,,,
+elise-vincent,Élise Vincent,Track lead Observabilité,Track Lead — Observability,program-committee,,https://linkedin.com/in/elise-vincent,,https://bsky.app/profile/evincent.bsky.social,,
+lucas-fontaine,Lucas Fontaine,Logistique,Logistics,volunteers,,https://linkedin.com/in/lucas-fontaine,,,,
+claire-renard,Claire Renard,Coordination du lieu,Venue Coordination,volunteers,,,,,,
+maxime-blanchard,Maxime Blanchard,Photographie,Photography,volunteers,,,,,,https://maxime-blanchard.photo
+emilie-rousseau,Émilie Rousseau,Accueil,Registration Desk,volunteers,,https://linkedin.com/in/emilie-rousseau,,,,
