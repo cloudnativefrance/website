@@ -13,12 +13,11 @@ const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
 
 const navItems: Array<{
-  key: "nav.home" | "nav.replays" | "nav.tickets" | "nav.cfp";
+  key: "nav.replays" | "nav.tickets" | "nav.cfp";
   path: string;
   dead: boolean;
   postEventOnly?: boolean;
 }> = [
-  { key: "nav.home",     path: "/",          dead: false },
   { key: "nav.tickets",  path: "/tickets",   dead: false },
   { key: "nav.cfp",      path: "/cfp",       dead: false },
   { key: "nav.replays",  path: "/replays",   dead: false, postEventOnly: true },
@@ -53,7 +52,6 @@ function sectionDropdown(
     label: t(labelKey),
     active: currentPath.startsWith(localizedBase),
     items: editionsDesc.map((year) => ({
-      year,
       href: getLocalePath(lang, `${basePath}/${year}`),
       label: `${t(labelKey)} ${year}`,
       current: currentPath === getLocalePath(lang, `${basePath}/${year}`),
@@ -63,6 +61,26 @@ function sectionDropdown(
 
 const programmeDD = sectionDropdown("programme", "nav.programme.label");
 const sponsorsDD  = sectionDropdown("sponsors",  "nav.sponsors.label");
+
+const aboutDD = (() => {
+  const homePath = getLocalePath(lang, "/");
+  const venuePath = getLocalePath(lang, "/venue");
+  const teamPath = getLocalePath(lang, "/team");
+  return {
+    key: "nav.home",
+    label: t("nav.home"),
+    active:
+      currentPath === homePath ||
+      currentPath === homePath + "/" ||
+      currentPath.startsWith(venuePath) ||
+      currentPath.startsWith(teamPath),
+    items: [
+      { href: homePath,  label: t("about.subnav.discover"), current: currentPath === homePath || currentPath === homePath + "/" },
+      { href: venuePath, label: t("about.subnav.venue"),    current: currentPath.startsWith(venuePath) },
+      { href: teamPath,  label: t("about.subnav.team"),     current: currentPath.startsWith(teamPath) },
+    ],
+  };
+})();
 
 const homeHref = getLocalePath(lang, "/");
 const ctaLabel = t("hero.cta.register");
@@ -103,6 +121,7 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
           </a>
         </li>
       ))}
+      <NavDropdown {...aboutDD} />
       <NavDropdown {...programmeDD} />
       <NavDropdown {...sponsorsDD} />
     </ul>
@@ -157,7 +176,7 @@ const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
           </a>
         </li>
       ))}
-      {[programmeDD, sponsorsDD].map((dd) => (
+      {[aboutDD, programmeDD, sponsorsDD].map((dd) => (
         <li>
           <p class="px-2 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{dd.label}</p>
           <ul class="pl-2">

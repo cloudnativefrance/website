@@ -6,7 +6,6 @@
  * the menu, arrow keys move focus through items.
  */
 interface Item {
-  year: number;
   href: string;
   label: string;
   current?: boolean;
@@ -14,7 +13,7 @@ interface Item {
 interface Props {
   key: string;      // i18n key used for the trigger label; used to build DOM ids
   label: string;    // visible trigger label
-  items: Item[];    // ordered as rendered (descending year recommended)
+  items: Item[];    // rendered in the order given
   active?: boolean; // currentPath is within this section
 }
 const { key, label, items, active = false } = Astro.props as Props;
