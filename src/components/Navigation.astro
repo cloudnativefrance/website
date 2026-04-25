@@ -83,7 +83,7 @@ const aboutDD = (() => {
 
 const homeHref = getLocalePath(lang, "/");
 const ctaLabel = t("hero.cta.register");
-const TICKETING_URL = "https://tickets.cloudnativedays.fr/";
+const TICKETS_HREF = getLocalePath(lang, "/tickets");
 
 // Lookup so the JSX can render links in an explicit order, interleaved with
 // dropdowns. Mobile menu reuses the same map below.
@@ -141,9 +141,7 @@ const replaysLink = linkByKey["nav.replays"];
     <!-- Right side -->
     <div class="flex items-center gap-3">
       <a
-        href={TICKETING_URL}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={TICKETS_HREF}
         class="hidden md:inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-medium px-4 h-9 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         {ctaLabel}
@@ -165,7 +163,7 @@ const replaysLink = linkByKey["nav.replays"];
   </nav>
 
   <!-- Mobile menu panel -->
-  <div id="mobile-menu" class="hidden md:hidden border-t border-border bg-background/95 backdrop-blur-sm">
+  <div id="mobile-menu" class="hidden md:hidden border-t border-border bg-background/95 backdrop-blur-sm max-h-[calc(100dvh-3.5rem)] overflow-y-auto overscroll-contain">
     <ul class="px-4 py-2" role="list">
       <li class="flex items-center justify-end gap-3 py-3 border-b border-border">
         <ThemeToggle />
@@ -226,7 +224,7 @@ const replaysLink = linkByKey["nav.replays"];
         );
       })()}
       <li>
-        <a href="#" class="flex items-center justify-center min-h-11 mx-2 my-3 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium">
+        <a href={TICKETS_HREF} class="flex items-center justify-center min-h-11 mx-2 my-3 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium">
           {ctaLabel}
         </a>
       </li>
