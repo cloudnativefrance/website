@@ -1,1 +1,7 @@
 slug,name,photo_url,company,role,bio,twitter,linkedin,github,bluesky,website,keynote
+sophie-lambert-2023,Sophie Lambert,,OVHcloud,Engineering Manager,Cloud-native and platform engineering at scale.,,,,,,true
+marc-villeneuve,Marc Villeneuve,,Doctolib,Principal Engineer,GitOps practitioner and CI/CD enthusiast.,,,,,,
+elena-petrova,Elena Petrova,,BlaBlaCar,Site Reliability Engineer,Service mesh and observability at carpooling scale.,,,,,,
+yann-castelnau,Yann Castelnau,,Carrefour,Cloud Architect,Helping retail go cloud-native.,,,,,,
+clara-jensen,Clara Jensen,,Spotify,DevOps Lead,CI/CD pipelines and developer experience.,,,,,,
+hugo-fontaine-2023,Hugo Fontaine,,Datadog,Platform Engineer,Observability and the meta-observability problem.,,,,,,
