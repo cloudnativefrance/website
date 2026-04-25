@@ -1,0 +1,91 @@
+---
+/**
+ * TopReplaysStrip — 4-thumbnail showcase of the most-watched talks for an edition.
+ *
+ * Pure Astro, zero client JS. Thumbnails come from YouTube's i.ytimg.com
+ * (same pattern as YouTubeFacade.astro). Each card is a block-level link
+ * opening the talk on YouTube in a new tab.
+ *
+ * Mobile (<md): horizontal CSS scroll-snap carousel (~80% viewport-width cards,
+ * second card peeks for swipe affordance — no JS, no dot indicators).
+ * Desktop (≥md): 4-column grid.
+ */
+import { useTranslations, getLangFromUrl } from "@/i18n/utils";
+import type { ui } from "@/i18n/ui";
+
+export interface Props {
+  /** Exactly 4 entries — order matters (left → right). */
+  replays: ReadonlyArray<{ youtubeId: string; titleKey: keyof typeof ui.fr }>;
+  /** Full YouTube playlist URL (the "View all replays" target). */
+  playlistUrl: string;
+  /** i18n key for the small uppercase eyebrow above the strip. */
+  eyebrowKey: keyof typeof ui.fr;
+  /** i18n key for the "View all replays" link below the strip. */
+  viewAllKey: keyof typeof ui.fr;
+  /** Extra classes for the outer wrapper (e.g. "mt-12"). */
+  class?: string;
+}
+
+const { replays, playlistUrl, eyebrowKey, viewAllKey, class: className = "" } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section class:list={["max-w-6xl mx-auto px-4 md:px-6 lg:px-8", className]}>
+  <p class="mb-6 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+    {t(eyebrowKey)}
+  </p>
+
+  <ul
+    class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 md:grid md:grid-cols-4 md:gap-4 md:overflow-visible md:mx-0 md:px-0 md:pb-0"
+    role="list"
+  >
+    {replays.map(({ youtubeId, titleKey }: { youtubeId: string; titleKey: keyof typeof ui.fr }) => (
+      <li class="flex-none w-[80%] snap-start md:w-auto">
+        <a
+          href={`https://youtu.be/${youtubeId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group relative block aspect-video overflow-hidden rounded-md border border-border bg-card transition-transform duration-150 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <img
+            src={`https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`}
+            alt=""
+            width="480"
+            height="360"
+            loading="lazy"
+            decoding="async"
+            class="absolute inset-0 w-full h-full object-cover"
+          />
+          <span
+            aria-hidden="true"
+            class="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
+          ></span>
+          <span
+            aria-hidden="true"
+            class="absolute top-2 right-2 inline-flex w-9 h-9 items-center justify-center rounded-full bg-card/90 backdrop-blur-sm text-primary"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </span>
+          <span class="absolute left-3 right-3 bottom-3 text-sm font-semibold text-white line-clamp-2">
+            {t(titleKey)}
+          </span>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <div class="mt-6 text-center">
+    <a
+      href={playlistUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
+    >
+      {t(viewAllKey)}
+      <span aria-hidden="true">→</span>
+    </a>
+  </div>
+</section>
