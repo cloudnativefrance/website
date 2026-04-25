@@ -1,6 +1,6 @@
 # Cloud Native Days France Website
 
-The bilingual (French / English) marketing and programme site for [Cloud Native Days France 2027](https://cloudnativedays.fr) — the third edition of the community-run Kubernetes-and-friends conference held at CENTQUATRE-PARIS in June 2027.
+The bilingual (French / English) marketing and program site for [Cloud Native Days France 2027](https://cloudnativedays.fr) — the third edition of the community-run Kubernetes-and-friends conference held at CENTQUATRE-PARIS in June 2027.
 
 ## Stack
 
