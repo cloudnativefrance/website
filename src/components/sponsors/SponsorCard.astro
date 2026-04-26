@@ -6,18 +6,9 @@ import { safeUrl, safeLogoPath, type SponsorEntry } from "@/lib/sponsor-utils";
 interface Props {
   sponsor: SponsorEntry;
   lang: Locale;
-  tier:
-    | "platinum"
-    | "gold"
-    | "silver"
-    | "end_user"
-    | "community"
-    | "experiences"
-    | "media"
-    | "institutional";
 }
 
-const { sponsor, lang, tier } = Astro.props;
+const { sponsor, lang } = Astro.props;
 const t = useTranslations(lang);
 
 const description = lang === "fr" ? sponsor.data.description_fr : sponsor.data.description_en;
@@ -25,33 +16,11 @@ const safeHref = safeUrl(sponsor.data.url);
 const logoSrc = safeLogoPath(sponsor.data.logo);
 const ariaLabel = t("sponsors.card.aria").replace("{name}", sponsor.data.name);
 
-// Tier-specific padding
-const tierPadding: Record<Props["tier"], string> = {
-  platinum: "p-8",
-  gold: "p-6",
-  silver: "p-4",
-  end_user: "p-4",
-  community: "p-3",
-  experiences: "p-3",
-  media: "p-3",
-  institutional: "p-3",
-};
-
-// Tier-specific logo dimensions
-const tierLogoSize: Record<Props["tier"], string> = {
-  platinum: "max-w-[300px] max-h-28",
-  gold: "max-w-[160px] max-h-16",
-  silver: "max-w-[120px] max-h-14",
-  end_user: "max-w-[140px] max-h-14",
-  community: "max-w-[88px] max-h-10",
-  experiences: "max-w-[100px] max-h-12",
-  media: "max-w-[100px] max-h-12",
-  institutional: "max-w-[88px] max-h-10",
-};
-
-const baseCardClass = `bg-card border border-border rounded-lg ${tierPadding[tier]} flex flex-col items-center justify-center gap-2`;
+const baseCardClass =
+  "bg-card border border-border rounded-lg aspect-square flex items-center justify-center p-3";
 const linkExtrasClass =
   "transition-all duration-200 motion-safe:hover:-translate-y-0.5 hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+const imgClass = "w-full h-full object-contain";
 ---
 
 {safeHref ? (
@@ -67,12 +36,11 @@ const linkExtrasClass =
       <img
         src={logoSrc}
         alt={sponsor.data.name}
-        class={`${tierLogoSize[tier]} object-contain`}
+        class={imgClass}
         loading="lazy"
         decoding="async"
       />
     ) : null}
-    <span class="text-sm text-muted-foreground text-center">{sponsor.data.name}</span>
   </a>
 ) : (
   <div class={baseCardClass} title={description}>
@@ -80,11 +48,10 @@ const linkExtrasClass =
       <img
         src={logoSrc}
         alt={sponsor.data.name}
-        class={`${tierLogoSize[tier]} object-contain`}
+        class={imgClass}
         loading="lazy"
         decoding="async"
       />
     ) : null}
-    <span class="text-sm text-muted-foreground text-center">{sponsor.data.name}</span>
   </div>
 )}
