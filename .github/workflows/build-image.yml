@@ -49,8 +49,13 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # Flux's ImagePolicy needs lexically sortable tags (filterTags →
+          # numerical sort on the embedded timestamp). The `main-<sha>-<ts>`
+          # pattern lets Flux pick the newest deploy without semver bumps.
+          # Bare SHA + `latest` are kept for humans and ad-hoc references.
           tags: |
             type=sha,prefix=
+            type=raw,value=main-{{sha}}-{{date 'X'}},enable={{is_default_branch}}
             type=raw,value=latest,enable={{is_default_branch}}
             type=semver,pattern={{version}}
 
