@@ -25,7 +25,7 @@ const isEmpty = sponsors.length === 0;
 
 // Grid classes per tier (UI-SPEC canonical expressions)
 const tierGrid: Record<Props["tier"], string> = {
-  platinum: "grid grid-cols-1 max-w-[512px] mx-auto",
+  platinum: "grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto",
   gold: "grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8",
   silver: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6",
   end_user: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6",

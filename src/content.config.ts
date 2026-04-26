@@ -92,19 +92,30 @@ const speakerSchema = z.object({
   keynote: z.boolean().optional(),
 });
 
+// Sheet authors use short/French tier labels; normalize to canonical schema names.
+const SPONSOR_TIER_ALIAS: Record<string, string> = {
+  enduser: "end_user",
+  experience: "experiences",
+  presse: "media",
+  ecole: "institutional",
+};
+
 const sponsorSchema = z.object({
   id: z.string(),
   name: z.string(),
-  tier: z.enum([
-    "platinum",
-    "gold",
-    "silver",
-    "end_user",
-    "community",
-    "experiences",
-    "media",
-    "institutional",
-  ]),
+  tier: z.preprocess(
+    (v) => (typeof v === "string" ? (SPONSOR_TIER_ALIAS[v.trim()] ?? v.trim()) : v),
+    z.enum([
+      "platinum",
+      "gold",
+      "silver",
+      "end_user",
+      "community",
+      "experiences",
+      "media",
+      "institutional",
+    ]),
+  ),
   logo: z.string(),
   url: z.string().url(),
   description_fr: z.string(),

@@ -49,9 +49,10 @@ const tierLogoSize: Record<Props["tier"], string> = {
   institutional: "max-w-[88px] max-h-10",
 };
 
-const baseCardClass = `bg-card border border-border rounded-lg ${tierPadding[tier]} flex flex-col items-center justify-center gap-2`;
+const baseCardClass = `bg-card border border-border rounded-lg ${tierPadding[tier]} flex items-center justify-center`;
 const linkExtrasClass =
   "transition-all duration-200 motion-safe:hover:-translate-y-0.5 hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+const imgClass = `${tierLogoSize[tier]} object-contain`;
 ---
 
 {safeHref ? (
@@ -67,12 +68,11 @@ const linkExtrasClass =
       <img
         src={logoSrc}
         alt={sponsor.data.name}
-        class={`${tierLogoSize[tier]} object-contain`}
+        class={imgClass}
         loading="lazy"
         decoding="async"
       />
     ) : null}
-    <span class="text-sm text-muted-foreground text-center">{sponsor.data.name}</span>
   </a>
 ) : (
   <div class={baseCardClass} title={description}>
@@ -80,11 +80,10 @@ const linkExtrasClass =
       <img
         src={logoSrc}
         alt={sponsor.data.name}
-        class={`${tierLogoSize[tier]} object-contain`}
+        class={imgClass}
         loading="lazy"
         decoding="async"
       />
     ) : null}
-    <span class="text-sm text-muted-foreground text-center">{sponsor.data.name}</span>
   </div>
 )}
