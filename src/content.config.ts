@@ -56,18 +56,24 @@ function csvLoader({ url, fallback, label }: { url?: string; fallback: string; l
       const [header, ...body] = rows;
       const keys = header.map((s) => s.trim());
       store.clear();
-      for (const row of body) {
+      // Prefix the store key with a zero-padded row index so Astro's
+      // alphabetical getCollection() order matches CSV order, and so that a
+      // sponsor appearing in multiple tiers (e.g. Chainguard in both Gold and
+      // Experience) gets a unique key per row instead of overwriting itself.
+      for (let rowIndex = 0; rowIndex < body.length; rowIndex++) {
+        const row = body[rowIndex];
         const obj: Record<string, string> = {};
         keys.forEach((k, i) => { obj[k] = (row[i] ?? "").trim(); });
-        const id = obj.slug || obj.id;
-        if (!id) continue;
+        const naturalId = obj.slug || obj.id;
+        if (!naturalId) continue;
+        const storeKey = `${String(rowIndex).padStart(4, "0")}-${naturalId}`;
         const data: Record<string, unknown> = { ...obj };
         if ("keynote" in obj) {
           const v = String(obj.keynote || "").toLowerCase();
           data.keynote = v === "true" || v === "1" || v === "yes";
         }
-        const parsed = await parseData({ id, data });
-        store.set({ id, data: parsed });
+        const parsed = await parseData({ id: storeKey, data });
+        store.set({ id: storeKey, data: parsed });
       }
     },
   };
