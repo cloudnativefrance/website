@@ -8,6 +8,8 @@ import tailwindcss from "@tailwindcss/vite";
 import { generateFlagEnvSchema } from "./src/config/flags-env.ts";
 
 // https://astro.build/config
+// Build is fully static; bump this file to force a CI rebuild that
+// re-fetches the upstream Google Sheets at compile time.
 export default defineConfig({
   site: "https://cloudnativedays.fr",
   redirects: {
