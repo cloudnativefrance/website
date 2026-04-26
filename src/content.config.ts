@@ -123,7 +123,7 @@ const sponsorSchema = z.object({
     ]),
   ),
   logo: z.string(),
-  url: z.string().url(),
+  url: socialUrl,
   description_fr: z.string(),
   description_en: z.string(),
 });
