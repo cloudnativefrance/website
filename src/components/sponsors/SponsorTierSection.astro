@@ -45,7 +45,7 @@ const tierGrid: Record<Props["tier"], string> = {
   ) : (
     <div class={tierGrid[tier]}>
       {sponsors.map((s) => (
-        <SponsorCard sponsor={s} lang={lang} />
+        <SponsorCard sponsor={s} lang={lang} tier={tier} />
       ))}
     </div>
   )}
