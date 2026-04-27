@@ -45,6 +45,16 @@ const railLabel =
   (ui.fr as Record<string, string>)[yearKey] ??
   t("schedule.rail_label");
 
+// Optional PDF programme download. Read at build time from
+// `PROGRAMME_PDF_URL_<year>` (e.g. PROGRAMME_PDF_URL_2026=/programme-2026.pdf
+// or an absolute URL). When unset, the button is hidden — drop the file in
+// public/ and set the env var to enable it.
+const programmePdfUrl =
+  typeof process !== "undefined"
+    ? (process.env as Record<string, string | undefined>)[`PROGRAMME_PDF_URL_${year}`]
+    : undefined;
+const programmePdfLabel = t("schedule.download_pdf").replace("{year}", String(year));
+
 // Future editions (year > CURRENT_EDITION) stay behind the `programme` flag.
 // Past/current editions always render — 2026 has real archive data, 2023 etc.
 // fall through to the empty-state until their Sheet tab lands.
@@ -90,6 +100,17 @@ const programmeReady = !isUpcomingEdition || isFlagActive("programme");
             <p class="mt-3 text-base md:text-lg text-muted-foreground max-w-2xl">
               {t("schedule.subtitle")}
             </p>
+            {programmePdfUrl && (
+              <a
+                href={programmePdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-5 inline-flex items-center justify-center gap-2 h-11 px-5 rounded-md bg-primary text-primary-foreground text-base font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                {programmePdfLabel}
+              </a>
+            )}
           </section>
           <section class="max-w-7xl mx-auto pb-20">
             <ScheduleGrid sessions={sessions} lang={lang} speakerInfo={speakerInfo} />
