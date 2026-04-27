@@ -74,6 +74,10 @@ export const ui = {
     "cfp.cta.notify": "Me notifier",
     "cfp.cta.submit": "Soumettre une conférence",
     "cfp.deadline": "Clôture le {date}",
+    "cfp.closed_for_now.title": "Notre CFP est actuellement fermé",
+    "cfp.closed_for_now.body": "Le Call For Paper (appel à conférencier(e)s) de l'édition 2027 ouvrira début 2027.",
+    "cfp.closed_for_now.notify_text": "Inscrivez-vous à la newsletter pour être informé(e) de l'ouverture du CFP.",
+    "cfp.closed_for_now.cta": "Inscrivez-vous à la Newsletter",
     "speakers.heading": "Nos intervenant(e)s",
     "speakers.subtext":
       "Découvrez les intervenants de Cloud Native Days France 2026.",
@@ -245,6 +249,9 @@ export const ui = {
     "contact.community.helper": "Suivez-nous aussi sur nos réseaux",
     "footer.landmark_aria": "Pied de page",
     "editions.2026.heading": "Revivez l'édition 2026",
+    "editions.2026.gallery_cta": "Voir le reportage photo",
+    "editions.2026.context_body":
+      "Le mardi 3 février dernier, 1700+ personnes et 40+ partenaires se sont réunis au CENTQUATRE-PARIS autour de 60 conférences sur des sujets Infrastructure, DevOps, Cloud Native et Open Source. La programmation a été saluée, orientée expertise et sans discours commercial, avec de nombreux retours d'expérience d'organisations Françaises comme Mistral AI, Air France, Winamax, Decathlon, Renault, Ledger, Ubisoft, l'INSEE, la DINUM…",
     "editions.2026.video_caption":
       "Cloud Native Days France : le FILM",
     "editions.2026.video_play_aria": "Lire la vidéo : {title}",
@@ -394,6 +401,10 @@ export const ui = {
     "cfp.cta.notify": "Notify me",
     "cfp.cta.submit": "Submit a talk",
     "cfp.deadline": "Closes {date}",
+    "cfp.closed_for_now.title": "Our CFP is currently closed",
+    "cfp.closed_for_now.body": "The Call for Papers for the 2027 edition will open in early 2027.",
+    "cfp.closed_for_now.notify_text": "Subscribe to the newsletter to be notified when the CFP opens.",
+    "cfp.closed_for_now.cta": "Sign up for the Newsletter",
     "speakers.heading": "Our Speakers",
     "speakers.subtext":
       "Meet the speakers of Cloud Native Days France 2027",
@@ -563,6 +574,9 @@ export const ui = {
     "contact.community.helper": "Follow us on social media",
     "footer.landmark_aria": "Site footer",
     "editions.2026.heading": "Relive the 2026 edition",
+    "editions.2026.gallery_cta": "View the photo gallery",
+    "editions.2026.context_body":
+      "On Tuesday February 3rd, 1,700+ people and 40+ partners gathered at CENTQUATRE-PARIS for 60 talks on Infrastructure, DevOps, Cloud Native and Open Source. The programme was praised — expertise-led, zero sales pitch, and packed with experience reports from French organisations like Mistral AI, Air France, Winamax, Decathlon, Renault, Ledger, Ubisoft, INSEE, DINUM and more.",
     "editions.2026.video_caption":
       "Cloud Native Days France: the FILM",
     "editions.2026.video_play_aria": "Play video: {title}",

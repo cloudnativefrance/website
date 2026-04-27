@@ -19,6 +19,8 @@ import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import YouTubeFacade from "./YouTubeFacade.astro";
 import TopReplaysStrip from "./TopReplaysStrip.astro";
 
+const galleryUrl = EDITION_2026.galleryUrl;
+
 export interface Props {
   /** Anchor id for deep-linking. Recommended: "edition-2026". */
   id?: string;
@@ -104,7 +106,28 @@ const cellClass = {
     </div>
   )}
 
-  {/* Most-watched talks — 4-thumbnail strip (replaces former replays + gallery CTAs). */}
+  {/* "Voir le reportage photo" — links to the external photo album. */}
+  {galleryUrl && (
+    <div class="mt-10 text-center">
+      <a
+        href={galleryUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-md border-2 border-primary text-primary bg-transparent text-base font-semibold hover:bg-primary/10 hover:shadow-[0_0_0_4px_oklch(62.5%_0.162_259.9_/_0.15)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-150"
+      >
+        {t("editions.2026.gallery_cta")}
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  )}
+
+  {/* Contextual paragraph — separates the gallery CTA from the replays strip
+      and supplies background for visitors who didn't attend. */}
+  <p class="mt-10 mx-auto max-w-3xl text-center text-base md:text-lg text-muted-foreground leading-relaxed">
+    {t("editions.2026.context_body")}
+  </p>
+
+  {/* Most-watched talks — 2-col grid (bigger thumbnails) replaces the older 4-col strip. */}
   <TopReplaysStrip
     replays={EDITION_2026.topReplays}
     playlistUrl={EDITION_2026.replaysUrl}
