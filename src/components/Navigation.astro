@@ -30,13 +30,17 @@ function isActive(currentPath: string, href: string, dead: boolean): boolean {
   return currentPath.startsWith(href);
 }
 
-const links = navItems.map(({ key, path, dead, postEventOnly }) => ({
-  key,
-  label: t(key),
-  href: getLocalePath(lang, path),
-  active: isActive(currentPath, getLocalePath(lang, path), dead),
-  postEventOnly: !!postEventOnly,
-}));
+const links = navItems.map(({ key, path, pathEn, dead, postEventOnly }) => {
+  const resolvedPath = lang === "en" && pathEn ? pathEn : path;
+  const href = getLocalePath(lang, resolvedPath);
+  return {
+    key,
+    label: t(key),
+    href,
+    active: isActive(currentPath, href, dead),
+    postEventOnly: !!postEventOnly,
+  };
+});
 
 const editionsDesc = [...EDITIONS].sort((a, b) => b - a);
 
@@ -80,7 +84,7 @@ const programmeDD = (() => {
 })();
 
 const aboutDD = (() => {
-  const aboutPath = getLocalePath(lang, "/decouvrir");
+  const aboutPath = getLocalePath(lang, lang === "en" ? "/discover" : "/decouvrir");
   const venuePath = getLocalePath(lang, "/informations-utiles");
   const teamPath = getLocalePath(lang, "/team");
   return {

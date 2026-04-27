@@ -14,6 +14,7 @@ const t = useTranslations(lang);
 
 const TICKETS_HREF = getLocalePath(lang, "/tickets");
 const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
+const DISCOVER_URL = getLocalePath(lang, lang === "en" ? "/discover" : "/decouvrir");
 
 // Both logo variants share intrinsic dimensions, so one ratio drives both <img> tags.
 const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width);
@@ -79,6 +80,15 @@ const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width)
         )}
       >
         {t("hero.cta.register")}
+      </a>
+      <a
+        href={DISCOVER_URL}
+        class={cn(
+          buttonVariants({ variant: "outline", size: "lg" }),
+          "h-[52px] px-8 text-lg font-bold"
+        )}
+      >
+        {t("hero.cta.discover")}
       </a>
       {SCHEDULE_URL && (
         <a

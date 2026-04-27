@@ -1,6 +1,6 @@
 ---
 import { languages, type Locale } from "@/i18n/ui";
-import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
+import { getLangFromUrl, useTranslations, getAlternatePath } from "@/i18n/utils";
 
 const currentLang = getLangFromUrl(Astro.url);
 const currentPath = Astro.url.pathname;
@@ -13,7 +13,7 @@ const entries = Object.entries(languages) as Array<[Locale, string]>;
     <>
       {i > 0 && <span aria-hidden="true" class="px-1 text-muted-foreground">/</span>}
       <a
-        href={getLocalePath(lang, currentPath)}
+        href={getAlternatePath(currentPath, lang)}
         aria-current={lang === currentLang ? "true" : undefined}
         class:list={[
           "uppercase rounded-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
