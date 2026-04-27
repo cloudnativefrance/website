@@ -3,13 +3,13 @@ import { getAllSpeakers, getSlug } from "@/lib/speakers";
 import { EDITIONS, type Edition } from "@/lib/editions";
 
 /**
- * Redirect shim for the former flat `/speakers/[slug]` URLs.
+ * Redirect shim for the former flat `/intervenants/[slug]` URLs.
  * Enumerates every speaker slug across all editions, picks the latest
  * edition each slug appears in, and emits a 301 redirect HTML page to
- * `/speakers/<latest-year>/<slug>`.
+ * `/intervenants/<latest-year>/<slug>`.
  *
  * Slugs that match an edition year (e.g., "2026") are filtered out to
- * avoid a route collision with `/speakers/[year]/index.astro`.
+ * avoid a route collision with `/intervenants/[year]/index.astro`.
  */
 export async function getStaticPaths() {
   const editionYears = new Set(EDITIONS.map(String));
@@ -33,5 +33,5 @@ export async function getStaticPaths() {
 
 const { year } = Astro.props as { year: Edition };
 const { slug } = Astro.params;
-return Astro.redirect(`/speakers/${year}/${slug}`, 301);
+return Astro.redirect(`/intervenants/${year}/${slug}`, 301);
 ---

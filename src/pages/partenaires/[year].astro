@@ -14,7 +14,7 @@ export async function getStaticPaths() {
 const { year: yearParam } = Astro.params;
 const yearNum = Number(yearParam);
 if (!isEdition(yearNum)) {
-  return Astro.redirect(`/sponsors/${CURRENT_EDITION}`, 308);
+  return Astro.redirect(`/partenaires/${CURRENT_EDITION}`, 308);
 }
 const year: Edition = yearNum;
 
