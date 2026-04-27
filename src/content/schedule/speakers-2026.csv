@@ -1,5 +1,5 @@
 slug,name,photo_url,company,role,bio,twitter,linkedin,github,bluesky,website,keynote
-petazzoni,Jérôme Petazzoni,,,Docker / tinkerer,,,,,,,true
+petazzoni,Jérôme Petazzoni,,Enix,Tinkerer,,,,,,,true
 vache,Aurélie Vache,,OVHcloud,DevRel / Docker Captain,,,,,,,
 saboni,Amine Saboni,,,,,,,,,,
 vermande,Nicolas Vermande,,,,,,,,,,

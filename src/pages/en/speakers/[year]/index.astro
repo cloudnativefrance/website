@@ -58,7 +58,12 @@ const regular = speakers
       </section>
     )}
 
-    {keynote && (
+    {keynote && (() => {
+      const keynotePrimary = primaryTalkBySlug.get(getSlug(keynote.id));
+      const keynoteHref = keynotePrimary
+        ? `${getLocalePath(lang, `/programme/${year}`)}#session-${keynotePrimary.id}`
+        : getLocalePath(lang, `/programme/${year}`);
+      return (
       <section class="max-w-6xl mx-auto pb-14 md:pb-20">
         <p
           class="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-accent"
@@ -67,7 +72,7 @@ const regular = speakers
         </p>
 
         <a
-          href={getLocalePath(lang, `/speakers/${year}/${getSlug(keynote.id)}`)}
+          href={keynoteHref}
           class="group relative flex flex-col md:flex-row items-center gap-8 md:gap-10 rounded-2xl border border-border bg-card p-8 md:p-10 overflow-hidden transition-colors duration-200 hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <!-- Subtle blue glow behind the photo -->
@@ -133,12 +138,13 @@ const regular = speakers
             <span
               class="mt-5 inline-flex items-center gap-1 text-sm font-medium text-primary group-hover:underline"
             >
-              {t("speakers.view_profile")} <span aria-hidden="true">→</span>
+              {t("speakers.schedule_link")} <span aria-hidden="true">→</span>
             </span>
           </div>
         </a>
       </section>
-    )}
+      );
+    })()}
 
     {regular.length > 0 && (
       <section class="max-w-7xl mx-auto pb-16 md:pb-24">
@@ -153,10 +159,15 @@ const regular = speakers
           role="list"
           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5"
         >
-          {regular.map((speaker) => (
+          {regular.map((speaker) => {
+            const primary = primaryTalkBySlug.get(getSlug(speaker.id));
+            const cardHref = primary
+              ? `${getLocalePath(lang, `/programme/${year}`)}#session-${primary.id}`
+              : getLocalePath(lang, `/programme/${year}`);
+            return (
             <li>
               <a
-                href={getLocalePath(lang, `/speakers/${year}/${getSlug(speaker.id)}`)}
+                href={cardHref}
                 class="group block h-full rounded-lg border border-border bg-card p-5 text-center transition-all duration-200 hover:border-primary/60 motion-safe:hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 <div class="flex flex-col items-center">
@@ -175,18 +186,16 @@ const regular = speakers
                         .join(" — ")}
                     </p>
                   )}
-                  {(() => {
-                    const primary = primaryTalkBySlug.get(getSlug(speaker.id));
-                    return primary && (
-                      <p class="mt-2 text-[13px] text-muted-foreground line-clamp-2">
-                        {primary.title}
-                      </p>
-                    );
-                  })()}
+                  {primary && (
+                    <p class="mt-2 text-[13px] text-muted-foreground line-clamp-2">
+                      {primary.title}
+                    </p>
+                  )}
                 </div>
               </a>
             </li>
-          ))}
+            );
+          })}
         </ul>
       </section>
     )}
