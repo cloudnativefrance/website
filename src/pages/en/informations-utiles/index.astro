@@ -16,8 +16,23 @@ const bbox = `${VENUE.lon - 0.006},${VENUE.lat - 0.0035},${VENUE.lon + 0.006},${
 const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${VENUE.lat},${VENUE.lon}`;
 const mapLink = `https://www.openstreetmap.org/?mlat=${VENUE.lat}&mlon=${VENUE.lon}#map=17/${VENUE.lat}/${VENUE.lon}`;
 
-const transport = [
-  { key: "metro", label: t("venue.transport.metro"), main: "Riquet — line 7", detail: t("venue.transport.metro_detail") },
+type TransportEntry = {
+  key: "metro" | "rer" | "bus" | "car";
+  label: string;
+  stations?: Array<{ name: string; time: string }>;
+  main?: string;
+  detail?: string;
+};
+
+const transport: TransportEntry[] = [
+  {
+    key: "metro",
+    label: t("venue.transport.metro"),
+    stations: [
+      { name: t("venue.transport.metro_riquet"),     time: t("venue.transport.metro_riquet_time") },
+      { name: t("venue.transport.metro_stalingrad"), time: t("venue.transport.metro_stalingrad_time") },
+    ],
+  },
   { key: "rer",   label: t("venue.transport.rer"),   main: "Rosa Parks — RER E", detail: t("venue.transport.rer_detail") },
   { key: "bus",   label: t("venue.transport.bus"),   main: "54, 60, 150, 239", detail: t("venue.transport.bus_detail") },
   { key: "car",   label: t("venue.transport.car"),   main: t("venue.transport.car_main"), detail: t("venue.transport.car_detail") },
@@ -27,7 +42,6 @@ const accessibility = [
   t("venue.access.pmr"),
   t("venue.access.elevators"),
   t("venue.access.toilets"),
-  t("venue.access.hearing"),
   t("venue.access.guide_dogs"),
 ];
 ---
@@ -84,7 +98,7 @@ const accessibility = [
       </h2>
 
       <ul role="list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {transport.map(({ key, label, main, detail }) => (
+        {transport.map(({ key, label, stations, main, detail }) => (
           <li class="rounded-xl border border-border bg-card p-6">
             <div class="flex items-start gap-4">
               <span class="flex shrink-0 h-10 w-10 items-center justify-center rounded-full bg-primary/10">
@@ -95,8 +109,21 @@ const accessibility = [
               </span>
               <div class="min-w-0">
                 <p class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{label}</p>
-                <p class="mt-1 text-base font-semibold text-foreground">{main}</p>
-                <p class="mt-1 text-sm text-muted-foreground">{detail}</p>
+                {stations ? (
+                  <ul role="list" class="mt-1 space-y-1">
+                    {stations.map((s) => (
+                      <li class="flex flex-wrap items-baseline gap-x-2">
+                        <span class="text-base font-semibold text-foreground">{s.name}</span>
+                        <span class="text-xs text-muted-foreground">{s.time}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <>
+                    <p class="mt-1 text-base font-semibold text-foreground">{main}</p>
+                    <p class="mt-1 text-sm text-muted-foreground">{detail}</p>
+                  </>
+                )}
               </div>
             </div>
           </li>
@@ -119,26 +146,7 @@ const accessibility = [
           </li>
         ))}
       </ul>
-      <p class="mt-4 text-sm text-muted-foreground max-w-3xl">{t("venue.access.note")}</p>
-    </section>
-
-    <section class="max-w-6xl mx-auto pb-16 md:pb-20">
-      <p class="text-xs font-semibold uppercase tracking-[0.2em]" style="color: var(--color-tertiary, #b8deff);">
-        {t("venue.around.rail_label")}
-      </p>
-      <h2 class="mt-3 mb-6 text-3xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
-        {t("venue.around.heading")}
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-        <article class="rounded-xl border border-border bg-card p-6">
-          <h3 class="text-lg font-bold text-foreground">{t("venue.around.hotels_heading")}</h3>
-          <p class="mt-3 text-sm text-foreground" style="line-height:1.6;">{t("venue.around.hotels_body")}</p>
-        </article>
-        <article class="rounded-xl border border-border bg-card p-6">
-          <h3 class="text-lg font-bold text-foreground">{t("venue.around.food_heading")}</h3>
-          <p class="mt-3 text-sm text-foreground" style="line-height:1.6;">{t("venue.around.food_body")}</p>
-        </article>
-      </div>
+      <p class="mt-4 text-sm text-muted-foreground">{t("venue.access.note")}</p>
     </section>
 
   </main>

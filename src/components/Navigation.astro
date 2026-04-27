@@ -13,12 +13,11 @@ const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
 
 const navItems: Array<{
-  key: "nav.replays" | "nav.tickets" | "nav.contact";
+  key: "nav.replays" | "nav.contact";
   path: string;
   dead: boolean;
   postEventOnly?: boolean;
 }> = [
-  { key: "nav.tickets",  path: "/tickets",   dead: false },
   { key: "nav.replays",  path: "/replays",   dead: false, postEventOnly: true },
   { key: "nav.contact",  path: "/contact",   dead: false },
 ];
@@ -109,7 +108,6 @@ const linkByKey = Object.fromEntries(links.map((l) => [l.key, l])) as Record<
   (typeof links)[number]["key"],
   (typeof links)[number]
 >;
-const ticketsLink = linkByKey["nav.tickets"];
 const replaysLink = linkByKey["nav.replays"];
 const contactLink = linkByKey["nav.contact"];
 ---
@@ -126,25 +124,10 @@ const contactLink = linkByKey["nav.contact"];
       <img src={logoCompactDark.src} alt="CND France" class="hidden dark:block h-8 md:h-10" loading="lazy" />
     </a>
 
-    <!-- Desktop links — order: À propos, Programme, Billetterie, Partenaires, Replays. -->
+    <!-- Desktop links — order: À propos, Programme, Partenaires, Replays, Contact. -->
     <ul class="hidden md:flex items-center justify-center flex-1 gap-10" role="list">
       <NavDropdown {...aboutDD} />
       <NavDropdown {...programmeDD} />
-      <li>
-        <a
-          href={ticketsLink.href}
-          data-nav-key={ticketsLink.key}
-          aria-current={ticketsLink.active ? "page" : undefined}
-          class:list={[
-            "text-lg font-medium text-foreground transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
-            ticketsLink.active
-              ? "border-b-2 border-primary"
-              : "border-b-2 border-transparent hover:border-primary/60",
-          ]}
-        >
-          {ticketsLink.label}
-        </a>
-      </li>
       <NavDropdown {...sponsorsDD} />
       <li data-post-event="true" class="hidden">
         <a
@@ -210,14 +193,13 @@ const contactLink = linkByKey["nav.contact"];
         <LanguageToggle />
       </li>
       {(() => {
-        // Same order as desktop: À propos, Programme, Billetterie, Partenaires, Replays.
+        // Same order as desktop: À propos, Programme, Partenaires, Replays, Contact.
         const order: Array<
           | { kind: "dd"; dd: typeof aboutDD }
-          | { kind: "link"; link: typeof ticketsLink }
+          | { kind: "link"; link: typeof replaysLink }
         > = [
           { kind: "dd",   dd: aboutDD },
           { kind: "dd",   dd: programmeDD },
-          { kind: "link", link: ticketsLink },
           { kind: "dd",   dd: sponsorsDD },
           { kind: "link", link: replaysLink },
           { kind: "link", link: contactLink },

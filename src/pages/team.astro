@@ -21,6 +21,12 @@ const groupTitles = {
   volunteers: t("team.group.volunteers"),
 } as const;
 
+const groupBodies = {
+  core: t("team.group.core.body"),
+  "program-committee": t("team.group.program_committee.body"),
+  volunteers: t("team.group.volunteers.body"),
+} as const;
+
 const hasAnyMember = all.length > 0;
 ---
 
@@ -42,6 +48,7 @@ const hasAnyMember = all.length > 0;
               members={byGroup[g]}
               lang={lang}
               title={groupTitles[g]}
+              subtitle={groupBodies[g]}
             />
           ) : null,
         )

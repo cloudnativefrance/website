@@ -8,6 +8,7 @@ import ComingSoonLayout from "@/components/flags/ComingSoonLayout.astro";
 import { isFlagActive } from "@/lib/flags";
 import { EDITIONS, isEdition, CURRENT_EDITION, type Edition } from "@/lib/editions";
 import ComingNotice from "@/components/ComingNotice.astro";
+import { ui } from "@/i18n/ui";
 
 export async function getStaticPaths() {
   return EDITIONS.map((year) => ({ params: { year: String(year) } }));
@@ -25,6 +26,14 @@ const t = useTranslations(lang);
 const sessions = await loadSessions(year);
 const speakerEntries = await getSpeakersByLocale(lang, year);
 const speakerNames = new Map(speakerEntries.map((s) => [getSlug(s.id), s.data.name]));
+
+// Year-specific rail label (e.g. "Programme — 03 Février 2026") with fallback
+// to the generic 2027 label.
+const yearKey = `schedule.rail_label.${year}`;
+const railLabel =
+  (ui[lang] as Record<string, string>)[yearKey] ??
+  (ui.fr as Record<string, string>)[yearKey] ??
+  t("schedule.rail_label");
 
 // Future editions (year > CURRENT_EDITION) stay behind the `programme` flag.
 // Past/current editions always render — 2026 has real archive data, 2023 etc.
@@ -46,7 +55,7 @@ const programmeReady = !isUpcomingEdition || isFlagActive("programme");
             class="text-xs font-semibold uppercase tracking-[0.2em]"
             style="color: var(--color-tertiary, #b8deff);"
           >
-            {t("schedule.rail_label")}
+            {railLabel}
           </p>
           <h1 class="mt-3 text-4xl md:text-5xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
             {`${t("schedule.heading")} ${year}`}
