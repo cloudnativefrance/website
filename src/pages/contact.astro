@@ -11,14 +11,10 @@ import partenairePhoto from "@/assets/photos/contact/partenaire.jpg";
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-// `photoFocus` overrides object-position so each card crops onto its subject:
-// participant.jpg's audience is dense across the frame (center is fine);
-// intervenants.jpg has the speaker on the right edge (would otherwise be
-// cropped out); partenaire.jpg's booth crowd is centered.
 const audiences = [
-  { email: CONTACT_EMAILS.participants, icon: "ticket",    titleKey: "contact.participants.title", bodyKey: "contact.participants.body", photo: participantPhoto, photoAlt: "Participantes et participants Cloud Native Days France 2026", photoFocus: "object-center" },
-  { email: CONTACT_EMAILS.speakers,     icon: "mic",       titleKey: "contact.speakers.title",     bodyKey: "contact.speakers.body",     photo: intervenantPhoto, photoAlt: "Intervenant(e) sur scène à Cloud Native Days France 2026",  photoFocus: "object-right" },
-  { email: CONTACT_EMAILS.sponsors,     icon: "handshake", titleKey: "contact.sponsors.title",     bodyKey: "contact.sponsors.body",     photo: partenairePhoto,  photoAlt: "Stand partenaire à Cloud Native Days France 2026",            photoFocus: "object-center" },
+  { email: CONTACT_EMAILS.participants, icon: "ticket",    titleKey: "contact.participants.title", bodyKey: "contact.participants.body", photo: participantPhoto, photoAlt: "Participantes et participants Cloud Native Days France 2026" },
+  { email: CONTACT_EMAILS.speakers,     icon: "mic",       titleKey: "contact.speakers.title",     bodyKey: "contact.speakers.body",     photo: intervenantPhoto, photoAlt: "Intervenant(e) sur scène à Cloud Native Days France 2026" },
+  { email: CONTACT_EMAILS.sponsors,     icon: "handshake", titleKey: "contact.sponsors.title",     bodyKey: "contact.sponsors.body",     photo: partenairePhoto,  photoAlt: "Stand partenaire à Cloud Native Days France 2026" },
 ] as const;
 ---
 
@@ -40,7 +36,7 @@ const audiences = [
     </section>
 
     <section class="mt-12 grid gap-6 md:grid-cols-3">
-      {audiences.map(({ email, icon, titleKey, bodyKey, photo, photoAlt, photoFocus }) => (
+      {audiences.map(({ email, icon, titleKey, bodyKey, photo, photoAlt }) => (
         <article class="rounded-lg border border-border bg-card p-6 flex flex-col gap-4 overflow-hidden">
           <span
             aria-hidden="true"
@@ -83,12 +79,12 @@ const audiences = [
           <Picture
             src={photo}
             alt={photoAlt}
-            widths={[400, 600, 800]}
+            widths={[400, 600, 800, 1200]}
             sizes="(min-width: 768px) 33vw, 100vw"
             formats={["avif", "webp"]}
             loading="lazy"
             decoding="async"
-            class={`mt-auto -mx-6 -mb-6 w-[calc(100%+3rem)] aspect-[4/3] object-cover ${photoFocus}`}
+            class="mt-auto -mx-6 -mb-6 w-[calc(100%+3rem)] h-auto block"
           />
         </article>
       ))}
