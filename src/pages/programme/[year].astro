@@ -25,7 +25,17 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const sessions = await loadSessions(year);
 const speakerEntries = await getSpeakersByLocale(lang, year);
-const speakerNames = new Map(speakerEntries.map((s) => [getSlug(s.id), s.data.name]));
+
+// Build a lookup map keyed by BOTH slug and full name so that sessions.csv
+// rows referring to a speaker either way resolve to the same record. Each
+// value carries the canonical display name + (optional) company so the
+// schedule cards can render "Name (Company)" without extra fetching.
+const speakerInfo = new Map<string, { name: string; company?: string }>();
+for (const s of speakerEntries) {
+  const info = { name: s.data.name, company: s.data.company };
+  speakerInfo.set(getSlug(s.id), info);
+  speakerInfo.set(s.data.name, info);
+}
 
 // Year-specific rail label (e.g. "Programme — 03 Février 2026") with fallback
 // to the generic 2027 label.
@@ -82,7 +92,7 @@ const programmeReady = !isUpcomingEdition || isFlagActive("programme");
             </p>
           </section>
           <section class="max-w-7xl mx-auto pb-20">
-            <ScheduleGrid sessions={sessions} lang={lang} speakerNames={speakerNames} />
+            <ScheduleGrid sessions={sessions} lang={lang} speakerInfo={speakerInfo} />
           </section>
         </>
       )}
