@@ -1,16 +1,20 @@
 ---
+import { Picture } from "astro:assets";
 import Layout from "../../layouts/Layout.astro";
 import SocialLinks from "@/components/SocialLinks.astro";
 import { useTranslations, getLangFromUrl } from "@/i18n/utils";
 import { CONTACT_EMAILS } from "@/lib/event";
+import participantPhoto from "@/assets/photos/contact/participant.jpg";
+import intervenantPhoto from "@/assets/photos/contact/intervenants.jpg";
+import partenairePhoto from "@/assets/photos/contact/partenaire.jpg";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
 const audiences = [
-  { email: CONTACT_EMAILS.participants, icon: "ticket",    titleKey: "contact.participants.title", bodyKey: "contact.participants.body" },
-  { email: CONTACT_EMAILS.speakers,     icon: "mic",       titleKey: "contact.speakers.title",     bodyKey: "contact.speakers.body" },
-  { email: CONTACT_EMAILS.sponsors,     icon: "handshake", titleKey: "contact.sponsors.title",     bodyKey: "contact.sponsors.body" },
+  { email: CONTACT_EMAILS.participants, icon: "ticket",    titleKey: "contact.participants.title", bodyKey: "contact.participants.body", photo: participantPhoto, photoAlt: "Attendees at Cloud Native Days France 2026" },
+  { email: CONTACT_EMAILS.speakers,     icon: "mic",       titleKey: "contact.speakers.title",     bodyKey: "contact.speakers.body",     photo: intervenantPhoto, photoAlt: "Speaker on stage at Cloud Native Days France 2026" },
+  { email: CONTACT_EMAILS.sponsors,     icon: "handshake", titleKey: "contact.sponsors.title",     bodyKey: "contact.sponsors.body",     photo: partenairePhoto,  photoAlt: "Partner booth at Cloud Native Days France 2026" },
 ] as const;
 ---
 
@@ -32,8 +36,8 @@ const audiences = [
     </section>
 
     <section class="mt-12 grid gap-6 md:grid-cols-3">
-      {audiences.map(({ email, icon, titleKey, bodyKey }) => (
-        <article class="rounded-lg border border-border bg-card p-6 flex flex-col gap-4">
+      {audiences.map(({ email, icon, titleKey, bodyKey, photo, photoAlt }) => (
+        <article class="rounded-lg border border-border bg-card p-6 flex flex-col gap-4 overflow-hidden">
           <span
             aria-hidden="true"
             class="inline-flex w-12 h-12 items-center justify-center rounded-full bg-primary/15 text-primary"
@@ -64,7 +68,7 @@ const audiences = [
           </div>
           <a
             href={`mailto:${email}`}
-            class="mt-auto inline-flex items-center gap-2 self-start rounded-full bg-muted px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            class="inline-flex items-center gap-2 self-start rounded-full bg-muted px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect width="20" height="16" x="2" y="4" rx="2"/>
@@ -72,6 +76,16 @@ const audiences = [
             </svg>
             {email}
           </a>
+          <Picture
+            src={photo}
+            alt={photoAlt}
+            widths={[400, 600, 800]}
+            sizes="(min-width: 768px) 33vw, 100vw"
+            formats={["avif", "webp"]}
+            loading="lazy"
+            decoding="async"
+            class="mt-auto -mx-6 -mb-6 w-[calc(100%+3rem)] aspect-[4/3] object-cover"
+          />
         </article>
       ))}
     </section>
