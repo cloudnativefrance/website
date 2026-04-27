@@ -1,0 +1,27 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { useTranslations } from "@/i18n/utils";
+import { NEWSLETTER_URL } from "@/lib/event";
+
+const lang = "fr";
+const t = useTranslations(lang);
+---
+
+<Layout title={t("nav.tickets")} description={t("tickets.coming_soon.body")} lang={lang}>
+  <main class="mx-auto max-w-3xl px-4 md:px-6 py-24 md:py-32 text-center">
+    <h1 class="text-4xl md:text-5xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+      {t("tickets.coming_soon.title")}
+    </h1>
+    <p class="mt-6 text-base md:text-lg text-muted-foreground">
+      {t("tickets.coming_soon.body")}
+    </p>
+    <a
+      href={NEWSLETTER_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="mt-8 inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-base font-semibold px-6 h-12 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    >
+      {t("tickets.coming_soon.cta")}
+    </a>
+  </main>
+</Layout>

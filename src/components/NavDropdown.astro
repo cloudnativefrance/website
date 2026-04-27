@@ -30,7 +30,7 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
     aria-controls={menuId}
     data-nav-key={key}
     class:list={[
-      "inline-flex items-center gap-1 text-lg font-medium text-foreground transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
+      "inline-flex items-center gap-1 text-lg font-medium leading-none text-foreground transition-colors pb-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm",
       active ? "border-b-2 border-primary" : "border-b-2 border-transparent hover:border-primary/60",
     ]}
   >
@@ -41,7 +41,7 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
     id={menuId}
     role="menu"
     aria-labelledby={buttonId}
-    class="hidden absolute right-0 mt-2 min-w-48 rounded-md border border-border bg-popover text-popover-foreground shadow-lg py-1 z-50"
+    class="hidden absolute right-0 mt-2 min-w-56 rounded-md border border-border bg-popover text-popover-foreground shadow-lg py-1 z-50"
   >
     {items.map((item) => (
       <li role="none">
@@ -50,7 +50,7 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
           href={item.href}
           aria-current={item.current ? "page" : undefined}
           class:list={[
-            "block px-4 py-2 text-base font-semibold hover:bg-muted focus-visible:bg-muted focus-visible:outline-none",
+            "block px-4 py-2 text-base font-semibold whitespace-nowrap hover:bg-muted focus-visible:bg-muted focus-visible:outline-none",
             item.current && "text-primary",
           ]}
         >

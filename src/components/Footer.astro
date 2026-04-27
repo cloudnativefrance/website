@@ -9,15 +9,18 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
 
-// SAME nav items as Navigation.astro (order mirrored for muscle memory).
+// Footer navigation column. Note: this set is intentionally NARROWER than the
+// header — "À propos" and "Intervenant(e)s" are reachable through the header
+// dropdowns; CFP is added between Programme and Partenaires per Apr-2026
+// stakeholder feedback. Uses `about.subnav.venue` ("Infos pratiques") rather
+// than `nav.venue` ("Informations pratiques") for tighter footer copy.
 const navItems = [
-  { key: "nav.home"     as const, path: "/" },
-  { key: "nav.speakers" as const, path: "/speakers" },
-  { key: "nav.schedule" as const, path: "/programme" },
-  { key: "nav.sponsors" as const, path: "/sponsors" },
-  { key: "nav.venue"    as const, path: "/informations-utiles" },
-  { key: "nav.team"     as const, path: "/team" },
-  { key: "nav.contact"  as const, path: "/contact" },
+  { key: "nav.schedule"       as const, path: "/programme" },
+  { key: "nav.cfp"            as const, path: "/cfp" },
+  { key: "nav.sponsors"       as const, path: "/sponsors" },
+  { key: "about.subnav.venue" as const, path: "/informations-utiles" },
+  { key: "nav.team"           as const, path: "/team" },
+  { key: "nav.contact"        as const, path: "/contact" },
 ];
 
 function isActive(currentPath: string, href: string): boolean {
@@ -46,46 +49,39 @@ const legalLinks = [
   class="bg-background text-muted-foreground mt-12"
 >
   <div class="mx-auto max-w-7xl px-4 md:px-6 py-12">
-      <!-- Newsletter CTA -->
-      <div class="flex flex-col items-center gap-4 mb-12 pb-12 border-b border-border">
-        <h2 class="text-2xl sm:text-3xl font-bold text-foreground text-center">
-          {t("footer.newsletter.heading")}
-        </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 lg:gap-12">
+
+      <!-- Column 1: Brand + Newsletter -->
+      <div>
+        <img src={logoFullLight.src} alt="Cloud Native Days France" class="dark:hidden h-16 md:h-20" loading="lazy" />
+        <img src={logoFullDark.src} alt="Cloud Native Days France" class="hidden dark:block h-16 md:h-20" />
+        <p class="text-sm text-muted-foreground mt-4">{t("footer.tagline")}</p>
+        <p class="text-sm text-muted-foreground mt-3">{t("footer.association")}</p>
         <a
           href={NEWSLETTER_URL}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={t("hero.cta.newsletter_aria")}
-          class="inline-flex items-center justify-center gap-2 h-[52px] px-8 text-lg font-bold rounded-md border-2 border-destructive text-destructive bg-transparent hover:bg-destructive/10 hover:text-destructive hover:border-destructive hover:shadow-[0_0_0_4px_oklch(54.0%_0.216_25.2_/_0.15)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-150"
+          class="mt-5 inline-flex items-center gap-2 text-base font-semibold text-destructive hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-sm"
         >
           <svg
             aria-hidden="true"
             focusable="false"
             xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="shrink-0"
           >
             <rect width="20" height="16" x="2" y="4" rx="2" />
             <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
           </svg>
-          {t("hero.cta.newsletter")}
+          {t("footer.newsletter.heading")}
         </a>
-      </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 lg:gap-12">
-
-      <!-- Column 1: Brand -->
-      <div>
-        <img src={logoFullLight.src} alt="Cloud Native Days France" class="dark:hidden h-8" loading="lazy" />
-        <img src={logoFullDark.src} alt="Cloud Native Days France" class="hidden dark:block h-8" />
-        <p class="text-sm text-muted-foreground mt-4">{t("footer.tagline")}</p>
-        <p class="text-sm text-muted-foreground mt-3">{t("footer.association")}</p>
       </div>
 
       <!-- Column 2: Quick nav -->

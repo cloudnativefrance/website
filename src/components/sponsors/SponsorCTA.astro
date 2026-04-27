@@ -1,6 +1,6 @@
 ---
 import type { Locale } from "@/i18n/ui";
-import { useTranslations } from "@/i18n/utils";
+import { useTranslations, getLocalePath } from "@/i18n/utils";
 
 interface Props {
   lang: Locale;
@@ -9,17 +9,16 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
-{/* TODO: verify with organizers — replace with sponsor-specific inbox when provisioned */}
-const contactEmail = "contact@cloudnativedays.fr";
+const contactHref = getLocalePath(lang, "/contact");
 ---
 
-<section class="py-24">
+<section class="py-16">
   <div class="max-w-[640px] mx-auto text-center px-4">
     <h2 class="text-2xl font-semibold text-foreground">{t("sponsors.cta.heading")}</h2>
     <p class="text-base text-muted-foreground mt-4">{t("sponsors.cta.body")}</p>
     <a
-      href={`mailto:${contactEmail}`}
-      class="inline-flex items-center justify-center rounded-md bg-accent text-accent-foreground text-sm font-medium px-6 py-3 mt-8 transition-opacity motion-safe:hover:-translate-y-0.5 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      href={contactHref}
+      class="inline-flex items-center justify-center h-[52px] rounded-md border-2 border-destructive text-destructive bg-transparent text-lg font-bold px-8 mt-8 transition-all duration-150 hover:bg-destructive/10 hover:text-destructive hover:border-destructive hover:shadow-[0_0_0_4px_oklch(54.0%_0.216_25.2_/_0.15)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       {t("sponsors.cta.button")}
     </a>

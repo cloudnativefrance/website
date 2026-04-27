@@ -1,6 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import SponsorTierSection from "@/components/sponsors/SponsorTierSection.astro";
 import SponsorCTA from "@/components/sponsors/SponsorCTA.astro";
 import { getSponsors, type SponsorEntry } from "@/lib/sponsor-utils";
@@ -65,7 +65,20 @@ const tierTitles = {
 
     {isPending ? (
       <section class="mt-12 rounded-lg border border-border bg-card p-12 text-center max-w-2xl mx-auto">
-        <p class="text-lg text-muted-foreground">{t("sponsors.year_pending")}</p>
+        {year === 2027 ? (
+          <>
+            <p class="text-lg text-foreground">{t("sponsors.year_pending_2027.lead")}</p>
+            <p class="mt-4 text-base text-muted-foreground">{t("sponsors.year_pending_2027.cta")}</p>
+            <a
+              href={getLocalePath(lang, "/sponsors/2026")}
+              class="mt-6 inline-flex items-center gap-1 text-base font-medium text-primary hover:underline"
+            >
+              {t("sponsors.year_pending_2027.link")} <span aria-hidden="true">→</span>
+            </a>
+          </>
+        ) : (
+          <p class="text-lg text-muted-foreground">{t("sponsors.year_pending")}</p>
+        )}
       </section>
     ) : (
       TIER_ORDER.map((tier) => (

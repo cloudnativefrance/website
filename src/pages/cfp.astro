@@ -1,9 +1,13 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { useTranslations } from "@/i18n/utils";
+import { NEWSLETTER_URL } from "@/lib/event";
+import { FLAGS } from "@/config/flags";
+import { getFlagState } from "@/lib/flags";
 
 const lang = "fr";
 const t = useTranslations(lang);
+const cfpState = getFlagState(FLAGS.cfp);
 
 const CFP_URL = "https://cfp.cloudnativedays.fr/2026/";
 
@@ -84,13 +88,33 @@ const criteria = [
 ];
 ---
 
-<Layout title="Appel à conférences (CFP)" description="Proposez une intervention pour Cloud Native Days France 2026." lang={lang}>
+<Layout title={cfpState === "active" ? "Appel à conférences (CFP)" : t("cfp.closed_for_now.title")} description="Cloud Native Days France — Call for Papers." lang={lang}>
   <main>
+    {cfpState !== "active" && (
+      <section class="mx-auto max-w-2xl px-4 md:px-6 pt-24 md:pt-32 pb-24 md:pb-32 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+          {t("cfp.closed_for_now.title")}
+        </h1>
+        <p class="mt-6 text-base md:text-lg text-muted-foreground">
+          {t("cfp.closed_for_now.body")}
+        </p>
+        <p class="mt-6 text-base md:text-lg text-muted-foreground">
+          {t("cfp.closed_for_now.notify_text")}
+        </p>
+        <a
+          href={NEWSLETTER_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-8 inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-base font-semibold px-6 h-12 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          {t("cfp.closed_for_now.cta")}
+        </a>
+      </section>
+    )}
+    {cfpState === "active" && (
+    <>
     <section class="mx-auto max-w-3xl px-4 md:px-6 pt-16 md:pt-24 pb-12 md:pb-16 text-center">
-      <p class="text-xs font-semibold uppercase tracking-[0.2em]" style="color: var(--color-tertiary, #b8deff);">
-        Call for Papers
-      </p>
-      <h1 class="mt-4 text-4xl md:text-6xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+      <h1 class="text-4xl md:text-6xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
         Proposez une intervention
       </h1>
       <p class="mt-5 text-base md:text-lg text-muted-foreground">
@@ -270,7 +294,7 @@ const criteria = [
 
     <section class="mt-8 bg-card border-y border-border">
       <div class="mx-auto max-w-3xl px-4 md:px-6 py-16 md:py-20 text-center">
-        <p class="text-xs font-semibold uppercase tracking-[0.2em]" style="color: var(--color-tertiary, #b8deff);">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em]" style="color: var(--color-primary, #4985e8);">
           Prêt à partager ?
         </p>
         <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
@@ -287,5 +311,7 @@ const criteria = [
         <p class="mt-4 text-xs text-muted-foreground">cfp.cloudnativedays.fr/2026</p>
       </div>
     </section>
+    </>
+    )}
   </main>
 </Layout>

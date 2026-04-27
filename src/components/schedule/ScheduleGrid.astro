@@ -4,14 +4,23 @@ import { endTime, formatTime, listFormats, listLevels, listRooms, listTracks } f
 import type { Locale } from "@/i18n/ui";
 import { useTranslations, getLocalePath } from "@/i18n/utils";
 
+interface SpeakerInfo {
+  name: string;
+  company?: string;
+}
+
 interface Props {
   sessions: SessionRow[];
   lang: Locale;
-  /** Map of slug → display name for resolving speaker references in session cards. */
-  speakerNames: Map<string, string>;
+  /**
+   * Map of speaker reference → display info. Keyed by slug AND by full name
+   * so that sessions.csv rows referring to a speaker by either form resolve
+   * cleanly (the upstream Sheet has historically mixed both conventions).
+   */
+  speakerInfo: Map<string, SpeakerInfo>;
 }
 
-const { sessions, lang, speakerNames } = Astro.props;
+const { sessions, lang, speakerInfo } = Astro.props;
 const t = useTranslations(lang);
 
 const rooms = listRooms(sessions);
@@ -50,14 +59,19 @@ for (let m = GRID_START; m <= GRID_END; m += 30) {
 }
 
 function sessionSpeakerLinks(s: SessionRow) {
-  // Resolve speaker refs to display names. When the slug is known, link to the
-  // profile page; otherwise the ref is already a full name so use it verbatim.
+  // Resolve speaker refs to display info (name + optional company). The map
+  // is keyed by slug AND by name (see programme/[year].astro), so a sessions
+  // row that references a speaker by either form resolves cleanly. If neither
+  // hits, we fall back to the raw ref so the cell never shows blank.
   return s.speakers.map((ref) => {
-    const resolvedName = speakerNames.get(ref);
-    if (resolvedName) {
-      return { label: resolvedName, href: getLocalePath(lang, `/speakers/${ref}`) };
-    }
-    return { label: ref, href: null };
+    const info = speakerInfo.get(ref);
+    const label = info?.name ?? ref;
+    const company = info?.company;
+    return {
+      label,
+      company,
+      href: info?.name ? getLocalePath(lang, `/speakers/${ref}`) : null,
+    };
   });
 }
 
@@ -119,8 +133,10 @@ const CSS_VARS = {
   data-schedule-empty={t("schedule.agenda.empty")}
   style={`--grid-rows: ${GRID_ROWS}; --grid-cols: ${rooms.length};`}
 >
-  <!-- Filter bar — multi-select chips grouped by role, two rows -->
-  <div class="sticky top-[64px] z-20 -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8 py-3 bg-background/90 backdrop-blur-sm border-b border-border">
+  <!-- Filter bar — multi-select chips grouped by role, two rows.
+       Sticky only on md+ so the chip bar doesn't permanently cover the
+       calendar on narrow phones (Apr-2026 user feedback). -->
+  <div class="md:sticky md:top-[64px] z-20 -mx-4 md:-mx-6 lg:-mx-8 px-4 md:px-6 lg:px-8 py-3 bg-background/90 backdrop-blur-sm border-b border-border">
     <div class="flex items-start justify-between gap-3">
       <div class="flex flex-col gap-3 flex-1 min-w-0" role="toolbar" aria-label={t("schedule.filter.toolbar")}>
         <!-- Room -->
@@ -358,6 +374,7 @@ const CSS_VARS = {
                     <>
                       {i > 0 && <span>, </span>}
                       {sp.href ? <a href={sp.href} class="hover:underline">{sp.label}</a> : <span>{sp.label}</span>}
+                      {sp.company && <span class="schedule-session-company"> ({sp.company})</span>}
                     </>
                   ))}
                   {speakers.length > 2 && <span> +{speakers.length - 2}</span>}

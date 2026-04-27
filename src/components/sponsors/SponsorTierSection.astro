@@ -23,21 +23,22 @@ const { tier, sponsors, lang, title } = Astro.props;
 const t = useTranslations(lang);
 const isEmpty = sponsors.length === 0;
 
-// Grid classes per tier (UI-SPEC canonical expressions)
+// Grid classes per tier. `auto-rows-fr` keeps every card in a tier the same
+// height, so logos with different aspect ratios sit on a uniform baseline.
 const tierGrid: Record<Props["tier"], string> = {
-  platinum: "grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto",
-  gold: "grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8",
-  silver: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6",
-  end_user: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6",
-  community: "grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3 lg:gap-4",
-  experiences: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6",
-  media: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6",
-  institutional: "grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3 lg:gap-4",
+  platinum: "grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto auto-rows-fr",
+  gold: "grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 auto-rows-fr",
+  silver: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 lg:gap-6 auto-rows-fr",
+  end_user: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 auto-rows-fr",
+  community: "grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-4 gap-3 lg:gap-4 auto-rows-fr",
+  experiences: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 auto-rows-fr",
+  media: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 auto-rows-fr",
+  institutional: "grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3 lg:gap-4 auto-rows-fr",
 };
 ---
 
-<section class="py-16">
-  <h2 class="text-2xl font-semibold tracking-wider uppercase text-foreground text-center mb-8">
+<section class="py-8 md:py-10">
+  <h2 class="text-2xl font-semibold tracking-wider uppercase text-foreground text-center mb-6">
     {title}
   </h2>
   {isEmpty ? (

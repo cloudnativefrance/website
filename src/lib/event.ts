@@ -39,10 +39,9 @@ export const NEWSLETTER_URL =
  * rendered (see safeUrl() in @/lib/sponsor-utils).
  */
 export const SOCIAL_LINKS = {
-  linkedin: "https://www.linkedin.com/company/cloud-native-france/",
-  youtube: "https://www.youtube.com/@cloudnativedays",
-  bluesky: "https://bsky.app/profile/cloudnativedays.fr",
-  twitter: "https://x.com/cloudnativedays",
+  linkedin: "https://www.linkedin.com/company/cloud-native-days-france",
+  youtube: "https://www.youtube.com/@CloudNativeDaysFR",
+  bluesky: "https://bsky.app/profile/did:plc:idq4iwpot2ig5iripmm4fdiw",
   gallery: EDITION_2026.galleryUrl,
 } as const;
 

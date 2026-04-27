@@ -31,7 +31,7 @@ const t = useTranslations(lang);
 
 <section class:list={["max-w-6xl mx-auto px-4 md:px-6 lg:px-8", className]}>
   <ul
-    class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 md:grid md:grid-cols-4 md:gap-4 md:overflow-visible md:mx-0 md:px-0 md:pb-0"
+    class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:mx-0 md:px-0 md:pb-0"
     role="list"
   >
     {replays.map(({ youtubeId, titleKey }: { youtubeId: string; titleKey: keyof typeof ui.fr }) => (
