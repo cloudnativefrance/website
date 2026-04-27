@@ -32,24 +32,39 @@ const tierPadding: Record<Props["tier"], string> = {
   silver: "p-4",
   end_user: "p-4",
   community: "p-3",
-  experiences: "p-3",
-  media: "p-3",
+  experiences: "p-4",
+  media: "p-4",
   institutional: "p-3",
 };
 
-// Tier-specific logo dimensions
+// Tier-specific logo dimensions. `experiences` and `media` mirror `end_user`
+// per Apr-2026 stakeholder feedback to keep partner-card sizes balanced.
 const tierLogoSize: Record<Props["tier"], string> = {
   platinum: "max-w-[300px] max-h-28",
   gold: "max-w-[160px] max-h-16",
   silver: "max-w-[120px] max-h-14",
   end_user: "max-w-[140px] max-h-14",
   community: "max-w-[88px] max-h-10",
-  experiences: "max-w-[100px] max-h-12",
-  media: "max-w-[100px] max-h-12",
+  experiences: "max-w-[140px] max-h-14",
+  media: "max-w-[140px] max-h-14",
   institutional: "max-w-[88px] max-h-10",
 };
 
-const baseCardClass = `bg-card border border-border rounded-lg ${tierPadding[tier]} flex items-center justify-center`;
+// Per-tier minimum height — keeps every card in a tier visually balanced even
+// when logos have wildly different aspect ratios. Combined with `auto-rows-fr`
+// on the grid, all cards in the same tier render at identical height.
+const tierMinH: Record<Props["tier"], string> = {
+  platinum: "min-h-[160px]",
+  gold: "min-h-[112px]",
+  silver: "min-h-[96px]",
+  end_user: "min-h-[112px]",
+  community: "min-h-[80px]",
+  experiences: "min-h-[112px]",
+  media: "min-h-[112px]",
+  institutional: "min-h-[80px]",
+};
+
+const baseCardClass = `bg-card border border-border rounded-lg ${tierPadding[tier]} ${tierMinH[tier]} h-full flex items-center justify-center`;
 const linkExtrasClass =
   "transition-all duration-200 motion-safe:hover:-translate-y-0.5 hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 const imgClass = `${tierLogoSize[tier]} object-contain`;
