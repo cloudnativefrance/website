@@ -45,14 +45,16 @@ const railLabel =
   (ui.fr as Record<string, string>)[yearKey] ??
   t("schedule.rail_label");
 
-// Optional PDF programme download. Read at build time from
-// `PROGRAMME_PDF_URL_<year>` (e.g. PROGRAMME_PDF_URL_2026=/programme-2026.pdf
-// or an absolute URL). When unset, the button is hidden — drop the file in
-// public/ and set the env var to enable it.
+// Optional PDF programme download. Defaults to a known asset under public/
+// for years where we ship one; can be overridden at build time via
+// `PROGRAMME_PDF_URL_<year>`. When neither is set, the button is hidden.
+const KNOWN_PROGRAMME_PDFS: Partial<Record<Edition, string>> = {
+  2026: "/programme-cnd-france-2026.pdf",
+};
 const programmePdfUrl =
-  typeof process !== "undefined"
+  (typeof process !== "undefined"
     ? (process.env as Record<string, string | undefined>)[`PROGRAMME_PDF_URL_${year}`]
-    : undefined;
+    : undefined) ?? KNOWN_PROGRAMME_PDFS[year];
 const programmePdfLabel = t("schedule.download_pdf").replace("{year}", String(year));
 
 // Future editions (year > CURRENT_EDITION) stay behind the `programme` flag.
@@ -87,12 +89,12 @@ const programmeReady = !isUpcomingEdition || isFlagActive("programme");
       ) : (
         <>
           <section class="max-w-7xl mx-auto pt-16 md:pt-20 pb-6">
-            {year === CURRENT_EDITION && <ComingNotice class="mb-8" />}
+            {year === CURRENT_EDITION && <ComingNotice class="mx-auto max-w-6xl mb-8" />}
             <p
               class="text-xs font-semibold uppercase tracking-[0.2em]"
               style="color: var(--color-primary, #4985e8);"
             >
-              {t("schedule.rail_label")}
+              {railLabel}
             </p>
             <h1 class="mt-3 text-4xl md:text-5xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
               {`${t("schedule.heading")} ${year}`}
