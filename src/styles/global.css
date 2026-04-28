@@ -36,6 +36,9 @@
   /* Brand hues — same in light and dark, never overridden */
   --primary: oklch(62.5% 0.162 259.9);
   --primary-foreground: oklch(100% 0 0);
+  /* Accessible variant for primary text on light surfaces (WCAG AA ≥4.5:1).
+     Mode-aware: darker shade in light, lighter shade in dark (overridden in .dark below). */
+  --primary-strong: oklch(48% 0.18 259.9);
   --accent: oklch(76.6% 0.142 10.1);
   --accent-foreground: oklch(16.8% 0.052 286.4);
   --destructive: oklch(54.0% 0.216 25.2);
@@ -78,6 +81,9 @@
   /* Dark-mode glows on CTAs */
   --shadow-glow-primary: 0 0 20px oklch(62.5% 0.162 259.9 / 0.3);
   --shadow-glow-accent: 0 0 20px oklch(76.6% 0.142 10.1 / 0.25);
+
+  /* Primary text on dark surfaces needs a brighter shade than --primary. */
+  --primary-strong: oklch(78% 0.16 259.9);
 }
 
 @theme inline {
@@ -89,6 +95,7 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-strong: var(--primary-strong);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);

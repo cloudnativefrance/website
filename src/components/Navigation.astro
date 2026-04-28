@@ -124,8 +124,8 @@ const contactLink = linkByKey["nav.contact"];
   <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 md:px-6 md:py-6">
     <!-- Logo (theme-aware: only the variant matching the current .dark class renders) -->
     <a href={homeHref} class="shrink-0 flex items-center" aria-label="CND France">
-      <img src={logoCompactLight.src} alt="CND France" class="dark:hidden h-10 md:h-14" />
-      <img src={logoCompactDark.src} alt="CND France" class="hidden dark:block h-10 md:h-14" loading="lazy" />
+      <img src={logoCompactLight.src} alt="CND France" width={logoCompactLight.width} height={logoCompactLight.height} class="dark:hidden h-10 md:h-14 w-auto" />
+      <img src={logoCompactDark.src} alt="CND France" width={logoCompactDark.width} height={logoCompactDark.height} class="hidden dark:block h-10 md:h-14 w-auto" loading="lazy" />
     </a>
 
     <!-- Desktop links — order: À propos, Programme, Partenaires, Replays, Contact. -->

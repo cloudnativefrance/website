@@ -53,11 +53,11 @@ const legalLinks = [
 
       <!-- Column 1: Brand + Newsletter -->
       <div>
-        <img src={logoFullLight.src} alt="Cloud Native Days France" class="dark:hidden h-16 md:h-20" loading="lazy" />
-        <img src={logoFullDark.src} alt="Cloud Native Days France" class="hidden dark:block h-16 md:h-20" />
+        <img src={logoFullLight.src} alt="Cloud Native Days France" width={logoFullLight.width} height={logoFullLight.height} class="dark:hidden h-16 md:h-20 w-auto" loading="lazy" />
+        <img src={logoFullDark.src} alt="Cloud Native Days France" width={logoFullDark.width} height={logoFullDark.height} class="hidden dark:block h-16 md:h-20 w-auto" />
         <p class="text-sm text-muted-foreground mt-4">{t("footer.tagline")}</p>
         <p class="text-sm text-muted-foreground mt-3">{t("footer.association")}</p>
-        <p class="mt-3 text-sm font-bold tracking-wide text-primary">{t("social.hashtag")}</p>
+        <p class="mt-3 text-sm font-bold tracking-wide text-primary-strong">{t("social.hashtag")}</p>
         <a
           href={NEWSLETTER_URL}
           target="_blank"
