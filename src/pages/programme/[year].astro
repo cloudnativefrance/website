@@ -1,14 +1,13 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import ScheduleGrid from "@/components/schedule/ScheduleGrid.astro";
-import { loadSessions } from "@/lib/schedule";
+import { loadSessions, getProgrammeMetadata } from "@/lib/schedule";
 import { getSpeakersByLocale, getSlug } from "@/lib/speakers";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import ComingSoonLayout from "@/components/flags/ComingSoonLayout.astro";
 import { isFlagActive } from "@/lib/flags";
 import { EDITIONS, isEdition, CURRENT_EDITION, type Edition } from "@/lib/editions";
 import ComingNotice from "@/components/ComingNotice.astro";
-import { ui } from "@/i18n/ui";
 
 export async function getStaticPaths() {
   return EDITIONS.map((year) => ({ params: { year: String(year) } }));
@@ -37,25 +36,7 @@ for (const s of speakerEntries) {
   speakerInfo.set(s.data.name, info);
 }
 
-// Year-specific rail label (e.g. "Programme — 03 Février 2026") with fallback
-// to the generic 2027 label.
-const yearKey = `schedule.rail_label.${year}`;
-const railLabel =
-  (ui[lang] as Record<string, string>)[yearKey] ??
-  (ui.fr as Record<string, string>)[yearKey] ??
-  t("schedule.rail_label");
-
-// Optional PDF programme download. Defaults to a known asset under public/
-// for years where we ship one; can be overridden at build time via
-// `PROGRAMME_PDF_URL_<year>`. When neither is set, the button is hidden.
-const KNOWN_PROGRAMME_PDFS: Partial<Record<Edition, string>> = {
-  2026: "/programme-cnd-france-2026.pdf",
-};
-const programmePdfUrl =
-  (typeof process !== "undefined"
-    ? (process.env as Record<string, string | undefined>)[`PROGRAMME_PDF_URL_${year}`]
-    : undefined) ?? KNOWN_PROGRAMME_PDFS[year];
-const programmePdfLabel = t("schedule.download_pdf").replace("{year}", String(year));
+const { railLabel, programmePdfUrl, programmePdfLabel } = getProgrammeMetadata(year, lang);
 
 // Future editions (year > CURRENT_EDITION) stay behind the `programme` flag.
 // Past/current editions always render — 2026 has real archive data, 2023 etc.

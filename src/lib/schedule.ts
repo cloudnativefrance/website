@@ -1,5 +1,7 @@
 import { fetchCsvOrFallback, getCsvUrl } from "./remote-csv";
 import { CURRENT_EDITION, type Edition } from "./editions";
+import { ui, type Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
 
 export type SessionFormat = "keynote" | "talk" | "lightning" | "workshop";
 export type SessionStatus = "confirmed" | "tentative" | "cancelled" | "hidden";
@@ -288,4 +290,34 @@ export function buildIcs(sessions: SessionRow[]): string {
     ...sessions.map(sessionToIcs),
     "END:VCALENDAR",
   ].join("\r\n");
+}
+
+const KNOWN_PROGRAMME_PDFS: Partial<Record<Edition, string>> = {
+  2026: "/programme-cnd-france-2026.pdf",
+};
+
+export interface ProgrammeMetadata {
+  railLabel: string;
+  programmePdfUrl: string | undefined;
+  programmePdfLabel: string;
+}
+
+export function getProgrammeMetadata(year: Edition, lang: Locale): ProgrammeMetadata {
+  const t = useTranslations(lang);
+  const yearKey = `schedule.rail_label.${year}`;
+  const railLabel =
+    (ui[lang] as Record<string, string>)[yearKey] ??
+    (ui.fr as Record<string, string>)[yearKey] ??
+    t("schedule.rail_label");
+
+  const envOverride =
+    typeof process !== "undefined"
+      ? (process.env as Record<string, string | undefined>)[`PROGRAMME_PDF_URL_${year}`]
+      : undefined;
+
+  return {
+    railLabel,
+    programmePdfUrl: envOverride ?? KNOWN_PROGRAMME_PDFS[year],
+    programmePdfLabel: t("schedule.download_pdf").replace("{year}", String(year)),
+  };
 }
