@@ -144,16 +144,36 @@ const TEAM_GROUPS = [
   "autres-benevoles",
 ] as const;
 
+// Temporary compatibility map — the published Google Sheet still uses the
+// pre-April-2026 group slugs (direction, editorial, ...). They are mapped
+// to the new audience-facing categories at load time so the build keeps
+// working while the Sheet owner repoints the column. Drop this map after
+// the Sheet has been migrated.
+const LEGACY_TEAM_GROUP_ALIAS: Record<string, (typeof TEAM_GROUPS)[number]> = {
+  direction: "equipe-principale",
+  editorial: "equipe-principale",
+  communication: "equipe-principale",
+  partenariats: "equipe-principale",
+  billetterie: "equipe-principale",
+  aidants: "autres-benevoles",
+  inclusivite: "equipe-principale",
+};
+
 const teamSchema = z.object({
   id: z.string(),
   name: z.string(),
   role_fr: z.string(),
   role_en: z.string(),
   groups: z.preprocess(
-    (v) =>
-      typeof v === "string"
+    (v) => {
+      const items = typeof v === "string"
         ? v.split(",").map((s) => s.trim()).filter(Boolean)
-        : v,
+        : v;
+      if (!Array.isArray(items)) return items;
+      const mapped = items.map((g) => LEGACY_TEAM_GROUP_ALIAS[g] ?? g);
+      // Dedupe — multiple legacy slugs can collapse to the same new slug.
+      return Array.from(new Set(mapped));
+    },
     z.array(z.enum(TEAM_GROUPS)).min(1),
   ),
   photo: z.string().optional().or(z.literal("").transform(() => undefined)),
