@@ -52,6 +52,7 @@ const social = {
       photo={speaker.data.photo_url}
       social={social}
       lang={lang}
+      backHref={getLocalePath(lang, `/speakers/${year}`)}
     >
       {speaker.data.bio && (
         <article class="prose prose-invert max-w-none">

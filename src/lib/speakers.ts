@@ -11,11 +11,14 @@ function speakersCollectionName(year: Edition): SpeakersCollection {
 }
 
 /**
- * Extract the slug from a speaker collection entry id. After the speakers.csv
- * migration, id === slug (no locale prefix); still true per-year.
+ * Extract the natural slug from a speaker collection entry id. The csvLoader
+ * stores entries as `${rowIndex.padStart(4, "0")}-${naturalSlug}` so multiple
+ * speakers with the same slug (or duplicates across editions) get unique
+ * Astro store keys. Strip that 4-digit prefix here so URLs and session
+ * cross-references use the human-readable slug authored in the Sheet.
  */
 export function getSlug(entryId: string): string {
-  return entryId;
+  return entryId.replace(/^\d{4}-/, "");
 }
 
 /** Get every speaker for the given year. The collection is locale-agnostic. */

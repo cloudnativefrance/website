@@ -16,15 +16,17 @@ interface Props {
     website?: string;
   };
   lang: Locale;
+  backHref?: string;
 }
 
-const { name, company, role, photo, social, lang } = Astro.props;
+const { name, company, role, photo, social, lang, backHref } = Astro.props;
 const t = useTranslations(lang);
+const resolvedBackHref = backHref ?? getLocalePath(lang, "/speakers");
 ---
 
 <div class="max-w-3xl mx-auto">
   <a
-    href={getLocalePath(lang, "/speakers")}
+    href={resolvedBackHref}
     class="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
   >
     <svg
