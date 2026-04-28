@@ -40,17 +40,33 @@ export function safeUrl(raw: string | undefined): string | null {
 export function safeLogoPath(raw: string | undefined): string | null {
   const t = (raw || "").trim();
   if (!t) return null;
-  if (t.includes("..")) return null;
+  if (t.includes("..")) {
+    warnRejectedLogo(t, "contains '..'");
+    return null;
+  }
   // Absolute public paths ("/sponsors/foo.svg") — reject protocol-relative
   if (t.startsWith("/") && !t.startsWith("//")) return t;
   // https absolute URLs only
   try {
     const u = new URL(t);
     if (u.protocol === "https:") return u.toString();
+    warnRejectedLogo(t, `unsupported protocol ${u.protocol}`);
   } catch {
-    /* fallthrough */
+    warnRejectedLogo(t, "not a leading-slash path nor an https URL");
   }
   return null;
+}
+
+/**
+ * Surface logo paths that the allowlist rejected. Build-time only — runs
+ * once per row during Astro's content-collection load, not on every page
+ * render. Used to debug Sheet entries whose logo column is malformed
+ * (typical: missing leading slash, e.g. `wescale.webp` instead of
+ * `/sponsors/wescale.webp`).
+ */
+function warnRejectedLogo(value: string, reason: string): void {
+  if (typeof process === "undefined" || process.env.NODE_ENV === "test") return;
+  console.warn(`[safeLogoPath] rejected logo "${value}" — ${reason}. Expected /sponsors/<file>.<ext> or https://…`);
 }
 
 type SponsorsCollection = "sponsors-2023" | "sponsors-2026" | "sponsors-2027";
