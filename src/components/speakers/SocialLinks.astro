@@ -5,7 +5,6 @@ interface Props {
     linkedin?: string;
     bluesky?: string;
     website?: string;
-    twitter?: string;
   };
 }
 
@@ -35,7 +34,6 @@ const links = {
   linkedin: safeUrl(social?.linkedin),
   bluesky: safeUrl(social?.bluesky),
   website: safeUrl(social?.website),
-  twitter: safeUrl(social?.twitter),
 };
 const hasAny = Object.values(links).some((v) => v !== null);
 ---
@@ -129,19 +127,6 @@ const hasAny = Object.values(links).some((v) => v !== null);
             <circle cx="12" cy="12" r="10" />
             <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
             <path d="M2 12h20" />
-          </svg>
-        </a>
-      )}
-      {links.twitter && (
-        <a
-          href={links.twitter}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Twitter / X profile"
-          class="text-muted-foreground hover:text-primary transition-colors duration-150 p-2"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
           </svg>
         </a>
       )}

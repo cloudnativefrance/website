@@ -98,7 +98,6 @@ const speakerSchema = z.object({
   company: z.string().optional(),
   role: z.string().optional(),
   bio: z.string().optional(),
-  twitter: socialUrl,
   linkedin: socialUrl,
   github: socialUrl,
   bluesky: socialUrl,
@@ -146,7 +145,6 @@ const teamSchema = z.object({
   social_linkedin: socialUrl,
   social_github: socialUrl,
   social_bluesky: socialUrl,
-  social_twitter: socialUrl,
   social_website: socialUrl,
 });
 

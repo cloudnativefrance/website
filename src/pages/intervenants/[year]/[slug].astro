@@ -36,7 +36,6 @@ const talks = await getTalksForSpeaker(lang, slug, year);
 const allSpeakers = await getAllSpeakers(year);
 const speakerNameBySlug = new Map(allSpeakers.map((s) => [getSlug(s.id), s.data.name]));
 const social = {
-  twitter: speaker.data.twitter,
   linkedin: speaker.data.linkedin,
   github: speaker.data.github,
   bluesky: speaker.data.bluesky,
