@@ -3,6 +3,7 @@ import Layout from "@/layouts/Layout.astro";
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import SponsorTierSection from "@/components/sponsors/SponsorTierSection.astro";
 import SponsorCTA from "@/components/sponsors/SponsorCTA.astro";
+import SponsorStands2026 from "@/components/sponsors/SponsorStands2026.astro";
 import { getSponsors, type SponsorEntry } from "@/lib/sponsor-utils";
 import { EDITIONS, isEdition, CURRENT_EDITION, type Edition } from "@/lib/editions";
 import { isFlagActive } from "@/lib/flags";
@@ -80,7 +81,11 @@ const tierTitles = {
           <p class="text-lg text-muted-foreground">{t("sponsors.year_pending")}</p>
         )}
       </section>
-    ) : (
+    ) : null}
+
+    {isPending && year === 2027 && <SponsorStands2026 />}
+
+    {!isPending && (
       TIER_ORDER.map((tier) => (
         <SponsorTierSection
           tier={tier}

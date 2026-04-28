@@ -105,6 +105,10 @@ export const ui = {
       "La liste des partenaires sera annoncée prochainement.",
     "sponsors.empty_state": "Les partenaires de cette édition seront annoncés prochainement.",
     "sponsors.year_pending": "À venir — la liste des partenaires sera annoncée prochainement.",
+    "sponsors.stands_2026.heading": "Stands de l'édition 2026",
+    "sponsors.stands_2026.intro":
+      "Un aperçu de quelques stands de l'édition 2026 : retrouvez l'ambiance et les partenaires qui rendent l'événement possible.",
+    "sponsors.stands_2026.alt": "Stand {name} à Cloud Native Days France 2026",
     "sponsors.year_pending_2027.lead": "À venir — Nos premiers partenaires de l'édition 2027 seront annoncés fin 2026.",
     "sponsors.year_pending_2027.cta": "Retrouvez nos partenaires 2026 sans qui CND France n'aurait pas été possible.",
     "sponsors.year_pending_2027.link": "Voir les partenaires 2026",
@@ -439,6 +443,10 @@ export const ui = {
       "The sponsor list will be announced soon.",
     "sponsors.empty_state": "The sponsors for this edition will be announced soon.",
     "sponsors.year_pending": "Coming soon — the sponsor lineup will be announced shortly.",
+    "sponsors.stands_2026.heading": "Booths from the 2026 edition",
+    "sponsors.stands_2026.intro":
+      "A glimpse at a few booths from the 2026 edition — the atmosphere and the partners that make the event happen.",
+    "sponsors.stands_2026.alt": "{name} booth at Cloud Native Days France 2026",
     "sponsors.year_pending_2027.lead": "Coming soon — Our first 2027 sponsors will be announced late 2026.",
     "sponsors.year_pending_2027.cta": "Meet our 2026 sponsors who made CND France possible.",
     "sponsors.year_pending_2027.link": "View 2026 sponsors",

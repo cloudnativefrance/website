@@ -1,0 +1,57 @@
+---
+/**
+ * SponsorStands2026 — gallery of 6 partner-stand photos from the 2026
+ * edition, shown beneath the 2027-pending placeholder so the partners-2027
+ * page has visual content while the new sponsor list is being assembled.
+ *
+ * 2-per-row grid, fixed order per partners brief:
+ *   Scaleway / Numspot
+ *   Plakar   / Enix
+ *   Traefik  / Veeam
+ */
+import { Image } from "astro:assets";
+import { useTranslations, getLangFromUrl } from "@/i18n/utils";
+import scalewayImg from "@/assets/photos/partners-2027/scaleway.jpg";
+import numspotImg from "@/assets/photos/partners-2027/numspot.jpg";
+import plakarImg from "@/assets/photos/partners-2027/plakar.jpg";
+import enixImg from "@/assets/photos/partners-2027/enix.jpg";
+import traefikImg from "@/assets/photos/partners-2027/traefik.jpg";
+import veeamImg from "@/assets/photos/partners-2027/veeam.jpg";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const stands = [
+  { src: scalewayImg, name: "Scaleway" },
+  { src: numspotImg, name: "Numspot" },
+  { src: plakarImg, name: "Plakar" },
+  { src: enixImg, name: "Enix" },
+  { src: traefikImg, name: "Traefik" },
+  { src: veeamImg, name: "Veeam" },
+] as const;
+---
+
+<section class="mt-16 max-w-5xl mx-auto">
+  <h2 class="text-2xl md:text-3xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+    {t("sponsors.stands_2026.heading")}
+  </h2>
+  <p class="mt-3 text-base text-muted-foreground max-w-2xl">
+    {t("sponsors.stands_2026.intro")}
+  </p>
+  <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+    {stands.map(({ src, name }) => (
+      <figure class="overflow-hidden rounded-lg border border-border bg-card">
+        <Image
+          src={src}
+          alt={t("sponsors.stands_2026.alt").replace("{name}", name)}
+          widths={[480, 720, 960]}
+          sizes="(min-width: 640px) 50vw, 100vw"
+          formats={["avif", "webp"]}
+          loading="lazy"
+          decoding="async"
+          class="w-full h-auto aspect-[4/3] object-cover"
+        />
+      </figure>
+    ))}
+  </div>
+</section>
