@@ -471,7 +471,7 @@ const CSS_VARS = {
 <style>
   /* --row-height: pixels per 5-minute slot. Sized so a 10-min card (2 rows)
      fits a time chip + 2-line title. */
-  .schedule-root { --row-height: 28px; --card-pad: 8px; }
+  .schedule-root { --row-height: 34px; --card-pad: 8px; }
 
   .chip {
     display: inline-flex;
@@ -661,24 +661,24 @@ const CSS_VARS = {
      header, trim padding, keep only time + tight title so the card stays
      readable even in 2-row (10-min) height. */
   .schedule-session.is-compact {
-    padding: 4px 8px;
-    gap: 2px;
+    padding: 6px 10px;
+    gap: 3px;
   }
   .schedule-session.is-compact .schedule-session-head {
-    font-size: 10px;
+    font-size: 11px;
   }
-  .schedule-session.is-compact .schedule-time-range { font-size: 10px; }
+  .schedule-session.is-compact .schedule-time-range { font-size: 11px; }
   .schedule-session.is-compact .schedule-bookmark { width: 18px; height: 18px; }
   .schedule-session.is-compact .schedule-bookmark svg { width: 12px; height: 12px; }
   .schedule-session.is-compact .schedule-session-title {
-    font-size: 12px;
+    font-size: 13px;
     -webkit-line-clamp: 2;
     line-clamp: 2;
   }
   .schedule-session.is-compact .schedule-session-speakers {
-    font-size: 11px;
-    -webkit-line-clamp: 1;
-    line-clamp: 1;
+    font-size: 12px;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
   }
 
   /* Modal description: markdown-rendered paragraphs + inline elements */

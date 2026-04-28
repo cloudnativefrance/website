@@ -18,6 +18,10 @@ const groupTitles = Object.fromEntries(
   TEAM_GROUPS.map((g) => [g, t(`team.group.${g}` as const)]),
 ) as Record<TeamGroup, string>;
 
+const groupIntros = Object.fromEntries(
+  TEAM_GROUPS.map((g) => [g, t(`team.intro.${g}` as const)]),
+) as Record<TeamGroup, string>;
+
 const hasAnyMember = all.length > 0;
 ---
 
@@ -38,6 +42,7 @@ const hasAnyMember = all.length > 0;
               members={byGroup[g]}
               lang={lang}
               title={groupTitles[g]}
+              intro={groupIntros[g]}
             />
           ) : null,
         )

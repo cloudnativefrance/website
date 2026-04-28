@@ -94,7 +94,7 @@ const regular = speakers
                     <SpeakerAvatar name={s.data.name} photo={s.data.photo_url} size="lg" />
                   </div>
                   <span class="inline-block px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-accent bg-accent/15 rounded-full">
-                    {t("speakers.keynote_badge")}
+                    {slug === "petazzoni" ? t("speakers.keynote_badge_mc") : t("speakers.keynote_badge")}
                   </span>
                   <h2 class="text-xl md:text-2xl font-bold text-foreground" style="letter-spacing:-0.02em;">
                     {s.data.name}
