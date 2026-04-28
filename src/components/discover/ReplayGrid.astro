@@ -1,0 +1,64 @@
+---
+import type { Replay } from "@/data/replays";
+import { REPLAYS_PLAYLIST_ID } from "@/data/replays";
+import type { Locale } from "@/i18n/ui";
+
+interface Props {
+  title: string;
+  cta: string;
+  replays: Replay[];
+  lang: Locale;
+}
+
+const { title, cta, replays } = Astro.props;
+const replaysHref = `https://www.youtube.com/playlist?list=${REPLAYS_PLAYLIST_ID}`;
+---
+
+<section id="replays" class="bg-muted/30">
+  <div class="mx-auto max-w-7xl px-4 md:px-6 py-16">
+    <h2 class="text-3xl font-bold text-foreground mb-10 text-center">{title}</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+      {replays.map(({ id, title: talkTitle }) => (
+        <a
+          href={`https://www.youtube.com/watch?v=${id}&list=${REPLAYS_PLAYLIST_ID}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group relative rounded-lg overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 block"
+          aria-label={talkTitle}
+        >
+          <img
+            src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
+            alt={talkTitle}
+            class="w-full aspect-video object-cover"
+            loading="lazy"
+            width="480"
+            height="360"
+          />
+          <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity flex items-end p-3">
+            <span class="text-white text-sm font-medium line-clamp-2">{talkTitle}</span>
+          </div>
+          <div class="absolute inset-0 flex items-center justify-center opacity-80 group-hover:opacity-0 transition-opacity">
+            <div class="w-12 h-12 rounded-full bg-black/60 flex items-center justify-center">
+              <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+    <div class="mt-10 text-center">
+      <a
+        href={replaysHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 text-primary font-semibold hover:underline underline-offset-4 text-lg"
+      >
+        {cta}
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
