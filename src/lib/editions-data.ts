@@ -28,6 +28,12 @@ import ambiance03 from "@/assets/photos/ambiance/ambiance-03.jpg";
 import ambiance06 from "@/assets/photos/ambiance/ambiance-06.jpg";
 import ambiance10 from "@/assets/photos/ambiance/ambiance-10.jpg";
 import kcdLogo from "@/assets/logos/kcd2023/logo-color.png";
+import replayKeynote from "@/assets/photos/replays-2026/keynote.png";
+import replayMistral from "@/assets/photos/replays-2026/mistral.png";
+import replayRenault from "@/assets/photos/replays-2026/renault.png";
+import replaySncf from "@/assets/photos/replays-2026/sncf.png";
+import replaySellsy from "@/assets/photos/replays-2026/sellsy.png";
+import replaySanteMentale from "@/assets/photos/replays-2026/santementale.png";
 
 type Stat = { value: string; labelKey: string };
 type Thumbnail = {
@@ -61,14 +67,20 @@ export const EDITION_2026 = {
     { src: ambiance06, altKey: "editions.2026.thumbnail_alt.2", size: "medium" },
     { src: ambiance10, altKey: "editions.2026.thumbnail_alt.3", size: "medium" },
   ] as const satisfies ReadonlyArray<Thumbnail>,
-  // Top 4 most-watched talks from the 2026 edition (manually curated).
-  // YouTube thumbnails fetched at runtime from i.ytimg.com — no build step needed.
+  // Top 6 most-watched talks from the 2026 edition (manually curated).
+  // Local thumbnails for art-directed previews — replaces YouTube hqdefault.
   topReplays: [
-    { youtubeId: "lJXUhqHWCDo", titleKey: "editions.2026.top_replay.1" },
-    { youtubeId: "LaOq7x-nGM4", titleKey: "editions.2026.top_replay.2" },
-    { youtubeId: "F8x6DBeNeqg", titleKey: "editions.2026.top_replay.3" },
-    { youtubeId: "Wb3cNKyJtCY", titleKey: "editions.2026.top_replay.4" },
-  ] as const satisfies ReadonlyArray<{ youtubeId: string; titleKey: keyof typeof ui.fr }>,
+    { youtubeId: "lJXUhqHWCDo", titleKey: "editions.2026.top_replay.1", thumb: replayKeynote },
+    { youtubeId: "LaOq7x-nGM4", titleKey: "editions.2026.top_replay.2", thumb: replayMistral },
+    { youtubeId: "F8x6DBeNeqg", titleKey: "editions.2026.top_replay.3", thumb: replayRenault },
+    { youtubeId: "Wb3cNKyJtCY", titleKey: "editions.2026.top_replay.4", thumb: replaySncf },
+    { youtubeId: "g3KXvevXStM", titleKey: "editions.2026.top_replay.5", thumb: replaySellsy },
+    { youtubeId: "XwECzgHIV_U", titleKey: "editions.2026.top_replay.6", thumb: replaySanteMentale },
+  ] as const satisfies ReadonlyArray<{
+    youtubeId: string;
+    titleKey: keyof typeof ui.fr;
+    thumb: ImageMetadata;
+  }>,
   placeholder: false,
 } as const;
 
