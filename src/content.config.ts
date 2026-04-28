@@ -155,7 +155,7 @@ const LEGACY_TEAM_GROUP_ALIAS: Record<string, (typeof TEAM_GROUPS)[number]> = {
   communication: "equipe-principale",
   partenariats: "equipe-principale",
   billetterie: "equipe-principale",
-  aidants: "autres-benevoles",
+  aidants: "equipe-principale",
   inclusivite: "equipe-principale",
 };
 
