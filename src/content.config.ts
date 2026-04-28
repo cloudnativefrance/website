@@ -135,18 +135,39 @@ const sponsorSchema = z.object({
   description_en: z.string(),
 });
 
+// A team member can belong to multiple groups (e.g. someone in both Direction
+// and Éditorial). Sheet authors list groups comma-separated in a single cell.
+const TEAM_GROUPS = [
+  "direction",
+  "editorial",
+  "communication",
+  "partenariats",
+  "billetterie",
+  "aidants",
+  "inclusivite",
+] as const;
+
 const teamSchema = z.object({
   id: z.string(),
   name: z.string(),
   role_fr: z.string(),
   role_en: z.string(),
-  group: z.enum(["core", "program-committee", "volunteers"]),
+  groups: z.preprocess(
+    (v) =>
+      typeof v === "string"
+        ? v.split(",").map((s) => s.trim()).filter(Boolean)
+        : v,
+    z.array(z.enum(TEAM_GROUPS)).min(1),
+  ),
   photo: z.string().optional().or(z.literal("").transform(() => undefined)),
   social_linkedin: socialUrl,
   social_github: socialUrl,
   social_bluesky: socialUrl,
   social_website: socialUrl,
 });
+
+export type TeamGroup = (typeof TEAM_GROUPS)[number];
+export { TEAM_GROUPS };
 
 // -- Per-year collection factories -----------------------------------------
 

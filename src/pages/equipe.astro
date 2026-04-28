@@ -9,22 +9,29 @@ const t = useTranslations(lang);
 
 const all = await getCollection("team");
 
-const GROUP_ORDER = ["core", "program-committee", "volunteers"] as const;
+// A member can belong to multiple groups; the same person renders once per
+// section they're listed in.
+const GROUP_ORDER = [
+  "direction",
+  "editorial",
+  "communication",
+  "partenariats",
+  "billetterie",
+  "aidants",
+  "inclusivite",
+] as const;
 const byGroup = Object.fromEntries(
-  GROUP_ORDER.map((g) => [g, all.filter((m) => m.data.group === g)]),
+  GROUP_ORDER.map((g) => [g, all.filter((m) => m.data.groups.includes(g))]),
 ) as Record<(typeof GROUP_ORDER)[number], CollectionEntry<"team">[]>;
 
-// Enum-value → i18n-key mapping (D-09: key uses underscore, enum uses hyphen).
 const groupTitles = {
-  core: t("team.group.core"),
-  "program-committee": t("team.group.program_committee"),
-  volunteers: t("team.group.volunteers"),
-} as const;
-
-const groupBodies = {
-  core: t("team.group.core.body"),
-  "program-committee": t("team.group.program_committee.body"),
-  volunteers: t("team.group.volunteers.body"),
+  direction: t("team.group.direction"),
+  editorial: t("team.group.editorial"),
+  communication: t("team.group.communication"),
+  partenariats: t("team.group.partenariats"),
+  billetterie: t("team.group.billetterie"),
+  aidants: t("team.group.aidants"),
+  inclusivite: t("team.group.inclusivite"),
 } as const;
 
 const hasAnyMember = all.length > 0;
@@ -48,7 +55,6 @@ const hasAnyMember = all.length > 0;
               members={byGroup[g]}
               lang={lang}
               title={groupTitles[g]}
-              subtitle={groupBodies[g]}
             />
           ) : null,
         )
