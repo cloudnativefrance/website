@@ -98,6 +98,10 @@ const speakerSchema = z.object({
   bluesky: socialUrl,
   website: socialUrl,
   keynote: z.boolean().optional(),
+  keynote_size: z
+    .enum(["lead", "guest", "panel"])
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
 });
 
 // Sheet authors use short/French tier labels; normalize to canonical schema names.

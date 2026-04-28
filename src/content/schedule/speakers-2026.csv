@@ -1,84 +1,84 @@
-slug,name,photo_url,company,role,bio,linkedin,github,bluesky,website,keynote
-petazzoni,Jérôme Petazzoni,/speakers/petazzoni.jpg,Enix,Tinkerer,"Jérôme fait partie de l'équipe qui a conçu et popularisé Docker. Vous avez peut-être déjà vu ses hits comme « Chérie j'ai rétréci Docker », « S'il vous plaît, dessine moi un cluster » ou encore « Rions avec les plugins CNI et changeons de moteur en plein vol » (il a un sens de l'humour un peu spécial). Aujourd'hui, il donne des formations Kubernetes chez Enix (enix.io), embarqué dans une croisade ayant pour but de montrer que Kubernetes, finalement, c'est pas si compliqué que ça et que vous aussi, vous pouvez vous y mettre sans problème. Il possède un nombre indéterminé d'instruments de musique, et sait jouer le thème de Zelda sur la plupart d'entre eux.",,,,,true
+slug,name,photo_url,company,role,bio,linkedin,github,bluesky,website,keynote,keynote_size
+petazzoni,Jérôme Petazzoni,/speakers/petazzoni.jpg,Enix,Tinkerer,"Jérôme fait partie de l'équipe qui a conçu et popularisé Docker. Vous avez peut-être déjà vu ses hits comme « Chérie j'ai rétréci Docker », « S'il vous plaît, dessine moi un cluster » ou encore « Rions avec les plugins CNI et changeons de moteur en plein vol » (il a un sens de l'humour un peu spécial). Aujourd'hui, il donne des formations Kubernetes chez Enix (enix.io), embarqué dans une croisade ayant pour but de montrer que Kubernetes, finalement, c'est pas si compliqué que ça et que vous aussi, vous pouvez vous y mettre sans problème. Il possède un nombre indéterminé d'instruments de musique, et sait jouer le thème de Zelda sur la plupart d'entre eux.",,,,,true,lead
 vache,Aurélie Vache,/speakers/vache.jpg,OVHcloud,DevRel / Docker Captain,"Aurélie est Developer Advocate chez OVHcloud. Elle est Docker Captain, CNCF Ambassador, Google Cloud Developer Expert, GitPod Hero & Women Techmakers Ambassador. Dans le milieu du Dev et de l'Ops depuis + de 19 ans, elle est une passionnée de Cloud et prône les bonnes pratiques DevOps/Cloud/Golang.
 
 Rédactrice technique, sketchnoter, auteure de livres illustrés, speaker, jury dans plusieurs CFP et organisatrice de conférences depuis 2016.
 
 Elle adore faire du mentoring et aider les autres.
 
-Elle a créé une nouvelle façon visuelle pour les gens d'apprendre et de comprendre les technologies Cloud : ""Understanding Kubernetes/Istio/Docker in a visual way"" dans des sketchnotes, livres et des vidéos illustrés.",,,,,
-saboni,Amine Saboni,/speakers/saboni.jpg,,,"MLOps Engineer working at pruna, I am interested in efficient, reliable & robustly beneficial AI. My work is centered around building ML development platforms, and provide relevant tooling to build & deploy robust ML models in applications.",,,,,
+Elle a créé une nouvelle façon visuelle pour les gens d'apprendre et de comprendre les technologies Cloud : ""Understanding Kubernetes/Istio/Docker in a visual way"" dans des sketchnotes, livres et des vidéos illustrés.",,,,,,
+saboni,Amine Saboni,/speakers/saboni.jpg,,,"MLOps Engineer working at pruna, I am interested in efficient, reliable & robustly beneficial AI. My work is centered around building ML development platforms, and provide relevant tooling to build & deploy robust ML models in applications.",,,,,,
 vermande,Nicolas Vermande,/speakers/vermande.jpg,,,"Nicolas est un passionné de technologie, à la fois praticien, évangéliste et product owner. Depuis plus de 21 ans, il évolue dans les domaines des technologies cloud-native, de l’open source, de la virtualisation et des réseaux de datacentres.
-Il aime avant tout aider les utilisateurs et créer des solutions innovantes qui résolvent de vrais problèmes pratiques. On le retrouve régulièrement lors de conférences techniques internationales et d’événements en ligne, où il partage son expertise, promeut les bonnes pratiques et s’implique concrètement auprès des communautés et des utilisateurs.",,,,,
-chmielowski,Luc Chmielowski,/speakers/chmielowski.jpg,,,"Luc Chmielowski est ingénieur logiciel et maintainer de Kyverno, un projet open source dédié à la gestion des politiques et à la sécurité dans Kubernetes. Passionné par le développement open source, il aime concevoir et construire des solutions allant des interfaces utilisateur aux plateformes cloud fondées en passant par tout ce qui touche à l’intelligence artificielle. Il apprécie avant tout l'aspect collaboratif de l’ingénierie — que ce soit pour échanger des idées, contribuer à des projets open source ou simplement discuter (de technologie ou d’autre chose) avec des personnes animées par la même curiosité.",,,,,
-piard,Vincent PIARD,/speakers/piard.jpg,DINUM,,"Biberonné aux joies du Cobol, engraissé aux compotes Php, gavé de Java, sustenté aux sucreries C#, repu au Flex et finalement nourri en intraveineuse de JS, je me délecte en ce moment d'IOT, de Kubernetes et de Devops. A mes heures perdues, je cuisine également quelques mets open source. Architecte de profession et présent sur [Github](https://github.com/lynchmaniac) et [Gitlab](https://gitlab.com/lynchmaniac)",,,,,
+Il aime avant tout aider les utilisateurs et créer des solutions innovantes qui résolvent de vrais problèmes pratiques. On le retrouve régulièrement lors de conférences techniques internationales et d’événements en ligne, où il partage son expertise, promeut les bonnes pratiques et s’implique concrètement auprès des communautés et des utilisateurs.",,,,,,
+chmielowski,Luc Chmielowski,/speakers/chmielowski.jpg,,,"Luc Chmielowski est ingénieur logiciel et maintainer de Kyverno, un projet open source dédié à la gestion des politiques et à la sécurité dans Kubernetes. Passionné par le développement open source, il aime concevoir et construire des solutions allant des interfaces utilisateur aux plateformes cloud fondées en passant par tout ce qui touche à l’intelligence artificielle. Il apprécie avant tout l'aspect collaboratif de l’ingénierie — que ce soit pour échanger des idées, contribuer à des projets open source ou simplement discuter (de technologie ou d’autre chose) avec des personnes animées par la même curiosité.",,,,,,
+piard,Vincent PIARD,/speakers/piard.jpg,DINUM,,"Biberonné aux joies du Cobol, engraissé aux compotes Php, gavé de Java, sustenté aux sucreries C#, repu au Flex et finalement nourri en intraveineuse de JS, je me délecte en ce moment d'IOT, de Kubernetes et de Devops. A mes heures perdues, je cuisine également quelques mets open source. Architecte de profession et présent sur [Github](https://github.com/lynchmaniac) et [Gitlab](https://gitlab.com/lynchmaniac)",,,,,,
 behar,Vincent Behar,/speakers/behar.jpg,Ubisoft,,"Développeur passionné avec plus de 18 ans d'expérience, j’ai toujours vécu un peu à cheval entre le monde des devs et celui des ops. Mes sujets de prédilection sont l’intégration et le déploiement continu, ainsi que le monitoring. J'ai commencé à utiliser - et parfois contribuer à - OpenShift & Kubernetes en 2015. Je travaille actuellement chez Ubisoft depuis 4 ans, où je participe à la construction d’une plateforme d’hébergement interne, basée sur Kubernetes. Avec un focus particulier ces derniers mois sur le multi-tenancy...
 
 
 
 Bluesky: https://vbehar.dev/
-Slack CNCF & Kubernetes: @vbehar",,,,,
-rexed,Henrik Rexed,/speakers/rexed.jpg,,,"Henrik est  Cloud Native Advocate chez Dynatrace et ambassadeur CNCF. Avant de rejoindre Dynatrace, Henrik a travaillé pendant plus de 15 ans en tant qu’ingénieur en performance. Henrik Rexed est également l’un des organisateurs des conférences WOPR et KCD/CND Austria, ainsi que le propriétaire de la chaîne YouTube IsitObservable.",,,,,
+Slack CNCF & Kubernetes: @vbehar",,,,,,
+rexed,Henrik Rexed,/speakers/rexed.jpg,,,"Henrik est  Cloud Native Advocate chez Dynatrace et ambassadeur CNCF. Avant de rejoindre Dynatrace, Henrik a travaillé pendant plus de 15 ans en tant qu’ingénieur en performance. Henrik Rexed est également l’un des organisateurs des conférences WOPR et KCD/CND Austria, ainsi que le propriétaire de la chaîne YouTube IsitObservable.",,,,,,
 arthur-outhenin-chalandre,Arthur Outhenin-Chalandre,/speakers/arthur-outhenin-chalandre.jpg,,,"Arthur travaille comme Staff SRE chez Ledger. Il a toujours aimé utiliser des logiciels Open Source et y contribuer pour construire des infrastructures fiables et performantes et améliorer la productivité des développeurs.
 
 Il contribue activement en tant que développeur et reviewer à Cilium ClusterMesh et au groupe SIG-multicluster, où il participe à l'amélioration du standard MCS-API.
 
 Github: https://github.com/MrFreezeex 
-LinkedIn: https://www.linkedin.com/in/arthur-outhenin-chalandre/",,,,,
+LinkedIn: https://www.linkedin.com/in/arthur-outhenin-chalandre/",,,,,,
 yannick-lambruschi,Yannick Lambruschi,/speakers/yannick-lambruschi.jpg,,,"Senior ML Data Engineer, passionné par la création de systèmes de données évolutifs et par la mise en production de solutions de machine learning. Fort d'une solide expérience en data engineering, Feature store et technologies cloud, j'aime partager des conseils et bonnes pratiques sur les pipelines de données, les workflows de ML et les tendances émergentes dans le domaine de la donnée et du machine learning. J'ai à cœur d'aider les autres à naviguer dans le monde en constante évolution des données et de l'IA, mais par-dessus tout, je suis un grand fan des loutres.
-Linkedin: https://www.linkedin.com/in/yannicklambruschi/",,,,,
+Linkedin: https://www.linkedin.com/in/yannicklambruschi/",,,,,,
 solvik-blum,Solvik Blum,/speakers/solvik-blum.jpg,,,"Head of Infrastructure & Security chez Numberly, j’architecture et opère des plateformes critiques multi-datacenter, cloud et on-prem, avec un fort focus sur l’automatisation, la sécurité et l’open source.
 15 ans d’expérience dans la gestion d’équipes tech, la sécurité certifiée (ISO-27001, HDS), et la transformation cloud native à grande échelle.
-Ex-Scaleway, passé par toutes les couches de l’infra, passionné par le partage de solutions robustes, scalables et accessibles à toutes les équipes.",,,,,
+Ex-Scaleway, passé par toutes les couches de l’infra, passionné par le partage de solutions robustes, scalables et accessibles à toutes les équipes.",,,,,,
 johan-lore,Johan Lore,/speakers/johan-lore.jpg,,,"Johan Lore is Lead Tech Ops at Decathlon, where he manages infrastructure and DevOps practices for high-availability e-commerce platforms. 
 Passionate about technical innovation and continuous improvement, he supports teams in designing resilient, scalable systems focused on user experience.
 With solid expertise in cloud, automation, and observability, he enjoys sharing his feedback on the industrialization of deployments, cost optimization, and the adoption of modern technologies to meet business challenges. 
 
-LinkedIn : linkedin.com/in/johan-lore",,,,,
-hela-ben-farhat,Hela Ben Farhat,/speakers/hela-ben-farhat.jpg,,,"Après plus de 7 ans d'expérience dans le conseil en Transformation technologique (Cloud, DevOps et FinOps), j'ai rejoint Bpifrance en 2021 en tant que Responsable Shared Services Cloud afin d'accélérer l'adoption du Cloud et la démarche FinOps. Depuis début 2025, je pilote la stratégie de plateformisation au sein de la Direction du Digital Bpifrance, dans le but de permettre aux équipes Produit de gagner en rapidité et en efficacité dans leurs livraisons et opérations.",,,,,
+LinkedIn : linkedin.com/in/johan-lore",,,,,,
+hela-ben-farhat,Hela Ben Farhat,/speakers/hela-ben-farhat.jpg,,,"Après plus de 7 ans d'expérience dans le conseil en Transformation technologique (Cloud, DevOps et FinOps), j'ai rejoint Bpifrance en 2021 en tant que Responsable Shared Services Cloud afin d'accélérer l'adoption du Cloud et la démarche FinOps. Depuis début 2025, je pilote la stratégie de plateformisation au sein de la Direction du Digital Bpifrance, dans le but de permettre aux équipes Produit de gagner en rapidité et en efficacité dans leurs livraisons et opérations.",,,,,,
 christophe-jauffret,Christophe Jauffret,/speakers/christophe-jauffret.jpg,,,"Christophe Jauffret est Principal Solutions Architect chez Nutanix, spécialisé dans les technos Cloud Native.
 
 Depuis plus de 25 ans, il aime plonger dans les nouvelles technos qui simplifient la vie des équipes IT. Il a connu les débuts de la virtualisation, contribué à son adoption massive, puis s’est tourné vers l’automatisation, les conteneurs, et tout ce qui touche au Cloud Native. Passé par des startups open source, VMware, Quest Software, il garde une passion intacte pour les outils bien pensés et les architectures propres.
 
-Quand il ne fait pas tomber des clusters en test de charge, il partage ses retours d’expérience pour éviter aux autres de tomber dans les mêmes pièges.",,,,,
+Quand il ne fait pas tomber des clusters en test de charge, il partage ses retours d’expérience pour éviter aux autres de tomber dans les mêmes pièges.",,,,,,
 alice-frosi,Alice Frosi,/speakers/alice-frosi.jpg,,,"Alice est Principal Software Engineer et s'intéresse à la virtualisation et aux conteneurs, et à toutes leurs possibles combinaisons.
 Ancienne responsable de la maintenance de KubeVirt, elle a récemment rejoint l'équipe CoreOS et commencé à travailler sur les clusters confidentiels et cluster api.
 
-LinkedIn : https://de.linkedin.com/in/afrosi",,,,,
-matthieu-strohl,Matthieu Strohl,/speakers/matthieu-strohl.jpg,,,"Après avoir commencé dans l'armée de l'air en tant qu'administrateur système et réseau en 2007, j'ai évolué sur différents poste et différentes technologies dont OpenStack, Openshift, de la CI/CD et plus globalement KuberneteS ces dernières années avec un focus sur TalosLinux. Je suis actuellement leader de domaine Plateform Engineering chez Inside ([https://insidegroup.fr/](https://insidegroup.fr/)).",,,,,
+LinkedIn : https://de.linkedin.com/in/afrosi",,,,,,
+matthieu-strohl,Matthieu Strohl,/speakers/matthieu-strohl.jpg,,,"Après avoir commencé dans l'armée de l'air en tant qu'administrateur système et réseau en 2007, j'ai évolué sur différents poste et différentes technologies dont OpenStack, Openshift, de la CI/CD et plus globalement KuberneteS ces dernières années avec un focus sur TalosLinux. Je suis actuellement leader de domaine Plateform Engineering chez Inside ([https://insidegroup.fr/](https://insidegroup.fr/)).",,,,,,
 luckas-bosch,Luckas Bosch,/speakers/luckas-bosch.jpg,,,"Après avoir commencé ma carrière en France comme administrateur systèmes et réseaux, je me suis envolé pour New York où je travaille aujourd’hui en tant que Site Reliability Engineer (SRE) dans l’univers du streaming et du broadcasting. J’évolue au quotidien dans des environnements critiques, avec une forte composante Kubernetes, infrastructure as code, monitoring et tooling en Go.
 
 Passionné par Linux, les conteneurs et les systèmes distribués, je partage également mon enthousiasme à travers La Tangente, un podcast tech où je reçois des passionnés d’informatique de tous horizons : ingénieurs, chercheurs, entrepreneurs, etc. On y parle de cloud, de dev, d’infra, mais aussi de parcours de vie et de ce qui fait vibrer les professionnels et passionnés d'informatique.
 
 [La Tangente Podcast](https://linktr.ee/la_tangente_podcast)
 [Mon LinkedIn](https://www.linkedin.com/in/luckasbosch)
-[Mes autres réseaux](https://linktr.ee/0xbochi)",,,,,
-paul-gonin,Paul Gonin,/speakers/paul-gonin.jpg,,,"Paul Gonin est Senior Engineering Director chez SUSE, où il dirige les équipes de Dev en charge de la suite de produits Rancher et des distributions Kubernetes K3s & RKE2. Au quotidien, il jongle entre le pilotage de du développement de solution logicielles critiques pour les infrastructures IT des larges entreprises et organisations et l’implication au sein des communautés open source, avec pour mission de faire de Kubernetes un standard accessible partout, du Datacenter, à l'Edge et même sur le poste des Dev. Il est tombé dans l’open source et Linux presque à la naissance (de Linux).",,,,,
+[Mes autres réseaux](https://linktr.ee/0xbochi)",,,,,,
+paul-gonin,Paul Gonin,/speakers/paul-gonin.jpg,,,"Paul Gonin est Senior Engineering Director chez SUSE, où il dirige les équipes de Dev en charge de la suite de produits Rancher et des distributions Kubernetes K3s & RKE2. Au quotidien, il jongle entre le pilotage de du développement de solution logicielles critiques pour les infrastructures IT des larges entreprises et organisations et l’implication au sein des communautés open source, avec pour mission de faire de Kubernetes un standard accessible partout, du Datacenter, à l'Edge et même sur le poste des Dev. Il est tombé dans l’open source et Linux presque à la naissance (de Linux).",,,,,,
 christophe-morvan,Christophe Morvan,/speakers/christophe-morvan.jpg,,,"Tour à tour enseignant chercheur en informatique théorique, créateur d'une startup, puis évangeliste chez OUTSCALE. Christophe est aujourd'hui à la tête d'une équipe d'architectes solution qui contribuent à la formation et l'accompagnement des clients dans la prise en main de notre cloud.
-https://www.linkedin.com/in/morvan/",,,,,
+https://www.linkedin.com/in/morvan/",,,,,,
 ismail-kaboubi,Ismail KABOUBI,/speakers/ismail-kaboubi.jpg,,,"Tech Lead de la plateforme Kubernetes de Renault (AITS), je pilote un ""GKE as a Service"" sécurisé et multi-tenant sur Google Cloud. Fondateur d’Edixos, cabinet de conseil cloud-native. 10+ ans sur Kubernetes, certifié CKA & CKAD. Je conçois des plateformes développeur avec GitOps, Crossplane (maintainer du provider-ovh) et des contrôleurs personnalisés. Contributeur de l'écosystème Kubernetes. Mon credo : rendre l'infra complexe simple et self-service.
 
-Linkedin: https://www.linkedin.com/in/ismail-kaboubi/",,,,,
+Linkedin: https://www.linkedin.com/in/ismail-kaboubi/",,,,,,
 alexis-la-goutte,Alexis La Goutte,/speakers/alexis-la-goutte.jpg,,,"Consultant Réseaux & Sécurité depuis 20ans dans l'Ouest, passionné par les réseaux, l'automatisation  et le cloud-native. Expert en infrastructures hybrides mêlant switching, sécurité réseau (FortiGate, SD-WAN, et Kubernetes. j'aime relier deux mondes : le réseau traditionnel et les environnements cloud native, en explorant notamment Cilium, l’eBPF..
 
 Linkedin : https://www.linkedin.com/in/alexis-lagoutte/
 BlueSky : https://bsky.app/profile/alagoutte.bsky.social
 X : https://x.com/alagoutte
 Gitlab : https://gitlab.com/alagoutte/
-Github :   https://github.com/alagoutte/",,,,,
+Github :   https://github.com/alagoutte/",,,,,,
 tomy-guichard,Tomy Guichard,/speakers/tomy-guichard.jpg,,,"Tomy est ingénieur DevOps chez Scaleway où il participe notamment au développement et à la maintenance de Kapsule, le service Kubernetes managé de Scaleway.
 
-[Linkedin](https://www.linkedin.com/in/tomy-guichard-18580a196/)",,,,,
+[Linkedin](https://www.linkedin.com/in/tomy-guichard-18580a196/)",,,,,,
 luc-juggery,Luc Juggery,/speakers/luc-juggery.jpg,,,"Luc Juggery, Developer Relations Engineer, Exoscale
 
 I'm a software engineer with over 20 years of experience in large corporations and startups, including roles as a co-founder. I continuously expand my knowledge through side projects, online courses, and participations in technical events - as both speaker and attendee.
 
-My interest in the container ecosystem has been a significant part of my career, during which I developed expertise in areas such as Docker, Kubernetes, cloud-native applications, DevOps, infrastructure as code, and CI/CD pipelines. I'm passionate about learning, teaching, and sharing knowledge on these technologies.",,,,,
-gilles-chehade,Gilles Chehade,/speakers/gilles-chehade.jpg,,,"Gilles Chehade est le co-fondateur et CTO de Plakar. Figure de l'Open Source, il est connu pour avoir fondé le projet OpenSMTPD et est core committer pour le projet OpenBSD depuis 2008.",,,,,
+My interest in the container ecosystem has been a significant part of my career, during which I developed expertise in areas such as Docker, Kubernetes, cloud-native applications, DevOps, infrastructure as code, and CI/CD pipelines. I'm passionate about learning, teaching, and sharing knowledge on these technologies.",,,,,,
+gilles-chehade,Gilles Chehade,/speakers/gilles-chehade.jpg,,,"Gilles Chehade est le co-fondateur et CTO de Plakar. Figure de l'Open Source, il est connu pour avoir fondé le projet OpenSMTPD et est core committer pour le projet OpenBSD depuis 2008.",,,,,,
 sherine-khoury,Sherine Khoury,/speakers/sherine-khoury.jpg,,,"Dans la tech depuis très longtemps, je suis actuellement Principal Software Engineer chez Red Hat depuis 4 ans,et je travaille sur OpenShift  et son déploiement multi-platformes. 
 Je m'intéresse à plein de sujets dev, ops, sécurité, platform engineering. 
 Les communautés tech me tiennent à coeur, notamment le [Marseille Java User Group](https://marsjug.org/) que j'aide à organiser.
-Et sinon, j’aime bien courir dans la pampa quand mes genoux me le permettent.",,,,,
+Et sinon, j’aime bien courir dans la pampa quand mes genoux me le permettent.",,,,,true,panel
 maxime-calves,Maxime Calves,/speakers/maxime-calves.jpg,,,"Salut ! Moi, c'est Maxime Calves, un Lead Platform Engineer passionné par les défis techniques à grande échelle et l’automatisation.
 
 Avec ma culture DevOps et ma passion pour l'innovation, je m'investis pleinement dans l’ingénierie des plateformes, avec l’ambition de les construire comme des produits fiables et impeccables — le type de service que j’aimerais utiliser au quotidien.
@@ -97,16 +97,16 @@ With a strong DevOps culture and a genuine drive for innovation, I’m fully com
 
 My mission? To make development processes smoother and more efficient. I have the pleasure of working with fantastic teams at Crédit Agricole Group Infrastructure Platform, where I can put my skills into practice and help drive projects to new heights.
 
-Since 2023, I’ve also been actively involved in building and growing the Cloud Native community in Montpellier. I’ve had the opportunity to organise more than twenty monthly events, bringing together renowned speakers from across France. My goal is to create a space for sharing, learning, and connecting with fellow technology enthusiasts.",,,,,
-amine-ait-aazizi,Amine AIT AAZIZI,/speakers/amine-ait-aazizi.jpg,,,"Amine est un architecte Cloud & SRE. Très passionné par les technologies Cloud natives, le FinOps et le Platform Engineering … Il accompagne ses clients afin de développer une expertise technique sur les sujets Cloud.",,,,,
+Since 2023, I’ve also been actively involved in building and growing the Cloud Native community in Montpellier. I’ve had the opportunity to organise more than twenty monthly events, bringing together renowned speakers from across France. My goal is to create a space for sharing, learning, and connecting with fellow technology enthusiasts.",,,,,,
+amine-ait-aazizi,Amine AIT AAZIZI,/speakers/amine-ait-aazizi.jpg,,,"Amine est un architecte Cloud & SRE. Très passionné par les technologies Cloud natives, le FinOps et le Platform Engineering … Il accompagne ses clients afin de développer une expertise technique sur les sujets Cloud.",,,,,,
 mathieu-tortuyaux,Mathieu Tortuyaux,/speakers/mathieu-tortuyaux.jpg,,,"Mathieu is working as a Linux OS software engineer @ Microsoft mainly involved in the Flatcar development (an open-source Container OS Linux distribution). He's involved in the test automation, release cycle and features development. Outside of the work, he co-founded SRE France, an association that organizes DevOps/SRE Meetups in France and co-created the SRE SummerCamp: a 2 days event mixing outdoors activities and SRE/DevOps talks.
 
-Mastodon: https://fosstodon.org/@tormath1",,,,,
+Mastodon: https://fosstodon.org/@tormath1",,,,,,
 mouhamad-koreissi,Mouhamad Koreissi,/speakers/mouhamad-koreissi.jpg,,,"Kubestronaut
 
 Cloud, Containers, Security, Observability
 
-https://www.linkedin.com/in/koreissm/",,,,,
+https://www.linkedin.com/in/koreissm/",,,,,,
 diana-todea,Diana Todea,/speakers/diana-todea.jpg,,,"Diana est ingénieure en expérience développeur chez VictoriaMetrics. Elle a travaillé en tant que Senior Site Reliability Engineer, spécialisée dans l’observabilité. Elle est passionnée par le serverless, la sécurité opérationnelle (SecOps) et le machine learning.
 Elle est membre active du projet open source OpenTelemetry de la CNCF, co-organisatrice de Cloud Native Days Romania, co-responsable du groupe de travail sur la neurodiversité (dans le cadre de l’initiative merge-forward de la CNCF) et soutient les groupes sous-représentés dans la tech.
 
@@ -114,25 +114,25 @@ LinkedIn: https://www.linkedin.com/in/diana-todea-b2a79968/
 Bluesky: @didiviking.bksy.social
 X: @dianavtodea
 Mastodon: @dianatodea
-GitHub: https://github.com/didiViking/Conferences_Talks",,,,,
+GitHub: https://github.com/didiViking/Conferences_Talks",,,,,,
 baptiste-assmann,Baptiste Assmann,/speakers/baptiste-assmann.jpg,,,"Baptiste Assmann est Directeur Produit chez HAProxy Technologies. Expert en load balancing et architectures haute performance, il joue un rôle clé dans l'évolution de HAProxy au sein de l'écosystème Cloud Native (Kubernetes, Gateway API). Speaker régulier, il partage son expertise sur la scalabilité et la sécurité des applications modernes.
 
 Twitter: https://x.com/BaptisteAssmann
 LinkedIn: https://www.linkedin.com/in/bassmann/
-GitHub: https://github.com/bedis",,,,,
+GitHub: https://github.com/bedis",,,,,,
 timothee-ravier,Timothée Ravier,/speakers/timothee-ravier.jpg,,,"Timothée Ravier est un ingénieur dans l'équipe CoreOS à Red Hat. Il maintient les Fedora Atomic Desktops (Silverblue, Kinoite). Il est développeur KDE et membre de l'équipe qui maintient les applications KDE en tant que Flatpaks sur Flathub.
 
 Mastodon : https://floss.social/@siosm
-GitHub : https://github.com/travier",,,,,
+GitHub : https://github.com/travier",,,,,,
 williams-ahile,Williams Ahilé,/speakers/williams-ahile.jpg,,,"Je suis Ingénieur DevOps, passionné par l’automatisation, le Cloud Native et l’amélioration continue. Après un début de carrière comme développeur full stack (Java, Angular, Laravel, Ionic), j’ai évolué vers le DevOps en travaillant sur des projets stratégiques chez Thalès, PwC, URSSAF, et d’autres grands comptes.
 
 Au quotidien, j’accompagne les équipes dans la mise en place de pipelines CI/CD, le déploiement d’infrastructures Kubernetes et Cloud, ainsi que l’intégration d’outils de supervision et de qualité logicielle. Je suis fortement intéressé par les solutions Cloud et DevOps et j’aime partager des retours d’expérience concrets et mettre en avant les solutions open source qui simplifient la vie des équipes.
 
 --
 ✉️ williams14.ahile@gmail.com
-🔗 https://www.linkedin.com/in/williams-ahile-5a3698150/",,,,,
-guillaume-legrain,Guillaume Legrain,/speakers/guillaume-legrain.jpg,,,"SRE @Numberly specializes in container orchestration, infrastructure automation, and production reliability, with particular expertise with Kubernetes",,,,,
-alexandre-nguyen,Alexandre NGUYEN,/speakers/alexandre-nguyen.jpg,,,"Senior Data Devops au sein de l’équipe Data de Mirakl, je suis passionné par le développement, l’infrastructure et les technologies cloud. J’accompagne les Data Scientists et Data Engineers dans l’industrialisation et la mise en production de leurs innovations. Avant Mirakl, j’ai travaillé chez AWS en tant qu’architecte de solutions, où j’aidais les clients à exploiter pleinement les avantages du cloud.",,,,,
+🔗 https://www.linkedin.com/in/williams-ahile-5a3698150/",,,,,,
+guillaume-legrain,Guillaume Legrain,/speakers/guillaume-legrain.jpg,,,"SRE @Numberly specializes in container orchestration, infrastructure automation, and production reliability, with particular expertise with Kubernetes",,,,,,
+alexandre-nguyen,Alexandre NGUYEN,/speakers/alexandre-nguyen.jpg,,,"Senior Data Devops au sein de l’équipe Data de Mirakl, je suis passionné par le développement, l’infrastructure et les technologies cloud. J’accompagne les Data Scientists et Data Engineers dans l’industrialisation et la mise en production de leurs innovations. Avant Mirakl, j’ai travaillé chez AWS en tant qu’architecte de solutions, où j’aidais les clients à exploiter pleinement les avantages du cloud.",,,,,,
 paul-laffitte,Paul Laffitte,/speakers/paul-laffitte.jpg,,,"Paul s'est passionné pour le développement très tôt en autodidacte, avant d’intégrer **Epitech** en 2016. 
 
 De 2017 à 2020, il plonge dans l’univers de la **réalité virtuelle** à Barcelone. Il rejoint ensuite **Enix** en 2020 en tant que développeur, mais (ADN Enix oblige) y intègre une forte composante infrastructure et surtout opérationnelle. Il y déploie notamment une plateforme **OpenStack sur Kubernetes** et contribue à plusieurs projets open source dont **kube-image-keeper** et **topomatik**.
@@ -141,7 +141,7 @@ Curieux de nature, il aime explorer et tester des choses improbables, il a notam
 
 En dehors du travail, Paul s’intéresse à la **domotique** et apprécie particulièrement la création d'ambiances lumineuses et colorées qui mettent en valeur à la perfection son **manguier**, son **avocatier** et les diverses plantes qu'il fait pousser **depuis la graine**.
 
-[Github](https://github.com/plaffitt) - [Blog](https://blog.plaffitt.com/en/) - [Linkedin](https://www.linkedin.com/in/paul-laffitte/)",,,,,
+[Github](https://github.com/plaffitt) - [Blog](https://blog.plaffitt.com/en/) - [Linkedin](https://www.linkedin.com/in/paul-laffitte/)",,,,,,
 herve-leclerc,Hervé Leclerc,,,,"linkedin : https://www.linkedin.com/in/herveleclerc/
 github : https://github.com/herveleclerc
 
@@ -171,109 +171,109 @@ kubernetes clusters with gitops
 - OSXP : ""Native Kubernetes CD pipelines with Tekton CD""
 
 
-Son expertise couvre un large spectre de sujets, de l'optimisation des coûts cloud à l'écologie numérique, en passant par les dernières innovations en matière de conteneurisation et d'automatisation. En tant que formateur certifié Docker et Kubernetes, il continue d'influencer et de façonner l'avenir du DevOps et du Cloud Computing en France.",,,,,
+Son expertise couvre un large spectre de sujets, de l'optimisation des coûts cloud à l'écologie numérique, en passant par les dernières innovations en matière de conteneurisation et d'automatisation. En tant que formateur certifié Docker et Kubernetes, il continue d'influencer et de façonner l'avenir du DevOps et du Cloud Computing en France.",,,,,,
 maffert-anthony,Maffert Anthony,,,,"**Anthony Maffert** a rejoint **Winamax** il y a 7 ans en tant qu’ingénieur backend sur la verticale *Paris sportifs*. Il a contribué à des projets stratégiques comme le moteur de recherche de paris et la première version de **MyMatch**, produit phare de la plateforme.  
 
 Depuis 1 an et demi, il occupe le rôle de **Developer Advocate**, où il met en lumière l’expertise technique de Winamax auprès de la communauté, tout en favorisant le partage de savoir et la collaboration entre équipes internes.  
 
 Speaker à **Devoxx France 2024** et **2025**, il aime croiser retour d’expérience concret, architecture distribuée et storytelling technique.
 
-LinkedIn: https://www.linkedin.com/in/anthonymaffert/",,,,,
+LinkedIn: https://www.linkedin.com/in/anthonymaffert/",,,,,,
 dimitris-vassilopoulos,Dimitris Vassilopoulos,/speakers/dimitris-vassilopoulos.jpg,,,"Golden Kubestronaut and multi-cloud certified Solutions Architect
 
-[Linkedin](https://www.linkedin.com/in/dimitrisvassilopoulos/)",,,,,
+[Linkedin](https://www.linkedin.com/in/dimitrisvassilopoulos/)",,,,,,
 quentin-swiech,Quentin Swiech,/speakers/quentin-swiech.jpg,,,"Lead SRE, S3NS 
 
 Réseaux sociaux:
 Github: https://github.com/q-sw
-LinkedIn: https://www.linkedin.com/in/quentin-swiech-46aa96aa",,,,,
+LinkedIn: https://www.linkedin.com/in/quentin-swiech-46aa96aa",,,,,,
 leonard-suslian,Léonard Suslian,/speakers/leonard-suslian.jpg,,,"SRE chez Mistral AI spécialisé dans la conception et l'exploitation d'infrastructures kubernetes GPU bare-metal et dans le cloud.
 
 LinkedIn: https://www.linkedin.com/in/léonard-suslian
-GitHub: https://github.com/synthe102",,,,,
+GitHub: https://github.com/synthe102",,,,,,
 hugo-simon,Hugo Simon,/speakers/hugo-simon.jpg,,,"En tant qu’architecte applicatif au sein de l’INSEE, j’accompagne au quotidien les équipes de développement et de production afin d’améliorer leur SI. Mon objectif est d’encourager l’innovation tout en garantissant un cadre et une sécurité opérationnelle optimale. Cet objectif me pousse à réaliser une veille continuelle sur divers sujets techniques afin de proposer les solutions les plus adaptées.
 Data scientist de formation, je suis d'autant plus impliqué dans les sujets liés à la mise en production de solutions d'IA. 
 
 
 **Linkedin** : https://fr.linkedin.com/in/hugo-simon-53ba171bb
-**Medium** : https://medium.com/@simon.hugo59",,,,,
+**Medium** : https://medium.com/@simon.hugo59",,,,,,
 steeve-delmotte,Steeve Delmotte,/speakers/steeve-delmotte.jpg,,,"As the Sales Lead for Portworx by Pure Storage France, I help customers drive data resilience and application portability across any cloud.
 
-Linkedin: https://www.linkedin.com/in/steeve-delmotte-5b0347a6/",,,,,
+Linkedin: https://www.linkedin.com/in/steeve-delmotte-5b0347a6/",,,,,,
 edgar-halbert,Edgar Halbert,/speakers/edgar-halbert.jpg,,,"Data Engineering Manager chez Skello
 Passionné de data et de Kubernetes
 
-https://www.linkedin.com/in/edgar-h-66004b68/",,,,,
-clarence-pouthier,Clarence Pouthier,/speakers/clarence-pouthier.jpg,,,"Kasten Senior Systems Engineer, Veeam South EMEA.",,,,,
+https://www.linkedin.com/in/edgar-h-66004b68/",,,,,,
+clarence-pouthier,Clarence Pouthier,/speakers/clarence-pouthier.jpg,,,"Kasten Senior Systems Engineer, Veeam South EMEA.",,,,,,
 dan-maher,Dan Maher,/speakers/dan-maher.jpg,,,"Dan is a Senior Security Advocate at Datadog, core member of the DevOpsDays conference series, and full time open source developer. Previously, Dan has built and maintained large systems at Ubisoft, Mozilla, and Cerbos.
 
 https://hachyderm.io/@phrawzty
 https://bsky.app/profile/phrawzty.com
-https://www.linkedin.com/in/dan-phrawzty-maher/",,,,,
-stephane-robert,Stéphane ROBERT,/speakers/stephane-robert.jpg,,,"Stéphane Robert, expert DevOps, possède plus de 10 ans d'expérience dans l'optimisation des infrastructures cloud et la mise en œuvre de pratiques CI/CD. Passionné par l'automatisation et la résilience des systèmes, il a aidé de nombreuses entreprises à améliorer leur efficacité opérationnelle. Stéphane est reconnu pour son approche innovante et son engagement à partager ses connaissances sur son blog et en donnant des formations.",,,,,
+https://www.linkedin.com/in/dan-phrawzty-maher/",,,,,,
+stephane-robert,Stéphane ROBERT,/speakers/stephane-robert.jpg,,,"Stéphane Robert, expert DevOps, possède plus de 10 ans d'expérience dans l'optimisation des infrastructures cloud et la mise en œuvre de pratiques CI/CD. Passionné par l'automatisation et la résilience des systèmes, il a aidé de nombreuses entreprises à améliorer leur efficacité opérationnelle. Stéphane est reconnu pour son approche innovante et son engagement à partager ses connaissances sur son blog et en donnant des formations.",,,,,,
 vincent-jamois,Vincent Jamois,/speakers/vincent-jamois.jpg,,,"A plain Cloud-Native Solution Architect, covering France for Portworx by Pure Storage.
 
-Linkedin: https://www.linkedin.com/in/jamois-vincent/",,,,,
-antoine-roy,Antoine Roy,/speakers/antoine-roy.jpg,,,Devops avec 10 ans d'expérience en parsing YAML. LinkedIn: https://www.linkedin.com/in/roy-antoine-sre,,,,,
+Linkedin: https://www.linkedin.com/in/jamois-vincent/",,,,,,
+antoine-roy,Antoine Roy,/speakers/antoine-roy.jpg,,,Devops avec 10 ans d'expérience en parsing YAML. LinkedIn: https://www.linkedin.com/in/roy-antoine-sre,,,,,,
 caroline-de-vasson,Caroline de Vasson,/speakers/caroline-de-vasson.jpg,,,"Architecte applicative et technique dans l’âme, je cultive une curiosité naturelle pour toutes les dimensions du numérique. 
 Mon parcours m’a permis d’explorer les multiples facettes du développement, tout en gardant un œil attentif sur les enjeux opérationnels
 Passionnée par les technologies Cloud et en particuliers Kubernetes, j'accompagne aujourd'hui, les équipes de développement Air France-KLM dans leur migration et leur découverte de ces nouvelles plateformes.
 Pragmatique et engagée, j’aime autant concevoir des architectures robustes que mettre les mains dans le cambouis pour résoudre les défis concrets du quotidien. Mon moteur : faire avancer les projets avec des solutions simples, efficaces et bien pensées, là où la technique rencontre le terrain.
-https://fr.linkedin.com/in/caroline-de-vasson",,,,,
+https://fr.linkedin.com/in/caroline-de-vasson",,,,,,
 vincent-ledan,Vincent Ledan,/speakers/vincent-ledan.jpg,,,"Je suis le product leader Kubernetes platform Renault Group , Open source enthusiast et Focus sur les aspects developer experience et platform engineering 
 
-https://www.linkedin.com/in/vincent-ledan/",,,,,
+https://www.linkedin.com/in/vincent-ledan/",,,,,,
 yousri-kouki,Yousri KOUKI,/speakers/yousri-kouki.jpg,,,"Architecte Cloud Native Senior avec une solide expérience dans le design et la gouvernance de clusters Kubernetes à grande échelle. Il accompagne les entreprises et pilote des initiatives stratégiques autour de Kubernetes, de l’intelligence artificielle et de la cybersécurité. Passionné par l’écosystème CNCF, il contribue à l’industrialisation des standards Cloud Native.
 
 https://www.linkedin.com/in/yousrikouki
 https://medium.com/@yousri.kouki
-https://x.com/yousrikouki",,,,,
+https://x.com/yousrikouki",,,,,,
 thierry-abalea,Thierry ABALEA,/speakers/thierry-abalea.jpg,,,"[Thierry Abaléa](https://www.linkedin.com/in/thierry-abalea/) est cofondateur et CEO de [Shipfox](https://www.shipfox.io), une plateforme qui accélère GitHub Actions.  
 Auparavant, il a été VP of Engineering chez [GitGuardian](https://www.gitguardian.com), l’application la plus installée sur le GitHub Marketplace, spécialisée dans la détection et la remédiation des secrets exposés, ainsi que VP of Engineering chez [Alma](https://almapay.com/).  
-Avec une expertise à l’intersection de la CI/CD, du DevSecOps et des pratiques d’ingénierie modernes, il partage une vision pragmatique : sécuriser et optimiser la CI/CD sans ralentir les équipes.",,,,,
+Avec une expertise à l’intersection de la CI/CD, du DevSecOps et des pratiques d’ingénierie modernes, il partage une vision pragmatique : sécuriser et optimiser la CI/CD sans ralentir les équipes.",,,,,,
 corentin-closs,Corentin Closs,/speakers/corentin-closs.jpg,,,"Je suis actuellement développeur chez Ubisoft, où j'ai commencé dans le studio de Montpellier il y a 5 ans sur BGE2, avant de rejoindre l'IT à Paris pour switcher vers l'écosystème cloud-native. Je travaille depuis plus de 3 ans sur notre plateforme interne de multi-tenancy basée sur Kubernetes, initialement basée sur Rancher et maintenant sur Capsule. J'aime également tester et découvrir de nouveaux projets sur mon infra personnelle, mais aussi aller au cinéma, jouer aux jeux vidéo, et surtout les Polémons ! 
 
-https://www.linkedin.com/in/corentincloss/ et @Corentin Closs sur les slacks CNCF et Kubernetes",,,,,
+https://www.linkedin.com/in/corentincloss/ et @Corentin Closs sur les slacks CNCF et Kubernetes",,,,,,
 quentin-loupot,Quentin Loupot,/speakers/quentin-loupot.jpg,,,"Avec près de 20 ans d’expérience, Quentin a commencé comme développeur web avec une appétence pour l’administration des systèmes Linux. 
 
 Coup de chance (ou volonté divine), le DevOps est devenu une spécialité à part entière peu de temps après, lui permettant d’évoluer naturellement de l’administration système vers le DevOps.
 
 Il a ensuite opéré un virage entreprenarial pendant lequel il a infogéré quelques centaines de serveurs pour le compte de ses clients, accompagné de son frangin pendant cette période. 
 
-Depuis 2021, en charge de l’infrastructure chez Sellsy, et ce sont toujours les mêmes Linux qu’il opère avec son équipe, depuis les PC des développeurs aux infras de prod conteneurisées, en passant par la CI/CD.",,,,,
-nathan-randriamanana,Nathan Randriamanana,/speakers/nathan-randriamanana.jpg,,,"En tant que Data Scientist à la direction des statistiques d'entreprises de l’Insee, je pilote le répertoire Sirene et son système de codification automatique de l’APE. J’assure la rédaction des spécifications métiers et la prise en charge du pipeline complet de ML, en coordination étroite avec l’équipe informatique pour le déploiement en production. Mon objectif est d’améliorer l’intégration des modèles IA dans le SI : industrialiser les solutions, garantir reproductibilité et conformité aux contraintes métiers, et favoriser l’adoption du MLOps au sein de l’administration. Par ailleurs, je mène une veille active sur les projets IA open source pour proposer des solutions opérationnelles et adaptées.",,,,,
+Depuis 2021, en charge de l’infrastructure chez Sellsy, et ce sont toujours les mêmes Linux qu’il opère avec son équipe, depuis les PC des développeurs aux infras de prod conteneurisées, en passant par la CI/CD.",,,,,,
+nathan-randriamanana,Nathan Randriamanana,/speakers/nathan-randriamanana.jpg,,,"En tant que Data Scientist à la direction des statistiques d'entreprises de l’Insee, je pilote le répertoire Sirene et son système de codification automatique de l’APE. J’assure la rédaction des spécifications métiers et la prise en charge du pipeline complet de ML, en coordination étroite avec l’équipe informatique pour le déploiement en production. Mon objectif est d’améliorer l’intégration des modèles IA dans le SI : industrialiser les solutions, garantir reproductibilité et conformité aux contraintes métiers, et favoriser l’adoption du MLOps au sein de l’administration. Par ailleurs, je mène une veille active sur les projets IA open source pour proposer des solutions opérationnelles et adaptées.",,,,,,
 maxime-veroone,Maxime Véroone,/speakers/maxime-veroone.jpg,,,"Depuis 2012, Maxime a usé ses souliers dans les Datacenters des Hauts de France, déployant et automatisant la gestion de centaines de serveurs et VMs Linux, à force de solutions Libres et Open-Source.
 Aujourd'hui Staff Ops Engineer chez Decathlon dans le Domaine ""E-Commerce"", il travaille à élargir et renforcer les ponts entre Devs et Ops tout en améliorant la résilience et la performance de ses infrastructures Cloud.
 
 Linkedin : https://www.linkedin.com/in/maxime-veroone
 Github : https://github.com/mveroone
-Bsky : @maxime.veroone.fr",,,,,
-nicolas-fidel,Nicolas Fidel,/speakers/nicolas-fidel.jpg,,,"**Nicolas Fidel** a rejoint **Winamax** il y a 2 ans en tant qu’ingénieur **DevOps / SRE**, après avoir été diplômé de l’**EPITA**, où il a également exercé comme élève assistant. Jeune ingénieur passionné par l’**infrastructure**, son **automatisation** et les enjeux liés à l’**observabilité**, il a notamment contribué à la refonte complète de l’observabilité chez Winamax. Toujours curieux et enthousiaste, il aime partager ses découvertes et retours d’expérience autour de la construction de systèmes robustes et scalables. https://www.linkedin.com/in/nicolas-fidel/",,,,,
+Bsky : @maxime.veroone.fr",,,,,,
+nicolas-fidel,Nicolas Fidel,/speakers/nicolas-fidel.jpg,,,"**Nicolas Fidel** a rejoint **Winamax** il y a 2 ans en tant qu’ingénieur **DevOps / SRE**, après avoir été diplômé de l’**EPITA**, où il a également exercé comme élève assistant. Jeune ingénieur passionné par l’**infrastructure**, son **automatisation** et les enjeux liés à l’**observabilité**, il a notamment contribué à la refonte complète de l’observabilité chez Winamax. Toujours curieux et enthousiaste, il aime partager ses découvertes et retours d’expérience autour de la construction de systèmes robustes et scalables. https://www.linkedin.com/in/nicolas-fidel/",,,,,,
 raphael-pinson,Raphaël Pinson,/speakers/raphael-pinson.jpg,,,"Raphaël est un Technical Marketing Engineer chez Isovalent, spécialiste du réseau et de la sécurité cloud-native et créateur du projet Cilium, basé sur eBPF.
 
 Il travaille sur Cilium, Hubble et Tetragon, ainsi que sur l’avenir du réseau et de la sécurité cloud-native avec eBPF.
 
-Ambassadeur CNCF depuis 2023, il contribue à la vulgarisation et à la diffusion des technologies open source du cloud-native.",,,,,
+Ambassadeur CNCF depuis 2023, il contribue à la vulgarisation et à la diffusion des technologies open source du cloud-native.",,,,,,
 alexandre-buisine,Alexandre Buisine,/speakers/alexandre-buisine.jpg,,,"Avec 15 ans d'expérience dans la technique et le management, il reste un grand passionné du monde open-source et plus particulièrement tout ce qui touche aux conteneurs.
 Il a rejoint l'équipe Enix en 2018 an au poste de directeur général sans pour autant s'éloigner des technos d'infrastructures réseaux et systèmes.
 Juste avant Enix, Alexandre a passé 3 ans à développer un service de VR (Réalité Virtuelle) basé sur une stack applicative tournant sur docker, et à solutionner les problèmes d'orchestration pour gérer l'encodage et la conversion optique des vidéos en VR.
 Auparavant, il avait été CTO puis avait dirigé la société SmartJog, dans les domaines de l'audio-visuel, la transmission satellite, le développement logiciel, les réseaux IP, la distribution massive de contenus sur Internet.
-Alexandre est diplômé d'EPITA et titulaire d'un MBA de l'école HEC. A titre personnel, il aime grimper, bricoler, et mettre en conteneur tout et n'importe quoi.",,,,,
+Alexandre est diplômé d'EPITA et titulaire d'un MBA de l'école HEC. A titre personnel, il aime grimper, bricoler, et mettre en conteneur tout et n'importe quoi.",,,,,,
 yann-rotilio,Yann Rotilio,/speakers/yann-rotilio.jpg,,,"Dans l'IT depuis 2007, j'ai commencé en tant que développeur Java avant d'embrasser la culture DevOPS dans le but d'amliorer l'opérabilité des applications. 
 Depuis 2016 et ma rencontre avec Kubernetes je ne l'ai plus lâché, j'ai même essayer de le mettre partout où j'ai pu (dans les trains, les gares et les garages à vélo)
-Ravi d'aider toute personne cherchant un bon restaurant dans la région lyonnaise",,,,,
+Ravi d'aider toute personne cherchant un bon restaurant dans la région lyonnaise",,,,,,
 sebastien-allamand,Sébastien Allamand,/speakers/sebastien-allamand.jpg,,,"Sébastien is a Senior AWS Container Solution Architect Specialist at AWS since 2019, where he actively contributes to significant open-source projects in the Kubernetes ecosystem. He is a key contributor to projects like kro (Kubernetes Resource Orchestrator), AWS Controllers for Kubernetes (ACK), and Karpenter, demonstrating his commitment to advancing cloud-native technologies.
 
 With deep expertise in AWS and open-source container solutions, Sébastien collaborates with organizations across EMEA and France, helping them implement container best practices and optimize their cloud infrastructure. His technical focus spans platform engineering, distributed systems, and developer workflow optimization.
 
 Before joining AWS, Sébastien spent 17 years at Orange in various technical leadership roles, including developer, project manager, and solution architect. He notably designed and open-sourced CassKop, a Kubernetes Operator for managing Cassandra databases, showcasing his ability to bridge enterprise needs with open-source solutions.
 
-His continuous involvement in open-source projects and extensive experience in both cloud-native technologies and enterprise architecture makes him a valuable contributor to the container ecosystem and cloud computing community.",,,,,
+His continuous involvement in open-source projects and extensive experience in both cloud-native technologies and enterprise architecture makes him a valuable contributor to the container ecosystem and cloud computing community.",,,,,,
 amine-alaoui-echerif,Amine Alaoui Echerif,,,,"Amine Alaoui Echerif est Platform Engineer et Cloud Architect dans l’exploitation de plateformes CaaS, PaaS et FaaS en environnements multi-cloud et on-prem.
 Il travaille sur le cycle de vie des clusters Kubernetes, l’automatisation avec Terraform, les pipelines CI/CD et l’optimisation de plateformes en production.
-Il collabore au quotidien avec les équipes Dev et Ops pour améliorer la fiabilité, simplifier les opérations et faire évoluer les pratiques cloud native à grande échelle.",,,,,
-mohammad-amla,Mohammad AMLA,/speakers/mohammad-amla.jpg,,,"Ingénieur spécialisé dans les environnements cloud-native, Mohammad conçoit des plateformes Kubernetes automatisées et sécurisées.",,,,,
-etienne-germain,Etienne Germain,/speakers/etienne-germain.jpg,,,"Autodidacte, geek et punk dans l’âme, Etienne navigue dans l'IT depuis bientôt 10 ans (et autant chez ITS). Il a commencé comme intégrateur, puis s'est fait attraper par le monde du DevOps. Passionné et tenace, il explore désormais les profondeurs de Kubernetes on-prem, où il s'amuse régulièrement avec Cilium et Talos, osant parfois s'aventurer dans des recoins sombres du kernel. Et s'il n'est pas en train de déboguer des réseaux ou de jouer avec des conteneurs, on peut surement le trouver manette à la main ou bien sur son portable en train de faire de la veille techno.",,,,,
+Il collabore au quotidien avec les équipes Dev et Ops pour améliorer la fiabilité, simplifier les opérations et faire évoluer les pratiques cloud native à grande échelle.",,,,,,
+mohammad-amla,Mohammad AMLA,/speakers/mohammad-amla.jpg,,,"Ingénieur spécialisé dans les environnements cloud-native, Mohammad conçoit des plateformes Kubernetes automatisées et sécurisées.",,,,,,
+etienne-germain,Etienne Germain,/speakers/etienne-germain.jpg,,,"Autodidacte, geek et punk dans l’âme, Etienne navigue dans l'IT depuis bientôt 10 ans (et autant chez ITS). Il a commencé comme intégrateur, puis s'est fait attraper par le monde du DevOps. Passionné et tenace, il explore désormais les profondeurs de Kubernetes on-prem, où il s'amuse régulièrement avec Cilium et Talos, osant parfois s'aventurer dans des recoins sombres du kernel. Et s'il n'est pas en train de déboguer des réseaux ou de jouer avec des conteneurs, on peut surement le trouver manette à la main ou bien sur son portable en train de faire de la veille techno.",,,,,,
 mazlum-tosun,Mazlum Tosun,/speakers/mazlum-tosun.jpg,,,"Google Developer Expert sur Google Cloud et Docker Captain.
 
 Lead et Architecte Data sur Google Cloud.
@@ -285,5 +285,15 @@ Mes contenus Google Cloud et Tech :
 
 Vidéos : https://bit.ly/gcp-learning-mazlum-gb
 
-Article : https://medium.com/@mazlum.tosun",,,,,
-victor-coutellier,Victor Coutellier,/speakers/victor-coutellier.jpg,,,"Utilisateur et contributeur de technologies open source telles que Kubernetes ou Openstack, je m'intéresse particulièrement à la scalabilité de ces produits en entreprise. Mon experience, forgée au sein de NumSpot, d'OVHcloud et de la Société Générale, m'a permis de développer et d'optimiser des infrastructures cloud complexes, en participant activement à des projets communautaires.",,,,,
+Article : https://medium.com/@mazlum.tosun",,,,,,
+victor-coutellier,Victor Coutellier,/speakers/victor-coutellier.jpg,,,"Utilisateur et contributeur de technologies open source telles que Kubernetes ou Openstack, je m'intéresse particulièrement à la scalabilité de ces produits en entreprise. Mon experience, forgée au sein de NumSpot, d'OVHcloud et de la Société Générale, m'a permis de développer et d'optimiser des infrastructures cloud complexes, en participant activement à des projets communautaires.",,,,,,
+ricardo-rocha,Ricardo Rocha,,CERN,Président TAB CNCF / Responsable infrastructure,,,,,,true,lead
+julien-dauphant,Julien Dauphant,,DINUM,Directeur de produits Cloud,,,,,,true,guest
+renaud-fleury,Renaud Fleury,,DGFIP,Product Owner Socle Kubernetes,,,,,,true,guest
+jean-baptiste-kempf,Jean-Baptiste Kempf,,Scaleway,CTO,,,,,,true,guest
+gaspard-plantrou,Gaspard Plantrou,,Numspot,CPO,,,,,,true,guest
+florian-caringi,Florian Caringi,,TOSIT,Manager Data AI Platform & architecture / VP TOSIT,,,,,,true,guest
+laurent-bernaille,Laurent Bernaille,,,,,,,,,true,panel
+denis-germain,Denis Germain,,,,,,,,,true,panel
+victor-boissiere,Victor Boissière,,,,,,,,,true,panel
+sebastien-blanc,Sébastien Blanc,,,,,,,,,true,panel
