@@ -65,7 +65,7 @@ export default function KeyNumbers({ lang }: KeyNumbersProps) {
     return () => observer.disconnect();
   }, []);
 
-  const attendees = useCountUp(stats[0].value, 2000, visible);
+  const attendees = useCountUp(stats[0].value, 2500, visible);
   const talks = useCountUp(stats[1].value, 2000, visible);
   const partners = useCountUp(stats[2].value, 2000, visible);
   const animated = [attendees, talks, partners];
