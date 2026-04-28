@@ -54,7 +54,15 @@ function csvLoader({ url, fallback, label }: { url?: string; fallback: string; l
       const rows = parseCsv(raw);
       if (rows.length === 0) return;
       const [header, ...body] = rows;
-      const keys = header.map((s) => s.trim());
+      // Header aliases: tolerate sheet column renames so a single typo upstream
+      // does not break the whole build. Map sheet-side spellings → schema names.
+      const HEADER_ALIASES: Record<string, string> = {
+        role_eng: "role_en",
+      };
+      const keys = header.map((s) => {
+        const k = s.trim();
+        return HEADER_ALIASES[k] ?? k;
+      });
       store.clear();
       // Prefix the store key with a zero-padded row index so Astro's
       // alphabetical getCollection() order matches CSV order, and so that a
