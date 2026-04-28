@@ -32,7 +32,7 @@ export const ui = {
     "site.title": "Cloud Native Days France 2027",
     "site.description": "3 juin 2027 — CENTQUATRE-PARIS",
     "seo.default_description":
-      "Cloud Native Days France — 3 juin 2027 au CENTQUATRE-PARIS. Conférence cloud-native, DevOps et IA par et pour les praticiens.",
+      "Cloud Native Days France — 3 juin 2027 au CENTQUATRE-PARIS. Conférence cloud-native, DevOps et IA par et pour les praticiens. #CloudnativedaysFR",
     "seo.og_site_name": "Cloud Native Days France",
     "seo.og_image_alt":
       "Cloud Native Days France — 3 juin 2027 au CENTQUATRE-PARIS",
@@ -227,7 +227,8 @@ export const ui = {
     "footer.association": "Organisé sous le statut d'association 1901, par l'association Cloud Native France.",
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Suivez-nous",
-    "footer.newsletter.heading": "Restez informé",
+    "footer.newsletter.heading": "Restez informé(e)",
+    "social.hashtag": "#CloudnativedaysFR",
     "footer.legal.heading": "Légal",
     "footer.legal.coc": "Code de conduite",
     "footer.legal.privacy": "Confidentialité",
@@ -362,7 +363,7 @@ export const ui = {
     "site.title": "Cloud Native Days France 2027",
     "site.description": "June 3, 2027 — CENTQUATRE-PARIS",
     "seo.default_description":
-      "Cloud Native Days France — June 3, 2027 at CENTQUATRE-PARIS. Cloud-native, DevOps and AI conference from practitioners, for practitioners.",
+      "Cloud Native Days France — June 3, 2027 at CENTQUATRE-PARIS. Cloud-native, DevOps and AI conference from practitioners, for practitioners. #CloudnativedaysFR",
     "seo.og_site_name": "Cloud Native Days France",
     "seo.og_image_alt":
       "Cloud Native Days France — June 3, 2027 at CENTQUATRE-PARIS",
@@ -556,6 +557,7 @@ export const ui = {
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Follow us",
     "footer.newsletter.heading": "Stay informed",
+    "social.hashtag": "#CloudnativedaysFR",
     "footer.legal.heading": "Legal",
     "footer.legal.coc": "Code of Conduct",
     "footer.legal.privacy": "Privacy",
