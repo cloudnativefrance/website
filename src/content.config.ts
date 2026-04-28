@@ -139,13 +139,9 @@ const sponsorSchema = z.object({
 });
 
 const TEAM_GROUPS = [
-  "direction",
-  "editorial",
-  "communication",
-  "partenariats",
-  "billetterie",
-  "aidants",
-  "inclusivite",
+  "equipe-principale",
+  "comite-selection",
+  "autres-benevoles",
 ] as const;
 
 const teamSchema = z.object({
