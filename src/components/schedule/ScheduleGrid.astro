@@ -495,7 +495,10 @@ const CSS_VARS = {
 </aside>
 
 <style>
-  .schedule-root { --row-height: 22px; --card-pad: 8px; }
+  /* --row-height = pixels per 5-minute row. Bumped from 22 → 28 so the
+     shortest cards (10 min = 2 rows) have enough room for time + 2-line
+     title without clipping. */
+  .schedule-root { --row-height: 28px; --card-pad: 8px; }
 
   .chip {
     display: inline-flex;
@@ -589,6 +592,9 @@ const CSS_VARS = {
   .schedule-time-col {
     display: grid;
     grid-template-rows: repeat(var(--grid-rows), var(--row-height));
+    /* Match .schedule-tracks' row-gap so the time labels stay aligned with
+       the cards. Without this the time column drifts up by 4 px per row. */
+    row-gap: 4px;
     border-right: 1px dashed color-mix(in oklch, var(--color-border) 80%, transparent);
   }
   .schedule-time-label {
