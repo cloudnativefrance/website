@@ -82,6 +82,7 @@ export const ui = {
     "speakers.subtext":
       "Découvrez les intervenants de Cloud Native Days France 2026.",
     "speakers.keynote_rail_label": "Keynote d'ouverture",
+    "speakers.keynote_badge_mc": "Maître de cérémonie",
     "speakers.regular_rail_label": "Conférences",
     "speakers.keynote_badge": "Keynote",
     "speakers.track_prefix": "Salle",
@@ -415,6 +416,7 @@ export const ui = {
     "speakers.subtext":
       "Meet the speakers of Cloud Native Days France 2027",
     "speakers.keynote_rail_label": "Opening keynote",
+    "speakers.keynote_badge_mc": "Master of ceremonies",
     "speakers.regular_rail_label": "Conferences",
     "speakers.keynote_badge": "Keynote",
     "speakers.track_prefix": "Room",
