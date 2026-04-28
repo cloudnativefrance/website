@@ -1,39 +1,39 @@
 id,title,speakers,track,level,room,format,start_time,duration_min,tags,feedback_url,slides_url,recording_url,cover_image_url,language,status,description
-GJ89TV,Keynote d'ouverture Cloud Native Days France 2026!,petazzoni,Autres sujets et crazy stuff,,Monet,keynote,2026-02-03T09:00:00+01:00,75,,,,,,fr,confirmed,"Maître de cérémonie : Jérôme Petazzoni (co-créateur de Docker, Enix).
+GJ89TV,Keynote d'ouverture Cloud Native Days France 2026!,petazzoni,Autres sujets et crazy stuff,,Monet,keynote,2026-02-03T09:00:00+01:00,75,,,,,,fr,confirmed,"**Maître de cérémonie : Jérôme Petazzoni** _(co-créateur de Docker, Enix)_
 
-* **10 PB/s sans exploser le budget : Comment le CERN scale son infrastructure avec le cloud native et l'IA**
-    * _Ricardo Rocha est Président du Technical Advisory Board (TAB) de la CNCF et Responsable de l'infrastructure au CERN_
+**10 PB/s sans exploser le budget — comment le CERN scale son infrastructure avec le cloud native et l'IA**
+_Ricardo Rocha — Président du Technical Advisory Board (TAB) de la CNCF, Responsable de l'infrastructure au CERN_
 
-    La prochaine mise à niveau du Grand collisionneur de hadrons (LHC) multiplie par 10 les débits de données du CERN, atteignant **10 PB/s**. Le défi ? Le budget informatique, lui, reste identique.
+La prochaine mise à niveau du Grand collisionneur de hadrons (LHC) multiplie par 10 les débits de données du CERN, atteignant 10 PB/s. Le défi ? Le budget informatique, lui, reste identique.
 
-    Face à cette contrainte, le CERN a conçu une infrastructure cloud native nouvelle génération qui repense totalement l'utilisation des ressources. Au cœur du système : un partage intelligent des GPU et accélérateurs, des pipelines MLOps pour l'**inférence IA en temps réel** sur les détecteurs, et des workflows hybrides supportant aussi bien les environnements interactifs traditionnels (oui, même SSH !) que le traitement batch massif.
+Face à cette contrainte, le CERN a conçu une infrastructure cloud native nouvelle génération qui repense totalement l'utilisation des ressources. Au cœur du système : un partage intelligent des GPU et accélérateurs, des pipelines MLOps pour l'inférence IA en temps réel sur les détecteurs, et des workflows hybrides supportant aussi bien les environnements interactifs traditionnels (oui, même SSH !) que le traitement batch massif.
 
-    Cette session dévoilera les choix d'architecture qui permettent de tenir ce pari impossible :
-    * Comment **optimiser l'utilisation des accélérateurs** pour réduire drastiquement les coûts.
-    * Comment déployer des modèles IA à 100 mètres sous terre pour filtrer des pétaoctets de données par seconde.
-    * Comment intégrer dès la conception des critères de durabilité et de conscience carbone.
+Cette session dévoilera les choix d'architecture qui permettent de tenir ce pari impossible :
+• Comment optimiser l'utilisation des accélérateurs pour réduire drastiquement les coûts
+• Comment déployer des modèles IA à 100 mètres sous terre pour filtrer des pétaoctets de données par seconde
+• Comment intégrer dès la conception des critères de durabilité et de conscience carbone
 
-    Avec démos à l'appui, vous découvrirez des stratégies concrètes applicables à vos propres infrastructures, quelle que soit leur échelle. Car si ces techniques fonctionnent au CERN, elles fonctionneront chez vous.
+Avec démos à l'appui, vous découvrirez des stratégies concrètes applicables à vos propres infrastructures, quelle que soit leur échelle. Car si ces techniques fonctionnent au CERN, elles fonctionneront chez vous.
 
-* **(DINUM/DGFIP) Cloud de l'État : comment la collaboration interministérielle produit un socle Kubernetes open-source**
-    * _Julien Dauphant (Directeur de produits Cloud/DINUM)_
-    * _Renaud Fleury (Product Owner Socle Kubernetes/DGFIP)_
+**Cloud de l'État (DINUM / DGFIP) — comment la collaboration interministérielle produit un socle Kubernetes open-source**
+_Julien Dauphant (Directeur de produits Cloud, DINUM) · Renaud Fleury (Product Owner Socle Kubernetes, DGFIP)_
 
-* **Intervention de notre sponsor platinum Scaleway (3min)**
-    * _Jean-Baptiste Kempf_ (CTO Scaleway)
+**Intervention sponsor platinum — Scaleway** _(3 min)_
+_Jean-Baptiste Kempf — CTO Scaleway_
 
-* **Table Ronde (30min) : « Quels savoir-faire et technologies les équipes de développement doivent-elles acquérir pour l'ère Cloud Native ? »**. Par des membres actifs et reconnus dans la communauté Cloud Native / Open Source francophone :
-    * _Shérine Khoury_
-    * _Laurent Bernaille_
-    * _Denis Germain_
-    * _Victor Boissière_
-    * _Sébastien Blanc_
+**Table ronde** _(30 min)_ — « Quels savoir-faire et technologies les équipes de développement doivent-elles acquérir pour l'ère Cloud Native ? »
+Avec des membres reconnus de la communauté Cloud Native / Open Source francophone :
+• Shérine Khoury
+• Laurent Bernaille
+• Denis Germain
+• Victor Boissière
+• Sébastien Blanc
 
-* **Intervention de notre sponsor platinum Numspot (3min)**
-    * _Gaspard Plantrou_ (CPO Numspot)
+**Intervention sponsor platinum — Numspot** _(3 min)_
+_Gaspard Plantrou — CPO Numspot_
 
-* **(TOSIT) Comment nos communs numériques (Open source, Communauté, Gouvernance/fondation) peuvent permettre un cloud résilient / moins dépendant technologiquement ?**
-    * _Florian Caringi (Manager Data Ai Platform & architecture / VP TOSIT)_"
+**TOSIT — comment nos communs numériques peuvent permettre un cloud résilient et moins dépendant technologiquement**
+Open source, communauté, gouvernance / fondation : le rôle des communs numériques pour bâtir une infrastructure souveraine."
 9H9WKR,"Stop the Fight : doper et unifier HPA, VPA et KEDA avec des métriques avancées",vermande,Infrastructure et opérations,,Monet,talk,2026-02-03T10:30:00+01:00,45,,,,,,fr,confirmed,"On a tous déjà vu ça : **HPA** scale à l’horizontale, **VPA** ajuste les ressources, et **KEDA** vide la file… résultat : un combat permanent qui épuise les ressources et rend les clusters instables.
 Et si l’on pouvait enfin mettre fin à cette guerre pour obtenir un scaling fluide, prévisible et intelligent ?
 Dans cette session, nous verrons comment une **observabilité unifiée** et des **métriques métier pertinentes** peuvent transformer ce manque de cohésion en une orchestration plus harmonieuse.
@@ -476,15 +476,3 @@ Dans cette présentation, nous explorerons des solutions qui nous permettent d'o
 5.   Mesurer l'empreinte de l'utilisation des LLM locaux ou hébergés
 
 Au cours de cette session, nous présenterons également plusieurs projets CNCF dont **Kepler**, **KubeGreen** et **Vcluster**. Ensemble, façonnons un avenir plus vert pour l'ingénierie Cloud-Native ! 🌿🚀"
-HFFT3Q,REX Skello - Data Platform Engineering : Comment rendre les équipes métier vraiment autonomes grâce à Kubernetes et Airflow,edgar-halbert,Developer Experience,,Monet,talk,2026-02-03T18:00:00+01:00,30,,,,,,fr,confirmed,"Dans de nombreuses entreprises, la data devient un **bottleneck**. Les équipes métier ne peuvent pas avancer seules et attendent constamment que la data team traite leurs tickets, ce qui freine la prise de décision et la vélocité de l’entreprise.
-
-Chez **Skello**, nous avons choisi d’inverser cette dynamique. Notre mission : libérer la data team en donnant aux métiers les moyens de gérer leurs projets en **autonomie**. 
-
-Ce talk est un retour d'expérience concret sur la transformation de notre plateforme data centralisée en un **produit interne self-service**. Nous verrons comment nous avons appliqué les principes du **Platform Engineering** (GitOps, Kubernetes) pour y parvenir.
-
-Nous montrerons: 
-- Comment nos équipes métier **orchestrent** et **maintiennent** leurs propres pipelines data - du nettoyage jusqu'à la réinjection dans Salesforce - via une **simple interface YAML**
-
-- Les fondations techniques (Karpenter, Keda, ExternalSecrets) qui assurent la **scalabilité** et la **fiabilité** de notre plateforme
-
-Nous partagerons notre parcours, des principes techniques aux leçons apprises en livrant ce produit self-service",

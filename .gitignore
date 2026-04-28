@@ -12,5 +12,13 @@ drive-download-*.zip
 # Phase 16: KCD 2023 photo originals (not committed; only ≤1 MB JPG masters are)
 _photo-drop/
 
+# Local data drops used to enrich the Google Sheet (Pretalx exports, sponsor lists,
+# raw speaker photos). These are sources for ingestion scripts — never committed.
+PHOTOS_SPEAKERS/
+speakers_export.csv
+sponsors-2023-import.csv
+*.tsv
+CNDFr*.csv
+
 # Superpowers runtime artifacts (brainstorm screens, transient state)
 .superpowers/

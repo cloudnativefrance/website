@@ -3,29 +3,20 @@ import Layout from "@/layouts/Layout.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import TeamGroupSection from "@/components/team/TeamGroupSection.astro";
+import { TEAM_GROUPS, type TeamGroup } from "@/content.config";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
 const all = await getCollection("team");
 
-const GROUP_ORDER = ["core", "program-committee", "volunteers"] as const;
 const byGroup = Object.fromEntries(
-  GROUP_ORDER.map((g) => [g, all.filter((m) => m.data.group === g)]),
-) as Record<(typeof GROUP_ORDER)[number], CollectionEntry<"team">[]>;
+  TEAM_GROUPS.map((g) => [g, all.filter((m) => m.data.groups.includes(g))]),
+) as Record<TeamGroup, CollectionEntry<"team">[]>;
 
-// Enum-value → i18n-key mapping (D-09: key uses underscore, enum uses hyphen).
-const groupTitles = {
-  core: t("team.group.core"),
-  "program-committee": t("team.group.program_committee"),
-  volunteers: t("team.group.volunteers"),
-} as const;
-
-const groupBodies = {
-  core: t("team.group.core.body"),
-  "program-committee": t("team.group.program_committee.body"),
-  volunteers: t("team.group.volunteers.body"),
-} as const;
+const groupTitles = Object.fromEntries(
+  TEAM_GROUPS.map((g) => [g, t(`team.group.${g}` as const)]),
+) as Record<TeamGroup, string>;
 
 const hasAnyMember = all.length > 0;
 ---
@@ -41,14 +32,12 @@ const hasAnyMember = all.length > 0;
 
     {
       hasAnyMember ? (
-        GROUP_ORDER.map((g) =>
+        TEAM_GROUPS.map((g) =>
           byGroup[g].length > 0 ? (
             <TeamGroupSection
-              group={g}
               members={byGroup[g]}
               lang={lang}
               title={groupTitles[g]}
-              subtitle={groupBodies[g]}
             />
           ) : null,
         )

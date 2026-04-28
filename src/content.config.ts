@@ -54,7 +54,10 @@ function csvLoader({ url, fallback, label }: { url?: string; fallback: string; l
       const rows = parseCsv(raw);
       if (rows.length === 0) return;
       const [header, ...body] = rows;
-      const keys = header.map((s) => s.trim());
+      const keys = header.map((s) => {
+        const k = s.trim();
+        return HEADER_ALIASES[k] ?? k;
+      });
       store.clear();
       // Prefix the store key with a zero-padded row index so Astro's
       // alphabetical getCollection() order matches CSV order, and so that a
@@ -90,12 +93,15 @@ const speakerSchema = z.object({
   company: z.string().optional(),
   role: z.string().optional(),
   bio: z.string().optional(),
-  twitter: socialUrl,
   linkedin: socialUrl,
   github: socialUrl,
   bluesky: socialUrl,
   website: socialUrl,
   keynote: z.boolean().optional(),
+  keynote_size: z
+    .enum(["lead", "guest", "panel"])
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
 });
 
 // Sheet authors use short/French tier labels; normalize to canonical schema names.
@@ -104,6 +110,10 @@ const SPONSOR_TIER_ALIAS: Record<string, string> = {
   experience: "experiences",
   presse: "media",
   ecole: "institutional",
+};
+
+const HEADER_ALIASES: Record<string, string> = {
+  role_eng: "role_en",
 };
 
 const sponsorSchema = z.object({
@@ -128,19 +138,37 @@ const sponsorSchema = z.object({
   description_en: z.string(),
 });
 
+const TEAM_GROUPS = [
+  "direction",
+  "editorial",
+  "communication",
+  "partenariats",
+  "billetterie",
+  "aidants",
+  "inclusivite",
+] as const;
+
 const teamSchema = z.object({
   id: z.string(),
   name: z.string(),
   role_fr: z.string(),
   role_en: z.string(),
-  group: z.enum(["core", "program-committee", "volunteers"]),
+  groups: z.preprocess(
+    (v) =>
+      typeof v === "string"
+        ? v.split(",").map((s) => s.trim()).filter(Boolean)
+        : v,
+    z.array(z.enum(TEAM_GROUPS)).min(1),
+  ),
   photo: z.string().optional().or(z.literal("").transform(() => undefined)),
   social_linkedin: socialUrl,
   social_github: socialUrl,
   social_bluesky: socialUrl,
-  social_twitter: socialUrl,
   social_website: socialUrl,
 });
+
+export type TeamGroup = (typeof TEAM_GROUPS)[number];
+export { TEAM_GROUPS };
 
 // -- Per-year collection factories -----------------------------------------
 

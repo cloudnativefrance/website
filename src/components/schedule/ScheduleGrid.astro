@@ -75,32 +75,6 @@ function sessionSpeakerLinks(s: SessionRow) {
   });
 }
 
-function formatChipClass(fmt: string) {
-  switch (fmt) {
-    case "keynote":
-      return "bg-accent/15 text-accent border-accent/30";
-    case "lightning":
-      return "bg-[color:var(--color-tertiary)]/15 border-[color:var(--color-tertiary)]/30";
-    case "workshop":
-      return "bg-secondary text-foreground border-border";
-    default:
-      return "bg-primary/15 text-primary border-primary/30";
-  }
-}
-
-/**
- * Resolved CSS color per format — used to paint the swatch on the Format
- * filter chips so the chip visually matches the session card's background.
- */
-function formatSwatchColor(fmt: string): string {
-  switch (fmt) {
-    case "keynote": return "var(--color-accent, #ff8a9e)";
-    case "lightning": return "var(--color-tertiary, #b8deff)";
-    case "workshop": return "var(--color-secondary, #251c50)";
-    default: return "var(--color-primary, #4985e8)";
-  }
-}
-
 /**
  * Deterministic per-track accent color. Hashes the track name to a hue
  * in [0, 360) and returns the resolved HSL color so we don't have to put
@@ -495,7 +469,9 @@ const CSS_VARS = {
 </aside>
 
 <style>
-  .schedule-root { --row-height: 22px; --card-pad: 8px; }
+  /* --row-height: pixels per 5-minute slot. Sized so a 10-min card (2 rows)
+     fits a time chip + 2-line title. */
+  .schedule-root { --row-height: 28px; --card-pad: 8px; }
 
   .chip {
     display: inline-flex;
@@ -589,6 +565,8 @@ const CSS_VARS = {
   .schedule-time-col {
     display: grid;
     grid-template-rows: repeat(var(--grid-rows), var(--row-height));
+    /* Mirror .schedule-tracks' row-gap so labels stay aligned with cards. */
+    row-gap: 4px;
     border-right: 1px dashed color-mix(in oklch, var(--color-border) 80%, transparent);
   }
   .schedule-time-label {
