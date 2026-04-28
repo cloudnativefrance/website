@@ -7,15 +7,19 @@ interface Props {
   members: CollectionEntry<"team">[];
   lang: Locale;
   title: string;
+  intro?: string;
 }
 
-const { members, lang, title } = Astro.props;
+const { members, lang, title, intro } = Astro.props;
 ---
 
 <section class="py-12">
   <h2 class="text-2xl font-semibold text-foreground">{title}</h2>
+  {intro && (
+    <p class="mt-3 text-base text-muted-foreground max-w-3xl">{intro}</p>
+  )}
   <div
-    class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8"
+    class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8"
   >
     {members.map((m) => <TeamMemberCard member={m} lang={lang} />)}
   </div>
