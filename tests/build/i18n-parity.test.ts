@@ -28,6 +28,8 @@ const KNOWN_IDENTICAL_KEYS = new Set<string>([
   "editions.2026.top_replay.2",
   "editions.2026.top_replay.3",
   "editions.2026.top_replay.4",
+  "editions.2026.top_replay.5",
+  "editions.2026.top_replay.6",
 ]);
 
 function isNarrativeKey(key: string): boolean {
