@@ -54,11 +54,6 @@ function csvLoader({ url, fallback, label }: { url?: string; fallback: string; l
       const rows = parseCsv(raw);
       if (rows.length === 0) return;
       const [header, ...body] = rows;
-      // Header aliases: tolerate sheet column renames so a single typo upstream
-      // does not break the whole build. Map sheet-side spellings → schema names.
-      const HEADER_ALIASES: Record<string, string> = {
-        role_eng: "role_en",
-      };
       const keys = header.map((s) => {
         const k = s.trim();
         return HEADER_ALIASES[k] ?? k;
@@ -113,6 +108,10 @@ const SPONSOR_TIER_ALIAS: Record<string, string> = {
   ecole: "institutional",
 };
 
+const HEADER_ALIASES: Record<string, string> = {
+  role_eng: "role_en",
+};
+
 const sponsorSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -135,8 +134,6 @@ const sponsorSchema = z.object({
   description_en: z.string(),
 });
 
-// A team member can belong to multiple groups (e.g. someone in both Direction
-// and Éditorial). Sheet authors list groups comma-separated in a single cell.
 const TEAM_GROUPS = [
   "direction",
   "editorial",

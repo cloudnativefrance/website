@@ -3,36 +3,20 @@ import Layout from "@/layouts/Layout.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import TeamGroupSection from "@/components/team/TeamGroupSection.astro";
+import { TEAM_GROUPS, type TeamGroup } from "@/content.config";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
 const all = await getCollection("team");
 
-// A member can belong to multiple groups; the same person renders once per
-// section they're listed in.
-const GROUP_ORDER = [
-  "direction",
-  "editorial",
-  "communication",
-  "partenariats",
-  "billetterie",
-  "aidants",
-  "inclusivite",
-] as const;
 const byGroup = Object.fromEntries(
-  GROUP_ORDER.map((g) => [g, all.filter((m) => m.data.groups.includes(g))]),
-) as Record<(typeof GROUP_ORDER)[number], CollectionEntry<"team">[]>;
+  TEAM_GROUPS.map((g) => [g, all.filter((m) => m.data.groups.includes(g))]),
+) as Record<TeamGroup, CollectionEntry<"team">[]>;
 
-const groupTitles = {
-  direction: t("team.group.direction"),
-  editorial: t("team.group.editorial"),
-  communication: t("team.group.communication"),
-  partenariats: t("team.group.partenariats"),
-  billetterie: t("team.group.billetterie"),
-  aidants: t("team.group.aidants"),
-  inclusivite: t("team.group.inclusivite"),
-} as const;
+const groupTitles = Object.fromEntries(
+  TEAM_GROUPS.map((g) => [g, t(`team.group.${g}` as const)]),
+) as Record<TeamGroup, string>;
 
 const hasAnyMember = all.length > 0;
 ---
@@ -48,10 +32,9 @@ const hasAnyMember = all.length > 0;
 
     {
       hasAnyMember ? (
-        GROUP_ORDER.map((g) =>
+        TEAM_GROUPS.map((g) =>
           byGroup[g].length > 0 ? (
             <TeamGroupSection
-              group={g}
               members={byGroup[g]}
               lang={lang}
               title={groupTitles[g]}
