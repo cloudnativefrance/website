@@ -6,8 +6,6 @@ import DiscoverIntro from "@/components/discover/DiscoverIntro.astro";
 import PhotoGallery from "@/components/discover/PhotoGallery.astro";
 import DiscoverValues from "@/components/discover/DiscoverValues.astro";
 import AudienceProfiles from "@/components/discover/AudienceProfiles.astro";
-import ReplayGrid from "@/components/discover/ReplayGrid.astro";
-import { REPLAYS_2026 } from "@/data/replays";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -20,12 +18,15 @@ const t = useTranslations(lang);
   canonicalPath="/en/discover"
 >
   <main>
-    <DiscoverVideoHero
-      title={t("discover.hero.title")}
-      subtitle={t("discover.hero.subtitle")}
-      bestofCaption={t("discover.hero.bestof.caption")}
-      coulissesCaption={t("discover.hero.coulisses.caption")}
-    />
+    <!-- 1. Title -->
+    <section class="w-full bg-background">
+      <div class="mx-auto max-w-7xl px-4 md:px-6 pt-16 pb-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold text-foreground mb-4">{t("discover.hero.title")}</h1>
+        <p class="text-lg text-muted-foreground max-w-2xl mx-auto">{t("discover.hero.subtitle")}</p>
+      </div>
+    </section>
+
+    <!-- 2. Intro text -->
     <DiscoverIntro
       p1={t("discover.intro.p1")}
       p2={t("discover.intro.p2")}
@@ -33,6 +34,14 @@ const t = useTranslations(lang);
       highlightsTalks={t("discover.intro.highlights.talks")}
       highlightsPartners={t("discover.intro.highlights.partners")}
     />
+
+    <!-- 3. Videos -->
+    <DiscoverVideoHero
+      bestofCaption={t("discover.hero.bestof.caption")}
+      coulissesCaption={t("discover.hero.coulisses.caption")}
+    />
+
+    <!-- 4. Who is it for -->
     <AudienceProfiles
       title={t("discover.audience.title")}
       profiles={[
@@ -42,6 +51,8 @@ const t = useTranslations(lang);
         { icon: "🎯", title: t("discover.audience.cto.title"),  topics: t("discover.audience.cto.topics") },
       ]}
     />
+
+    <!-- 5. Our approach -->
     <DiscoverValues
       title={t("discover.values.title")}
       body={t("discover.values.body")}
@@ -53,17 +64,13 @@ const t = useTranslations(lang);
         tracks: t("discover.stats.tracks"),
       }}
     />
+
+    <!-- 6. Gallery -->
     <PhotoGallery
       title={t("discover.gallery.title")}
       closeLabel={t("discover.gallery.lightbox.close")}
       prevLabel={t("discover.gallery.lightbox.prev")}
       nextLabel={t("discover.gallery.lightbox.next")}
-    />
-    <ReplayGrid
-      title={t("discover.replays.title")}
-      cta={t("discover.replays.cta")}
-      replays={REPLAYS_2026}
-      lang={lang}
     />
   </main>
 </Layout>
