@@ -349,6 +349,15 @@ export const ui = {
       "Découvrez l'événement cloud-native de référence en France : ambiance, valeurs, talks 2026.",
     "discover.hero.title": "Découvrir CND France",
     "discover.hero.subtitle": "L'événement cloud-native de référence en France",
+    "discover.intro.p1":
+      "Cloud Native Days France est un événement indépendant, organisé pour la communauté francophone par des bénévoles passionné·e·s par l'infrastructure IT, le cloud, le DevOps, Kubernetes et le cloud native.",
+    "discover.intro.p2":
+      "CND France n'est pas un n-ième \"salon\" tech, c'est une journée de rassemblement de tout l'écosystème prônant le partage d'expertise et d'expérience dans un lieu atypique et plein de charme.",
+    "discover.intro.highlights.title": "CND France se distingue par :",
+    "discover.intro.highlights.talks":
+      "Des conférences de grande qualité sélectionnées parmi des centaines de propositions : orientées expertise et retours d'expériences concrets, sans aucun discours commercial.",
+    "discover.intro.highlights.partners":
+      "Un village de partenaires sélectionnés uniquement s'ils sont pertinents pour nos participant·e·s : des acteurs de référence avec des solutions et services que vous utilisez au quotidien.",
     "discover.gallery.title": "L'ambiance 2026 en images",
     "discover.gallery.lightbox.close": "Fermer",
     "discover.gallery.lightbox.prev": "Photo précédente",
@@ -714,6 +723,15 @@ export const ui = {
       "Discover the reference cloud-native event in France: atmosphere, values, and 2026 talks.",
     "discover.hero.title": "Discover CND France",
     "discover.hero.subtitle": "The reference cloud-native event in France",
+    "discover.intro.p1":
+      "Cloud Native Days France is an independent event, organized for the French-speaking community by volunteers passionate about IT infrastructure, cloud, DevOps, Kubernetes, and cloud native.",
+    "discover.intro.p2":
+      "CND France is not just another tech expo — it's a day of gathering for the entire ecosystem, promoting the sharing of expertise and experience in an atypical and charming venue.",
+    "discover.intro.highlights.title": "CND France stands out for:",
+    "discover.intro.highlights.talks":
+      "High-quality talks selected from hundreds of proposals: focused on expertise and concrete real-world feedback, with no commercial pitch.",
+    "discover.intro.highlights.partners":
+      "A partner village selected only when relevant to our attendees: key players with solutions and services you use daily.",
     "discover.gallery.title": "2026 in pictures",
     "discover.gallery.lightbox.close": "Close",
     "discover.gallery.lightbox.prev": "Previous photo",

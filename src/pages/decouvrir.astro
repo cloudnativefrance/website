@@ -2,6 +2,7 @@
 import Layout from "@/layouts/Layout.astro";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import DiscoverVideoHero from "@/components/discover/DiscoverVideoHero.astro";
+import DiscoverIntro from "@/components/discover/DiscoverIntro.astro";
 import PhotoGallery from "@/components/discover/PhotoGallery.astro";
 import DiscoverValues from "@/components/discover/DiscoverValues.astro";
 import AudienceProfiles from "@/components/discover/AudienceProfiles.astro";
@@ -22,6 +23,13 @@ const t = useTranslations(lang);
     <DiscoverVideoHero
       title={t("discover.hero.title")}
       subtitle={t("discover.hero.subtitle")}
+    />
+    <DiscoverIntro
+      p1={t("discover.intro.p1")}
+      p2={t("discover.intro.p2")}
+      highlightsTitle={t("discover.intro.highlights.title")}
+      highlightsTalks={t("discover.intro.highlights.talks")}
+      highlightsPartners={t("discover.intro.highlights.partners")}
     />
     <PhotoGallery
       title={t("discover.gallery.title")}
