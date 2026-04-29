@@ -366,7 +366,7 @@ export const ui = {
     "discover.gallery.lightbox.next": "Photo suivante",
     "discover.values.title": "Notre démarche",
     "discover.values.body":
-      "CND France est un événement indépendant, piloté par une communauté de praticien·ne·s passionné·e·s par le cloud-native, l'open source et l'écosystème CNCF. Nous croyons à un numérique souverain, à la diversité des profils et à l'apprentissage entre pair·es. Chaque édition rassemble des ingénieur·es, des ops, des architectes et des curieux·ses autour de talks concrets, de retours d'expérience et d'échanges authentiques.",
+      "Depuis 2023, nous essayons de pousser tous les curseurs de qualité au maximum : exigence de la programmation, qualité des repas, lieu unique, proposer les stands partenaires les plus intéressants pour vous. Parmi nos valeurs, nous croyons à l'importance de l'autonomie numérique (open source, multi-fournisseur…), à la richesse collective derrière la diversité des profils et à l'apprentissage entre pair·es. Nous essayons aussi de proposer un événement avec l'empreinte écologique la plus limitée possible.",
     "discover.stats.participants": "participant·e·s",
     "discover.stats.talks": "talks",
     "discover.stats.speakers": "speakers",
@@ -746,7 +746,7 @@ export const ui = {
     "discover.gallery.lightbox.next": "Next photo",
     "discover.values.title": "Our approach",
     "discover.values.body":
-      "CND France is an independent event run by a community of practitioners passionate about cloud-native, open source, and the CNCF ecosystem. We believe in digital sovereignty, diversity of backgrounds, and peer-to-peer learning. Each edition brings together engineers, ops, architects, and curious minds around concrete talks, real-world experience reports, and genuine conversations.",
+      "Since 2023, we push every quality dial to the max: rigorous programming, quality catering, a unique venue, and the most relevant partner stands for you. Our values include a belief in digital autonomy (open source, multi-vendor…), the collective strength that comes from diverse backgrounds, and peer-to-peer learning. We also strive to run an event with the smallest ecological footprint possible.",
     "discover.stats.participants": "participants",
     "discover.stats.talks": "talks",
     "discover.stats.speakers": "speakers",
