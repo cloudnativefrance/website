@@ -170,11 +170,14 @@ const teamSchema = z.object({
         ? v.split(",").map((s) => s.trim()).filter(Boolean)
         : v;
       if (!Array.isArray(items)) return items;
-      const mapped = items.map((g) => LEGACY_TEAM_GROUP_ALIAS[g] ?? g);
+      const mapped = items
+        .map((g) => LEGACY_TEAM_GROUP_ALIAS[g] ?? g)
+        // Drop unknown values instead of crashing the build.
+        .filter((g) => (TEAM_GROUPS as readonly string[]).includes(g));
       // Dedupe — multiple legacy slugs can collapse to the same new slug.
       return Array.from(new Set(mapped));
     },
-    z.array(z.enum(TEAM_GROUPS)).min(1),
+    z.array(z.enum(TEAM_GROUPS)).min(0),
   ),
   photo: z.string().optional().or(z.literal("").transform(() => undefined)),
   social_linkedin: socialUrl,

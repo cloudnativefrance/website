@@ -1,0 +1,39 @@
+---
+interface Props {
+  p1: string;
+  p2: string;
+  highlightsTitle: string;
+  highlightsTalks: string;
+  highlightsPartners: string;
+}
+
+const { p1, p2, highlightsTitle, highlightsTalks, highlightsPartners } = Astro.props;
+---
+
+<section class="bg-background">
+  <div class="mx-auto max-w-3xl px-4 md:px-6 py-12 md:py-16 space-y-6 leading-relaxed">
+    <!-- Option A: lead paragraph — larger, full foreground color -->
+    <p class="text-xl md:text-2xl text-foreground font-medium">{p1}</p>
+    <!-- Supporting paragraph -->
+    <p class="text-base md:text-lg text-muted-foreground">{p2}</p>
+
+    <!-- Option C: accent block with left border -->
+    <div class="bg-card border-l-4 border-primary rounded-r-xl p-6 space-y-4 mt-8">
+      <p class="text-sm font-semibold uppercase tracking-wide text-primary">{highlightsTitle}</p>
+      <ul class="space-y-4 list-none">
+        <li class="flex gap-3 text-muted-foreground">
+          <span class="mt-1 shrink-0 text-primary" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <span class="text-sm md:text-base leading-relaxed">{highlightsTalks}</span>
+        </li>
+        <li class="flex gap-3 text-muted-foreground">
+          <span class="mt-1 shrink-0 text-primary" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <span class="text-sm md:text-base leading-relaxed">{highlightsPartners}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>

@@ -17,18 +17,25 @@ const { title, body, stats, lang } = Astro.props;
 
 const valueLabels = {
   fr: [
-    { emoji: "🌐", label: "Open Source" },
+    { emoji: "🔓", label: "Autonomie Numérique" },
     { emoji: "🤝", label: "Communauté" },
-    { emoji: "🌱", label: "Souveraineté" },
-    { emoji: "♾️", label: "Inclusion" },
+    { emoji: "🌈", label: "Inclusion" },
+    { emoji: "🌿", label: "Écologie" },
   ],
   en: [
-    { emoji: "🌐", label: "Open Source" },
+    { emoji: "🔓", label: "Digital Autonomy" },
     { emoji: "🤝", label: "Community" },
-    { emoji: "🌱", label: "Sovereignty" },
-    { emoji: "♾️", label: "Inclusion" },
+    { emoji: "🌈", label: "Inclusion" },
+    { emoji: "🌿", label: "Ecology" },
   ],
 } as const;
+
+const statItems = [
+  { number: "2 500", suffix: "+", label: stats.participants },
+  { number: "50",    suffix: "+", label: stats.talks },
+  { number: "50",    suffix: "+", label: stats.speakers },
+  { number: "5",     suffix: "",  label: stats.tracks },
+];
 ---
 
 <section id="values" class="bg-card">
@@ -42,29 +49,21 @@ const valueLabels = {
         {valueLabels[lang].map(({ emoji, label }) => (
           <div class="flex flex-col items-center gap-2">
             <span class="text-5xl" aria-hidden="true">{emoji}</span>
-            <span class="text-sm font-medium text-muted-foreground">{label}</span>
+            <span class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
           </div>
         ))}
       </div>
     </div>
 
     <div class="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-8 border-t border-border pt-8">
-      <div class="text-center">
-        <div class="text-4xl font-bold text-primary">2 500</div>
-        <div class="text-sm text-muted-foreground mt-1">{stats.participants}</div>
-      </div>
-      <div class="text-center">
-        <div class="text-4xl font-bold text-primary">50+</div>
-        <div class="text-sm text-muted-foreground mt-1">{stats.talks}</div>
-      </div>
-      <div class="text-center">
-        <div class="text-4xl font-bold text-primary">40+</div>
-        <div class="text-sm text-muted-foreground mt-1">{stats.speakers}</div>
-      </div>
-      <div class="text-center">
-        <div class="text-4xl font-bold text-primary">5</div>
-        <div class="text-sm text-muted-foreground mt-1">{stats.tracks}</div>
-      </div>
+      {statItems.map(({ number, suffix, label }) => (
+        <div class="text-center">
+          <div class="text-4xl font-bold text-primary">
+            {number}<span class="text-destructive">{suffix}</span>
+          </div>
+          <div class="text-sm font-semibold uppercase tracking-wide text-muted-foreground mt-2">{label}</div>
+        </div>
+      ))}
     </div>
   </div>
 </section>

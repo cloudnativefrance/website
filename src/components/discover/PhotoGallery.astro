@@ -1,38 +1,33 @@
 ---
 import { Image } from "astro:assets";
+// Curated selection — avoids homepage photos (03, 06, 10) and removes near-duplicates (02).
 import amb00 from "@/assets/photos/ambiance/ambiance-00.jpg";
 import amb01 from "@/assets/photos/ambiance/ambiance-01.jpg";
-import amb02 from "@/assets/photos/ambiance/ambiance-02.jpg";
-import amb03 from "@/assets/photos/ambiance/ambiance-03.jpg";
 import amb04 from "@/assets/photos/ambiance/ambiance-04.jpg";
 import amb05 from "@/assets/photos/ambiance/ambiance-05.jpg";
-import amb06 from "@/assets/photos/ambiance/ambiance-06.jpg";
 import amb07 from "@/assets/photos/ambiance/ambiance-07.jpg";
 import amb08 from "@/assets/photos/ambiance/ambiance-08.jpg";
 import amb09 from "@/assets/photos/ambiance/ambiance-09.jpg";
-import amb10 from "@/assets/photos/ambiance/ambiance-10.jpg";
 
 interface Props {
   title: string;
   closeLabel: string;
   prevLabel: string;
   nextLabel: string;
+  albumLabel: string;
+  albumUrl: string;
 }
 
-const { title, closeLabel, prevLabel, nextLabel } = Astro.props;
+const { title, closeLabel, prevLabel, nextLabel, albumLabel, albumUrl } = Astro.props;
 
 const photos = [
-  { src: amb00, alt: "Ambiance CND France 2026 — photo 1" },
-  { src: amb01, alt: "Ambiance CND France 2026 — photo 2" },
-  { src: amb02, alt: "Ambiance CND France 2026 — photo 3" },
-  { src: amb03, alt: "Ambiance CND France 2026 — photo 4" },
-  { src: amb04, alt: "Ambiance CND France 2026 — photo 5" },
-  { src: amb05, alt: "Ambiance CND France 2026 — photo 6" },
-  { src: amb06, alt: "Ambiance CND France 2026 — photo 7" },
-  { src: amb07, alt: "Ambiance CND France 2026 — photo 8" },
-  { src: amb08, alt: "Ambiance CND France 2026 — photo 9" },
-  { src: amb09, alt: "Ambiance CND France 2026 — photo 10" },
-  { src: amb10, alt: "Ambiance CND France 2026 — photo 11" },
+  { src: amb05, alt: "Hall d'entrée de Cloud Native Days France 2026 sur deux niveaux" },
+  { src: amb07, alt: "Panel en scène lors de Cloud Native Days France 2026" },
+  { src: amb04, alt: "Networking au village partenaires de Cloud Native Days France 2026" },
+  { src: amb01, alt: "Conférence en salle principale lors de Cloud Native Days France 2026" },
+  { src: amb09, alt: "Vue aérienne de la grande halle de Cloud Native Days France 2026" },
+  { src: amb08, alt: "Talk dans une petite salle lors de Cloud Native Days France 2026" },
+  { src: amb00, alt: "Village partenaires de Cloud Native Days France 2026" },
 ];
 ---
 
@@ -55,6 +50,18 @@ const photos = [
         />
       </button>
     ))}
+  </div>
+
+  <div class="mt-10 text-center">
+    <a
+      href={albumUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-md border-2 border-primary-strong text-primary-strong bg-transparent text-base font-semibold hover:bg-primary/10 hover:shadow-[0_0_0_4px_oklch(62.5%_0.162_259.9_/_0.15)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-150"
+    >
+      {albumLabel}
+      <span aria-hidden="true">→</span>
+    </a>
   </div>
 
   <dialog
