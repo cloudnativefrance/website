@@ -26,18 +26,14 @@ const t = useTranslations(lang);
       bestofCaption={t("discover.hero.bestof.caption")}
       coulissesCaption={t("discover.hero.coulisses.caption")}
     />
-    <DiscoverIntro
-      p1={t("discover.intro.p1")}
-      p2={t("discover.intro.p2")}
-      highlightsTitle={t("discover.intro.highlights.title")}
-      highlightsTalks={t("discover.intro.highlights.talks")}
-      highlightsPartners={t("discover.intro.highlights.partners")}
-    />
-    <PhotoGallery
-      title={t("discover.gallery.title")}
-      closeLabel={t("discover.gallery.lightbox.close")}
-      prevLabel={t("discover.gallery.lightbox.prev")}
-      nextLabel={t("discover.gallery.lightbox.next")}
+    <AudienceProfiles
+      title={t("discover.audience.title")}
+      profiles={[
+        { icon: "💻", title: t("discover.audience.dev.title"), topics: t("discover.audience.dev.topics") },
+        { icon: "⚙️", title: t("discover.audience.ops.title"), topics: t("discover.audience.ops.topics") },
+        { icon: "🏗️", title: t("discover.audience.lead.title"), topics: t("discover.audience.lead.topics") },
+        { icon: "🎯", title: t("discover.audience.cto.title"),  topics: t("discover.audience.cto.topics") },
+      ]}
     />
     <DiscoverValues
       title={t("discover.values.title")}
@@ -50,14 +46,18 @@ const t = useTranslations(lang);
         tracks: t("discover.stats.tracks"),
       }}
     />
-    <AudienceProfiles
-      title={t("discover.audience.title")}
-      profiles={[
-        { icon: "💻", title: t("discover.audience.dev.title"), topics: t("discover.audience.dev.topics") },
-        { icon: "⚙️", title: t("discover.audience.ops.title"), topics: t("discover.audience.ops.topics") },
-        { icon: "🏗️", title: t("discover.audience.lead.title"), topics: t("discover.audience.lead.topics") },
-        { icon: "🎯", title: t("discover.audience.cto.title"),  topics: t("discover.audience.cto.topics") },
-      ]}
+    <DiscoverIntro
+      p1={t("discover.intro.p1")}
+      p2={t("discover.intro.p2")}
+      highlightsTitle={t("discover.intro.highlights.title")}
+      highlightsTalks={t("discover.intro.highlights.talks")}
+      highlightsPartners={t("discover.intro.highlights.partners")}
+    />
+    <PhotoGallery
+      title={t("discover.gallery.title")}
+      closeLabel={t("discover.gallery.lightbox.close")}
+      prevLabel={t("discover.gallery.lightbox.prev")}
+      nextLabel={t("discover.gallery.lightbox.next")}
     />
     <ReplayGrid
       title={t("discover.replays.title")}
