@@ -230,7 +230,7 @@ export const ui = {
     "legal.privacy.title": "Politique de confidentialité",
     "legal.terms.title": "Mentions légales",
     "legal.last_updated": "Dernière mise à jour : {date}",
-    "footer.tagline": "Cloud Native, DevOps et IA — entre praticiens.",
+    "footer.tagline": "Infra, DevOps & Cloud Native — entre praticien(ne)s.",
     "footer.association": "Organisé sous le statut d'association 1901, par l'association Cloud Native France.",
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Suivez-nous",
