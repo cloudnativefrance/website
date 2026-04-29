@@ -215,13 +215,13 @@ export const ui = {
       "Les enregistrements seront publiés après l'événement.",
     "replays.watch": "Regarder le replay",
     "team.page.title": "L'équipe",
-    "team.page.intro": "Les bénévoles qui organisent Cloud Native Days France.",
+    "team.page.intro": "Un grand merci à celles et à ceux qui donnent de leur temps et de leur énergie pour organiser Cloud Native Days France et rassembler tout l’écosystème.",
     "team.page.empty": "L'équipe sera annoncée prochainement.",
     "team.group.equipe-principale": "Équipe principale",
     "team.group.comite-selection": "Comité de sélection",
     "team.group.autres-benevoles": "Autres bénévoles",
     "team.intro.equipe-principale":
-      "Ils œuvrent toute l'année pour vous organiser Cloud Native Days France.",
+      "Ensemble, nous œuvrons toute l'année pour vous organiser Cloud Native Days France !",
     "team.intro.comite-selection":
       "Ils évaluent les propositions de conférences et aident à l'établissement de la programmation.",
     "team.intro.autres-benevoles":
