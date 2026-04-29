@@ -349,6 +349,8 @@ export const ui = {
       "Découvrez l'événement cloud-native de référence en France : ambiance, valeurs, talks 2026.",
     "discover.hero.title": "Découvrir CND France",
     "discover.hero.subtitle": "L'événement cloud-native de référence en France",
+    "discover.hero.bestof.caption": "Découvrir CND France",
+    "discover.hero.coulisses.caption": "Les coulisses, racontées par les bénévoles",
     "discover.intro.p1":
       "Cloud Native Days France est un événement indépendant, organisé pour la communauté francophone par des bénévoles passionné·e·s par l'infrastructure IT, le cloud, le DevOps, Kubernetes et le cloud native.",
     "discover.intro.p2":
@@ -723,6 +725,8 @@ export const ui = {
       "Discover the reference cloud-native event in France: atmosphere, values, and 2026 talks.",
     "discover.hero.title": "Discover CND France",
     "discover.hero.subtitle": "The reference cloud-native event in France",
+    "discover.hero.bestof.caption": "Discover CND France",
+    "discover.hero.coulisses.caption": "Behind the scenes, told by our volunteers",
     "discover.intro.p1":
       "Cloud Native Days France is an independent event, organized for the French-speaking community by volunteers passionate about IT infrastructure, cloud, DevOps, Kubernetes, and cloud native.",
     "discover.intro.p2":
