@@ -364,6 +364,7 @@ export const ui = {
     "discover.gallery.lightbox.close": "Fermer",
     "discover.gallery.lightbox.prev": "Photo précédente",
     "discover.gallery.lightbox.next": "Photo suivante",
+    "discover.gallery.album_cta": "Voir l'album photo",
     "discover.values.title": "Notre démarche",
     "discover.values.body":
       "Depuis 2023, nous essayons de pousser tous les curseurs de qualité au maximum : exigence de la programmation, qualité des repas, lieu unique, proposer les stands partenaires les plus intéressants pour vous. Parmi nos valeurs, nous croyons à l'importance de l'autonomie numérique (open source, multi-fournisseur…), à la richesse collective derrière la diversité des profils et à l'apprentissage entre pair·es. Nous essayons aussi de proposer un événement avec l'empreinte écologique la plus limitée possible.",
@@ -744,6 +745,7 @@ export const ui = {
     "discover.gallery.lightbox.close": "Close",
     "discover.gallery.lightbox.prev": "Previous photo",
     "discover.gallery.lightbox.next": "Next photo",
+    "discover.gallery.album_cta": "View photo album",
     "discover.values.title": "Our approach",
     "discover.values.body":
       "Since 2023, we push every quality dial to the max: rigorous programming, quality catering, a unique venue, and the most relevant partner stands for you. Our values include a belief in digital autonomy (open source, multi-vendor…), the collective strength that comes from diverse backgrounds, and peer-to-peer learning. We also strive to run an event with the smallest ecological footprint possible.",
