@@ -26,6 +26,13 @@ const t = useTranslations(lang);
       bestofCaption={t("discover.hero.bestof.caption")}
       coulissesCaption={t("discover.hero.coulisses.caption")}
     />
+    <DiscoverIntro
+      p1={t("discover.intro.p1")}
+      p2={t("discover.intro.p2")}
+      highlightsTitle={t("discover.intro.highlights.title")}
+      highlightsTalks={t("discover.intro.highlights.talks")}
+      highlightsPartners={t("discover.intro.highlights.partners")}
+    />
     <AudienceProfiles
       title={t("discover.audience.title")}
       profiles={[
@@ -45,13 +52,6 @@ const t = useTranslations(lang);
         speakers: t("discover.stats.speakers"),
         tracks: t("discover.stats.tracks"),
       }}
-    />
-    <DiscoverIntro
-      p1={t("discover.intro.p1")}
-      p2={t("discover.intro.p2")}
-      highlightsTitle={t("discover.intro.highlights.title")}
-      highlightsTalks={t("discover.intro.highlights.talks")}
-      highlightsPartners={t("discover.intro.highlights.partners")}
     />
     <PhotoGallery
       title={t("discover.gallery.title")}
