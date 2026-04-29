@@ -5,6 +5,7 @@ dist/
 .claude.json
 .DS_Store
 .astro/
+.idea/
 
 # Raw photography deliveries — optimised masters live in src/assets/photos/
 drive-download-*.zip
