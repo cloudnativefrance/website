@@ -44,11 +44,13 @@ const t = useTranslations(lang);
     <!-- 4. Who is it for -->
     <AudienceProfiles
       title={t("discover.audience.title")}
+      subtitle={t("discover.audience.subtitle")}
       profiles={[
-        { icon: "💻", title: t("discover.audience.dev.title"), topics: t("discover.audience.dev.topics") },
-        { icon: "⚙️", title: t("discover.audience.ops.title"), topics: t("discover.audience.ops.topics") },
-        { icon: "🏗️", title: t("discover.audience.lead.title"), topics: t("discover.audience.lead.topics") },
-        { icon: "🎯", title: t("discover.audience.cto.title"),  topics: t("discover.audience.cto.topics") },
+        { icon: "💻", title: t("discover.audience.dev.title"),   topics: t("discover.audience.dev.topics") },
+        { icon: "☁️", title: t("discover.audience.cloud.title"), topics: t("discover.audience.cloud.topics") },
+        { icon: "⚙️", title: t("discover.audience.ops.title"),   topics: t("discover.audience.ops.topics") },
+        { icon: "🏗️", title: t("discover.audience.lead.title"),  topics: t("discover.audience.lead.topics") },
+        { icon: "🎯", title: t("discover.audience.cto.title"),   topics: t("discover.audience.cto.topics") },
       ]}
     />
 
