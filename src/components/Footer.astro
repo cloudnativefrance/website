@@ -1,6 +1,7 @@
 ---
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { NEWSLETTER_URL } from "@/lib/event";
+import { CURRENT_EDITION } from "@/lib/editions";
 import logoFullDark from "@/assets/logos/dark/logo.svg";
 import logoFullLight from "@/assets/logos/principal/logo.svg";
 import SocialLinks from "@/components/SocialLinks.astro";
@@ -17,7 +18,7 @@ const currentPath = Astro.url.pathname;
 const navItems = [
   { key: "nav.schedule"       as const, path: "/programme" },
   { key: "nav.cfp"            as const, path: "/cfp" },
-  { key: "nav.sponsors"       as const, path: "/sponsors" },
+  { key: "nav.sponsors"       as const, path: `/sponsors/${CURRENT_EDITION}` },
   { key: "about.subnav.venue" as const, path: "/informations-utiles" },
   { key: "nav.team"           as const, path: "/team" },
   { key: "nav.contact"        as const, path: "/contact" },

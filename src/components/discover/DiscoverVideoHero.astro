@@ -1,4 +1,7 @@
 ---
+import { Image } from "astro:assets";
+import thumbCoulisses from "@/assets/photos/discover/thumb-coulisses.png";
+
 interface Props {
   bestofCaption: string;
   coulissesCaption: string;
@@ -8,40 +11,109 @@ const { bestofCaption, coulissesCaption } = Astro.props;
 
 const BESTOF_ID    = "qyMGuU2-w8o";
 const COULISSES_ID = "A51PGVvrt_8";
+
+const bestofPoster = `https://i.ytimg.com/vi/${BESTOF_ID}/hqdefault.jpg`;
 ---
 
 <section class="w-full bg-background">
   <div class="mx-auto max-w-7xl px-4 md:px-6 pb-8">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Best of — le "quoi" -->
+      <!-- Best of -->
       <div class="flex flex-col gap-3">
-        <div class="relative w-full aspect-video rounded-xl overflow-hidden">
-          <iframe
-            class="absolute inset-0 w-full h-full"
-            src={`https://www.youtube-nocookie.com/embed/${BESTOF_ID}`}
-            title={bestofCaption}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-            loading="lazy"
-          ></iframe>
+        <div
+          class="yt-facade relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer"
+          data-video-id={BESTOF_ID}
+          data-title={bestofCaption}
+        >
+          <button
+            type="button"
+            class="group absolute inset-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
+            aria-label={`Lire : ${bestofCaption}`}
+          >
+            <img
+              src={bestofPoster}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              class="absolute inset-0 h-full w-full object-cover"
+            />
+            <span class="absolute top-3 left-3 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded backdrop-blur-sm leading-tight">
+              {bestofCaption}
+            </span>
+            <span
+              aria-hidden="true"
+              class="absolute inset-0 flex items-center justify-center"
+            >
+              <span class="flex h-16 w-16 items-center justify-center rounded-full bg-black/60 transition-transform group-hover:scale-110">
+                <svg viewBox="0 0 24 24" class="h-8 w-8 fill-white translate-x-0.5" aria-hidden="true">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </span>
+            </span>
+          </button>
         </div>
-        <p class="text-center text-sm font-medium text-muted-foreground">{bestofCaption}</p>
+        <p class="text-center text-base font-medium text-muted-foreground">{bestofCaption}</p>
       </div>
 
-      <!-- Coulisses — les valeurs et le "comment" -->
+      <!-- Coulisses -->
       <div class="flex flex-col gap-3">
-        <div class="relative w-full aspect-video rounded-xl overflow-hidden">
-          <iframe
-            class="absolute inset-0 w-full h-full"
-            src={`https://www.youtube-nocookie.com/embed/${COULISSES_ID}`}
-            title={coulissesCaption}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-            loading="lazy"
-          ></iframe>
+        <div
+          class="yt-facade relative w-full aspect-video rounded-xl overflow-hidden cursor-pointer"
+          data-video-id={COULISSES_ID}
+          data-title={coulissesCaption}
+        >
+          <button
+            type="button"
+            class="group absolute inset-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
+            aria-label={`Lire : ${coulissesCaption}`}
+          >
+            <Image
+              src={thumbCoulisses}
+              alt=""
+              widths={[480, 800]}
+              sizes="(min-width: 768px) 50vw, 100vw"
+              formats={["avif", "webp"]}
+              loading="lazy"
+              decoding="async"
+              class="absolute inset-0 h-full w-full object-cover"
+            />
+            <span class="absolute top-3 left-3 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded backdrop-blur-sm leading-tight">
+              {coulissesCaption}
+            </span>
+            <span
+              aria-hidden="true"
+              class="absolute inset-0 flex items-center justify-center"
+            >
+              <span class="flex h-16 w-16 items-center justify-center rounded-full bg-black/60 transition-transform group-hover:scale-110">
+                <svg viewBox="0 0 24 24" class="h-8 w-8 fill-white translate-x-0.5" aria-hidden="true">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </span>
+            </span>
+          </button>
         </div>
-        <p class="text-center text-sm font-medium text-muted-foreground">{coulissesCaption}</p>
+        <p class="text-center text-base font-medium text-muted-foreground">{coulissesCaption}</p>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  const facades = document.querySelectorAll<HTMLElement>(".yt-facade");
+  facades.forEach((facade) => {
+    const btn = facade.querySelector("button");
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+      const id = facade.dataset.videoId;
+      const title = facade.dataset.title || "";
+      if (!id) return;
+      const iframe = document.createElement("iframe");
+      iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`;
+      iframe.title = title;
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      iframe.allowFullscreen = true;
+      iframe.className = "absolute inset-0 h-full w-full border-0 rounded-xl";
+      facade.replaceChildren(iframe);
+    }, { once: true });
+  });
+</script>

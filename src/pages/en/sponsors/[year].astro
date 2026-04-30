@@ -58,7 +58,7 @@ const tierTitles = {
     <header class="text-center">
       <h1 class="text-4xl font-bold text-foreground">{t("sponsors.page.title")} {year}</h1>
       {!isPending && (
-        <p class="mt-4 text-base text-muted-foreground max-w-2xl mx-auto">
+        <p class="mt-4 text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
           {hasAnySponsor ? t("sponsors.page.intro") : t("sponsors.empty_state")}
         </p>
       )}
