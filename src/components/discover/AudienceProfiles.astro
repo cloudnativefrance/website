@@ -14,15 +14,15 @@ interface Props {
 const { title, subtitle, profiles } = Astro.props;
 ---
 
-<section id="audience" class="mx-auto max-w-7xl px-4 md:px-6 py-16">
+<section id="audience" class="mx-auto max-w-6xl px-4 md:px-6 py-16">
   <h2 class="text-3xl font-bold text-foreground mb-4 text-center">{title}</h2>
-  <p class="text-center text-muted-foreground max-w-2xl mx-auto mb-10">{subtitle}</p>
+  <p class="text-center text-muted-foreground max-w-3xl mx-auto mb-10">{subtitle}</p>
   <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {profiles.map(({ icon, title: profileTitle, topics }) => (
       <div class="bg-card border border-border rounded-xl p-8 flex flex-col gap-4">
         <span class="text-5xl" aria-hidden="true">{icon}</span>
         <h3 class="text-xl font-semibold text-foreground">{profileTitle}</h3>
-        <p class="text-muted-foreground text-sm leading-relaxed">{topics}</p>
+        <p class="text-muted-foreground text-sm leading-relaxed text-center">{topics}</p>
       </div>
     ))}
   </div>

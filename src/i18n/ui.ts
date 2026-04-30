@@ -45,7 +45,7 @@ export const ui = {
     "hero.cta.register": "Prenez votre place",
     "hero.cta.schedule": "Voir le programme",
     "hero.description":
-      "Le Cloud Native Days France est l'\u00e9v\u00e9nement de r\u00e9f\u00e9rence en France sur les technologies Cloud Native et le DevOps. Organis\u00e9 par une \u00e9quipe de b\u00e9n\u00e9voles, il met en lumi\u00e8re les derni\u00e8res innovations dans ces domaines, avec une priorit\u00e9 aux solutions Open Source et aux cas concrets applicables au sein des organisations.",
+      "La communaut\u00e9 cloud native francophone se retrouve \u00e0 Paris. Une journ\u00e9e de retours d'exp\u00e9rience, de rencontres et de d\u00e9bats techniques \u2014 ouverte \u00e0 toutes et tous, du junior curieux \u00e0 l'archi senior.",
     "hero.logo_alt": "Cloud Native Days France",
     "hero.cta.newsletter": "Restez informé(e)",
     "hero.cta.newsletter_aria": "Restez informé(e) — annonces Cloud Native Days France",
@@ -59,7 +59,7 @@ export const ui = {
     "hero.cta.replays": "Voir les replays",
     "keynumbers.heading": "L'évènement en chiffres",
     "keynumbers.attendees": "Participant(e)s attendu(e)s",
-    "keynumbers.talks": "Conferences",
+    "keynumbers.talks": "Conférences",
     "keynumbers.partners": "Partenaires",
     "cfp.heading": "Appel à conférences",
     "cfp.status.coming_soon": "Bientôt ouvert",
@@ -225,7 +225,7 @@ export const ui = {
     "team.intro.comite-selection":
       "Ils évaluent les propositions de conférences et aident à l'établissement de la programmation.",
     "team.intro.autres-benevoles":
-      "Ils nous aident le jour J, épaulés par de nombreux étudiants de nos écoles partenaires.",
+      "Ces bénévoles nous aident le jour J, épaulé(e)s par de nombreux(ses) étudiant(e)s de nos écoles partenaires.",
     "legal.coc.title": "Code de conduite",
     "legal.privacy.title": "Politique de confidentialité",
     "legal.terms.title": "Mentions légales",
@@ -349,8 +349,8 @@ export const ui = {
       "Découvrez l'événement cloud-native de référence en France : ambiance, valeurs, talks 2026.",
     "discover.hero.title": "Découvrir CND France",
     "discover.hero.subtitle": "L'événement cloud-native de référence en France",
-    "discover.hero.bestof.caption": "Découvrir CND France",
-    "discover.hero.coulisses.caption": "Les coulisses, racontées par les bénévoles",
+    "discover.hero.bestof.caption": "CND France : le FILM",
+    "discover.hero.coulisses.caption": "CND France : les COULISSES",
     "discover.intro.p1":
       "Cloud Native Days France est un événement indépendant, organisé pour la communauté francophone par des bénévoles passionné(e)s par l'infrastructure IT, le cloud, le DevOps, Kubernetes et le cloud native.",
     "discover.intro.p2":
@@ -369,14 +369,14 @@ export const ui = {
     "discover.values.body":
       "Depuis 2023, nous essayons de pousser tous les curseurs de qualité au maximum : exigence de la programmation, qualité des repas, lieu unique, proposer les stands partenaires les plus intéressants pour vous. Parmi nos valeurs, nous croyons à l'importance de l'autonomie numérique (open source, multi-fournisseur…), à la richesse collective derrière la diversité des profils et à l'apprentissage entre pairs. Nous essayons aussi de proposer un événement avec l'empreinte écologique la plus limitée possible.",
     "discover.stats.participants": "participant(e)s",
-    "discover.stats.talks": "talks",
-    "discover.stats.speakers": "speakers",
+    "discover.stats.talks": "conférences",
+    "discover.stats.speakers": "intervenant(e)s",
     "discover.stats.tracks": "tracks",
     "discover.audience.title": "À qui s'adresse Cloud Native Days France ?",
     "discover.audience.subtitle":
       "CND France se destine à tous les professionnels de l'IT avec une appétence technique sur l'infrastructure et le Cloud, le DevOps, Kubernetes et le Cloud Native, ou encore le Platform Engineering.",
     "discover.audience.dev.title": "Développeur(se)",
-    "discover.audience.dev.topics": "CI/CD · Developer Experience · IA applicative · Architecture microservices",
+    "discover.audience.dev.topics": "CI/CD · Dev Experience · IA applicative · Architecture microservices",
     "discover.audience.cloud.title": "Ingénieur(e) Cloud & DevOps",
     "discover.audience.cloud.topics": "Kubernetes · GitOps · IaC · Platform Engineering · FinOps",
     "discover.audience.ops.title": "Ops & SRE",
@@ -384,7 +384,7 @@ export const ui = {
     "discover.audience.lead.title": "Tech Lead & Architecte",
     "discover.audience.lead.topics": "Architecture distribuée · Multi-cloud · Gouvernance",
     "discover.audience.cto.title": "CTO, DSI & VP…",
-    "discover.audience.cto.topics": "ROI cloud · Souveraineté numérique · Tendances",
+    "discover.audience.cto.topics": "Stratégie et ROI cloud · Autonomie numérique · IA en production · Tendances",
     "discover.replays.title": "Les talks 2026",
     "discover.replays.cta": "Voir tous les replays",
   },
@@ -606,7 +606,7 @@ export const ui = {
     "team.intro.comite-selection":
       "They review talk submissions and help shape the programme.",
     "team.intro.autres-benevoles":
-      "They help us on event day, backed by many students from our partner schools.",
+      "These volunteers help us on the day, backed by many students from our partner schools.",
     "legal.coc.title": "Code of Conduct",
     "legal.privacy.title": "Privacy Policy",
     "legal.terms.title": "Terms of Service",

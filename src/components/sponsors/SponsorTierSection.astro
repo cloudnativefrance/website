@@ -25,12 +25,21 @@ const isEmpty = sponsors.length === 0;
 
 // Grid classes per tier. `auto-rows-fr` keeps every card in a tier the same
 // height, so logos with different aspect ratios sit on a uniform baseline.
+const platinumGrid = (() => {
+  if (tier !== "platinum") return "";
+  const n = sponsors.length;
+  if (n <= 1) return "flex justify-center";
+  if (n === 2) return "grid grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto auto-rows-fr";
+  if (n === 3) return "grid grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto auto-rows-fr";
+  return "grid grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto auto-rows-fr";
+})();
+
 const tierGrid: Record<Props["tier"], string> = {
-  platinum: "grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto auto-rows-fr",
+  platinum: platinumGrid,
   gold: "grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 auto-rows-fr",
-  silver: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 lg:gap-6 auto-rows-fr",
+  silver: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 auto-rows-fr",
   end_user: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 auto-rows-fr",
-  community: "grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-4 gap-3 lg:gap-4 auto-rows-fr",
+  community: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 auto-rows-fr",
   experiences: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 auto-rows-fr",
   media: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 auto-rows-fr",
   institutional: "grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3 lg:gap-4 auto-rows-fr",
