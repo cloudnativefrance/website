@@ -332,14 +332,28 @@ const CSS_VARS = {
             >
               <div class="schedule-session-head">
                 <span class="schedule-time-range">{formatTime(s.startTime)} — {endTime(s)}</span>
-                <button
-                  type="button"
-                  class="schedule-bookmark"
-                  aria-label={t("schedule.bookmark_toggle")}
-                  data-bookmark={s.id}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
-                </button>
+                <div class="schedule-session-head-actions">
+                  {s.recordingUrl && (
+                    <a
+                      href={s.recordingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="schedule-recording-link"
+                      aria-label={t("schedule.open_recording")}
+                      title={t("schedule.open_recording")}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    class="schedule-bookmark"
+                    aria-label={t("schedule.bookmark_toggle")}
+                    data-bookmark={s.id}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+                  </button>
+                </div>
               </div>
               <h3 class="schedule-session-title">{s.title}</h3>
               {speakers.length > 0 && (
@@ -637,6 +651,29 @@ const CSS_VARS = {
   .schedule-bookmark:hover { color: var(--color-foreground); background: color-mix(in oklch, var(--color-foreground) 8%, transparent); }
   .schedule-bookmark.is-on { color: var(--color-primary); }
   .schedule-bookmark.is-on svg { fill: currentColor; }
+
+  .schedule-session-head-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+  /* Replay link sits next to the bookmark icon. The card click handler
+     already ignores <a> targets, so the link goes straight to YouTube. */
+  .schedule-recording-link {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-muted-foreground);
+    background: transparent;
+    text-decoration: none;
+  }
+  .schedule-recording-link:hover {
+    color: var(--color-primary);
+    background: color-mix(in oklch, var(--color-primary) 12%, transparent);
+  }
   .schedule-session-title {
     font-size: 13px;
     font-weight: 700;
@@ -668,8 +705,10 @@ const CSS_VARS = {
     font-size: 11px;
   }
   .schedule-session.is-compact .schedule-time-range { font-size: 11px; }
-  .schedule-session.is-compact .schedule-bookmark { width: 18px; height: 18px; }
-  .schedule-session.is-compact .schedule-bookmark svg { width: 12px; height: 12px; }
+  .schedule-session.is-compact .schedule-bookmark,
+  .schedule-session.is-compact .schedule-recording-link { width: 18px; height: 18px; }
+  .schedule-session.is-compact .schedule-bookmark svg,
+  .schedule-session.is-compact .schedule-recording-link svg { width: 12px; height: 12px; }
   .schedule-session.is-compact .schedule-session-title {
     font-size: 12px;
     -webkit-line-clamp: 3;

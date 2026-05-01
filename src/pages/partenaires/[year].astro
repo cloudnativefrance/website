@@ -56,7 +56,12 @@ const tierTitles = {
 <Layout title={`${t("sponsors.page.title")} ${year} | Cloud Native Days France`} lang={lang}>
   <main class="mx-auto max-w-7xl px-4 md:px-6 py-24">
     <header class="text-center">
-      <h1 class="text-4xl font-bold text-foreground">{t("sponsors.page.title")} {year}</h1>
+      <h1
+        class="text-4xl md:text-5xl font-bold text-foreground tracking-tight"
+        style="letter-spacing:-0.02em;"
+      >
+        {t("sponsors.page.title")} {year}
+      </h1>
       {!isPending && (
         <p class="mt-4 text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
           {hasAnySponsor ? t("sponsors.page.intro") : t("sponsors.empty_state")}
