@@ -39,8 +39,11 @@ const tierPadding: Record<Props["tier"], string> = {
 
 // Tier-specific logo dimensions. `experiences` and `media` mirror `end_user`
 // per Apr-2026 stakeholder feedback to keep partner-card sizes balanced.
+// Platinum uses max-w-full so the logo scales to the cell (was capped at
+// 300 px which both clipped narrow phones and shrank wide-aspect logos
+// like Numspot below the visual weight other partners get on prod).
 const tierLogoSize: Record<Props["tier"], string> = {
-  platinum: "max-w-[300px] max-h-28",
+  platinum: "max-w-full max-h-28",
   gold: "max-w-[160px] max-h-16",
   silver: "max-w-[140px] max-h-14",
   end_user: "max-w-[140px] max-h-14",

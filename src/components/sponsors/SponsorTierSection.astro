@@ -29,9 +29,9 @@ const platinumGrid = (() => {
   if (tier !== "platinum") return "";
   const n = sponsors.length;
   if (n <= 1) return "flex justify-center";
-  if (n === 2) return "grid grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto auto-rows-fr";
-  if (n === 3) return "grid grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto auto-rows-fr";
-  return "grid grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto auto-rows-fr";
+  if (n === 2) return "grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto auto-rows-fr";
+  if (n === 3) return "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto auto-rows-fr";
+  return "grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto auto-rows-fr";
 })();
 
 const tierGrid: Record<Props["tier"], string> = {
