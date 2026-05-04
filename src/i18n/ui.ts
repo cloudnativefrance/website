@@ -45,7 +45,7 @@ export const ui = {
     "hero.cta.register": "Prenez votre place",
     "hero.cta.schedule": "Voir le programme",
     "hero.description":
-      "La communaut\u00e9 cloud native francophone se retrouve \u00e0 Paris. Une journ\u00e9e de retours d'exp\u00e9rience, de rencontres et de d\u00e9bats techniques \u2014 ouverte \u00e0 toutes et tous, du junior curieux \u00e0 l'archi senior.",
+      "La communaut\u00e9 francophone passionn\u00e9e de devops et de cloud native se retrouve \u00e0 Paris. Une journ\u00e9e de retours d'exp\u00e9rience et de rencontres \u2014 ouverte \u00e0 toutes et tous, des juniors curieux \u00e0 l'archi senior jusqu'aux d\u00e9cideurs en qu\u00eate des derni\u00e8res tendances.",
     "hero.logo_alt": "Cloud Native Days France",
     "hero.cta.newsletter": "Restez informé(e)",
     "hero.cta.newsletter_aria": "Restez informé(e) — annonces Cloud Native Days France",
@@ -374,7 +374,7 @@ export const ui = {
     "discover.stats.tracks": "tracks",
     "discover.audience.title": "À qui s'adresse Cloud Native Days France ?",
     "discover.audience.subtitle":
-      "CND France se destine à tous les professionnels de l'IT avec une appétence technique sur l'infrastructure et le Cloud, le DevOps, Kubernetes et le Cloud Native, ou encore le Platform Engineering.",
+      "CND France se destine aux professionnel(le)s de l'IT avec une appétence technique sur l'infrastructure et le Cloud, le DevOps, Kubernetes et le Cloud Native, ou encore le Platform Engineering.",
     "discover.audience.dev.title": "Développeur(se)",
     "discover.audience.dev.topics": "CI/CD · Dev Experience · IA applicative · Architecture microservices",
     "discover.audience.cloud.title": "Ingénieur(e) Cloud & DevOps",
