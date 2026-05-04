@@ -1,13 +1,11 @@
 ---
 import { Image } from "astro:assets";
-// Curated selection — avoids homepage photos (03, 06, 10) and removes near-duplicates (02).
 import amb00 from "@/assets/photos/ambiance/ambiance-00.jpg";
 import amb01 from "@/assets/photos/ambiance/ambiance-01.jpg";
 import amb04 from "@/assets/photos/ambiance/ambiance-04.jpg";
 import amb05 from "@/assets/photos/ambiance/ambiance-05.jpg";
 import amb07 from "@/assets/photos/ambiance/ambiance-07.jpg";
 import amb08 from "@/assets/photos/ambiance/ambiance-08.jpg";
-import amb09 from "@/assets/photos/ambiance/ambiance-09.jpg";
 
 interface Props {
   title: string;
@@ -21,32 +19,31 @@ interface Props {
 const { title, closeLabel, prevLabel, nextLabel, albumLabel, albumUrl } = Astro.props;
 
 const photos = [
-  { src: amb05, alt: "Hall d'entrée de Cloud Native Days France 2026 sur deux niveaux" },
-  { src: amb07, alt: "Panel en scène lors de Cloud Native Days France 2026" },
-  { src: amb04, alt: "Networking au village partenaires de Cloud Native Days France 2026" },
-  { src: amb01, alt: "Conférence en salle principale lors de Cloud Native Days France 2026" },
-  { src: amb09, alt: "Vue aérienne de la grande halle de Cloud Native Days France 2026" },
-  { src: amb08, alt: "Talk dans une petite salle lors de Cloud Native Days France 2026" },
-  { src: amb00, alt: "Village partenaires de Cloud Native Days France 2026" },
+  { src: amb04, alt: "Hall d'entrée de Cloud Native Days France 2026 sur deux niveaux" },
+  { src: amb01, alt: "Networking au village partenaires de Cloud Native Days France 2026" },
+  { src: amb07, alt: "Speaker en scène lors de Cloud Native Days France 2026" },
+  { src: amb08, alt: "Audience en salle principale lors de Cloud Native Days France 2026" },
+  { src: amb05, alt: "Speaker au pupitre lors de Cloud Native Days France 2026" },
+  { src: amb00, alt: "Panel en scène lors de Cloud Native Days France 2026" },
 ];
 ---
 
 <section id="photos" class="mx-auto max-w-7xl px-4 md:px-6 py-16">
   <h2 class="text-3xl font-bold text-foreground mb-8 text-center">{title}</h2>
 
-  <div class="columns-1 sm:columns-2 lg:columns-3 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {photos.map(({ src, alt }, i) => (
       <button
-        class="gallery-btn w-full mb-4 rounded-lg overflow-hidden block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        class="gallery-btn w-full aspect-[4/3] rounded-lg overflow-hidden block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         data-index={String(i)}
         aria-label={alt}
       >
         <Image
           src={src}
           alt={alt}
-          widths={[400, 800]}
+          widths={[400, 800, 1200]}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          class="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
+          class="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-300"
         />
       </button>
     ))}
