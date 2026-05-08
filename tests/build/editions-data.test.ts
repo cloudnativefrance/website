@@ -51,13 +51,11 @@ describe("EDIT-01: EDITION_2026 data module (real 2026 recap)", () => {
 });
 
 describe("EDIT-02 / EDIT-03: EDITION_2023 data module (real KCD 2023 content)", () => {
-  it("wires the 2023 YouTube playlist as the featured video", () => {
+  it("wires the 2023 YouTube playlist as the featured video and points the playlist CTA at the @CNDFrance channel", () => {
     expect(EDITION_2023.youtubeId).toBe(
       "videoseries?list=PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h",
     );
-    expect(EDITION_2023.playlistUrl).toBe(
-      "https://www.youtube.com/playlist?list=PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h",
-    );
+    expect(EDITION_2023.playlistUrl).toBe("https://www.youtube.com/@CNDFrance");
   });
 
   it("has exactly 3 stats for the 2023 edition", () => {

@@ -84,7 +84,18 @@ function csvLoader({ url, fallback, label }: { url?: string; fallback: string; l
 
 // -- Schemas ---------------------------------------------------------------
 
-const socialUrl = z.string().url().optional().or(z.literal("").transform(() => undefined));
+// Sheet authors regularly paste cells like `LinkedIn: https://...` or
+// `Github: https://x\nLinkedIn: https://y` — strict z.url() rejects those and
+// fails the whole build. Extract the first http(s) URL we find and drop the
+// rest; empty/no-URL strings become undefined.
+const socialUrl = z.preprocess(
+  (raw) => {
+    if (typeof raw !== "string") return raw;
+    const match = raw.match(/https?:\/\/\S+/);
+    return match ? match[0].replace(/[),.;]+$/, "") : undefined;
+  },
+  z.string().url().optional(),
+);
 
 const speakerSchema = z.object({
   slug: z.string(),

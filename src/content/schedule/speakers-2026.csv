@@ -142,7 +142,7 @@ Curieux de nature, il aime explorer et tester des choses improbables, il a notam
 En dehors du travail, Paul s’intéresse à la **domotique** et apprécie particulièrement la création d'ambiances lumineuses et colorées qui mettent en valeur à la perfection son **manguier**, son **avocatier** et les diverses plantes qu'il fait pousser **depuis la graine**.
 
 [Github](https://github.com/plaffitt) - [Blog](https://blog.plaffitt.com/en/) - [Linkedin](https://www.linkedin.com/in/paul-laffitte/)",,,,,,
-herve-leclerc,Hervé Leclerc,,,,"linkedin : https://www.linkedin.com/in/herveleclerc/
+herve-leclerc,Hervé Leclerc,/speakers/herve-leclerc.jpg,,,"linkedin : https://www.linkedin.com/in/herveleclerc/
 github : https://github.com/herveleclerc
 
 
@@ -269,7 +269,7 @@ With deep expertise in AWS and open-source container solutions, Sébastien colla
 Before joining AWS, Sébastien spent 17 years at Orange in various technical leadership roles, including developer, project manager, and solution architect. He notably designed and open-sourced CassKop, a Kubernetes Operator for managing Cassandra databases, showcasing his ability to bridge enterprise needs with open-source solutions.
 
 His continuous involvement in open-source projects and extensive experience in both cloud-native technologies and enterprise architecture makes him a valuable contributor to the container ecosystem and cloud computing community.",,,,,,
-amine-alaoui-echerif,Amine Alaoui Echerif,,,,"Amine Alaoui Echerif est Platform Engineer et Cloud Architect dans l’exploitation de plateformes CaaS, PaaS et FaaS en environnements multi-cloud et on-prem.
+amine-alaoui-echerif,Amine Alaoui Echerif,/speakers/amine-alaoui-echerif.jpg,,,"Amine Alaoui Echerif est Platform Engineer et Cloud Architect dans l’exploitation de plateformes CaaS, PaaS et FaaS en environnements multi-cloud et on-prem.
 Il travaille sur le cycle de vie des clusters Kubernetes, l’automatisation avec Terraform, les pipelines CI/CD et l’optimisation de plateformes en production.
 Il collabore au quotidien avec les équipes Dev et Ops pour améliorer la fiabilité, simplifier les opérations et faire évoluer les pratiques cloud native à grande échelle.",,,,,,
 mohammad-amla,Mohammad AMLA,/speakers/mohammad-amla.jpg,,,"Ingénieur spécialisé dans les environnements cloud-native, Mohammad conçoit des plateformes Kubernetes automatisées et sécurisées.",,,,,,
@@ -287,13 +287,13 @@ Vidéos : https://bit.ly/gcp-learning-mazlum-gb
 
 Article : https://medium.com/@mazlum.tosun",,,,,,
 victor-coutellier,Victor Coutellier,/speakers/victor-coutellier.jpg,,,"Utilisateur et contributeur de technologies open source telles que Kubernetes ou Openstack, je m'intéresse particulièrement à la scalabilité de ces produits en entreprise. Mon experience, forgée au sein de NumSpot, d'OVHcloud et de la Société Générale, m'a permis de développer et d'optimiser des infrastructures cloud complexes, en participant activement à des projets communautaires.",,,,,,
-ricardo-rocha,Ricardo Rocha,,CERN,Président TAB CNCF / Responsable infrastructure,,,,,,true,lead
-julien-dauphant,Julien Dauphant,,DINUM,Directeur de produits Cloud,,,,,,true,guest
+ricardo-rocha,Ricardo Rocha,/speakers/ricardo-rocha.jpg,CERN,Président TAB CNCF / Responsable infrastructure,,,,,,true,lead
+julien-dauphant,Julien Dauphant,/speakers/julien-dauphant.jpg,DINUM,Directeur de produits Cloud,,,,,,true,guest
 renaud-fleury,Renaud Fleury,,DGFIP,Product Owner Socle Kubernetes,,,,,,true,guest
 jean-baptiste-kempf,Jean-Baptiste Kempf,,Scaleway,CTO,,,,,,true,guest
-gaspard-plantrou,Gaspard Plantrou,,Numspot,CPO,,,,,,true,guest
-florian-caringi,Florian Caringi,,TOSIT,Manager Data AI Platform & architecture / VP TOSIT,,,,,,true,guest
-laurent-bernaille,Laurent Bernaille,,,,,,,,,true,panel
-denis-germain,Denis Germain,,,,,,,,,true,panel
-victor-boissiere,Victor Boissière,,,,,,,,,true,panel
-sebastien-blanc,Sébastien Blanc,,,,,,,,,true,panel
+gaspard-plantrou,Gaspard Plantrou,/speakers/gaspard-plantrou.jpg,Numspot,CPO,,,,,,true,guest
+florian-caringi,Florian Caringi,/speakers/florian-caringi.jpg,TOSIT,Manager Data AI Platform & architecture / VP TOSIT,,,,,,true,guest
+laurent-bernaille,Laurent Bernaille,/speakers/laurent-bernaille.jpg,,,,,,,,true,panel
+denis-germain,Denis Germain,/speakers/denis-germain.jpg,,,,,,,,true,panel
+victor-boissiere,Victor Boissière,/speakers/victor-boissiere.jpg,,,,,,,,true,panel
+sebastien-blanc,Sébastien Blanc,/speakers/sebastien-blanc.png,,,,,,,,true,panel

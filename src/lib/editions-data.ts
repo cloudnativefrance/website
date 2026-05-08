@@ -50,9 +50,9 @@ export const EDITION_2026 = {
   youtubeId: "qyMGuU2-w8o",
   galleryUrl:
     "https://albums.ente.io/?t=QRX4L3WBSD#5jsodRK1mQbqS83qJMd2sVBZr9oW4Bzgm9DuVP6MowY5",
-  // 2026 replays YouTube playlist
-  replaysUrl:
-    "https://www.youtube.com/playlist?list=PLmZ3gFl2Aqt_4_F40zEoUEweEctmtx4p2",
+  // Points to the @CNDFrance channel — playlist links across the site
+  // funnel viewers to the channel itself rather than per-edition playlists.
+  replaysUrl: "https://www.youtube.com/@CNDFrance",
   stats: [
     { value: "1700+", labelKey: "editions.2026.stats.participants" },
     { value: "50+", labelKey: "editions.2026.stats.speakers" },
@@ -92,8 +92,7 @@ export const EDITION_2023 = {
   // Playlist embed — Stitch D-13 + the shell's `/embed/${id}` pattern accepts
   // the `videoseries?list=…` YouTube playlist shorthand.
   youtubeId: "videoseries?list=PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h",
-  playlistUrl:
-    "https://www.youtube.com/playlist?list=PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h",
+  playlistUrl: "https://www.youtube.com/@CNDFrance",
   stats: [
     { value: "1700+", labelKey: "editions.2023.stats.participants" },
     { value: "42", labelKey: "editions.2023.stats.speakers" },
@@ -141,7 +140,7 @@ export const EDITION_2023 = {
    * organizer confirmation. The playlist URL is a reasonable interim target
    * so visitors can still reach the 2023 content.
    */
-  galleryUrl: "https://www.youtube.com/playlist?list=PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h",
+  galleryUrl: "https://www.youtube.com/@CNDFrance",
   galleryPlaceholder: true,
   trackerUrl: "https://github.com/cloudnativefrance/website/issues/19",
   placeholder: false,
