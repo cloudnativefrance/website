@@ -1,14 +1,14 @@
 ---
 import { Image } from "astro:assets";
-import amb00 from "@/assets/photos/ambiance/ambiance-00.jpg";
-import amb01 from "@/assets/photos/ambiance/ambiance-01.jpg";
-import amb04 from "@/assets/photos/ambiance/ambiance-04.jpg";
-import amb05 from "@/assets/photos/ambiance/ambiance-05.jpg";
-import amb07 from "@/assets/photos/ambiance/ambiance-07.jpg";
-import amb08 from "@/assets/photos/ambiance/ambiance-08.jpg";
-import amb09 from "@/assets/photos/ambiance/ambiance-09.jpg";
-import amb11 from "@/assets/photos/ambiance/ambiance-11.jpg";
-import amb12 from "@/assets/photos/ambiance/ambiance-12.jpg";
+import landscape01 from "@/assets/photos/selection-2027/landscape-01.jpg";
+import landscape02 from "@/assets/photos/selection-2027/landscape-02.jpg";
+import landscape03 from "@/assets/photos/selection-2027/landscape-03.jpg";
+import landscape04 from "@/assets/photos/selection-2027/landscape-04.jpg";
+import landscape05 from "@/assets/photos/selection-2027/landscape-05.jpg";
+import landscape06 from "@/assets/photos/selection-2027/landscape-06.jpg";
+import portrait01 from "@/assets/photos/selection-2027/portrait-01.jpg";
+import portrait02 from "@/assets/photos/selection-2027/portrait-02.jpg";
+import portrait03 from "@/assets/photos/selection-2027/portrait-03.jpg";
 
 interface Props {
   title: string;
@@ -21,16 +21,20 @@ interface Props {
 
 const { title, closeLabel, prevLabel, nextLabel, albumLabel, albumUrl } = Astro.props;
 
-const photos = [
-  { src: amb04, alt: "Hall d'entrée de Cloud Native Days France 2026 sur deux niveaux" },
-  { src: amb01, alt: "Networking au village partenaires de Cloud Native Days France 2026" },
-  { src: amb00, alt: "Panel en scène lors de Cloud Native Days France 2026" },
-  { src: amb07, alt: "Speaker en scène lors de Cloud Native Days France 2026" },
-  { src: amb05, alt: "Speaker au pupitre lors de Cloud Native Days France 2026" },
-  { src: amb08, alt: "Audience en salle principale lors de Cloud Native Days France 2026" },
-  { src: amb11, alt: "Vue de la grande halle de Cloud Native Days France 2026" },
-  { src: amb09, alt: "Salle de conférence vue de l'arrière à Cloud Native Days France 2026" },
-  { src: amb12, alt: "Ambiance générale de Cloud Native Days France 2026" },
+// Row-major arrangement on the 3-column desktop grid: row 1 = 3 landscape,
+// row 2 = 3 portrait, row 3 = 3 landscape. Every column then holds 2 landscape
+// + 1 portrait, and each photo is shown in full at its native aspect ratio.
+type Photo = { src: ImageMetadata; alt: string; orientation: "landscape" | "portrait" };
+const photos: Photo[] = [
+  { src: landscape01, alt: "Hall principal de Cloud Native Days France 2026, vue d'ensemble", orientation: "landscape" },
+  { src: landscape02, alt: "Networking entre praticien(ne)s à Cloud Native Days France 2026", orientation: "landscape" },
+  { src: landscape03, alt: "Auditorium pendant une conférence à Cloud Native Days France 2026", orientation: "landscape" },
+  { src: portrait01, alt: "Vue verticale de l'événement Cloud Native Days France 2026", orientation: "portrait" },
+  { src: portrait02, alt: "Intervenant(e) en pleine présentation à Cloud Native Days France 2026", orientation: "portrait" },
+  { src: portrait03, alt: "Intervenant(e) à Cloud Native Days France 2026", orientation: "portrait" },
+  { src: landscape04, alt: "Audience attentive lors d'une session de Cloud Native Days France 2026", orientation: "landscape" },
+  { src: landscape05, alt: "Ambiance d'une keynote à Cloud Native Days France 2026", orientation: "landscape" },
+  { src: landscape06, alt: "Moment d'échange à Cloud Native Days France 2026", orientation: "landscape" },
 ];
 ---
 
@@ -38,9 +42,12 @@ const photos = [
   <h2 class="text-3xl font-bold text-foreground mb-8 text-center">{title}</h2>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    {photos.map(({ src, alt }, i) => (
+    {photos.map(({ src, alt, orientation }, i) => (
       <button
-        class="gallery-btn w-full aspect-[4/3] rounded-lg overflow-hidden block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        class:list={[
+          "gallery-btn w-full rounded-lg overflow-hidden block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          orientation === "landscape" ? "aspect-[3/2]" : "aspect-[2/3]",
+        ]}
         data-index={String(i)}
         aria-label={alt}
       >

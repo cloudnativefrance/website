@@ -40,7 +40,7 @@ export const NEWSLETTER_URL =
  */
 export const SOCIAL_LINKS = {
   linkedin: "https://www.linkedin.com/company/cloud-native-days-france",
-  youtube: "https://www.youtube.com/@CloudNativeDaysFR",
+  youtube: "https://www.youtube.com/@CNDFrance",
   bluesky: "https://bsky.app/profile/did:plc:idq4iwpot2ig5iripmm4fdiw",
   gallery: EDITION_2026.galleryUrl,
 } as const;
