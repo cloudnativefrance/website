@@ -17,10 +17,8 @@ describe("EDIT-01: EDITION_2026 data module (real 2026 recap)", () => {
     expect(EDITION_2026.youtubeId).toBe("qyMGuU2-w8o");
   });
 
-  it("has the ported gallery URL from venue/index.astro", () => {
-    expect(EDITION_2026.galleryUrl).toBe(
-      "https://albums.ente.io/?t=QRX4L3WBSD#5jsodRK1mQbqS83qJMd2sVBZr9oW4Bzgm9DuVP6MowY5",
-    );
+  it("has the gallery URL pointing at the self-hosted Ente bare URL", () => {
+    expect(EDITION_2026.galleryUrl).toBe("https://photos.cloudnativedays.fr");
   });
 
   it("is NOT flagged as placeholder (real content)", () => {
