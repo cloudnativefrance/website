@@ -1,4 +1,4 @@
-# Stage 1: Build the Ente photos SPA from a pinned upstream commit.
+# Stage 1: Build the Ente accounts SPA from a pinned upstream commit.
 FROM node:22-alpine AS build
 
 ARG ENTE_SHA
@@ -20,7 +20,10 @@ RUN corepack enable && corepack prepare yarn@1.22.22 --activate
 WORKDIR /src/web
 RUN yarn install --frozen-lockfile
 
-# Endpoint env vars baked at build time.
+# Endpoint env vars baked at build time. NEXT_PUBLIC_ENTE_ACCOUNTS_URL is
+# intentionally NOT set — it triggers a hard-exit in next.config.base.js
+# at the pinned SHA. The accounts URL is configured server-side in
+# museum.yaml via apps.accounts.
 ENV NEXT_PUBLIC_ENTE_ENDPOINT=${MUSEUM_ENDPOINT}
 ENV NEXT_PUBLIC_ENTE_ALBUMS_ENDPOINT=${ALBUMS_ENDPOINT}
 ENV NEXT_PUBLIC_ENTE_PHOTOS_ENDPOINT=${PHOTOS_ENDPOINT}
