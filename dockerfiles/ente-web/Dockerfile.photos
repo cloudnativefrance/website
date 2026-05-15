@@ -10,10 +10,12 @@ RUN apk add --no-cache git python3 make g++ curl bash
 
 # Rust + wasm-pack are required by web/packages/wasm (invoked via
 # `yarn build:wasm`, which runs before each `yarn build:<app>`). rustup's
-# minimal profile keeps the toolchain footprint to ~250 MB.
-RUN curl -sSfL https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal \
-    && curl -sSfL https://rustwasm.github.io/wasm-pack/installer/init.sh | sh
+# minimal profile keeps the toolchain footprint to ~250 MB. Split into
+# two RUN statements so the wasm-pack installer sees cargo in PATH —
+# inside a single RUN, the trailing ENV hasn't taken effect yet.
+RUN curl -sSfL https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal
 ENV PATH="/root/.cargo/bin:${PATH}"
+RUN curl -sSfL https://rustwasm.github.io/wasm-pack/installer/init.sh | bash
 
 WORKDIR /src
 # Shallow-clone then fetch the exact pinned SHA so the cache is reusable
