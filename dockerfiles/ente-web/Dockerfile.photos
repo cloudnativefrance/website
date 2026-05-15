@@ -6,7 +6,14 @@ ARG MUSEUM_ENDPOINT=https://api.photos.cloudnativedays.fr
 ARG ALBUMS_ENDPOINT=https://albums.cloudnativedays.fr
 ARG PHOTOS_ENDPOINT=https://photos.cloudnativedays.fr
 
-RUN apk add --no-cache git python3 make g++
+RUN apk add --no-cache git python3 make g++ curl bash
+
+# Rust + wasm-pack are required by web/packages/wasm (invoked via
+# `yarn build:wasm`, which runs before each `yarn build:<app>`). rustup's
+# minimal profile keeps the toolchain footprint to ~250 MB.
+RUN curl -sSfL https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal \
+    && curl -sSfL https://rustwasm.github.io/wasm-pack/installer/init.sh | sh
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 WORKDIR /src
 # Shallow-clone then fetch the exact pinned SHA so the cache is reusable
