@@ -48,8 +48,7 @@ type Thumbnail = {
 
 export const EDITION_2026 = {
   youtubeId: "qyMGuU2-w8o",
-  galleryUrl:
-    "https://albums.ente.io/?t=QRX4L3WBSD#5jsodRK1mQbqS83qJMd2sVBZr9oW4Bzgm9DuVP6MowY5",
+  galleryUrl: "https://photos.cloudnativedays.fr",
   // Points to the @CNDFrance channel — playlist links across the site
   // funnel viewers to the channel itself rather than per-edition playlists.
   replaysUrl: "https://www.youtube.com/@CNDFrance",
