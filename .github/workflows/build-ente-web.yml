@@ -1,0 +1,78 @@
+# Builds the 3 Ente web SPA images (photos, albums, accounts) and pushes
+# them to GHCR. Consumed by Flux image-automation in cnd-platform.
+name: Build and Push Ente Web Images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'dockerfiles/ente-web/**'
+      - 'ente-web.pin'
+      - '.github/workflows/build-ente-web.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'dockerfiles/ente-web/**'
+      - 'ente-web.pin'
+      - '.github/workflows/build-ente-web.yml'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_OWNER: ${{ github.repository_owner }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [photos, albums, accounts]
+    env:
+      IS_PUBLISH: ${{ github.event_name != 'pull_request' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read pinned Ente SHA
+        id: pin
+        run: echo "sha=$(tr -d '[:space:]' < ente-web.pin)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: env.IS_PUBLISH == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/ente-web-${{ matrix.app }}
+          tags: |
+            type=sha,prefix=
+            type=raw,value={{branch}}-{{sha}}-{{date 'X'}},enable={{is_default_branch}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: dockerfiles/ente-web/Dockerfile.${{ matrix.app }}
+          push: ${{ env.IS_PUBLISH }}
+          build-args: |
+            ENTE_SHA=${{ steps.pin.outputs.sha }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=ente-web-${{ matrix.app }}
+          cache-to: type=gha,mode=max,scope=ente-web-${{ matrix.app }}
+          platforms: linux/amd64
