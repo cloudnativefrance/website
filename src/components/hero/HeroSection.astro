@@ -88,7 +88,8 @@ const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width)
         href={DISCOVER_URL}
         class={cn(
           buttonVariants({ variant: "outline", size: "lg" }),
-          "h-[52px] px-8 text-lg font-bold"
+          "h-[52px] px-8 text-lg font-bold",
+          "border-2"
         )}
       >
         {t("hero.cta.discover")}
@@ -98,7 +99,10 @@ const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width)
           href={SCHEDULE_URL}
           class={cn(
             buttonVariants({ variant: "outline", size: "lg" }),
-            "h-[52px] px-8 text-lg font-bold"
+            "h-[52px] px-8 text-lg font-bold",
+            "border-2 border-primary-strong text-primary-strong bg-transparent",
+            "hover:bg-primary/10 hover:text-primary-strong hover:border-primary-strong hover:shadow-[0_0_0_4px_oklch(62.5%_0.162_259.9_/_0.15)]",
+            "focus-visible:ring-primary/50"
           )}
         >
           {t("hero.cta.schedule")}
