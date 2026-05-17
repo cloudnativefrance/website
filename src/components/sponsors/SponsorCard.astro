@@ -67,7 +67,17 @@ const tierMinH: Record<Props["tier"], string> = {
   institutional: "min-h-[80px]",
 };
 
-const baseCardClass = `bg-card border border-border rounded-lg ${tierPadding[tier]} ${tierMinH[tier]} h-full flex items-center justify-center`;
+// Logos shipped only as white-on-transparent disappear on the light-mode card
+// surface. Force a dark card background for these IDs in light mode; dark mode
+// already has a dark card, so it's left alone.
+const NEEDS_DARK_SURFACE = new Set(["kairos", "edb"]);
+// Same hue as --primary (259.9°), lighter (75%) so the card reads as a soft
+// brand blue while still giving white-text logos enough contrast.
+const surfaceClass = NEEDS_DARK_SURFACE.has(sponsor.data.id)
+  ? "bg-[oklch(75%_0.12_259.9)] border border-[oklch(75%_0.12_259.9)] dark:bg-card dark:border-border"
+  : "bg-card border border-border";
+
+const baseCardClass = `${surfaceClass} rounded-lg ${tierPadding[tier]} ${tierMinH[tier]} h-full flex items-center justify-center`;
 const linkExtrasClass =
   "transition-all duration-200 motion-safe:hover:-translate-y-0.5 hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 const imgClass = `${tierLogoSize[tier]} object-contain`;
