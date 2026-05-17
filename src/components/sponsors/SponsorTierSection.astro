@@ -2,6 +2,7 @@
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import SponsorCard from "@/components/sponsors/SponsorCard.astro";
+import type { Edition } from "@/lib/editions";
 import type { SponsorEntry } from "@/lib/sponsor-utils";
 
 interface Props {
@@ -16,10 +17,11 @@ interface Props {
     | "institutional";
   sponsors: SponsorEntry[];
   lang: Locale;
+  year: Edition;
   title: string;
 }
 
-const { tier, sponsors, lang, title } = Astro.props;
+const { tier, sponsors, lang, year, title } = Astro.props;
 const t = useTranslations(lang);
 const isEmpty = sponsors.length === 0;
 
@@ -55,7 +57,7 @@ const tierGrid: Record<Props["tier"], string> = {
   ) : (
     <div class={tierGrid[tier]}>
       {sponsors.map((s) => (
-        <SponsorCard sponsor={s} lang={lang} tier={tier} />
+        <SponsorCard sponsor={s} lang={lang} year={year} tier={tier} />
       ))}
     </div>
   )}
