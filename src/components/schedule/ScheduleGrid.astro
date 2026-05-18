@@ -777,6 +777,32 @@ const CSS_VARS = {
     const root = document.querySelector(".schedule-root");
     if (!root) return;
 
+    // Untrusted-input helpers — Sheet authors control session title, room,
+    // track, level, language, recording_url, slides_url, feedback_url. These
+    // values land in innerHTML and href sinks below, so escape/allowlist them
+    // before they reach the DOM. javascript:/data: URIs are blocked.
+    function escHtml(v) {
+      return String(v ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+    function safeHref(raw) {
+      const s = String(raw ?? "").trim();
+      if (!s) return "";
+      if (s.startsWith("/") && !s.startsWith("//")) return s;
+      try {
+        const u = new URL(s);
+        if (u.protocol === "http:" || u.protocol === "https:") return u.toString();
+      } catch { /* fallthrough */ }
+      return "";
+    }
+    function icsSafeUid(v) {
+      return String(v ?? "").replace(/[^A-Za-z0-9_.-]/g, "_");
+    }
+
     const STORAGE_KEY = "cnd-agenda-bookmarks-v1";
     const getBookmarks = () => {
       try {
@@ -972,19 +998,20 @@ const CSS_VARS = {
         const endHm = String(Math.floor(endTotal / 60) % 24).padStart(2, "0") + ":" + String(endTotal % 60).padStart(2, "0");
         const timeRange = startHm + " — " + endHm;
         const parts = [];
-        parts.push(`<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-widest uppercase ${fmt.cls}">${fmt.label}</span>`);
-        parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-foreground">${timeRange} · ${duration} min</span>`);
-        if (room) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-foreground">${room}</span>`);
-        if (track) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-foreground">${track}</span>`);
-        if (level) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-muted-foreground uppercase tracking-widest">${level}</span>`);
-        if (language) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-muted-foreground uppercase tracking-widest">${language}</span>`);
+        parts.push(`<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-widest uppercase ${fmt.cls}">${escHtml(fmt.label)}</span>`);
+        parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-foreground">${escHtml(timeRange)} · ${duration} min</span>`);
+        if (room) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-foreground">${escHtml(room)}</span>`);
+        if (track) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-foreground">${escHtml(track)}</span>`);
+        if (level) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-muted-foreground uppercase tracking-widest">${escHtml(level)}</span>`);
+        if (language) parts.push(`<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-muted-foreground uppercase tracking-widest">${escHtml(language)}</span>`);
         modalMetaTop.innerHTML = parts.join("");
       }
 
       // Cover image — optional hero at the top of the modal
       if (modalCover) {
-        if (coverImage) {
-          modalCover.setAttribute("src", coverImage);
+        const safeCover = safeHref(coverImage);
+        if (safeCover) {
+          modalCover.setAttribute("src", safeCover);
           modalCover.setAttribute("alt", title);
           modalCover.style.display = "";
           modalCover.classList.remove("hidden");
@@ -997,10 +1024,11 @@ const CSS_VARS = {
       // Speakers — render as clickable pills when we have a href, else plain pills
       if (modalSpeakers) {
         modalSpeakers.innerHTML = speakers.length === 0 ? "" : speakers.map((sp) => {
-          const safeLabel = String(sp.label || "").replace(/</g, "&lt;");
+          const safeLabel = escHtml(sp.label);
+          const href = safeHref(sp.href);
           const cls = "inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-3 py-1 text-sm text-foreground hover:border-primary/60";
-          return sp.href
-            ? `<a href="${sp.href}" class="${cls} text-primary">${safeLabel} <span aria-hidden="true">→</span></a>`
+          return href
+            ? `<a href="${href}" class="${cls} text-primary">${safeLabel} <span aria-hidden="true">→</span></a>`
             : `<span class="${cls} text-muted-foreground">${safeLabel}</span>`;
         }).join("");
       }
@@ -1023,12 +1051,14 @@ const CSS_VARS = {
       // can lose to .inline-flex depending on CSS source order.
       const toggleLink = (el, url) => {
         if (!el) return;
-        if (url) {
-          el.setAttribute("href", url);
+        const safe = safeHref(url);
+        if (safe) {
+          el.setAttribute("href", safe);
           el.style.display = "";
           el.classList.remove("hidden");
         } else {
           el.style.display = "none";
+          el.removeAttribute("href");
         }
       };
       toggleLink(modalFeedback, feedbackUrl);
@@ -1164,10 +1194,10 @@ const CSS_VARS = {
         item.className = "flex items-start justify-between gap-3 rounded-md border border-border bg-background/40 p-3";
         item.innerHTML = `
           <div class="min-w-0">
-            <div class="text-xs text-muted-foreground">${timeLabel} · ${room}</div>
-            <div class="text-sm font-semibold text-foreground truncate">${title}</div>
+            <div class="text-xs text-muted-foreground">${escHtml(timeLabel)} · ${escHtml(room)}</div>
+            <div class="text-sm font-semibold text-foreground truncate">${escHtml(title)}</div>
           </div>
-          <button type="button" class="agenda-remove shrink-0 text-muted-foreground hover:text-foreground" aria-label="${agendaRemoveLabel}">
+          <button type="button" class="agenda-remove shrink-0 text-muted-foreground hover:text-foreground" aria-label="${escHtml(agendaRemoveLabel)}">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
           </button>
         `;
@@ -1205,7 +1235,7 @@ const CSS_VARS = {
         const room = card.getAttribute("data-room") || "";
         events.push([
           "BEGIN:VEVENT",
-          `UID:${id}@cloudnativedays.fr`,
+          `UID:${icsSafeUid(id)}@cloudnativedays.fr`,
           `DTSTAMP:${icsDate(new Date().toISOString())}`,
           `DTSTART:${icsDate(start)}`,
           `DTEND:${icsDate(end)}`,
