@@ -45,7 +45,7 @@ export const ui = {
     "hero.cta.register": "Prenez votre place",
     "hero.cta.schedule": "Voir le programme",
     "hero.description":
-      "La communaut\u00e9 francophone passionn\u00e9e de devops et de cloud native se retrouve \u00e0 Paris. Une journ\u00e9e de retours d'exp\u00e9rience et de rencontres \u2014 ouverte \u00e0 toutes et tous, des juniors curieux \u00e0 l'archi senior jusqu'aux d\u00e9cideurs en qu\u00eate des derni\u00e8res tendances.",
+      "La communaut\u00e9 francophone passionn\u00e9e de devops et de cloud native se retrouve \u00e0 Paris. Une journ\u00e9e de retours d'exp\u00e9rience et de rencontres - ouverte \u00e0 toutes et tous, des juniors curieux \u00e0 l'archi senior jusqu'aux d\u00e9cideurs en qu\u00eate des derni\u00e8res tendances.",
     "hero.logo_alt": "Cloud Native Days France",
     "hero.cta.newsletter": "Restez informé(e)",
     "hero.cta.newsletter_aria": "Restez informé(e) — annonces Cloud Native Days France",
