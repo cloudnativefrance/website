@@ -250,6 +250,12 @@ function icsEscape(s: string): string {
     .replace(/\r?\n/g, "\\n");
 }
 
+// RFC 5545 UIDs must be a single line of safe chars; strip anything else so
+// a forged sheet `id` cell can't inject extra iCal properties.
+function icsSafeUid(s: string): string {
+  return s.replace(/[^A-Za-z0-9_.-]/g, "_");
+}
+
 /** Generate a single iCalendar (VEVENT) for one session. */
 export function sessionToIcs(session: SessionRow): string {
   const start = new Date(session.startTime);
@@ -268,7 +274,7 @@ export function sessionToIcs(session: SessionRow): string {
 
   return [
     "BEGIN:VEVENT",
-    `UID:${session.id}@cloudnativedays.fr`,
+    `UID:${icsSafeUid(session.id)}@cloudnativedays.fr`,
     `DTSTAMP:${icsDate(new Date().toISOString())}`,
     `DTSTART:${icsDate(session.startTime)}`,
     `DTEND:${icsDate(end)}`,
