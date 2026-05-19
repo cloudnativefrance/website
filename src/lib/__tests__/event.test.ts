@@ -1,14 +1,13 @@
 /**
  * Unit tests for src/lib/event.ts (formerly cfp.ts).
  *
- * Covers: TARGET_DATE, CONFERENCE_HALL_URL, NEWSLETTER_URL, getReplaysPath, isPostEvent.
+ * Covers: TARGET_DATE, NEWSLETTER_URL, getReplaysPath, isPostEvent.
  * CFP state logic is tested in src/lib/__tests__/flags.test.ts against getFlagState(FLAGS.cfp).
  */
 
 import { describe, it, expect } from "vitest";
 import {
   TARGET_DATE,
-  CONFERENCE_HALL_URL,
   NEWSLETTER_URL,
   getReplaysPath,
   isPostEvent,
@@ -23,11 +22,6 @@ describe("TARGET_DATE", () => {
 });
 
 describe("outbound URLs", () => {
-  it("CONFERENCE_HALL_URL is a string starting with https://", () => {
-    expect(typeof CONFERENCE_HALL_URL).toBe("string");
-    expect(CONFERENCE_HALL_URL.startsWith("https://")).toBe(true);
-  });
-
   it("NEWSLETTER_URL is a string starting with https://", () => {
     expect(typeof NEWSLETTER_URL).toBe("string");
     expect(NEWSLETTER_URL.startsWith("https://")).toBe(true);

@@ -17,9 +17,6 @@ import { EDITION_2026 } from "@/lib/editions-data";
  */
 export const TARGET_DATE = new Date("2027-06-03T09:00:00+02:00").getTime();
 
-export const CONFERENCE_HALL_URL =
-  "https://conference-hall.io/public/event/TODO_EVENT_ID";
-
 /**
  * Hosted Brevo newsletter signup form.
  *
