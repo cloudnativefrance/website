@@ -13,9 +13,11 @@ import { EDITION_2026 } from "@/lib/editions-data";
 export interface Props {
   /** Extra classes for the outer wrapper (e.g. "mb-8" or "mx-auto max-w-6xl pt-8"). */
   class?: string;
+  /** i18n key for the notice copy. Defaults to the schedule variant. */
+  i18nKey?: "schedule.notice.2027_coming" | "speakers.notice.2027_coming";
 }
 
-const { class: className = "" } = Astro.props;
+const { class: className = "", i18nKey = "schedule.notice.2027_coming" } = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 ---
@@ -25,7 +27,7 @@ const t = useTranslations(lang);
     <rect width="18" height="18" x="3" y="4" rx="2"/>
     <path d="M16 2v4M8 2v4M3 10h18"/>
   </svg>
-  <p class="flex-1 text-base md:text-lg text-foreground">{t("schedule.notice.2027_coming")}</p>
+  <p class="flex-1 text-base md:text-lg text-foreground">{t(i18nKey)}</p>
   <a
     href={EDITION_2026.replaysUrl}
     target="_blank"
