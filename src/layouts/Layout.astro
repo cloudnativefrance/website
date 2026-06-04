@@ -15,10 +15,15 @@ interface Props {
   canonicalPath?: string;
 }
 
+// Bump ?v= whenever public/og-default.png changes. The asset is served
+// immutable/max-age=1yr, so the query string is what busts browser, CDN and
+// social-scraper caches (otherwise a same-name swap never propagates).
+const OG_DEFAULT_IMAGE = "/og-default.png?v=2027";
+
 const {
   title = "Cloud Native Days France 2027",
   description,
-  ogImage = "/og-default.png",
+  ogImage = OG_DEFAULT_IMAGE,
   ogType = "website",
   lang,
   canonicalPath,
@@ -33,7 +38,7 @@ const siteOrigin = Astro.site ? Astro.site.origin : "";
 const safeOgImage = (() => {
   if (ogImage.startsWith("/")) return ogImage;
   if (siteOrigin && ogImage.startsWith(siteOrigin)) return ogImage;
-  return "/og-default.png";
+  return OG_DEFAULT_IMAGE;
 })();
 
 // Absolute URLs
