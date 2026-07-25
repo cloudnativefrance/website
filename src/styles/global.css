@@ -29,7 +29,11 @@
   --secondary: oklch(94.5% 0.011 250);
   --secondary-foreground: oklch(15.5% 0.040 268);
   --muted: oklch(94.5% 0.011 250);
-  --muted-foreground: oklch(54.0% 0.025 257);
+  /* 52%, not 54%: at 54% this cleared AA on --card (5.08) but failed on
+     --secondary (4.34), and eight components put muted text on secondary.
+     52% gives 5.09 on secondary and 5.96 on card. Dark mode is unaffected —
+     it already clears 5.05 on its darkest pairing. */
+  --muted-foreground: oklch(52% 0.025 257);
   --border: oklch(87.8% 0.014 250);
   --input: oklch(87.8% 0.014 250);
   --ring: oklch(62.5% 0.162 259.9);
