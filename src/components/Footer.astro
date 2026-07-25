@@ -1,6 +1,5 @@
 ---
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
-import { NEWSLETTER_URL } from "@/lib/event";
 import { CURRENT_EDITION } from "@/lib/editions";
 import logoFullDark from "@/assets/logos/dark/logo.svg";
 import logoFullLight from "@/assets/logos/principal/logo.svg";
@@ -59,31 +58,6 @@ const legalLinks = [
         <p class="text-sm text-muted-foreground mt-4">{t("footer.tagline")}</p>
         <p class="text-sm text-muted-foreground mt-3">{t("footer.association")}</p>
         <p class="mt-3 text-sm font-bold tracking-wide text-primary-strong">{t("social.hashtag")}</p>
-        <a
-          href={NEWSLETTER_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={t("hero.cta.newsletter_aria")}
-          class="mt-5 inline-flex items-center gap-2 text-base font-semibold text-destructive hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-sm"
-        >
-          <svg
-            aria-hidden="true"
-            focusable="false"
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <rect width="20" height="16" x="2" y="4" rx="2" />
-            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-          </svg>
-          {t("footer.newsletter.heading")}
-        </a>
       </div>
 
       <!-- Column 2: Quick nav -->

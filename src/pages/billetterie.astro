@@ -1,7 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { useTranslations } from "@/i18n/utils";
-import { NEWSLETTER_URL } from "@/lib/event";
 
 const lang = "fr";
 const t = useTranslations(lang);
@@ -15,13 +14,5 @@ const t = useTranslations(lang);
     <p class="mt-6 text-base md:text-lg text-muted-foreground">
       {t("tickets.coming_soon.body")}
     </p>
-    <a
-      href={NEWSLETTER_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="mt-8 inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-base font-semibold px-6 h-12 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-    >
-      {t("tickets.coming_soon.cta")}
-    </a>
   </main>
 </Layout>

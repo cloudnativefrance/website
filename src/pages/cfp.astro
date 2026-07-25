@@ -1,7 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { useTranslations } from "@/i18n/utils";
-import { NEWSLETTER_URL } from "@/lib/event";
 import { FLAGS } from "@/config/flags";
 import { getFlagState } from "@/lib/flags";
 
@@ -98,33 +97,6 @@ const criteria = [
         <p class="mt-6 text-base md:text-lg text-muted-foreground">
           {t("cfp.closed_for_now.body")}
         </p>
-        <p class="mt-6 text-base md:text-lg text-muted-foreground">
-          {t("cfp.closed_for_now.notify_text")}
-        </p>
-        <a
-          href={NEWSLETTER_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="mt-8 inline-flex items-center justify-center gap-2 rounded-md border-2 border-destructive text-destructive bg-transparent text-base font-semibold px-6 h-12 transition-colors hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-        >
-          <svg
-            aria-hidden="true"
-            focusable="false"
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <rect width="20" height="16" x="2" y="4" rx="2" />
-            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-          </svg>
-          {t("cfp.closed_for_now.cta")}
-        </a>
       </section>
     )}
     {cfpState === "active" && (
