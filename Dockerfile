@@ -5,6 +5,15 @@ RUN corepack enable pnpm
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .
+# Origin this image is built for. Empty by default so astro.config.mjs's own
+# fallback to production (src/lib/site-env.ts) is the single source of truth
+# for that default — an argument-less `docker build` still produces the
+# production site. The staging CI job overrides it via --build-arg. Placed
+# after `pnpm install` so a differing origin only invalidates the build layer,
+# not the dependency-install layer, letting staging and production builds
+# share the install cache.
+ARG PUBLIC_SITE_URL=
+ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
 RUN pnpm run build
 
 # Stage 2: Serve with the official rootless nginx image

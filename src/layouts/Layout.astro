@@ -5,6 +5,7 @@ import Navigation from "@/components/Navigation.astro";
 import Footer from "@/components/Footer.astro";
 import { type Locale } from "@/i18n/ui";
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
+import { isProductionOrigin } from "@/lib/site-env";
 
 interface Props {
   title?: string;
@@ -59,6 +60,10 @@ const metaDescription = description ?? t("seo.default_description");
 const ogLocale = resolvedLang === "fr" ? "fr_FR" : "en_US";
 const siteName = t("seo.og_site_name");
 const ogImageAlt = t("seo.og_image_alt");
+
+// Staging and any other non-production origin must never be indexed. Basic auth
+// already returns 401 to crawlers; this keeps the guarantee if auth is lifted.
+const indexable = isProductionOrigin(Astro.site?.origin);
 ---
 <html lang={resolvedLang}>
   <head>
@@ -73,6 +78,8 @@ const ogImageAlt = t("seo.og_image_alt");
     </script>
     <title>{title}</title>
     <meta name="description" content={metaDescription} />
+
+    {!indexable && <meta name="robots" content="noindex, nofollow" />}
 
     <!-- Canonical -->
     <link rel="canonical" href={canonicalUrl} />
