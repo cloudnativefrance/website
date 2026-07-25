@@ -3,6 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import HeroSection from "@/components/hero/HeroSection.astro";
 import KeyNumbers from "@/components/hero/KeyNumbers";
 import Edition2026Combined from "@/components/past-editions/Edition2026Combined.astro";
+import NewsletterCallout from "@/components/newsletter/NewsletterCallout.astro";
 import SponsorsPlatinumStrip from "@/components/sponsors/SponsorsPlatinumStrip.astro";
 import { getSponsors } from "@/lib/sponsor-utils";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
@@ -21,15 +22,22 @@ const allSponsors = isFlagActive("homepage_sponsors") ? await getSponsors() : []
 const platinumSponsors = allSponsors.filter((s) => s.data.tier === "platinum");
 ---
 
+<!-- newsletter={false}: the band is placed by hand below, after KeyNumbers.
+     Tickets and the CFP are both closed, so on this page the newsletter is
+     the only action available — it belongs where the pitch lands, not after
+     the reader has stopped looking for one. Every other route keeps the
+     site-wide placement above the footer. -->
 <Layout
   title={t("site.title")}
   description={description}
   ogType="event"
+  newsletter={false}
 >
   <script type="application/ld+json" set:html={schemaJson} />
   <main>
     <HeroSection />
     <KeyNumbers client:idle lang={lang} />
+    <NewsletterCallout lang={lang} />
     <Edition2026Combined />
     {platinumSponsors.length > 0 && (
       <SponsorsPlatinumStrip

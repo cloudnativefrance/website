@@ -12,8 +12,13 @@
  * posting cross-origin to sibforms.com plus GDPR consent, submission states and
  * anti-bot handling. See docs/superpowers/specs/2026-07-25-newsletter-callout-design.md.
  *
- * Designed in Stitch first (project "Cloud Native Days France 2027", screen
- * 629de73859f14848b9881e605f04b384 — "Newsletter Callout Band").
+ * Shaped in Stitch first (project "Cloud Native Days France 2027", screen
+ * 629de73859f14848b9881e605f04b384), then reworked against the rendered page:
+ * a contained card read as one more card at the end of the document, because
+ * --card sits 2.5% in lightness from --background. It is now a full-bleed band
+ * on --secondary with a structural top rule, the same idiom as ReplayGrid and
+ * DiscoverValues. That buys separation without buying height — the block is
+ * shorter than the card version it replaces.
  */
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import type { Locale } from "@/i18n/ui";
@@ -33,22 +38,19 @@ const t = useTranslations(resolvedLang);
 
 <section
   aria-labelledby="newsletter-callout-heading"
-  class:list={["mx-auto max-w-7xl px-4 md:px-6 pt-8 pb-16", className]}
+  class:list={["border-t border-border bg-secondary", className]}
 >
   <div
-    class="rounded-lg border border-border bg-card p-8 md:p-10 grid gap-8 md:grid-cols-[1fr_auto] md:items-center md:gap-16"
+    class="mx-auto max-w-7xl px-4 md:px-6 py-10 grid gap-6 md:grid-cols-[1fr_auto] md:items-center md:gap-16"
   >
-    <div class="flex flex-col items-start gap-3">
-      <p class="font-mono text-sm text-primary-strong">
-        {t("newsletter.eyebrow")}
-      </p>
+    <div class="flex flex-col items-start gap-2">
       <h2
         id="newsletter-callout-heading"
-        class="text-2xl md:text-3xl font-bold leading-tight tracking-[-0.02em] text-foreground"
+        class="text-2xl md:text-3xl font-bold leading-tight tracking-[-0.02em] text-balance text-foreground"
       >
         {t("newsletter.heading")}
       </h2>
-      <p class="max-w-[55ch] text-base leading-[1.6] text-muted-foreground">
+      <p class="max-w-[55ch] text-base leading-[1.6] text-pretty text-muted-foreground">
         {t("newsletter.body")}
       </p>
     </div>
@@ -88,7 +90,7 @@ const t = useTranslations(resolvedLang);
         {t("newsletter.cta")}
       </a>
       <p
-        class="max-w-[34ch] text-xs leading-[1.5] text-muted-foreground md:text-right"
+        class="max-w-[40ch] text-xs leading-[1.5] text-pretty text-muted-foreground md:text-right"
       >
         {t("newsletter.note")}
       </p>
