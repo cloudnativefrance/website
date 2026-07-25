@@ -30,9 +30,8 @@ function isActive(currentPath: string, href: string, dead: boolean): boolean {
   return currentPath.startsWith(href);
 }
 
-const links = navItems.map(({ key, path, pathEn, dead, postEventOnly }) => {
-  const resolvedPath = lang === "en" && pathEn ? pathEn : path;
-  const href = getLocalePath(lang, resolvedPath);
+const links = navItems.map(({ key, path, dead, postEventOnly }) => {
+  const href = getLocalePath(lang, path);
   return {
     key,
     label: t(key),

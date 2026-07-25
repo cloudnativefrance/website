@@ -1,5 +1,5 @@
 ---
-import { Image } from "astro:assets";
+import { Picture } from "astro:assets";
 import thumbCoulisses from "@/assets/photos/discover/thumb-coulisses.png";
 
 interface Props {
@@ -67,7 +67,7 @@ const bestofPoster = `https://i.ytimg.com/vi/${BESTOF_ID}/hqdefault.jpg`;
             class="group absolute inset-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
             aria-label={`Lire : ${coulissesCaption}`}
           >
-            <Image
+            <Picture
               src={thumbCoulisses}
               alt=""
               widths={[480, 800]}

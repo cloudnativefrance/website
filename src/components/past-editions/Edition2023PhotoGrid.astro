@@ -23,7 +23,17 @@ interface Props {
   openLabelTemplate: string; // e.g. "Ouvrir la photo : {alt}" — {alt} substituted per tile
 }
 
-const { photos, openLabelTemplate } = Astro.props;
+// Astro does not wire `Props` into `Astro.props` in this file, so without the
+// assertion below it is `any` and every downstream callback silently loses its
+// types. The cause is unknown. Tested and ruled out: stale generated types
+// (`astro sync` changes nothing), the `ImageMetadata` import source
+// (`astro:assets` does not export it), the `ImageMetadata` type itself
+// (swapping it for `string` keeps the `any`), a leading JSDoc block before the
+// imports (moving it changes nothing, and other components with one type fine),
+// and `ReadonlyArray<>` in Props (swapping for a mutable array keeps the `any`).
+// This restores real typing inside the component rather than suppressing the
+// error — `Props` is still declared and still checked at every call site.
+const { photos, openLabelTemplate } = Astro.props as Props;
 ---
 <div
   class="mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4"

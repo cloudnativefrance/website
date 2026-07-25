@@ -3,6 +3,18 @@ import { FLAGS, type FlagDefinition, type FlagName } from "@/config/flags";
 import { generateFlagEnvSchema } from "@/config/flags-env";
 import { ui } from "@/i18n/ui";
 
+/**
+ * FLAGS is `as const satisfies Record<string, FlagDefinition>` — the literal
+ * types are deliberate, they are what makes FlagName a union of real keys.
+ * Iterating therefore yields that narrow union, on which `closes` only exists
+ * for the flags that declare it.
+ *
+ * This is a checked assignment, not a cast: if a registry entry ever stopped
+ * satisfying FlagDefinition, this line would fail to compile.
+ */
+const FLAG_ENTRIES: ReadonlyArray<[string, FlagDefinition]> =
+  Object.entries(FLAGS);
+
 describe("flag registry", () => {
   it("exports FLAGS as a non-empty record", () => {
     expect(typeof FLAGS).toBe("object");
@@ -18,13 +30,13 @@ describe("flag registry", () => {
   });
 
   it("every flag has a kind of 'page' or 'element'", () => {
-    for (const [name, flag] of Object.entries(FLAGS)) {
+    for (const [name, flag] of FLAG_ENTRIES) {
       expect(["page", "element"]).toContain(flag.kind);
     }
   });
 
   it("date strings parse to valid dates", () => {
-    for (const [name, flag] of Object.entries(FLAGS)) {
+    for (const [name, flag] of FLAG_ENTRIES) {
       if (flag.opens) {
         expect(new Date(flag.opens).toString()).not.toBe("Invalid Date");
       }
@@ -35,7 +47,7 @@ describe("flag registry", () => {
   });
 
   it("when both opens and closes are set, opens < closes", () => {
-    for (const [name, flag] of Object.entries(FLAGS)) {
+    for (const [name, flag] of FLAG_ENTRIES) {
       if (flag.opens && flag.closes) {
         expect(new Date(flag.opens).getTime()).toBeLessThan(
           new Date(flag.closes).getTime(),
@@ -84,7 +96,7 @@ describe("i18n completeness (page-kind flags)", () => {
   const LOCALES = ["fr", "en"] as const;
 
   it("every page-kind flag has matching soon.title and soon.body in every locale", () => {
-    for (const [name, flag] of Object.entries(FLAGS)) {
+    for (const [name, flag] of FLAG_ENTRIES) {
       if (flag.kind !== "page") continue;
       for (const locale of LOCALES) {
         const titleKey = `flags.${name}.soon.title`;

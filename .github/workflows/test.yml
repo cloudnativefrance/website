@@ -41,11 +41,11 @@ jobs:
 
       - run: pnpm test
 
+      # Type-checks .astro, .ts and .tsx. Kept after the tests so a type
+      # regression is reported alongside a green suite rather than masking it.
+      - run: pnpm astro check
+
 # Deliberately no `paths:` filter. Scoping this to source directories would let
 # a change to the Dockerfile, a workflow, or a config file land untested — and a
 # `paths:` filter is also why a branch-creation push silently builds nothing
 # (see build-image.yml). Correctness beats a saved minute here.
-#
-# `pnpm astro check` is deliberately absent: it currently reports 17 errors in
-# content.config.ts and flags-registry.test.ts, all pre-existing. Adding it now
-# would make this workflow red on arrival. Worth a follow-up.

@@ -15,7 +15,8 @@ import { FLAGS } from "./flags";
 export interface FlagEnvEntry {
   context: "server";
   access: "public";
-  values: readonly ["on", "off", ""];
+  /** Mutable on purpose: Astro's EnumFieldInput expects string[], not a readonly tuple. */
+  values: ("on" | "off" | "")[];
   optional: true;
   default: "";
 }
@@ -27,7 +28,7 @@ export function generateFlagEnvSchema(): Record<string, FlagEnvEntry> {
     schema[key] = {
       context: "server",
       access: "public",
-      values: ["on", "off", ""] as const,
+      values: ["on", "off", ""],
       optional: true,
       default: "",
     };
