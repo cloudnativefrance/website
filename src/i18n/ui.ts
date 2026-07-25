@@ -230,10 +230,9 @@ export const ui = {
     "footer.association": "Organisé sous le statut d'association 1901, par l'association Cloud Native France.",
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Suivez-nous",
-    "newsletter.eyebrow": "$ subscribe --to newsletter",
-    "newsletter.heading": "Ne ratez aucune annonce",
-    "newsletter.body":
-      "Soyez informé(e) de l'ouverture de la billetterie et des annonces importantes.",
+    "newsletter.heading":
+      "Début du CFP ? Ouverture de la billetterie ? Programme ?",
+    "newsletter.body": "Restez informé(e) des annonces importantes.",
     "newsletter.cta": "S'inscrire",
     "newsletter.cta_aria":
       "S'inscrire à la newsletter Cloud Native Days France",
@@ -615,10 +614,8 @@ export const ui = {
     "footer.association": "Organized by the Cloud Native France association, a French non-profit (loi 1901).",
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Follow us",
-    "newsletter.eyebrow": "$ subscribe --to newsletter",
-    "newsletter.heading": "Don't miss an announcement",
-    "newsletter.body":
-      "Be the first to know when ticketing opens, plus every important announcement.",
+    "newsletter.heading": "CFP opening? Ticket sales? Schedule?",
+    "newsletter.body": "Stay posted on every important announcement.",
     "newsletter.cta": "Subscribe",
     "newsletter.cta_aria":
       "Subscribe to the Cloud Native Days France newsletter",
