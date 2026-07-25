@@ -121,7 +121,7 @@ const regular = speakers
                 <li>
                   <a
                     href={getLocalePath(lang, `/speakers/${year}/${slug}`)}
-                    class="group flex h-full flex-col items-center text-center rounded-lg border border-border bg-card p-5 transition-all duration-200 hover:border-primary/60 motion-safe:hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    class="group flex h-full flex-col items-center text-center rounded-lg border border-border bg-card p-5 transition-[border-color,translate,box-shadow] duration-200 hover:border-primary/60 motion-safe:hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <div class="h-[120px] w-[120px] rounded-full overflow-hidden bg-secondary">
                       <SpeakerAvatar name={s.data.name} photo={s.data.photo_url} size="lg" />
@@ -180,7 +180,7 @@ const regular = speakers
             <li>
               <a
                 href={getLocalePath(lang, `/speakers/${year}/${slug}`)}
-                class="group block h-full rounded-lg border border-border bg-card p-5 text-center transition-all duration-200 hover:border-primary/60 motion-safe:hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                class="group block h-full rounded-lg border border-border bg-card p-5 text-center transition-[border-color,translate,box-shadow] duration-200 hover:border-primary/60 motion-safe:hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 <div class="flex flex-col items-center">
                   <SpeakerAvatar

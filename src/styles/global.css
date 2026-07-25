@@ -1,4 +1,14 @@
 @import "tailwindcss";
+/* Tailwind 4 auto-detects sources across the project, markdown included, so any
+   class name merely *mentioned* in a doc becomes a real utility in the bundle.
+   Three paths were injecting utilities nothing renders: the installed agent
+   skills (whose performance guide quotes the very utility it tells you to
+   avoid), the symlink to them under .claude, and the frozen planning archive.
+   Do not name a utility literally in this comment either — the scanner reads
+   it too, which is how the last stray one survived the first attempt. */
+@source not "../../.agents";
+@source not "../../.claude";
+@source not "../../.planning.gsd-archive";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
