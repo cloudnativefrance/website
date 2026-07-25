@@ -28,7 +28,6 @@ export const ui = {
     "about.page.placeholder": "Le contenu de cette page arrive très prochainement.",
     "tickets.coming_soon.title": "La billetterie sera bientôt ouverte",
     "tickets.coming_soon.body": "Inscrivez-vous à la newsletter pour être informé(e) dès l'ouverture de la billetterie et bénéficier des tarifs Early Bird.",
-    "tickets.coming_soon.cta": "Inscrivez-vous à la Newsletter",
     "site.title": "Cloud Native Days France 2027",
     "site.description": "3 juin 2027 — CENTQUATRE-PARIS",
     "seo.default_description":
@@ -47,8 +46,6 @@ export const ui = {
     "hero.description":
       "La communaut\u00e9 francophone passionn\u00e9e de devops et de cloud native se retrouve \u00e0 Paris. Une journ\u00e9e de retours d'exp\u00e9rience et de rencontres - ouverte \u00e0 toutes et tous, des juniors curieux \u00e0 l'archi senior jusqu'aux d\u00e9cideurs en qu\u00eate des derni\u00e8res tendances.",
     "hero.logo_alt": "Cloud Native Days France",
-    "hero.cta.newsletter": "Restez informé(e)",
-    "hero.cta.newsletter_aria": "Restez informé(e) — annonces Cloud Native Days France",
     "countdown.days": "jours",
     "countdown.hours": "heures",
     "countdown.minutes": "minutes",
@@ -76,8 +73,6 @@ export const ui = {
     "cfp.deadline": "Clôture le {date}",
     "cfp.closed_for_now.title": "Notre CFP est actuellement fermé",
     "cfp.closed_for_now.body": "Le Call For Paper (appel à conférencier(e)s) de l'édition 2027 ouvrira début 2027.",
-    "cfp.closed_for_now.notify_text": "Inscrivez-vous à la newsletter pour être informé(e) de l'ouverture du CFP.",
-    "cfp.closed_for_now.cta": "Inscrivez-vous à la Newsletter",
     "speakers.heading": "Nos intervenant(e)s",
     "speakers.subtext":
       "Découvrez les intervenant(e)s de Cloud Native Days France 2026.",
@@ -235,7 +230,15 @@ export const ui = {
     "footer.association": "Organisé sous le statut d'association 1901, par l'association Cloud Native France.",
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Suivez-nous",
-    "footer.newsletter.heading": "Restez informé(e)",
+    "newsletter.eyebrow": "$ subscribe --to newsletter",
+    "newsletter.heading": "Ne ratez aucune annonce",
+    "newsletter.body":
+      "Soyez informé(e) de l'ouverture de la billetterie et des annonces importantes.",
+    "newsletter.cta": "S'inscrire",
+    "newsletter.cta_aria":
+      "S'inscrire à la newsletter Cloud Native Days France",
+    "newsletter.note":
+      "Un email par annonce importante. Désinscription en un clic.",
     "social.hashtag": "#CNDFrance",
     "footer.legal.heading": "Légal",
     "footer.legal.coc": "Code de conduite",
@@ -412,7 +415,6 @@ export const ui = {
     "about.page.placeholder": "Content for this page is coming soon.",
     "tickets.coming_soon.title": "Tickets opening soon",
     "tickets.coming_soon.body": "Subscribe to the newsletter to be notified when ticketing opens and benefit from Early Bird rates.",
-    "tickets.coming_soon.cta": "Sign up for the Newsletter",
     "site.title": "Cloud Native Days France 2027",
     "site.description": "June 3, 2027 — CENTQUATRE-PARIS",
     "seo.default_description":
@@ -431,8 +433,6 @@ export const ui = {
     "hero.description":
       "The French-speaking DevOps and cloud-native community comes together in Paris. A day of real-world experience reports and conversations \u2014 open to everyone, from curious juniors to senior architects all the way to decision-makers tracking the latest trends.",
     "hero.logo_alt": "Cloud Native Days France",
-    "hero.cta.newsletter": "Stay in the loop",
-    "hero.cta.newsletter_aria": "Stay in the loop — Cloud Native Days France announcements",
     "countdown.days": "days",
     "countdown.hours": "hours",
     "countdown.minutes": "minutes",
@@ -460,8 +460,6 @@ export const ui = {
     "cfp.deadline": "Submissions close {date}",
     "cfp.closed_for_now.title": "Our CFP is currently closed",
     "cfp.closed_for_now.body": "The Call for Papers for the 2027 edition will open in early 2027.",
-    "cfp.closed_for_now.notify_text": "Subscribe to the newsletter to be notified when the CFP opens.",
-    "cfp.closed_for_now.cta": "Sign up for the Newsletter",
     "speakers.heading": "Our speakers",
     "speakers.subtext":
       "Meet the speakers from Cloud Native Days France 2026.",
@@ -617,7 +615,15 @@ export const ui = {
     "footer.association": "Organized by the Cloud Native France association, a French non-profit (loi 1901).",
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Follow us",
-    "footer.newsletter.heading": "Stay informed",
+    "newsletter.eyebrow": "$ subscribe --to newsletter",
+    "newsletter.heading": "Don't miss an announcement",
+    "newsletter.body":
+      "Be the first to know when ticketing opens, plus every important announcement.",
+    "newsletter.cta": "Subscribe",
+    "newsletter.cta_aria":
+      "Subscribe to the Cloud Native Days France newsletter",
+    "newsletter.note":
+      "One email per important announcement. Unsubscribe in one click.",
     "social.hashtag": "#CNDFrance",
     "footer.legal.heading": "Legal",
     "footer.legal.coc": "Code of Conduct",

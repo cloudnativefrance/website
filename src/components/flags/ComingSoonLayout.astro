@@ -55,7 +55,9 @@ const opensLine = formattedOpens
   : null;
 ---
 
-<Layout title={title} description={body} lang={lang}>
+{/* newsletter={false}: this page IS a newsletter appeal — its title, body and
+    CTA all point at it. The site-wide band would be a straight duplicate. */}
+<Layout title={title} description={body} lang={lang} newsletter={false}>
   <main>
     <section
       class="relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden px-4 py-16 md:py-24"

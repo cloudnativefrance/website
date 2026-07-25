@@ -1,7 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { useTranslations } from "@/i18n/utils";
-import { NEWSLETTER_URL } from "@/lib/event";
 import { FLAGS } from "@/config/flags";
 import { getFlagState } from "@/lib/flags";
 
@@ -98,17 +97,6 @@ const criteria = [
         <p class="mt-6 text-base md:text-lg text-muted-foreground">
           {t("cfp.closed_for_now.body")}
         </p>
-        <p class="mt-6 text-base md:text-lg text-muted-foreground">
-          {t("cfp.closed_for_now.notify_text")}
-        </p>
-        <a
-          href={NEWSLETTER_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="mt-8 inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground text-base font-semibold px-6 h-12 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        >
-          {t("cfp.closed_for_now.cta")}
-        </a>
       </section>
     )}
     {cfpState === "active" && (

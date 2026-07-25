@@ -5,7 +5,6 @@ import FeatureGate from "@/components/flags/FeatureGate.astro";
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { NEWSLETTER_URL } from "@/lib/event";
 import logoFullDark from "@/assets/logos/dark/logo.svg";
 import logoFullLight from "@/assets/logos/principal/logo.svg";
 
@@ -16,7 +15,7 @@ const TICKETS_HREF = getLocalePath(lang, "/tickets");
 const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
 const DISCOVER_URL = getLocalePath(lang, lang === "en" ? "/discover" : "/decouvrir");
 
-// Both logo variants share intrinsic dimensions, so one ratio drives both <img> tags.
+// Both logo variants share intrinsic dimensions, so one ratio drives both images.
 const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width);
 ---
 
@@ -108,39 +107,6 @@ const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width)
           {t("hero.cta.schedule")}
         </a>
       )}
-      <a
-        href={NEWSLETTER_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={t("hero.cta.newsletter_aria")}
-        class={cn(
-          buttonVariants({ variant: "outline", size: "lg" }),
-          "h-[52px] px-8 text-lg font-bold",
-          "border-2 border-destructive text-destructive bg-transparent",
-          "hover:bg-destructive/10 hover:text-destructive hover:border-destructive hover:shadow-[0_0_0_4px_oklch(54.0%_0.216_25.2_/_0.15)]",
-          "focus-visible:ring-destructive/50",
-          "gap-2"
-        )}
-      >
-        <svg
-          aria-hidden="true"
-          focusable="false"
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="shrink-0"
-        >
-          <rect width="20" height="16" x="2" y="4" rx="2" />
-          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-        </svg>
-        {t("hero.cta.newsletter")}
-      </a>
     </div>
   </div>
 </section>
