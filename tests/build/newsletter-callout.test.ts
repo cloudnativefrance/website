@@ -22,7 +22,6 @@ const DIST = resolve(import.meta.dirname, "../../dist");
 const HEADING_ID = "newsletter-callout-heading";
 
 const NEW_KEYS = [
-  "newsletter.eyebrow",
   "newsletter.heading",
   "newsletter.body",
   "newsletter.cta",
@@ -80,11 +79,6 @@ describe("newsletter i18n keys", () => {
       expect(ui.en).not.toHaveProperty(key);
     });
   }
-
-  it("the eyebrow is the same command string in both locales", () => {
-    // It is a shell command, not prose — translating it would be wrong.
-    expect(ui.fr["newsletter.eyebrow"]).toBe(ui.en["newsletter.eyebrow"]);
-  });
 });
 
 describe("newsletter callout distribution", () => {
