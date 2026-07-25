@@ -1,6 +1,11 @@
 # Stage 1: Build the Astro site
 FROM node:22-alpine AS build
 WORKDIR /app
+# Origin this image is built for. Defaults to production so an argument-less
+# `docker build` keeps producing the production site. The staging CI job
+# overrides it via --build-arg.
+ARG PUBLIC_SITE_URL=https://cloudnativedays.fr
+ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
 RUN corepack enable pnpm
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile

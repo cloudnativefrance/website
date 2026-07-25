@@ -11,7 +11,10 @@ import { generateFlagEnvSchema } from "./src/config/flags-env.ts";
 // Build is fully static; bump this file to force a CI rebuild that
 // re-fetches the upstream Google Sheets at compile time.
 export default defineConfig({
-  site: "https://cloudnativedays.fr",
+  // Driven by PUBLIC_SITE_URL so staging builds advertise their own origin in
+  // canonical URLs, hreflang, OG image URLs and the sitemap. Defaults to
+  // production, so every existing build path is unchanged.
+  site: process.env.PUBLIC_SITE_URL ?? "https://cloudnativedays.fr",
   redirects: {
     "/programme":    "/programme/2026",
     "/sponsors":     "/sponsors/2026",
