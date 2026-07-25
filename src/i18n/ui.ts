@@ -231,7 +231,7 @@ export const ui = {
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Suivez-nous",
     "newsletter.heading":
-      "Début du CFP ? Ouverture de la billetterie ? Programme ?",
+      "Ouverture de la billetterie ? Programme ? Début du CFP ?",
     "newsletter.body": "Restez informé(e) des annonces importantes.",
     "newsletter.cta": "S'inscrire",
     "newsletter.cta_aria":
@@ -614,7 +614,7 @@ export const ui = {
     "footer.association": "Organized by the Cloud Native France association, a French non-profit (loi 1901).",
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Follow us",
-    "newsletter.heading": "CFP opening? Ticket sales? Schedule?",
+    "newsletter.heading": "Ticket sales? Schedule? CFP opening?",
     "newsletter.body": "Stay posted on every important announcement.",
     "newsletter.cta": "Subscribe",
     "newsletter.cta_aria":
