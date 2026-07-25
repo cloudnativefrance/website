@@ -33,7 +33,14 @@ const initialsSizeClasses = {
     <img
       src={photo}
       alt={name}
-      class={cn(sizeClasses[size], "object-cover", className)}
+      class={cn(
+        sizeClasses[size],
+        "object-cover",
+        // Rule 11: pure black/white at low alpha, never a tinted neutral —
+        // a tint picks up the surface beneath and reads as dirt on the edge.
+        "outline outline-1 -outline-offset-1 outline-black/10 dark:outline-white/10",
+        className,
+      )}
     />
   ) : (
     <div
