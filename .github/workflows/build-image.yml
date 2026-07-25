@@ -72,7 +72,7 @@ jobs:
           context: .
           push: ${{ env.IS_PUBLISH }}
           build-args: |
-            PUBLIC_SITE_URL=${{ github.ref_name == 'staging' && 'https://staging.cloudnativedays.fr' || 'https://cloudnativedays.fr' }}
+            PUBLIC_SITE_URL=${{ github.ref_name == 'staging' && 'https://staging.cloudnativedays.fr' || '' }}
           # workflow_dispatch is the "rebuild to pick up Google Sheets
           # changes" lever — without bypassing the cache, the pnpm-build
           # layer is reused and the upstream CSVs are never refetched.

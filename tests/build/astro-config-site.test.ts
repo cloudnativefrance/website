@@ -7,8 +7,8 @@
  * and must be overridable so staging builds do not advertise production URLs.
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { PROD_ORIGIN } from "../../src/lib/site-env.ts";
 
-const PROD_ORIGIN = "https://cloudnativedays.fr";
 const STAGING_ORIGIN = "https://staging.cloudnativedays.fr";
 
 async function loadConfig() {
@@ -34,5 +34,14 @@ describe("astro.config.mjs site origin", () => {
     process.env.PUBLIC_SITE_URL = STAGING_ORIGIN;
     const config = await loadConfig();
     expect(config.site).toBe(STAGING_ORIGIN);
+  });
+
+  it("falls back to the production origin when PUBLIC_SITE_URL is empty", async () => {
+    // Regression guard: Dockerfile sets `ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL`
+    // with an empty ARG default. `??` would treat that empty string as "set"
+    // and ship the site un-indexable; `||` must fall back to production.
+    process.env.PUBLIC_SITE_URL = "";
+    const config = await loadConfig();
+    expect(config.site).toBe(PROD_ORIGIN);
   });
 });

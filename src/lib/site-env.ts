@@ -3,9 +3,9 @@
  *
  * `site` in astro.config.mjs is driven by PUBLIC_SITE_URL and defaults to
  * production. Everything that must differ between production and staging —
- * robots.txt today, the noindex meta tag next — derives from that single
- * origin rather than from a second environment flag that could drift out of
- * sync with it.
+ * robots.txt and the noindex meta tag — derives from that single origin
+ * rather than from a second environment flag that could drift out of sync
+ * with it.
  *
  * Both helpers fail closed: an unknown origin is treated as non-production,
  * so a misconfigured build is un-indexable rather than a duplicate of the

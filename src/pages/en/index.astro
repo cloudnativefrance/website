@@ -12,7 +12,7 @@ import { isFlagActive } from "@/lib/flags";
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const description = t("seo.default_description");
-const siteUrl = Astro.site ? Astro.site.toString() : "https://cloudnativedays.fr/";
+const siteUrl = Astro.site.toString();
 const schemaJson = eventSchemaJson({ lang, siteUrl, description });
 
 const allSponsors = isFlagActive("homepage_sponsors") ? await getSponsors() : [];
