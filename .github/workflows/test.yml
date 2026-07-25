@@ -1,0 +1,51 @@
+# Runs the Vitest suite on every change.
+#
+# Until this existed nothing executed `pnpm test`, which is how the suite stayed
+# red across several releases with 17 failing assertions nobody saw.
+name: Tests
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+  workflow_dispatch:
+
+# A newer push to the same ref supersedes the run in flight.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+
+      # The specs under tests/build/ assert against built HTML, so the build is
+      # part of the test setup rather than a separate concern. Skipping it makes
+      # discover-page.test.ts silently skip and the two speaker specs throw.
+      #
+      # This step fetches the published Google Sheets. If that fails,
+      # src/lib/remote-csv.ts falls back to the copies committed under
+      # src/content/, which carry the same speaker anchors the specs rely on —
+      # so the suite passes on either path, with or without network.
+      - run: pnpm build
+
+      - run: pnpm test
+
+# Deliberately no `paths:` filter. Scoping this to source directories would let
+# a change to the Dockerfile, a workflow, or a config file land untested — and a
+# `paths:` filter is also why a branch-creation push silently builds nothing
+# (see build-image.yml). Correctness beats a saved minute here.
+#
+# `pnpm astro check` is deliberately absent: it currently reports 17 errors in
+# content.config.ts and flags-registry.test.ts, all pre-existing. Adding it now
+# would make this workflow red on arrival. Worth a follow-up.
