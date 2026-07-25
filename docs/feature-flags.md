@@ -184,8 +184,14 @@ Flag names with underscores become uppercase with underscores preserved: `homepa
 **Staging preview** — preview the real page before the date:
 ```bash
 FLAG_TICKETS=on pnpm build
-# or set FLAG_TICKETS=on in the staging env at the K8s level
 ```
+Flags resolve from `process.env` at **build** time (`src/lib/flags.ts`), and the
+shipped artifact is a static nginx image — a Kubernetes-level env var on the
+running pod cannot change it. The override must be present when the *image*
+is built, e.g. as a `--build-arg` threaded through to `ENV` before `pnpm run
+build`, the same pattern this repo now uses for `PUBLIC_SITE_URL` (see the
+`Dockerfile` and `.github/workflows/build-image.yml`). `FLAG_*` does not use
+that pattern yet — wiring it up is a separate, not-yet-made decision.
 
 **Emergency kill switch** — hide a page immediately without editing dates:
 ```bash
@@ -311,7 +317,12 @@ Add an element-kind flag with `opens: "<date>"`, wrap the element in `<FeatureGa
 Add an element-kind flag with BOTH `opens` and `closes`. The wrapped element appears only inside the window.
 
 ### Force-activate a flag in staging
-Set `FLAG_<NAME>=on` in your staging deploy's environment. Production remains unaffected.
+`FLAG_<NAME>=on` must be supplied at **image-build** time, not as a Kubernetes
+deploy-time environment variable — the site is a static build baked into the
+nginx image, and `src/lib/flags.ts` only ever reads `process.env` while
+`pnpm run build` runs. Setting it on the running pod has no effect. See
+"Staging preview" above for the build-arg pattern this repo doesn't wire up
+for flags yet.
 
 ### Kill a flag immediately without waiting for the cron
 ```bash
@@ -336,7 +347,7 @@ Flip via env override only. Registry stays truthful about which toggles are manu
 ### "My page still shows coming-soon after the opens date"
 1. Check the latest GitHub Actions `flag-cron` runs — did the cron trigger a deploy on the right date?
 2. Verify the deploy succeeded (not red in CI).
-3. Check if an env override is active: `FLAG_<NAME>=off` on the production environment overrides the date.
+3. Check if an env override was active at build time: `FLAG_<NAME>=off` when the image was built overrides the date. (A runtime env var on the deployed pod has no effect — see "Env variable overrides" above.)
 4. Verify the date string parses correctly: `new Date("2026-09-01T00:00:00+02:00")` should return a valid `Date`, not `Invalid Date`.
 
 ### "My env override isn't being picked up"

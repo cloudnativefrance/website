@@ -15,7 +15,7 @@ The bilingual (French / English) marketing and program site for [Cloud Native Da
 
 The site is a static HTML bundle served by `nginx` from a multi-stage `Dockerfile`. Production deploys are managed via Kubernetes out of the separate [`cnd-platform`](https://github.com/cloudnativedays-france/cnd-platform) GitOps repository. This repository ships the site image; the platform repo owns the manifests.
 
-CI builds the image on every push via `.github/workflows/build-image.yml`.
+CI builds the image on every push via `.github/workflows/build-image.yml`. Pushes to `main` build the production image; pushes to `staging` build a second image channel for `https://staging.cloudnativedays.fr`, with `PUBLIC_SITE_URL` set at build time (see below) so the two are indexed differently and never share a canonical origin.
 
 ## Quickstart
 
@@ -54,6 +54,8 @@ Four CSVs back the site. Production reads them from published Google Sheets (URL
 | Speakers | `SCHEDULE_SPEAKERS_CSV_URL` | `src/content/schedule/speakers.csv` |
 | Sponsors | `SPONSORS_CSV_URL` | `src/content/sponsors/sponsors.csv` |
 | Team | `TEAM_CSV_URL` | `src/content/team/team.csv` |
+
+One more build-time env var, unrelated to content: `PUBLIC_SITE_URL` sets the build's origin (`site` in `astro.config.mjs`), which drives canonical URLs, hreflang, the sitemap, `robots.txt`, and the `noindex` meta tag. Empty or unset falls back to the production origin (`src/lib/site-env.ts`); CI sets it to `https://staging.cloudnativedays.fr` for the `staging` branch.
 
 See [`docs/updating-content.md`](docs/updating-content.md) for the editor runbook.
 
