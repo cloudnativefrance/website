@@ -3,7 +3,7 @@ name: Build and Push Container Image
 
 on:
   push:
-    branches: [main]
+    branches: [main, staging]
     paths:
       - 'src/**'
       - 'public/**'
@@ -56,11 +56,12 @@ jobs:
           # Flux's ImagePolicy needs lexically sortable tags (filterTags →
           # numerical sort on the embedded timestamp). The
           # `<branch>-<sha>-<unix-ts>` pattern lets Flux pick the newest
-          # deploy without semver bumps; gating on is_default_branch keeps
-          # feature-branch dispatches from polluting the channel.
+          # deploy without semver bumps. Only `main` and `staging` get this
+          # tag — one channel per environment — so feature-branch dispatches
+          # still cannot pollute either. `latest` remains main-only.
           tags: |
             type=sha,prefix=
-            type=raw,value={{branch}}-{{sha}}-{{date 'X'}},enable={{is_default_branch}}
+            type=raw,value={{branch}}-{{sha}}-{{date 'X'}},enable=${{ github.ref_name == 'main' || github.ref_name == 'staging' }}
             type=raw,value=latest,enable={{is_default_branch}}
             type=semver,pattern={{version}}
 
@@ -70,6 +71,8 @@ jobs:
         with:
           context: .
           push: ${{ env.IS_PUBLISH }}
+          build-args: |
+            PUBLIC_SITE_URL=${{ github.ref_name == 'staging' && 'https://staging.cloudnativedays.fr' || 'https://cloudnativedays.fr' }}
           # workflow_dispatch is the "rebuild to pick up Google Sheets
           # changes" lever — without bypassing the cache, the pnpm-build
           # layer is reused and the upstream CSVs are never refetched.
