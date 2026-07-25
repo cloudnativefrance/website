@@ -1,3 +1,4 @@
+import type { Loader, LoaderContext } from "astro/loaders";
 import { defineCollection } from "astro:content";
 import { z } from "astro/zod";
 import {
@@ -43,13 +44,13 @@ function parseCsv(text: string): string[][] {
 
 // -- csvLoader (unchanged) -------------------------------------------------
 
-function csvLoader({ url, fallback, label }: { url?: string; fallback: string; label: string }) {
+function csvLoader({ url, fallback, label }: { url?: string; fallback: string; label: string }): Loader {
   return {
     name: `csv:${label}`,
-    load: async ({ store, parseData }: {
-      store: { set: (entry: { id: string; data: unknown }) => void; clear: () => void };
-      parseData: (opts: { id: string; data: unknown }) => Promise<unknown>;
-    }) => {
+    // Typed from Astro's own LoaderContext rather than a hand-written shape:
+    // the local one declared store.set as `(entry) => void` while Astro's is
+    // generic over the entry data and returns boolean, so the two drifted.
+    load: async ({ store, parseData }: LoaderContext) => {
       const raw = await fetchCsvOrFallback({ url, fallbackRelPath: fallback, label });
       const rows = parseCsv(raw);
       if (rows.length === 0) return;

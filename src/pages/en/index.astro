@@ -12,7 +12,9 @@ import { isFlagActive } from "@/lib/flags";
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const description = t("seo.default_description");
-const siteUrl = Astro.site.toString();
+// `site` is always set in astro.config.mjs, and Astro rejects an invalid
+// value at config load, so this is defined for every build.
+const siteUrl = Astro.site!.toString();
 const schemaJson = eventSchemaJson({ lang, siteUrl, description });
 
 const allSponsors = isFlagActive("homepage_sponsors") ? await getSponsors() : [];

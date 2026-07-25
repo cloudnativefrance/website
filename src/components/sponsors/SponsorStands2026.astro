@@ -9,7 +9,7 @@
  *   Plakar   / Enix
  *   Traefik  / Veeam
  */
-import { Image } from "astro:assets";
+import { Picture } from "astro:assets";
 import { useTranslations, getLangFromUrl } from "@/i18n/utils";
 import scalewayImg from "@/assets/photos/partners-2027/scaleway.jpg";
 import numspotImg from "@/assets/photos/partners-2027/numspot.jpg";
@@ -41,7 +41,7 @@ const stands = [
   <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
     {stands.map(({ src, name }) => (
       <figure class="overflow-hidden rounded-lg border border-border bg-card">
-        <Image
+        <Picture
           src={src}
           alt={t("sponsors.stands_2026.alt").replace("{name}", name)}
           widths={[480, 720, 960]}
