@@ -154,15 +154,28 @@
 }
 
 /* A11Y-05: Global prefers-reduced-motion baseline (Phase 16, D-07).
-   Any animated component MUST NOT redefine its own motion fallback. */
+   Any animated component MUST NOT redefine its own motion fallback.
+
+   This removes MOVEMENT, not feedback. The previous version killed every
+   transition with a blanket 0.01ms duration, which also silenced the colour,
+   shadow and opacity changes that tell someone their click or focus landed —
+   leaving the interface feeling broken rather than calm. Restricting the
+   transitioned property set instead means motion snaps while state changes
+   still read. Keyframe animations are stopped outright.
+
+   Deliberately NOT setting `translate: none`: several elements use a static
+   translate for layout (the lightbox arrows are centred with -translate-y-1/2),
+   and zeroing it would move them, not calm them. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+    transition-property:
+      color, background-color, border-color, outline-color,
+      text-decoration-color, fill, stroke, box-shadow, opacity !important;
   }
 }
 

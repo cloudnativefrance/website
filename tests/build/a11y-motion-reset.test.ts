@@ -45,12 +45,36 @@ describe("A11Y-05: prefers-reduced-motion reset", () => {
     expect(text).toMatch(/@media\s*\(\s*prefers-reduced-motion:\s*reduce\s*\)/);
   });
 
-  it("block contains all four locked declarations (D-07)", () => {
+  it("stops keyframe animations and smooth scrolling", () => {
     const text = readFileSync(CSS_PATH, "utf-8");
     expect(text).toContain("animation-duration: 0.01ms !important");
     expect(text).toContain("animation-iteration-count: 1 !important");
-    expect(text).toContain("transition-duration: 0.01ms !important");
     expect(text).toContain("scroll-behavior: auto !important");
+  });
+
+  it("removes movement without silencing state feedback", () => {
+    // The original reset killed every transition with a blanket 0.01ms
+    // duration, which also silenced the colour, shadow and opacity changes
+    // that tell someone their click or focus landed. Restricting the
+    // transitioned property set leaves movement snapping while state still
+    // reads. Re-adding a blanket duration would undo that.
+    const text = readFileSync(CSS_PATH, "utf-8");
+    expect(text).not.toContain("transition-duration: 0.01ms !important");
+    expect(text).toMatch(/transition-property:[\s\S]*?!important/);
+    for (const kept of ["color", "background-color", "box-shadow", "opacity"]) {
+      expect(
+        text,
+        `${kept} must survive the reduced-motion reset — it is feedback, not motion`,
+      ).toMatch(new RegExp(`transition-property:[\\s\\S]*?\\b${kept}\\b`));
+    }
+  });
+
+  it("does not zero translate globally", () => {
+    // Several elements use a static translate for layout — the lightbox arrows
+    // are centred with -translate-y-1/2. Zeroing it would move them, not calm
+    // them.
+    const text = readFileSync(CSS_PATH, "utf-8");
+    expect(text).not.toMatch(/translate:\s*none\s*!important/);
   });
 
   it("block is NOT nested inside an @layer (Pitfall 3)", () => {
