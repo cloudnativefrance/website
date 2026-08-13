@@ -4,14 +4,38 @@ import { useTranslations } from "@/i18n/utils";
 
 const t = useTranslations("en");
 const title = t("legal.privacy.title");
-const description = "Cloud Native Days France privacy policy. No personal data collected.";
-const lastUpdated = "2026-05-18";
+const description = "Cloud Native Days France privacy policy. No cookies, self-hosted analytics.";
+const lastUpdated = "2026-08-13";
 ---
 <LegalPageLayout title={title} description={description} lastUpdated={lastUpdated} lang="en">
   <p class="text-base leading-relaxed mt-4">
-    <strong>This site collects no personal data during your visit.</strong>
+    <strong>This site sets no cookies and retains no data that directly identifies you.</strong>
     It is a static site hosted on Cloud Native France's infrastructure.
-    No cookies are set by our domain, and no analytics service is used.
+    The audience measurement described below is self-hosted and cookie-free.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Audience measurement</h2>
+  <p class="text-base leading-relaxed mt-4">
+    We use <a href="https://umami.is" class="text-primary hover:underline">Umami</a>, an
+    open-source analytics tool that we <strong>host ourselves</strong> on our own infrastructure.
+    No data is sent to any third party.
+  </p>
+  <p class="text-base leading-relaxed mt-4">
+    Umami works <strong>without cookies</strong>. For each visit, the following are recorded:
+  </p>
+  <ul class="list-disc ml-6 mt-4 space-y-2">
+    <li>the page viewed and the time it was viewed;</li>
+    <li>the referring site (for example, the social network you arrived from);</li>
+    <li>the country, derived from your IP address;</li>
+    <li>the browser, operating system, device type, screen size and language.</li>
+  </ul>
+  <p class="text-base leading-relaxed mt-4">
+    <strong>Your IP address is not retained.</strong> It is used only at the time of the visit, to
+    derive the country and to compute an anonymous session identifier; it is never written to any
+    database. No advertising identifiers, no profiling, no sharing with third parties.
+  </p>
+  <p class="text-base leading-relaxed mt-4">
+    Your browser's "Do Not Track" signal is honoured — if it is enabled, no visit is recorded.
   </p>
 
   <h2 class="text-2xl font-semibold mt-8">Data Controller</h2>
@@ -45,7 +69,7 @@ const lastUpdated = "2026-05-18";
 
   <h2 class="text-2xl font-semibold mt-8">Your rights</h2>
   <p class="text-base leading-relaxed mt-4">
-    Under the GDPR and the French "Informatique et Libertés" law, you have rights of access, rectification, erasure, restriction and objection regarding your personal data. Since our site collects no personal data, these rights have no direct object here. You may nonetheless send any request or complaint to the contact address above, or directly to the French data-protection authority, the <a href="https://www.cnil.fr/en/home" class="text-primary hover:underline">CNIL</a>.
+    Under the GDPR and the French "Informatique et Libertés" law, you have rights of access, rectification, erasure, restriction and objection regarding your personal data. Our audience measurement retains neither your IP address nor any identifier that could recognise you, so no recorded data can be linked back to you individually. You may nonetheless send any request or complaint to the contact address above, or directly to the French data-protection authority, the <a href="https://www.cnil.fr/en/home" class="text-primary hover:underline">CNIL</a>.
   </p>
 
   <h2 class="text-2xl font-semibold mt-8">Changes</h2>
