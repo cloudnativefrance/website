@@ -90,7 +90,7 @@ export default function KeyNumbers({ lang }: KeyNumbersProps) {
             >
               {animated[i]}
             </span>
-            <span className="text-xl sm:text-5xl font-bold text-destructive">
+            <span className="text-xl sm:text-5xl font-bold text-destructive-strong">
               {stat.suffix}
             </span>
             <p className="mt-2 text-base font-normal text-muted-foreground">
