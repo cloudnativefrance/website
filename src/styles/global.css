@@ -57,6 +57,14 @@
   --accent-foreground: oklch(16.8% 0.052 286.4);
   --destructive: oklch(54.0% 0.216 25.2);
   --destructive-foreground: oklch(100% 0 0);
+  /* Accessible variant for destructive red painted AS text or a border rather
+     than as a fill (WCAG AA ≥4.5:1) — the counterpart to --primary-strong.
+     Light keeps --destructive unchanged: it already clears AA on the darkest
+     light surface (4.83 on --secondary). Dark overrides it below, because at
+     L=54% a saturated red carries too little luminance to separate from the
+     dark violet surfaces — it measured 2.8:1 there. Solid --destructive fills
+     and --chart-2 keep the original hue. */
+  --destructive-strong: oklch(54.0% 0.216 25.2);
   --chart-1: oklch(62.5% 0.162 259.9);
   --chart-2: oklch(54.0% 0.216 25.2);
   --chart-3: oklch(76.6% 0.142 10.1);
@@ -98,6 +106,13 @@
 
   /* Primary text on dark surfaces needs a brighter shade than --primary. */
   --primary-strong: oklch(78% 0.16 259.9);
+
+  /* 68%, not 54%: the lightest dark surface (--secondary) is the binding
+     constraint, and this is the most chroma the sRGB gamut allows at the
+     lightness AA demands there — 4.9:1 on --secondary, 6.1:1 on --background.
+     Going lighter would clear AA more comfortably but drift the brand red
+     toward pink. */
+  --destructive-strong: oklch(68% 0.20 25.2);
 }
 
 @theme inline {
@@ -118,6 +133,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-strong: var(--destructive-strong);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
