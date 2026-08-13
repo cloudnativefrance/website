@@ -78,6 +78,32 @@ describe.each([
   );
 });
 
+/** WCAG 2.2 1.4.11: the visual boundary of a UI component. Lower than the text
+ *  threshold because a border only has to be *findable*, not readable. */
+const AA_NON_TEXT = 3;
+
+describe.each([
+  ["light", light],
+  ["dark", dark],
+])("%s mode: --input draws control boundaries", (mode, tokens) => {
+  it.each(SURFACES)("clears 3:1 on %s", (surface) => {
+    const ratio = contrastRatio(
+      parseOklch(tokens["--input"]),
+      parseOklch(tokens[surface] ?? light[surface])
+    );
+    expect(
+      Number(ratio.toFixed(2)),
+      `--input on ${surface} (${mode})`
+    ).toBeGreaterThanOrEqual(AA_NON_TEXT);
+  });
+
+  // --border only separates two surfaces, so it is exempt from 1.4.11 and
+  // deliberately stays subtle. Asserted so the two are not re-merged.
+  it("is distinct from the purely structural --border", () => {
+    expect(tokens["--input"]).not.toBe(tokens["--border"]);
+  });
+});
+
 describe("solid brand fills", () => {
   // `--destructive` keeps its original lightness so that white-on-red fills and
   // the `--chart-2` series are unchanged; only the text/border variant moves.

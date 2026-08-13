@@ -35,7 +35,13 @@
      it already clears 5.05 on its darkest pairing. */
   --muted-foreground: oklch(52% 0.025 257);
   --border: oklch(87.8% 0.014 250);
-  --input: oklch(87.8% 0.014 250);
+  /* No longer a copy of --border. The two do different jobs: --border only
+     separates two surfaces (a card from the page), which WCAG asks nothing of,
+     while --input draws the boundary of an interactive control and so owes
+     1.4.11 its 3:1. At the shared 87.8% it owed 1.34:1 against --background —
+     the outlined button read as floating text with no edge at all. 62% clears
+     3:1 on all three light surfaces (3.38 bg / 3.63 card / 3.10 secondary). */
+  --input: oklch(62% 0.025 250);
   --ring: oklch(62.5% 0.162 259.9);
 
   --sidebar: oklch(97.5% 0.006 250);
@@ -91,7 +97,11 @@
   --muted: oklch(27.1% 0.091 286.5);
   --muted-foreground: oklch(66.8% 0.047 290.8);
   --border: oklch(30.8% 0.102 285.5);
-  --input: oklch(30.8% 0.102 285.5);
+  /* Same split as light — see the note there. 1.37:1 at the shared 30.8%.
+     55% clears 3:1 on all three dark surfaces (3.94 bg / 3.55 card / 3.14
+     secondary); the chroma is trimmed to 0.045 so this stays a neutral edge
+     and does not read as a third brand colour beside the blue CTAs. */
+  --input: oklch(55% 0.045 286);
   --ring: oklch(62.5% 0.162 259.9);
 
   --sidebar: oklch(16.8% 0.052 286.4);
