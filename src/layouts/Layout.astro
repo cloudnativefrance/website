@@ -72,6 +72,14 @@ const ogImageAlt = t("seo.og_image_alt");
 // Staging and any other non-production origin must never be indexed. Basic auth
 // already returns 401 to crawlers; this keeps the guarantee if auth is lifted.
 const indexable = isProductionOrigin(Astro.site?.origin);
+
+// Analytics ships only from the production origin, for the same reason as
+// `indexable`: a staging build must never write into production statistics.
+// Derived from the origin rather than a second environment flag (see
+// src/lib/site-env.ts) and fails closed — an unknown origin yields no analytics.
+// A separate const rather than reusing `indexable`: the two share a condition
+// today but mean different things.
+const analyticsEnabled = isProductionOrigin(Astro.site?.origin);
 ---
 <html lang={resolvedLang}>
   <head>
@@ -88,6 +96,20 @@ const indexable = isProductionOrigin(Astro.site?.origin);
     <meta name="description" content={metaDescription} />
 
     {!indexable && <meta name="robots" content="noindex, nofollow" />}
+
+    {/* Self-hosted Umami. Cookieless, no personal data, DNT honoured. Served
+        from /cnd.js rather than the default /script.js because ad-blocker
+        filter lists match the default path. No data-domains attribute: the
+        build-time gate above is the single source of truth for prod-vs-staging. */}
+    {analyticsEnabled && (
+      <script
+        is:inline
+        defer
+        src="https://stats.cloudnativedays.fr/cnd.js"
+        data-website-id="a046b482-155c-4226-b2f7-bcef4f0638a6"
+        data-do-not-track="true"
+      />
+    )}
 
     <!-- Canonical -->
     <link rel="canonical" href={canonicalUrl} />

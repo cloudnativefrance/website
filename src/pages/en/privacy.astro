@@ -5,13 +5,30 @@ import { useTranslations } from "@/i18n/utils";
 const t = useTranslations("en");
 const title = t("legal.privacy.title");
 const description = "Cloud Native Days France privacy policy. No personal data collected.";
-const lastUpdated = "2026-05-18";
+const lastUpdated = "2026-08-13";
 ---
 <LegalPageLayout title={title} description={description} lastUpdated={lastUpdated} lang="en">
   <p class="text-base leading-relaxed mt-4">
     <strong>This site collects no personal data during your visit.</strong>
     It is a static site hosted on Cloud Native France's infrastructure.
-    No cookies are set by our domain, and no analytics service is used.
+    No cookies are set by our domain.
+  </p>
+
+  <h2 class="text-2xl font-semibold mt-8">Audience measurement</h2>
+  <p class="text-base leading-relaxed mt-4">
+    We use <a href="https://umami.is" class="text-primary hover:underline">Umami</a>, an
+    open-source analytics tool that we <strong>host ourselves</strong> on our own infrastructure.
+    No data is sent to any third party.
+  </p>
+  <p class="text-base leading-relaxed mt-4">
+    Umami works <strong>without cookies</strong> and collects no personal data. For each visit,
+    only the page viewed, the time it was viewed, and the referring site (for example, the social
+    network you arrived from) are recorded.
+  </p>
+  <p class="text-base leading-relaxed mt-4">
+    Recording of IP addresses and browser user agents is disabled: no geolocation, no identifier,
+    nothing that could recognise you from one visit to the next. Your browser's "Do Not Track"
+    signal is honoured — if it is enabled, no visit is recorded.
   </p>
 
   <h2 class="text-2xl font-semibold mt-8">Data Controller</h2>
