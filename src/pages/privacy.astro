@@ -4,14 +4,15 @@ import { useTranslations } from "@/i18n/utils";
 
 const t = useTranslations("fr");
 const title = t("legal.privacy.title");
-const description = "Politique de confidentialité de Cloud Native Days France. Aucune donnée personnelle collectée.";
+const description = "Politique de confidentialité de Cloud Native Days France. Aucun cookie, mesure d'audience auto-hébergée.";
 const lastUpdated = "2026-08-13";
 ---
 <LegalPageLayout title={title} description={description} lastUpdated={lastUpdated} lang="fr">
   <p class="text-base leading-relaxed mt-4">
-    <strong>Ce site ne collecte aucune donnée personnelle au moment de votre visite.</strong>
+    <strong>Ce site ne dépose aucun cookie et ne conserve aucune donnée permettant de vous
+    identifier directement.</strong>
     Il s'agit d'un site statique hébergé sur l'infrastructure de l'association Cloud Native France.
-    Aucun cookie n'est déposé par notre domaine.
+    La mesure d'audience, décrite ci-dessous, est auto-hébergée et sans cookie.
   </p>
 
   <h2 class="text-2xl font-semibold mt-8">Mesure d'audience</h2>
@@ -21,15 +22,23 @@ const lastUpdated = "2026-08-13";
     propre infrastructure. Aucune donnée n'est transmise à un tiers.
   </p>
   <p class="text-base leading-relaxed mt-4">
-    Umami fonctionne <strong>sans cookie</strong> et ne collecte aucune donnée personnelle. Pour
-    chaque visite, seuls sont enregistrés la page consultée, la date de consultation, et le site
-    référent (par exemple le réseau social depuis lequel vous êtes arrivé).
+    Umami fonctionne <strong>sans cookie</strong>. Pour chaque visite sont enregistrés :
+  </p>
+  <ul class="list-disc ml-6 mt-4 space-y-2">
+    <li>la page consultée et la date de consultation ;</li>
+    <li>le site référent (par exemple le réseau social depuis lequel vous êtes arrivé) ;</li>
+    <li>le pays, déduit de votre adresse IP ;</li>
+    <li>le navigateur, le système d'exploitation, le type d'appareil, la taille de l'écran et la langue.</li>
+  </ul>
+  <p class="text-base leading-relaxed mt-4">
+    <strong>Votre adresse IP n'est pas conservée.</strong> Elle sert uniquement, au moment de la
+    visite, à déduire le pays puis à calculer un identifiant de session anonyme ; elle n'est
+    écrite dans aucune base. Aucun identifiant publicitaire, aucun profilage, aucun partage avec
+    un tiers.
   </p>
   <p class="text-base leading-relaxed mt-4">
-    L'enregistrement des adresses IP et du navigateur utilisé est désactivé : aucune
-    géolocalisation, aucun identifiant, aucune donnée permettant de vous reconnaître d'une visite
-    à l'autre. Le signal « Do Not Track » de votre navigateur est respecté : s'il est activé,
-    aucune visite n'est enregistrée.
+    Le signal « Do Not Track » de votre navigateur est respecté : s'il est activé, aucune visite
+    n'est enregistrée.
   </p>
 
   <h2 class="text-2xl font-semibold mt-8">Responsable du traitement</h2>
@@ -63,7 +72,7 @@ const lastUpdated = "2026-08-13";
 
   <h2 class="text-2xl font-semibold mt-8">Vos droits</h2>
   <p class="text-base leading-relaxed mt-4">
-    Conformément au RGPD et à la loi Informatique et Libertés, vous disposez des droits d'accès, de rectification, d'effacement, de limitation et d'opposition concernant vos données personnelles. Comme notre site ne collecte aucune donnée personnelle, ces droits n'ont pas d'objet direct ici. Toutefois, vous pouvez adresser toute demande ou plainte à l'adresse de contact ci-dessus, ou directement à la <a href="https://www.cnil.fr/fr/plaintes" class="text-primary hover:underline">CNIL</a>.
+    Conformément au RGPD et à la loi Informatique et Libertés, vous disposez des droits d'accès, de rectification, d'effacement, de limitation et d'opposition concernant vos données personnelles. Notre mesure d'audience ne conserve ni votre adresse IP ni aucun identifiant permettant de vous reconnaître, si bien qu'aucune donnée enregistrée ne peut vous être rattachée individuellement. Toutefois, vous pouvez adresser toute demande ou plainte à l'adresse de contact ci-dessus, ou directement à la <a href="https://www.cnil.fr/fr/plaintes" class="text-primary hover:underline">CNIL</a>.
   </p>
 
   <h2 class="text-2xl font-semibold mt-8">Modifications</h2>
