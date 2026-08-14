@@ -43,6 +43,16 @@ const sheet = await fetchSheet();
 // drifting would be caught instead of silently swallowed by a set comparison.
 const SPEAKER_ORDER_EXCEPTIONS = new Set(["DHAXQN", "V7UJ7V", "8HZM98"]);
 
+// The Pretalx event's only content locale is French (content_locales: ["fr"]),
+// so there's no structured field to mark a talk as English-spoken. The
+// organiser flagged talk ADHUPC by typing a "(Talk EN)" prefix into the title
+// itself; the Sheet's copy was hand-cleaned to drop it. Pretalx is now the
+// source of truth, so the prefix stays and the site displays it — see the
+// dedicated title test below, which pins this exact exception down so a
+// second title drifting wouldn't be swallowed by excluding titles wholesale.
+const TITLE_EXCEPTION_ID = "ADHUPC";
+const TITLE_EXCEPTION_PREFIX = "(Talk EN) ";
+
 describe("Pretalx output matches the Sheet it replaced", () => {
   it.skipIf(!sheet)("has the same talks", async () => {
     const rows = await loadSessions(2026);
@@ -62,7 +72,11 @@ describe("Pretalx output matches the Sheet it replaced", () => {
           mismatches.push(`${row.id} ${field}: pretalx=${JSON.stringify(mine)} sheet=${JSON.stringify(theirs)}`);
         }
       };
-      check("title", row.title, s.title);
+      // Title is checked for every talk except the known "(Talk EN)" prefix
+      // exception — see TITLE_EXCEPTION_ID and the dedicated title test below.
+      if (row.id !== TITLE_EXCEPTION_ID) {
+        check("title", row.title, s.title);
+      }
       check("room", row.room, s.room);
       check("start", row.startTime, s.start_time);
       check("duration", row.durationMin, Number(s.duration_min));
@@ -107,6 +121,32 @@ describe("Pretalx output matches the Sheet it replaced", () => {
     }
 
     expect(new Set(reordered)).toEqual(SPEAKER_ORDER_EXCEPTIONS);
+  });
+
+  // Pretalx's only content locale is French, so there's no structured field to
+  // mark a talk as English-spoken — the organiser typed a "(Talk EN)" prefix
+  // into ADHUPC's title instead, and the Sheet's copy was hand-cleaned to drop
+  // it. Pretalx is authoritative going forward, so the prefix is expected and
+  // pinned exactly here, rather than excluded wholesale, so a second title
+  // drifting between the two sources would still be caught.
+  it.skipIf(!sheet)("title diverges from the Sheet only on the known (Talk EN) exception", async () => {
+    const rows = await loadSessions(2026);
+    const bySheetId = new Map(sheet!.map((r) => [r.id, r]));
+    const diverged: string[] = [];
+
+    for (const row of rows) {
+      const s = bySheetId.get(row.id);
+      if (!s) continue;
+      if (row.title !== s.title) {
+        diverged.push(row.id);
+      }
+    }
+
+    expect(diverged).toEqual([TITLE_EXCEPTION_ID]);
+
+    const exceptionRow = rows.find((r) => r.id === TITLE_EXCEPTION_ID);
+    const exceptionSheetRow = bySheetId.get(TITLE_EXCEPTION_ID);
+    expect(exceptionRow?.title).toBe(TITLE_EXCEPTION_PREFIX + exceptionSheetRow?.title);
   });
 
   it.skipIf(!sheet)("does not lose recordings", async () => {
