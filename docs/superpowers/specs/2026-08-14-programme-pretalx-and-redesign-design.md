@@ -93,7 +93,7 @@ at 1440px produces roughly 3400px of page for 51 talks. Observed problems:
 |---|---|---|
 | 1 | One page serves both live attendees and archive browsers, switching behaviour by edition state | Avoids a second page and a second URL to keep in sync across two locales |
 | 2 | Build-time fetch with a committed snapshot fallback | Matches the existing `remote-csv.ts` contract: fresh on every build, and a Pretalx outage cannot break CI |
-| 3 | Pretalx is the single source of truth for session data, including slides and replays | Removes the hand-copy step that already lost a talk |
+| 3 | Pretalx is the single source of truth for session data, including slides and replays | Removes a hand-copy step of 51 rows × 17 columns, and unlocks feedback URLs, slides and track colours the Sheet never carried |
 | 4 | Grid rows are time **slots**, not minutes; two views (Grid / List) over one dataset | Time-proportional layout is what produces the dead space, and neither view alone serves both audiences |
 | 5 | Replay URLs become Pretalx resource links, entered once | Keeps decision 3 whole; the checklist is generated from today's Sheet so it is copy-paste |
 | 6 | **The speakers tab is left untouched** | Pretalx holds only name, bio and avatar. `company` (77/77), `role` (77/77), `linkedin` (76/77), `photo_url` (77/77) and the keynote display flags have no Pretalx equivalent, and 10 keynote participants have no Pretalx person record at all. An overlay would churn six page files and the Zod schema to move roughly one column of real work |
@@ -326,7 +326,7 @@ honoured by any transition introduced.
 | Fallback path | A failing fetch produces the snapshot's rows and logs a warning; the build does not throw |
 | Parity with the Sheet | Normalized 2026 output matches the live sessions tab field-by-field on id, title, room, start, duration, format, language and speakers, for all 51 rows |
 | Filter/search reducer *(PR 2)* | Pure-function unit tests over query + chip combinations |
-| Build | `/programme/2023`, `/programme/2026`, `/en/programme/2026` render; ICS output is byte-identical to pre-migration |
+| Build | `/programme/2023`, `/programme/2026`, `/en/programme/2026` render; ICS output is unchanged except for the `DTSTAMP` line, which `buildIcs` regenerates from `new Date()` on every run, and the `Feedback:` lines that now appear because Pretalx supplies the URLs the Sheet lacked |
 
 Per `superpowers:verification-before-completion`, no completion claim without command
 output. PR 1 additionally requires a visual before/after of `/programme/2026` showing the
