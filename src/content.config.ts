@@ -7,40 +7,7 @@ import {
   EDITIONS,
 } from "./lib/remote-csv";
 import type { Edition } from "./lib/editions";
-
-// -- CSV parser (unchanged) ------------------------------------------------
-
-function parseCsv(text: string): string[][] {
-  const rows: string[][] = [];
-  let i = 0;
-  const n = text.length;
-  while (i < n) {
-    const row: string[] = [];
-    let field = "";
-    let inQ = false;
-    while (i < n) {
-      const ch = text[i];
-      if (inQ) {
-        if (ch === '"') {
-          if (text[i + 1] === '"') { field += '"'; i += 2; }
-          else { inQ = false; i++; }
-        } else { field += ch; i++; }
-        continue;
-      }
-      if (ch === '"') { inQ = true; i++; }
-      else if (ch === ",") { row.push(field); field = ""; i++; }
-      else if (ch === "\n" || ch === "\r") {
-        row.push(field);
-        if (ch === "\r" && text[i + 1] === "\n") i++;
-        i++;
-        break;
-      } else { field += ch; i++; }
-    }
-    if (i >= n && (field.length > 0 || row.length > 0)) row.push(field);
-    if (row.length > 0 && !(row.length === 1 && row[0] === "")) rows.push(row);
-  }
-  return rows;
-}
+import { parseCsv } from "./lib/csv";
 
 // -- csvLoader (unchanged) -------------------------------------------------
 
