@@ -1,19 +1,26 @@
-# Updating content — the CSV runbook
+# Updating content — the sessions & CSV runbook
 
-This guide is for anyone adding or editing speakers, sessions, sponsors, or team members. It is written for both developers (who edit the local CSV fallbacks) and content editors (who maintain the Google Sheets). You only need to know a bit of English and how to click "Publish to web" in Google Sheets.
+This guide is for anyone adding or editing speakers, sessions, sponsors, or team members.
+Sessions are authored in **Pretalx** (`cfp.cloudnativedays.fr`); speakers, sponsors, and team
+are authored in **Google Sheets**. This doc is written for both developers (who edit the
+local fallbacks) and content editors (who maintain the Sheets). You only need to know a bit
+of English and how to click "Publish to web" in Google Sheets.
 
-## Which Google Sheet is which
+## Which source is which
 
-The site draws all its roster data from four CSVs. In production each CSV is a Google Sheet published to the web and referenced via an environment variable. In development the site falls back to the committed files under `src/content/`.
+Sessions come from Pretalx's released-schedule export, fetched at build time
+(`src/lib/pretalx.ts`) with a committed snapshot fallback. The other three rosters are Google
+Sheets published to the web and referenced via an environment variable; in development the
+site falls back to the committed CSVs under `src/content/`.
 
-| Entity | Env var | Local fallback |
-|--------|---------|----------------|
-| Conference sessions | `SCHEDULE_SESSIONS_CSV_URL` | `src/content/schedule/sessions.csv` |
-| Speaker profiles | `SCHEDULE_SPEAKERS_CSV_URL` | `src/content/schedule/speakers.csv` |
-| Sponsors | `SPONSORS_CSV_URL` | `src/content/sponsors/sponsors.csv` |
-| Team members | `TEAM_CSV_URL` | `src/content/team/team.csv` |
+| Entity | Source | Env var | Local fallback |
+|--------|--------|---------|-----------------|
+| Conference sessions | Pretalx | `PRETALX_BASE_URL` | `src/content/schedule/pretalx-{year}.json` |
+| Speaker profiles | Google Sheet | `SPEAKERS_CSV_URL_{2023,2026,2027}` | `src/content/schedule/speakers-{year}.csv` |
+| Sponsors | Google Sheet | `SPONSORS_CSV_URL_{2023,2026,2027}` | `src/content/sponsors/sponsors-{year}.csv` |
+| Team members | Google Sheet | `TEAM_CSV_URL` | `src/content/team/team.csv` |
 
-The env-var wiring lives in `src/lib/remote-csv.ts`. If the env var is set to a non-empty string, the CSV at that URL wins; otherwise the local fallback is used. This means development works offline; production reads live Sheets without redeploying for content edits (just a rebuild).
+The env-var wiring for the Sheet-backed rosters lives in `src/lib/remote-csv.ts`. If the env var is set to a non-empty string, the CSV at that URL wins; otherwise the local fallback is used. This means development works offline; production reads live Sheets without redeploying for content edits (just a rebuild). The Pretalx snapshot fallback is refreshed with `pnpm sync:pretalx` rather than hand-edited — see the Sessions section below.
 
 Ask a maintainer for the live Sheet URLs — they are not checked into this repo on purpose, to keep write access scoped. The rebuild hook that picks up a Sheet edit is documented in the separate [`cnd-platform`](https://github.com/cloudnativedays-france/cnd-platform) repository.
 
@@ -54,35 +61,45 @@ To add a speaker in development without touching the Sheet: append the row to `s
 
 ## Sessions
 
-Sheet columns:
+Sessions are **not** edited in this repo or in a Sheet — they are authored in Pretalx
+(`cfp.cloudnativedays.fr`). The site normalizes Pretalx's released-schedule export into a
+`SessionRow` (see `src/lib/schedule.ts` and `src/lib/pretalx.ts`); the field-by-field mapping
+lives there, not in a CSV header.
 
+- **Title, room, format, start time, duration, track, language, description** — edited
+  directly on the talk in Pretalx.
+- **Speakers** — Pretalx's own speaker list for the talk, resolved to the site's speaker
+  slugs by matching against the Speakers Sheet's `name` column (see below). A speaker must
+  have a row in that Sheet before their talk will build.
+- **Slides** — a talk resource (file or link) in Pretalx.
+- **Replay** — a talk resource of type link, titled `Replay`, pointing at the YouTube/Vimeo
+  URL. Setting this is what drives a talk onto `/replays`.
+- **Status** — only talks in the released schedule version are exported; hiding a talk in
+  Pretalx removes it from the site on the next build.
+
+### How to add or edit a session
+
+1. Edit the talk directly in Pretalx (title, room, slot, track, resources, …).
+2. If speakers changed, confirm every speaker's Pretalx `name` matches a row in the Speakers
+   Sheet exactly — a mismatch fails the build loudly rather than silently dropping the name.
+3. Trigger a rebuild (see below). Production fetches the released schedule export live; there
+   is no separate "publish" step like the Sheet-backed rosters have.
+
+Editions with no public Pretalx event (2023) read a frozen
+`src/content/schedule/sessions-{year}.json` archive instead — that JSON is historical and is
+not meant to be extended.
+
+### Keeping the offline fallback fresh
+
+If Pretalx is unreachable at build time, the build falls back to the committed snapshot at
+`src/content/schedule/pretalx-{year}.json`. That snapshot does **not** update itself — refresh
+it after schedule changes with:
+
+```bash
+pnpm sync:pretalx
 ```
-id,title,speakers,track,level,room,format,start_time,duration_min,tags,feedback_url,slides_url,recording_url,cover_image_url,language,status,description
-```
 
-- **id** (required) — short unique code (6 chars, e.g. `GJ89TV`). Stable across edits. Used internally for bookmarks and the recording permalink.
-- **title** (required) — session title in the spoken language.
-- **speakers** (required) — comma-separated list of speaker slugs from the Speakers sheet. Order is significant: the first slug is the primary speaker. E.g. `arthur-outhenin-chalandre,quentin-swiech` for a co-presentation.
-- **track** (optional) — free-text theme used for colour-coding. Keep the set small.
-- **level** (optional) — `beginner` / `intermediate` / `advanced` / empty.
-- **room** (required) — physical room name (e.g. `Monet`, `Debussy`, `Piaf`, `Dumas`, `Ravel`).
-- **format** (required) — one of `keynote`, `talk`, `lightning`, `workshop`.
-- **start_time** (required) — ISO 8601 timestamp with timezone, e.g. `2026-02-03T09:00:00+01:00`.
-- **duration_min** (required) — integer minutes.
-- **tags** (optional) — comma-separated free-text tags.
-- **feedback_url** (optional, set post-event) — Open Feedback link.
-- **slides_url** (optional, set post-event) — public slide deck URL.
-- **recording_url** (optional, set post-event) — YouTube / Vimeo / etc. permalink. Setting this is what drives a row to appear on `/replays` (see Phase 8 event lifecycle).
-- **cover_image_url** (optional) — session-level hero image.
-- **language** (optional) — `fr` or `en`.
-- **status** (required) — `confirmed`, `tentative`, `cancelled`, or `hidden` (hidden rows are excluded at load time).
-- **description** (optional) — abstract, markdown supported inside the modal.
-
-### How to add a session
-
-1. Confirm every speaker slug in your `speakers` column exists in the Speakers sheet. Missing speakers will render as a blank name on the session card.
-2. Append the row. Required fields: `id`, `title`, `speakers`, `room`, `format`, `start_time`, `duration_min`, `status`.
-3. Publish the Sheet as CSV (as above); trigger a rebuild.
+Do not hand-edit the snapshot file; the next sync overwrites it.
 
 ---
 
@@ -134,13 +151,23 @@ id,name,role_fr,role_en,group,photo,social_linkedin,social_github,social_bluesky
 
 ## How the build resolves the source
 
-At build time, `src/lib/remote-csv.ts` runs this logic per entity:
+Sessions and the Sheet-backed rosters resolve differently at build time.
 
-1. If the corresponding env var (e.g. `SCHEDULE_SESSIONS_CSV_URL`) is set and non-empty, fetch the CSV from that URL.
+**Sessions** (`src/lib/pretalx.ts`, `src/lib/schedule.ts`):
+
+1. Fetch the Pretalx released-schedule export for the edition's event.
+2. If that fetch fails or is invalid, fall back to the committed
+   `src/content/schedule/pretalx-{year}.json` snapshot and warn in the build log.
+3. Normalize each talk into a `SessionRow`, resolving speaker names against the Speakers
+   Sheet.
+
+**Speakers, sponsors, team** (`src/lib/remote-csv.ts`):
+
+1. If the corresponding env var (e.g. `SPEAKERS_CSV_URL_2026`) is set and non-empty, fetch the CSV from that URL.
 2. Otherwise, read the local file under `src/content/{…}/*.csv`.
 3. Parse CSV, validate each row against the Zod schema in `src/content.config.ts`, skip invalid rows with a warning, expose a typed list to the rest of the code.
 
-This means a production deploy with env vars set always reflects the latest Sheet snapshot at build time. Rebuilding is the only "publish" action.
+This means a production deploy with env vars set always reflects the latest Pretalx schedule and Sheet snapshots at build time. Rebuilding is the only "publish" action.
 
 ## Triggering a rebuild in production
 
