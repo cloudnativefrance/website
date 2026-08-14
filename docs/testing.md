@@ -11,6 +11,24 @@ Three commands cover the automated surface. Run them before opening a PR and kee
 
 The build-output tests under `tests/build/` read from `dist/` via a `readPage(relativePath)` helper. **Run `pnpm astro build` before running them.** If `dist/` is stale, the helper throws with a "Run 'pnpm build' before running tests" message pointing at the exact missing path.
 
+## Blocking pre-merge gate — `feat/programme-pretalx`
+
+### `pnpm vitest run tests/build/pretalx-parity.test.ts` — `does not lose recordings`
+
+This one is **blocking**, not a known failure to wave through. Unlike every entry
+in the "non-blocking" section below, it must be **green before this branch
+merges** and must **never** be reclassified as non-blocking.
+
+It is red on purpose: 51 YouTube replay URLs exist only in the old sessions
+Sheet and are being entered into Pretalx by hand. Progress is tracked in
+`docs/ops/pretalx-2026-replay-links.md`. The test goes green once that
+worklist is complete.
+
+This test (and the rest of that file) is network-dependent and skips —
+doesn't pass — when the Sheet is unreachable. A green `pnpm test` run where
+this test was skipped rather than executed has not cleared the gate; check
+the run's skip count, or re-run on a working connection, before merging.
+
 ## Known pre-existing failures (non-blocking)
 
 Do not fix these in an unrelated PR. They are documented, scoped, and tracked.

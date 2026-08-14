@@ -25,10 +25,13 @@ const t = useTranslations(lang);
 const sessions = await loadSessions(year);
 const speakerEntries = await getSpeakersByLocale(lang, year);
 
-// Build a lookup map keyed by BOTH slug and full name so that sessions.csv
-// rows referring to a speaker either way resolve to the same record. Each
-// value carries the canonical display name + (optional) company so the
-// schedule cards can render "Name (Company)" without extra fetching.
+// Build a lookup map keyed by BOTH slug and full name. Every current session
+// source already resolves to slugs (the Pretalx resolver guarantees one or
+// throws; the frozen 2023 archive stores slugs too), so the name key is a
+// harmless safety net rather than a live requirement — see the matching
+// comment on ScheduleGrid's speakerInfo prop. Each value carries the
+// canonical display name + (optional) company so the schedule cards can
+// render "Name (Company)" without extra fetching.
 const speakerInfo = new Map<string, { name: string; company?: string }>();
 for (const s of speakerEntries) {
   const info = { name: s.data.name, company: s.data.company };

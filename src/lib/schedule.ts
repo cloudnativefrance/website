@@ -97,7 +97,11 @@ function loadArchivedSessions(year: Edition): SessionRow[] {
   // rendering an empty programme.
   let rows: SessionRow[];
   try {
-    rows = JSON.parse(readFileSync(path, "utf8")) as SessionRow[];
+    const parsed: unknown = JSON.parse(readFileSync(path, "utf8"));
+    if (!Array.isArray(parsed)) {
+      throw new Error(`expected a JSON array, got ${typeof parsed}`);
+    }
+    rows = parsed as SessionRow[];
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     throw new Error(`[schedule] sessions-${year}.json unreadable at ${path}: ${msg}`);

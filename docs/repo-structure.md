@@ -32,7 +32,7 @@ Shared UI. Most components are `.astro` (server-rendered, zero JS). Files ending
 
 ## src/content
 
-Local CSV fallbacks that stand in when the production Google Sheet env vars are unset (typical in dev). One CSV per entity: `schedule/sessions.csv`, `schedule/speakers.csv`, `sponsors/sponsors.csv`, `team/team.csv`. **These are fallbacks, not the source of truth** — editing them is acceptable in development but content changes must land in the Google Sheets for production. See `docs/updating-content.md`.
+Local CSV/JSON fallbacks that stand in when the production Google Sheet env vars are unset, or the production Pretalx instance is unreachable (typical in dev). Sessions now come from Pretalx, not a Sheet: the committed fallback is `schedule/pretalx-{year}.json` (refreshed via `pnpm sync:pretalx`), with frozen archives at `schedule/sessions-{year}.json` for editions with no Pretalx event. Speakers are still Sheet-backed and per-edition: `schedule/speakers-2023.csv`, `schedule/speakers-2026.csv`, `schedule/speakers-2027.csv`. Sponsors and team: `sponsors/sponsors.csv`, `team/team.csv`. **These are fallbacks, not the source of truth** — editing them is acceptable in development but content changes must land in the Google Sheets (or Pretalx, for sessions) for production. See `docs/updating-content.md`.
 
 ## src/lib
 

@@ -4,7 +4,7 @@ import type { Edition } from "./editions";
 import type { SessionFormat, SessionLanguage, SessionRow } from "./schedule";
 import { parseCsv } from "./csv";
 import { fetchTextOrFallback } from "./remote-fetch";
-import { getCsvUrl } from "./remote-csv";
+import { fetchCsvOrFallback, getCsvUrl } from "./remote-csv";
 
 export const PRETALX_BASE =
   process.env.PRETALX_BASE_URL || "https://cfp.cloudnativedays.fr";
@@ -116,6 +116,20 @@ function pickResource(
   return hit ? absolutise(hit.url) : "";
 }
 
+/**
+ * A talk's replay/recording resource URL, or "" when none is attached. Scans
+ * both `links` and `attachments`, matching on video hostname or a
+ * replay-labelled resource title.
+ *
+ * This is the single source of truth for "does this talk have a replay" —
+ * `toSessionRows` uses it to populate `recordingUrl`, and
+ * `scripts/sync-pretalx.ts` uses it for the replay count it prints, so the
+ * two never disagree the way a restated inline rule could drift.
+ */
+export function talkRecordingUrl(talk: PretalxTalk): string {
+  return pickResource(talk, (r) => VIDEO_HOST.test(r.url) || REPLAY_LABEL.test(r.title));
+}
+
 export function toSessionRows(
   doc: PretalxScheduleExport,
   resolveSpeaker: SpeakerResolver,
@@ -143,10 +157,7 @@ export function toSessionRows(
           tags: [],
           feedbackUrl: talk.feedback_url ?? "",
           slidesUrl: pickResource(talk, (r) => SLIDES_LABEL.test(r.title)),
-          recordingUrl: pickResource(
-            talk,
-            (r) => VIDEO_HOST.test(r.url) || REPLAY_LABEL.test(r.title),
-          ),
+          recordingUrl: talkRecordingUrl(talk),
           coverImageUrl: talk.logo ? absolutise(talk.logo) : "",
           language: (talk.language as SessionLanguage) || "",
           // The export contains only talks in the released schedule version.
@@ -181,12 +192,23 @@ export function buildSpeakerResolver(csvText: string): SpeakerResolver {
     const [header, ...body] = rows;
     const iSlug = header.findIndex((h) => h.trim() === "slug");
     const iName = header.findIndex((h) => h.trim() === "name");
-    if (iSlug >= 0 && iName >= 0) {
-      for (const row of body) {
-        const name = (row[iName] ?? "").trim();
-        const slug = (row[iSlug] ?? "").trim();
-        if (name && slug) index.set(name, slug);
-      }
+    // A missing column yields an empty index, which would otherwise surface as
+    // 67 identical "no row in the speakers Sheet" errors — misdiagnosing a
+    // missing *column* as missing *rows*. Fail loudly once, here, instead.
+    const missing = [
+      iSlug < 0 ? "slug" : null,
+      iName < 0 ? "name" : null,
+    ].filter((c): c is string => c !== null);
+    if (missing.length > 0) {
+      throw new Error(
+        `Speakers CSV is missing column(s): ${missing.join(", ")}. The CSV appears ` +
+          `malformed — check the published Sheet tab and its header row.`,
+      );
+    }
+    for (const row of body) {
+      const name = (row[iName] ?? "").trim();
+      const slug = (row[iSlug] ?? "").trim();
+      if (name && slug) index.set(name, slug);
     }
   }
 
@@ -204,7 +226,13 @@ export function buildSpeakerResolver(csvText: string): SpeakerResolver {
 }
 
 export async function loadSpeakerResolver(year: Edition): Promise<SpeakerResolver> {
-  const csvText = await fetchTextOrFallback({
+  // Use the CSV-validating wrapper, not the bare text fetch: content.config.ts
+  // fetches this exact URL for the speakers collection, and fetchTextOrFallback
+  // memoises by URL alone. Sharing the validated wrapper means whichever caller
+  // runs first, both see a body that passed the "looks like CSV" guard — an
+  // HTML interstitial from a Sheets outage can never win the race and get
+  // cached unvalidated.
+  const csvText = await fetchCsvOrFallback({
     url: getCsvUrl("speakers", year),
     fallbackRelPath: `src/content/schedule/speakers-${year}.csv`,
     label: `speakers-${year}.csv (slug index)`,
@@ -226,7 +254,30 @@ export async function fetchScheduleExport(
       if (!Array.isArray(days) || days.length === 0) {
         throw new Error("Pretalx export has no schedule days");
       }
+      // The structural precondition (days present) isn't enough: a fresh event,
+      // a reset schedule version, or a released-but-empty version all satisfy it
+      // while carrying zero talks. That would render the "coming soon" empty
+      // state with the build succeeding silently, leaving the committed 51-talk
+      // snapshot unused. Mirror scripts/sync-pretalx.ts's guard so both paths
+      // agree on what counts as "no usable export".
+      const talkCount = days.reduce(
+        (sum, day) => sum + Object.values(day.rooms ?? {}).flat().length,
+        0,
+      );
+      if (talkCount === 0) {
+        throw new Error("Pretalx export contains no talks");
+      }
     },
   });
-  return JSON.parse(body) as PretalxScheduleExport;
+  // `validate` above only runs on a remote body — the readFileSync fallback path
+  // in fetchTextOrFallback returns unvalidated. If Pretalx is unreachable *and*
+  // the committed snapshot is corrupt, this parse is the only thing that would
+  // fail, and a bare SyntaxError names no file. Name it here instead.
+  const snapshotPath = `src/content/schedule/pretalx-${year}.json`;
+  try {
+    return JSON.parse(body) as PretalxScheduleExport;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(`[pretalx] ${snapshotPath} is not valid JSON: ${msg}`);
+  }
 }

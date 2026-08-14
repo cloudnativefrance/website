@@ -12,14 +12,18 @@
  *                    snapshot is refused — see the shrink guard below.
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { PRETALX_EVENT, scheduleExportUrl } from "../src/lib/pretalx";
+import {
+  PRETALX_EVENT,
+  scheduleExportUrl,
+  talkRecordingUrl,
+  type PretalxScheduleExport,
+  type PretalxTalk,
+} from "../src/lib/pretalx";
 import type { Edition } from "../src/lib/editions";
 
-type ScheduleExportShape = { schedule: { conference: { days: { rooms: Record<string, unknown[]> }[] } } };
-
-/** Count talks in an already-parsed export document. */
-function countTalks(doc: ScheduleExportShape): number {
-  return doc.schedule.conference.days.flatMap((d) => Object.values(d.rooms).flat()).length;
+/** All talks in an already-parsed export document, flattened across days and rooms. */
+function allTalks(doc: PretalxScheduleExport): PretalxTalk[] {
+  return doc.schedule.conference.days.flatMap((d) => Object.values(d.rooms).flat());
 }
 
 const allowShrink = process.argv.includes("--allow-shrink");
@@ -33,10 +37,8 @@ for (const [yearStr, slug] of Object.entries(PRETALX_EVENT)) {
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(30000) });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const doc = await res.json();
-    const talks = doc.schedule.conference.days.flatMap((d: { rooms: Record<string, unknown[]> }) =>
-      Object.values(d.rooms).flat(),
-    );
+    const doc = (await res.json()) as PretalxScheduleExport;
+    const talks = allTalks(doc);
     if (talks.length === 0) throw new Error("export contains no talks");
 
     // The snapshot is the site's offline fallback: a fetched export that
@@ -44,7 +46,9 @@ for (const [yearStr, slug] of Object.entries(PRETALX_EVENT)) {
     // transient upstream bug) must not silently shrink it. Cancellations do
     // happen though, so the refusal is overridable via --allow-shrink.
     if (existsSync(out)) {
-      const existingCount = countTalks(JSON.parse(readFileSync(out, "utf8")) as ScheduleExportShape);
+      const existingCount = allTalks(
+        JSON.parse(readFileSync(out, "utf8")) as PretalxScheduleExport,
+      ).length;
       if (talks.length < existingCount && !allowShrink) {
         throw new Error(
           `fetched export has ${talks.length} talks, fewer than the committed snapshot's ` +
@@ -55,9 +59,10 @@ for (const [yearStr, slug] of Object.entries(PRETALX_EVENT)) {
     }
 
     writeFileSync(out, JSON.stringify(doc, null, 2) + "\n", "utf8");
-    const recordings = talks.filter((t: { links?: { url: string }[] }) =>
-      (t.links ?? []).some((l) => /youtube\.com|youtu\.be|vimeo\.com/i.test(l.url)),
-    ).length;
+    // Same rule toSessionRows uses to populate recordingUrl (see
+    // talkRecordingUrl in src/lib/pretalx.ts), so the count printed here is
+    // the same number the merge-gate decision is made against.
+    const recordings = talks.filter((t) => talkRecordingUrl(t)).length;
     console.log(`${out}: ${talks.length} talks, ${recordings} with a replay link`);
   } catch (err) {
     failed = true;

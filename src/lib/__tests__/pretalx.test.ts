@@ -143,6 +143,51 @@ describe("buildSpeakerResolver", () => {
     const resolve = buildSpeakerResolver("slug,name\n a-b , Ada Lovelace \n");
     expect(resolve("Ada Lovelace", "X")).toBe("a-b");
   });
+
+  it("throws naming the missing column(s) instead of silently indexing nothing", () => {
+    // Without this guard, a missing header yields an empty index and every
+    // subsequent resolve() throws the generic "no row in the speakers Sheet"
+    // error — misdiagnosing a missing *column* as missing *rows*.
+    expect(() => buildSpeakerResolver("name\nJérôme Petazzoni")).toThrow(/slug/);
+    expect(() => buildSpeakerResolver("slug\npetazzoni")).toThrow(/name/);
+  });
+});
+
+describe("buildSpeakerResolver drift guard (committed files, offline)", () => {
+  // Fix 3 (final review): the resolver's fallback path is "never fail the
+  // build on transient unreachability" in the transport, but the resolver
+  // itself throws if a Pretalx person has no row in the committed CSV — so a
+  // Sheets outage plus an undetected drift between the two committed files
+  // would hard-fail the *entire* build, not just the programme page. Nothing
+  // exercised that invariant before this test: the old sessions CSV drifted
+  // 50-vs-51 unnoticed, which is exactly the failure mode this migration
+  // exists to eliminate. Pure and offline — no network — against exactly the
+  // two committed files a real Sheets outage would fall back to.
+  it("resolves every Pretalx person in the committed pretalx-2026.json from the committed speakers-2026.csv", () => {
+    const csvText = readFileSync("src/content/schedule/speakers-2026.csv", "utf8");
+    const resolve = buildSpeakerResolver(csvText);
+
+    const personTalk = new Map<string, string>();
+    for (const day of doc.schedule.conference.days) {
+      for (const talks of Object.values(day.rooms)) {
+        for (const talk of talks) {
+          for (const p of talk.persons) personTalk.set(p.name, talk.code);
+        }
+      }
+    }
+    expect(personTalk.size).toBeGreaterThan(0);
+
+    const unresolved: string[] = [];
+    for (const [name, code] of personTalk) {
+      try {
+        resolve(name, code);
+      } catch {
+        unresolved.push(`${name} (${code})`);
+      }
+    }
+
+    expect(unresolved).toEqual([]);
+  });
 });
 
 describe("durationToMinutes edge cases", () => {

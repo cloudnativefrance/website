@@ -149,9 +149,26 @@ describe("Pretalx output matches the Sheet it replaced", () => {
     expect(exceptionRow?.title).toBe(TITLE_EXCEPTION_PREFIX + exceptionSheetRow?.title);
   });
 
+  // This is a deliberately RED merge gate, not a bug: 51 YouTube replay URLs
+  // exist only in the old Sheet and are being entered into Pretalx by hand
+  // (worklist: docs/ops/pretalx-2026-replay-links.md). It must go green before
+  // this branch merges, and docs/testing.md lists it as blocking — do not
+  // reclassify it as a known/non-blocking failure.
+  //
+  // Hazard: this test is `it.skipIf(!sheet)`, sharing the same skip condition
+  // as every other test in this file. If the Sheet happens to be unreachable
+  // when the suite runs, this test is SKIPPED, not passed — a green suite in
+  // that run has proved nothing about the merge gate. Vitest's own "skipped"
+  // count in the run summary is the tell; check it (or re-run on a healthy
+  // connection) before treating an all-green suite as clearance to merge.
   it.skipIf(!sheet)("does not lose recordings", async () => {
     const rows = await loadSessions(2026);
     const sheetCount = sheet!.filter((r) => r.recording_url).length;
-    expect(rows.filter((r) => r.recordingUrl).length).toBeGreaterThanOrEqual(sheetCount);
+    expect(
+      rows.filter((r) => r.recordingUrl).length,
+      `Pretalx is missing replay links the Sheet had (expected >= ${sheetCount}). ` +
+        `This is the pre-merge gate: work through docs/ops/pretalx-2026-replay-links.md ` +
+        `and enter the remaining replay URLs into Pretalx before merging.`,
+    ).toBeGreaterThanOrEqual(sheetCount);
   });
 });

@@ -13,9 +13,12 @@ interface Props {
   sessions: SessionRow[];
   lang: Locale;
   /**
-   * Map of speaker reference → display info. Keyed by slug AND by full name
-   * so that sessions.csv rows referring to a speaker by either form resolve
-   * cleanly (the upstream Sheet has historically mixed both conventions).
+   * Map of speaker reference → display info. Keyed by both slug and full
+   * name. In practice every current source already resolves to slugs — the
+   * Pretalx resolver in `src/lib/pretalx.ts` guarantees a slug or throws, and
+   * the frozen pre-Pretalx archive (2023) stores slugs too — but the extra
+   * name key costs nothing and stays as a safety net should a future source
+   * not make that guarantee.
    */
   speakerInfo: Map<string, SpeakerInfo>;
 }
