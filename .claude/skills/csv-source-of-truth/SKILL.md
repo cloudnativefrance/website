@@ -62,7 +62,7 @@ When NOT to use:
 | Sponsors | Google Sheet | `SPONSORS_CSV_URL_<year>` | `getCollection("sponsors-<year>")` |
 | Team | Google Sheet | `TEAM_CSV_URL` | `getCollection("team")` |
 
-Editions with no Pretalx event (2023) read the frozen
+Editions with no Pretalx event (2023, and 2027 until its event opens) read the frozen
 `src/content/schedule/sessions-<year>.json` archive.
 
 ## Common Mistakes

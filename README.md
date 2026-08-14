@@ -33,7 +33,8 @@ pnpm build
 pnpm test
 ```
 
-The dev server watches `src/` and the local CSV fallbacks under `src/content/`.
+The dev server watches `src/` and the local fallbacks under `src/content/` (Pretalx session
+snapshots as JSON, speaker/sponsor/team rosters as CSV).
 
 ## Where to find what
 

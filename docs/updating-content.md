@@ -55,7 +55,9 @@ slug,name,photo_url,company,role,bio,twitter,linkedin,github,bluesky,website,key
 4. Verify the URL ends with `output=csv` or `gviz/tq?tqx=out:csv`. If the maintainer set the env var once, you can skip steps 3-4 — existing publishes auto-update when the sheet changes.
 5. Trigger a rebuild in production (see below), or in development just re-run `pnpm dev` / `pnpm build`.
 
-To add a speaker in development without touching the Sheet: append the row to `src/content/schedule/speakers.csv`, save, and re-run `pnpm dev`. The hot-reload will re-parse the CSV.
+To add a speaker in development without touching the Sheet: append the row to the edition's
+CSV under `src/content/schedule/` (`speakers-2023.csv`, `speakers-2026.csv`, or
+`speakers-2027.csv`), save, and re-run `pnpm dev`. The hot-reload will re-parse the CSV.
 
 ---
 
@@ -85,9 +87,14 @@ lives there, not in a CSV header.
 3. Trigger a rebuild (see below). Production fetches the released schedule export live; there
    is no separate "publish" step like the Sheet-backed rosters have.
 
-Editions with no public Pretalx event (2023) read a frozen
+Editions with no public Pretalx event (2023, and 2027 until its event opens) read a frozen
 `src/content/schedule/sessions-{year}.json` archive instead — that JSON is historical and is
 not meant to be extended.
+
+> **2027 landmine:** `sessions-2027.json` is intentionally `[]`. Do **not** regenerate it from
+> the Sheet — that tab holds a contaminated scratch copy of the 2026 rows (identical ids, all
+> dated 2026-02-03, one with a Linear URL pasted into its title). 2027 gets real data once its
+> Pretalx event is public and `PRETALX_EVENT[2027]` is set in `src/lib/pretalx.ts`.
 
 ### Keeping the offline fallback fresh
 
