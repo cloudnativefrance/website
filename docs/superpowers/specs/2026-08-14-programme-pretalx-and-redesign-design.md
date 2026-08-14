@@ -281,6 +281,15 @@ The default resolves from edition state, and is overridable:
 - Track shown as a coloured pill in the Pretalx hex, with foreground and background run
   through `src/lib/color-contrast.ts` (`contrastRatio`, plus a small hex parser alongside
   the existing `parseOklch`). `#edbb45` must never ship as unreadable text.
+- **The coloured left border goes; the pill replaces it, not supplements it.** Today's
+  card carries a 4px accent edge (`ScheduleGrid.astro:314`, and 3px on mobile at `:764`).
+  A thick colour bar down one side of a card is a well-known generic-UI tell, and the
+  project's `impeccable` design hook flags it as such. It is defensible *only* as a data
+  encoding — the calendar convention of colour-coding a slot by category — and once the
+  pill carries that encoding legibly and with checked contrast, the edge is decoration
+  doing a job something else already does. Carry one signal, not two.
+  (Left untouched in PR 1 deliberately: that PR's whole verifiable claim is that the page
+  renders identically, proven by a 0.06% pixel diff, and a visual change would void it.)
 - Format badge only when it is not a plain talk.
 - On a past edition the replay action is the card's primary CTA.
 
