@@ -1,5 +1,12 @@
-import { fetchCsvOrFallback, getCsvUrl } from "./remote-csv";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { CURRENT_EDITION, type Edition } from "./editions";
+import {
+  PRETALX_EVENT,
+  fetchScheduleExport,
+  loadSpeakerResolver,
+  toSessionRows,
+} from "./pretalx";
 import { ui, type Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 
@@ -44,134 +51,40 @@ export interface SessionRow {
 }
 
 /**
- * Minimal CSV parser — handles RFC-4180-style quoted fields with escaped `""`.
- * Not a general purpose CSV lib; tailored to the known shape of sessions.csv.
- */
-function parseCsv(text: string): string[][] {
-  const rows: string[][] = [];
-  let i = 0;
-  const n = text.length;
-
-  while (i < n) {
-    const row: string[] = [];
-    let field = "";
-    let inQuotes = false;
-
-    while (i < n) {
-      const ch = text[i];
-
-      if (inQuotes) {
-        if (ch === '"') {
-          if (text[i + 1] === '"') {
-            field += '"';
-            i += 2;
-          } else {
-            inQuotes = false;
-            i++;
-          }
-        } else {
-          field += ch;
-          i++;
-        }
-        continue;
-      }
-
-      if (ch === '"') {
-        inQuotes = true;
-        i++;
-      } else if (ch === ",") {
-        row.push(field);
-        field = "";
-        i++;
-      } else if (ch === "\n" || ch === "\r") {
-        row.push(field);
-        // Skip \r\n
-        if (ch === "\r" && text[i + 1] === "\n") i++;
-        i++;
-        break;
-      } else {
-        field += ch;
-        i++;
-      }
-    }
-
-    // End-of-file flush when the file doesn't end with a newline
-    if (i >= n && (field.length > 0 || row.length > 0)) {
-      row.push(field);
-    }
-
-    if (row.length > 0 && !(row.length === 1 && row[0] === "")) {
-      rows.push(row);
-    }
-  }
-
-  return rows;
-}
-
-/**
- * Load all sessions. Fetches the published Google Sheet at build time and
- * falls back to the repo-committed CSV on network failure. Result is cached
- * for the process lifetime (see src/lib/remote-csv.ts).
+ * Load all sessions for an edition.
+ *
+ * Editions with a public Pretalx event are fetched from its released schedule
+ * export at build time, falling back to the committed snapshot when Pretalx is
+ * unreachable. Editions without one (2023, and 2027 until its event opens) read
+ * a frozen JSON archive.
  */
 export async function loadSessions(
   year: Edition = CURRENT_EDITION,
 ): Promise<SessionRow[]> {
-  const raw = await fetchCsvOrFallback({
-    url: getCsvUrl("sessions", year),
-    fallbackRelPath: `src/content/schedule/sessions-${year}.csv`,
-    label: `sessions-${year}.csv`,
-  });
-  const rows = parseCsv(raw);
-  if (rows.length === 0) return [];
+  const slug = PRETALX_EVENT[year];
+  if (!slug) return loadArchivedSessions(year);
 
-  const [header, ...body] = rows;
-  const idx = (col: string) => header.indexOf(col);
+  const [doc, resolveSpeaker] = await Promise.all([
+    fetchScheduleExport(year, slug),
+    loadSpeakerResolver(year),
+  ]);
+  return toSessionRows(doc, resolveSpeaker).filter(
+    (s) => s.status !== "hidden" && s.id,
+  );
+}
 
-  const iId = idx("id");
-  const iTitle = idx("title");
-  const iSpeakers = idx("speakers");
-  const iTrack = idx("track");
-  const iLevel = idx("level");
-  const iRoom = idx("room");
-  const iFormat = idx("format");
-  const iStart = idx("start_time");
-  const iDuration = idx("duration_min");
-  const iTags = idx("tags");
-  const iFeedback = idx("feedback_url");
-  const iSlides = idx("slides_url");
-  const iRecording = idx("recording_url");
-  const iCover = idx("cover_image_url");
-  const iLanguage = idx("language");
-  const iStatus = idx("status");
-  const iDescription = idx("description");
-
-  return body
-    .map((r): SessionRow => ({
-      id: r[iId] ?? "",
-      title: r[iTitle] ?? "",
-      speakers: (r[iSpeakers] ?? "")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
-      track: r[iTrack] ?? "",
-      level: iLevel >= 0 ? ((r[iLevel] as SessionLevel) || "") : "",
-      room: r[iRoom] ?? "",
-      format: ((r[iFormat] as SessionFormat) || "talk"),
-      startTime: r[iStart] ?? "",
-      durationMin: Number(r[iDuration] ?? 0),
-      tags: (r[iTags] ?? "")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
-      feedbackUrl: r[iFeedback] ?? "",
-      slidesUrl: iSlides >= 0 ? (r[iSlides] ?? "") : "",
-      recordingUrl: iRecording >= 0 ? (r[iRecording] ?? "") : "",
-      coverImageUrl: iCover >= 0 ? (r[iCover] ?? "") : "",
-      language: iLanguage >= 0 ? ((r[iLanguage] as SessionLanguage) || "") : "",
-      status: ((r[iStatus] as SessionStatus) || "confirmed"),
-      description: r[iDescription] ?? "",
-    }))
-    .filter((s) => s.status !== "hidden" && s.id);
+/** Frozen archive for editions that predate — or do not yet have — a Pretalx event. */
+function loadArchivedSessions(year: Edition): SessionRow[] {
+  const path = join(process.cwd(), `src/content/schedule/sessions-${year}.json`);
+  try {
+    const rows = JSON.parse(readFileSync(path, "utf8")) as SessionRow[];
+    console.log(`[schedule] sessions-${year}.json: ${rows.length} archived sessions`);
+    return rows;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[schedule] sessions-${year}.json unreadable (${msg}); rendering empty`);
+    return [];
+  }
 }
 
 /**

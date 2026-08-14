@@ -186,3 +186,18 @@ describe("toSessionRows edge branches (hand-built talks, not the fixture)", () =
     expect(rows[0].recordingUrl).toBe("https://youtube.com/watch?v=abc123");
   });
 });
+
+import { loadSessions } from "../schedule";
+
+describe("loadSessions archive path", () => {
+  it("reads the frozen JSON for an edition with no Pretalx event", async () => {
+    const rows = await loadSessions(2023);
+    expect(rows).toHaveLength(6);
+    expect(rows[0].id).toBeTruthy();
+    expect(rows.every((r) => r.recordingUrl.startsWith("https://"))).toBe(true);
+  });
+
+  it("returns an empty array for an edition with no data at all", async () => {
+    await expect(loadSessions(2027)).resolves.toEqual([]);
+  });
+});

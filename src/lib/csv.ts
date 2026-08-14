@@ -41,6 +41,7 @@ export function parseCsv(text: string): string[][] {
         i++;
       } else if (ch === "\n" || ch === "\r") {
         row.push(field);
+        // Skip \r\n
         if (ch === "\r" && text[i + 1] === "\n") i++;
         i++;
         break;
@@ -50,6 +51,7 @@ export function parseCsv(text: string): string[][] {
       }
     }
 
+    // End-of-file flush when the file doesn't end with a newline
     if (i >= n && (field.length > 0 || row.length > 0)) {
       row.push(field);
     }

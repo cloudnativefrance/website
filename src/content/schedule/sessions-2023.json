@@ -1,0 +1,138 @@
+[
+  {
+    "id": "KCD23-01",
+    "title": "Cloud-native en France : où en sommes-nous ?",
+    "speakers": [
+      "sophie-lambert-2023"
+    ],
+    "track": "Autres sujets et crazy stuff",
+    "level": "",
+    "room": "Centre",
+    "format": "keynote",
+    "startTime": "2023-06-07T09:00:00+02:00",
+    "durationMin": 45,
+    "tags": [],
+    "feedbackUrl": "",
+    "slidesUrl": "",
+    "recordingUrl": "https://www.youtube.com/playlist?list=PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h",
+    "coverImageUrl": "",
+    "language": "fr",
+    "status": "confirmed",
+    "description": "Keynote d'ouverture — état des lieux de l'écosystème cloud-native francophone en 2023."
+  },
+  {
+    "id": "KCD23-02",
+    "title": "GitOps en production : 18 mois plus tard",
+    "speakers": [
+      "marc-villeneuve"
+    ],
+    "track": "Developer Experience",
+    "level": "intermediate",
+    "room": "Salle 1",
+    "format": "talk",
+    "startTime": "2023-06-07T10:00:00+02:00",
+    "durationMin": 30,
+    "tags": [
+      "gitops;cicd"
+    ],
+    "feedbackUrl": "",
+    "slidesUrl": "",
+    "recordingUrl": "https://www.youtube.com/playlist?list=PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h",
+    "coverImageUrl": "",
+    "language": "fr",
+    "status": "confirmed",
+    "description": "Retour sur 18 mois de GitOps en production chez Doctolib : ce qui marche, ce qui casse, ce qui surprend."
+  },
+  {
+    "id": "KCD23-03",
+    "title": "Service mesh à l'échelle chez BlaBlaCar",
+    "speakers": [
+      "elena-petrova"
+    ],
+    "track": "Infrastructure et Opérations",
+    "level": "advanced",
+    "room": "Salle 2",
+    "format": "talk",
+    "startTime": "2023-06-07T11:00:00+02:00",
+    "durationMin": 45,
+    "tags": [
+      "service-mesh;istio"
+    ],
+    "feedbackUrl": "",
+    "slidesUrl": "",
+    "recordingUrl": "https://www.youtube.com/playlist?list=PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h",
+    "coverImageUrl": "",
+    "language": "fr",
+    "status": "confirmed",
+    "description": "Comment BlaBlaCar a déployé un service mesh sur des centaines de microservices sans casser la production."
+  },
+  {
+    "id": "KCD23-04",
+    "title": "Le carrefour de Carrefour vers Kubernetes",
+    "speakers": [
+      "yann-castelnau"
+    ],
+    "track": "Infrastructure et Opérations",
+    "level": "intermediate",
+    "room": "Salle 1",
+    "format": "talk",
+    "startTime": "2023-06-07T14:00:00+02:00",
+    "durationMin": 30,
+    "tags": [
+      "kubernetes;migration"
+    ],
+    "feedbackUrl": "",
+    "slidesUrl": "",
+    "recordingUrl": "https://www.youtube.com/playlist?list=PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h",
+    "coverImageUrl": "",
+    "language": "fr",
+    "status": "confirmed",
+    "description": "Migration progressive d'un grand groupe retail vers Kubernetes : choix d'architecture, organisation, et leçons apprises."
+  },
+  {
+    "id": "KCD23-05",
+    "title": "5 anti-patterns à éviter en CI/CD",
+    "speakers": [
+      "clara-jensen"
+    ],
+    "track": "Developer Experience",
+    "level": "beginner",
+    "room": "Salle 2",
+    "format": "lightning",
+    "startTime": "2023-06-07T15:00:00+02:00",
+    "durationMin": 10,
+    "tags": [
+      "cicd;devex"
+    ],
+    "feedbackUrl": "",
+    "slidesUrl": "",
+    "recordingUrl": "https://www.youtube.com/playlist?list=PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h",
+    "coverImageUrl": "",
+    "language": "fr",
+    "status": "confirmed",
+    "description": "Lightning talk — cinq erreurs courantes dans les pipelines CI/CD et comment les corriger en 10 minutes."
+  },
+  {
+    "id": "KCD23-06",
+    "title": "Méta-observabilité : qui surveille les watchers ?",
+    "speakers": [
+      "hugo-fontaine-2023"
+    ],
+    "track": "Infrastructure et Opérations",
+    "level": "advanced",
+    "room": "Centre",
+    "format": "talk",
+    "startTime": "2023-06-07T16:00:00+02:00",
+    "durationMin": 45,
+    "tags": [
+      "observability;metrics"
+    ],
+    "feedbackUrl": "",
+    "slidesUrl": "",
+    "recordingUrl": "https://www.youtube.com/playlist?list=PLmZ3gFl2Aqt_Qo4EAITE1ewy1ww5jkU2h",
+    "coverImageUrl": "",
+    "language": "fr",
+    "status": "confirmed",
+    "description": "Quand votre stack d'observabilité tombe, comment le savez-vous ? Approches et patterns pour observer l'observabilité."
+  }
+]
