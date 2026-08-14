@@ -15,6 +15,12 @@ export interface SessionRow {
   speakers: string[];
   /** Optional thematic track (e.g. 'FinOps'). Free text; empty when not classified. */
   track: string;
+  /**
+   * Curated per-track accent colour from Pretalx, as a hex string. Undefined for
+   * archived editions and unclassified talks. Carried but not yet rendered — the
+   * schedule redesign (PR 2) consumes it and drops the name-hash fallback.
+   */
+  trackColor?: string;
   /** Target audience proficiency. Empty when unclassified. */
   level: SessionLevel;
   /** Physical room — Monet / Debussy / Dumas / Piaf / Ravel. */
