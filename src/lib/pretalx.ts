@@ -2,6 +2,9 @@ import type { Edition } from "./editions";
 // Type-only: schedule.ts imports this module at runtime, so a value import here
 // would create a cycle. TypeScript erases `import type`.
 import type { SessionFormat, SessionLanguage, SessionRow } from "./schedule";
+import { parseCsv } from "./csv";
+import { fetchTextOrFallback } from "./remote-fetch";
+import { getCsvUrl } from "./remote-csv";
 
 export const PRETALX_BASE =
   process.env.PRETALX_BASE_URL || "https://cfp.cloudnativedays.fr";
@@ -158,4 +161,72 @@ export function toSessionRows(
   return rows.sort(
     (a, b) => a.startTime.localeCompare(b.startTime) || a.room.localeCompare(b.room),
   );
+}
+
+// -- Speaker resolution and fetch layer -------------------------------------
+
+/**
+ * Build a Pretalx-name -> site-slug resolver from the speakers Sheet.
+ *
+ * The Sheet's `speakers` column holds slugs, and speaker URLs plus
+ * getTalksForSpeaker() route on them, so the normalizer must emit slugs too.
+ * Slugifying the Pretalx name is not good enough: the Sheet uses shortened
+ * slugs ("petazzoni" for "Jérôme Petazzoni") and that approach misses 8 of 67.
+ * Exact match on the `name` column hits 67/67.
+ */
+export function buildSpeakerResolver(csvText: string): SpeakerResolver {
+  const rows = parseCsv(csvText);
+  const index = new Map<string, string>();
+  if (rows.length > 0) {
+    const [header, ...body] = rows;
+    const iSlug = header.findIndex((h) => h.trim() === "slug");
+    const iName = header.findIndex((h) => h.trim() === "name");
+    if (iSlug >= 0 && iName >= 0) {
+      for (const row of body) {
+        const name = (row[iName] ?? "").trim();
+        const slug = (row[iSlug] ?? "").trim();
+        if (name && slug) index.set(name, slug);
+      }
+    }
+  }
+
+  return (personName, talkCode) => {
+    const slug = index.get(personName.trim());
+    if (!slug) {
+      throw new Error(
+        `Pretalx speaker "${personName}" (talk ${talkCode}) has no row in the ` +
+          `speakers Sheet. Add a row with a matching \`name\`, or correct the ` +
+          `spelling on one side — emitting the raw name would produce a 404 link.`,
+      );
+    }
+    return slug;
+  };
+}
+
+export async function loadSpeakerResolver(year: Edition): Promise<SpeakerResolver> {
+  const csvText = await fetchTextOrFallback({
+    url: getCsvUrl("speakers", year),
+    fallbackRelPath: `src/content/schedule/speakers-${year}.csv`,
+    label: `speakers-${year}.csv (slug index)`,
+  });
+  return buildSpeakerResolver(csvText);
+}
+
+export async function fetchScheduleExport(
+  year: Edition,
+  slug: string,
+): Promise<PretalxScheduleExport> {
+  const body = await fetchTextOrFallback({
+    url: scheduleExportUrl(slug),
+    fallbackRelPath: `src/content/schedule/pretalx-${year}.json`,
+    label: `pretalx-${year}.json`,
+    validate: (text) => {
+      const doc = JSON.parse(text) as Partial<PretalxScheduleExport>;
+      const days = doc?.schedule?.conference?.days;
+      if (!Array.isArray(days) || days.length === 0) {
+        throw new Error("Pretalx export has no schedule days");
+      }
+    },
+  });
+  return JSON.parse(body) as PretalxScheduleExport;
 }

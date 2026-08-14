@@ -1,6 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
-import { toSessionRows, type PretalxScheduleExport } from "../pretalx";
+import {
+  toSessionRows,
+  durationToMinutes,
+  buildSpeakerResolver,
+  type PretalxScheduleExport,
+  type PretalxTalk,
+} from "../pretalx";
 
 const doc = JSON.parse(
   readFileSync("src/content/schedule/pretalx-2026.json", "utf8"),
@@ -80,5 +86,103 @@ describe("toSessionRows", () => {
 
   it("marks every exported talk confirmed", () => {
     expect(rows.every((r) => r.status === "confirmed")).toBe(true);
+  });
+
+  // The stand-in resolver above ignores its second argument, so nothing else
+  // in this file proves talk.code (not some other field) reaches the
+  // resolver. A swapped argument order would type-check and pass silently.
+  it("passes the talk's own code as the resolver's second argument", () => {
+    const withCode = toSessionRows(doc, (name, code) => `${name}@${code}`);
+    const s = withCode.find((r) => r.id === "9H9WKR");
+    expect(s?.speakers).toEqual(["Nicolas Vermande@9H9WKR"]);
+  });
+});
+
+describe("buildSpeakerResolver", () => {
+  // The Sheet uses hand-shortened slugs. Slugifying the Pretalx name would give
+  // "jerome-petazzoni" and 404; exact name match is what actually works (67/67).
+  const csv = [
+    "slug,name,company",
+    "petazzoni,Jérôme Petazzoni,Enix",
+    "nicolas-vermande,Nicolas Vermande,Staticvoid",
+  ].join("\n");
+
+  it("maps an exact Pretalx name to the Sheet slug", () => {
+    const resolve = buildSpeakerResolver(csv);
+    expect(resolve("Jérôme Petazzoni", "GJ89TV")).toBe("petazzoni");
+    expect(resolve("Nicolas Vermande", "9H9WKR")).toBe("nicolas-vermande");
+  });
+
+  it("throws with the name and talk code when a speaker is unknown", () => {
+    const resolve = buildSpeakerResolver(csv);
+    // Emitting the raw name would render /intervenants/Someone%20New — a 404
+    // that looks like a working link. Fail the build instead.
+    expect(() => resolve("Someone New", "ABC123")).toThrow(/Someone New/);
+    expect(() => resolve("Someone New", "ABC123")).toThrow(/ABC123/);
+  });
+
+  it("tolerates surrounding whitespace on both sides", () => {
+    const resolve = buildSpeakerResolver("slug,name\n a-b , Ada Lovelace \n");
+    expect(resolve("Ada Lovelace", "X")).toBe("a-b");
+  });
+});
+
+describe("durationToMinutes edge cases", () => {
+  it("throws on a malformed duration", () => {
+    expect(() => durationToMinutes("not-a-duration")).toThrow(/unparseable duration/);
+  });
+});
+
+describe("toSessionRows edge branches (hand-built talks, not the fixture)", () => {
+  const baseTalk: PretalxTalk = {
+    code: "ZZZZZZ",
+    title: "Edge case talk",
+    date: "2026-02-03T09:00:00+01:00",
+    duration: "00:20",
+    room: "Room A",
+    track: null,
+    type: "Conférence",
+    language: "fr",
+    abstract: null,
+    description: null,
+    logo: null,
+    url: "https://cfp.example/talk/ZZZZZZ",
+    persons: [{ code: "P1", name: "Edge Speaker" }],
+  };
+
+  function docWith(talk: PretalxTalk): PretalxScheduleExport {
+    return {
+      schedule: {
+        version: "1.0",
+        conference: {
+          title: "Test",
+          tracks: [],
+          days: [{ date: "2026-02-03", rooms: { "Room A": [talk] } }],
+        },
+      },
+    };
+  }
+
+  const resolve = (name: string) => name;
+
+  it("yields an empty track and undefined trackColor when track is null", () => {
+    const rows = toSessionRows(docWith(baseTalk), resolve);
+    expect(rows[0].track).toBe("");
+    expect(rows[0].trackColor).toBeUndefined();
+  });
+
+  it("yields empty slidesUrl and recordingUrl when links/attachments are absent", () => {
+    const rows = toSessionRows(docWith(baseTalk), resolve);
+    expect(rows[0].slidesUrl).toBe("");
+    expect(rows[0].recordingUrl).toBe("");
+  });
+
+  it("picks a YouTube link as the recordingUrl", () => {
+    const talk: PretalxTalk = {
+      ...baseTalk,
+      links: [{ title: "Watch it", url: "https://youtube.com/watch?v=abc123" }],
+    };
+    const rows = toSessionRows(docWith(talk), resolve);
+    expect(rows[0].recordingUrl).toBe("https://youtube.com/watch?v=abc123");
   });
 });
