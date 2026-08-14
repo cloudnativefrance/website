@@ -2,10 +2,17 @@
 
 **Date:** 2026-08-14
 **Status:** Approved, ready for implementation
-**Delivery:** two PRs — **PR 1 = Parts 1 + 2** (data pipeline), **PR 2 = Part 3** (page redesign)
+**Delivery:** two PRs — **PR 1 = Part 1** (sessions pipeline), **PR 2 = Part 3** (page redesign)
 
 Each PR gets its own implementation plan. PR 1's plan is written first; PR 2's is written
 after PR 1 merges, so the redesign is planned against fields that demonstrably exist.
+
+> **Revision, 2026-08-14 (post-approval).** The first version of this spec measured column
+> fill rates against the **committed fallback CSVs** rather than the live published Sheet
+> that builds actually fetch. Three claims were wrong and are corrected below: the Sheet is
+> not missing a talk, `linkedin` is not dead, and `company`/`role` are fully populated. The
+> consequence is that **Part 2 (speaker overlay) is dropped** — with the real numbers it
+> saves almost nothing while touching six page files. Speakers stay exactly as they are.
 
 ---
 
@@ -32,43 +39,48 @@ redesigning the page on top of the fields that unlocks.
 ### Data
 
 `src/lib/schedule.ts:110` fetches a published Google Sheet CSV tab and parses it with a
-hand-rolled RFC-4180 parser (`parseCsv`, 60 lines). Column fill rates as authored today:
+hand-rolled RFC-4180 parser (`parseCsv`, 60 lines). Fill rates measured against the **live
+published Sheet** (51 session rows for 2026):
 
-| Column | 2026 | 2023 | Verdict |
-|---|---|---|---|
-| `id` `title` `speakers` `track` `room` `format` `start_time` `duration_min` | 50/50 | 6/6 | all available from Pretalx |
-| `recording_url` | 50/50 | 6/6 | **the only field Pretalx has no native slot for** |
-| `description` `language` `status` | 50/50 | 6/6 | available from Pretalx |
-| `level` | **0/50** | 5/6 | never populated for 2026 |
-| `tags` | **0/50** | 5/6 | never populated for 2026 |
-| `feedback_url` | **0/50** | 0/6 | **Pretalx has it for 51/51** |
-| `slides_url` | **0/50** | 0/6 | Pretalx `attachments`, 1 talk already uploaded |
-| `cover_image_url` | **0/50** | 0/6 | never populated anywhere |
+| Column | 2026 live | Verdict |
+|---|---|---|
+| `id` `title` `speakers` `track` `room` `format` `start_time` `duration_min` | 51/51 | all available from Pretalx |
+| `description` `language` `status` | 51/51 | available from Pretalx |
+| `recording_url` | 51/51 | **the only field Pretalx has no native slot for** |
+| `feedback_url` | **0/51** | **Pretalx has it for 51/51** |
+| `slides_url` | **0/51** | Pretalx `attachments`, 1 talk already uploaded |
+| `level` `tags` `cover_image_url` | **0/51** | never populated for 2026 |
 
-Two defects the migration fixes outright:
+The live Sheet is **not** drifting from Pretalx: all 51 ids resolve to a Pretalx talk and
+all 51 Pretalx codes appear in the Sheet, in both directions. The migration is therefore a
+mechanical swap, not a reconciliation. What it buys is the elimination of the hand-copy
+step itself, plus three fields the Sheet has never carried:
 
-1. **A talk is missing from the site.** Pretalx has 51 released talks; the Sheet has 50.
-   `HFFT3Q` — *"REX Skello — Data Platform Engineering: Comment rendre les équipes métier
-   vraiment autonomes grâce à Kubernetes et Airflow"*, Monet, 30 min — is in the released
-   schedule and has never rendered. Hand-copying dropped it.
-2. **Feedback links are absent.** Pretalx exposes `feedback_url` for every talk; the Sheet
-   column is empty, so the modal's feedback button never appears.
+1. **Feedback links.** Pretalx exposes `feedback_url` for all 51 talks; the Sheet column is
+   empty, so the modal's feedback button never renders.
+2. **Slides.** Pretalx `attachments` already holds one uploaded deck, invisible to the site.
+3. **Track colours.** Curated per-track hex values, discarded in favour of a name hash.
+
+**The committed fallback is stale.** `src/content/schedule/sessions-2026.csv` has 50 rows;
+the live Sheet has 51. It is missing `HFFT3Q` — *"REX Skello — Data Platform Engineering"*,
+Monet, 30 min. Nobody notices because the fallback only serves during an outage, at which
+point the site would silently render a talk-short programme. A committed snapshot refreshed
+by an explicit command (below) replaces a fallback nobody remembers to update.
 
 The `id` column already contains Pretalx submission codes (`GJ89TV`, `9H9WKR`, `S3SPP8`…),
-and every CSV id resolves to a Pretalx talk. The join is exact in both directions bar the
-one missing row, which makes the migration mechanical rather than a reconciliation.
+so session ids — and therefore existing `localStorage` bookmarks — are unchanged by the swap.
 
 ### Page
 
 `src/components/schedule/ScheduleGrid.astro` is 1278 lines / 53 KB, including a ~500-line
 inline `<script is:inline>` and a ~290-line `<style>` block. Rendering `/programme/2026`
-at 1440px produces roughly 3400px of page for 50 talks. Observed problems:
+at 1440px produces roughly 3400px of page for 51 talks. Observed problems:
 
 | Problem | Evidence |
 |---|---|
 | Time-proportional rows waste the page | The 75-min opening keynote renders as a ~450px empty box. The 12:10–13:00 lunch gap is a ~400px unexplained void. |
 | Cards clip their own content | *"REX SNCF – Des Rails aux Nuages : Comment Kubernetes à l'Edge Révolutionne les…"* is cut mid-word with no ellipsis; the speaker line overflows the card border. Same at 12:00 in Dumas. |
-| No text search | 50 talks, no way to find "Cilium" or "FinOps" by name. |
+| No text search | 51 talks, no way to find "Cilium" or "FinOps" by name. |
 | Card height encodes duration | A 45-min talk is a tall box with text pinned to the top; a 10-min lightning talk is cramped. Nobody reads height as minutes. |
 | Track colour is a 3px left border | Hues come from `trackColor()` (`ScheduleGrid.astro:83`), a name hash. Yellow, pink, purple and orange land adjacent. Pretalx's curated per-track colours are discarded. |
 | Filters cost 8 rows on mobile | At 390px, notice + title + PDF button + chip stack ≈ 1100px before the first talk. |
@@ -84,7 +96,7 @@ at 1440px produces roughly 3400px of page for 50 talks. Observed problems:
 | 3 | Pretalx is the single source of truth for session data, including slides and replays | Removes the hand-copy step that already lost a talk |
 | 4 | Grid rows are time **slots**, not minutes; two views (Grid / List) over one dataset | Time-proportional layout is what produces the dead space, and neither view alone serves both audiences |
 | 5 | Replay URLs become Pretalx resource links, entered once | Keeps decision 3 whole; the checklist is generated from today's Sheet so it is copy-paste |
-| 6 | The speakers tab shrinks to an overlay rather than disappearing | Pretalx cannot hold company, role, or the site's keynote display flag |
+| 6 | **The speakers tab is left untouched** | Pretalx holds only name, bio and avatar. `company` (77/77), `role` (77/77), `linkedin` (76/77), `photo_url` (77/77) and the keynote display flags have no Pretalx equivalent, and 10 keynote participants have no Pretalx person record at all. An overlay would churn six page files and the Zod schema to move roughly one column of real work |
 
 ---
 
@@ -121,8 +133,8 @@ New `src/lib/pretalx.ts`, split in two so the network and the mapping are testab
 `loadSessions(year)` in `src/lib/schedule.ts` keeps its exact signature and return type.
 Every consumer — `ScheduleGrid.astro`, `src/pages/replays/index.astro:15`,
 `src/pages/programme.ics.ts`, `src/lib/speakers.ts` — is untouched by PR 1. That is what
-makes the swap provable: the rendered page must be identical apart from the one recovered
-talk and the newly present feedback links.
+makes the swap provable: the rendered page must be identical apart from the newly present
+feedback links, and slides on the one talk that has a deck uploaded.
 
 ### Field mapping
 
@@ -131,7 +143,7 @@ talk and the newly present feedback links.
 | `id` | `code` | Already the Sheet's `id`, so bookmarks in `localStorage` survive |
 | `title` | `title` | |
 | `description` | `description` | Markdown. The existing `mdToHtml` in the inline script already renders and sanitises it |
-| `speakers` | `persons[].code` → slug | Mapped through the speaker overlay, see Part 2 |
+| `speakers` | `persons[].name` → Sheet slug | Exact-name index, 67/67. Unresolved names throw. See Part 2 |
 | `track` | `track` | Track name |
 | `trackColor` **(new field)** | `conference.tracks[].color` | Hex, e.g. `#edbb45`. Carried by PR 1 but not yet read — PR 2 consumes it and deletes the `trackColor()` hash at `ScheduleGrid.astro:83`. Adding a field keeps PR 1 render-identical |
 | `room` | `room` | |
@@ -157,9 +169,10 @@ them by resource kind (uploaded file vs URL), and organisers should not have to 
 | otherwise | talk — 29 |
 
 Mapping *only* by submission type would give 19 lightning talks, because two 10-minute
-sessions are typed `Conférence` / `Retour d'expérience`. Duration is the honest signal and
-matches the Sheet's hand-classified 21. The resulting 29 talks versus the Sheet's 28 is the
-recovered `HFFT3Q`.
+sessions are typed `Conférence` / `Retour d'expérience`. Duration is the honest signal.
+
+**This rule is validated, not assumed:** run against all 51 talks it reproduces the Sheet's
+hand-classification exactly — 1 keynote, 29 talks, 21 lightning, **zero disagreements**.
 
 ### Resilience
 
@@ -187,33 +200,41 @@ left, **`parseCsv` and its 60 lines are deleted from `schedule.ts`**.
 
 ---
 
-## Part 2 — Speaker overlay
+## Part 2 — Speakers stay on the Sheet *(dropped from scope)*
 
-Pretalx speakers carry only `code`, `name`, `biography`, `avatar_url`. No company, no role,
-no socials, and no notion of the site's keynote display treatment. The speakers tab
-therefore survives, but only for what Pretalx cannot express:
+The speakers tab and its `csvLoader` collections are **not touched**. Pretalx carries only
+`code`, `name`, `biography`, `avatar_url`; everything the site actually renders about a
+speaker — `company`, `role`, `linkedin`, `photo_url`, `keynote`, `keynote_size` — is
+near-fully populated in the Sheet and has no Pretalx equivalent. Ten keynote participants
+(Ricardo Rocha, Jean-Baptiste Kempf, Laurent Bernaille, Denis Germain and six others) have
+no Pretalx person record at all, so the Sheet remains authoritative regardless.
 
-```
-pretalx_code, slug, company, role, keynote, keynote_size
-   + optional name, bio, photo_url — fallbacks, used only when there is no Pretalx match
-```
+### Resolving session → speaker references
 
-Deleted outright: `linkedin`, `github`, `bluesky`, `website` — **0/77 filled, all four**.
-`company` (10/77) and `role` (8/77) stay because the schedule cards render "Name (Company)".
+This is the one genuinely tricky part of PR 1, and it stays in `pretalx.ts`.
 
-Pretalx wins for `name`, `biography`, `avatar_url` whenever a match exists; today that is
-67 of the 77 rows, so organisers stop maintaining bios and photos by hand. The remaining
-~10 rows are people with no released talk — MCs and panellists — and keep using the
-fallback columns.
+Today `SessionRow.speakers` holds **Sheet slugs** (`petazzoni`, `vermande`,
+`arthur-outhenin-chalandre`) — verified 67/67 across the live sessions tab. Speaker URLs are
+`/intervenants/{slug}` and `/en/speakers/{slug}`, and `getTalksForSpeaker`
+(`src/lib/speakers.ts:50`) filters on `s.speakers.includes(speakerSlug)`. The normalizer
+must therefore keep emitting slugs, or every speaker cross-link breaks.
 
-### Slug stability — the main risk
+Pretalx gives `persons[].code` and `persons[].name`. Two mapping strategies were measured
+against the live data:
 
-Speaker URLs are `/intervenants/{slug}` and `/en/speakers/{slug}`. Pretalx keys by `code`.
-Deriving slugs from names would silently change URLs and 404 every existing inbound link.
+| Strategy | Result |
+|---|---|
+| Slugify the Pretalx name | **59/67** — fails on hand-shortened slugs: `Jérôme Petazzoni` → `jerome-petazzoni`, but the Sheet says `petazzoni`. Also `vermande`, `aurelie-vache`, and 5 more |
+| **Exact match on speaker `name`** | **67/67** |
 
-Mitigation: the overlay carries the **authoritative `slug`**, and a test asserts that every
-speaker slug present in today's `speakers-2026.csv` still resolves after the swap. If one
-does not, the build fails loudly rather than shipping dead URLs.
+So the normalizer builds a `name → slug` index from the speakers CSV — reached through the
+existing `fetchCsvOrFallback` + `getCsvUrl("speakers", year)`, not through `astro:content`,
+which `src/lib/schedule.ts` cannot import without a cycle.
+
+**An unresolved name is a hard error, not a fallback.** Silently emitting the raw name
+would produce `/intervenants/Jérôme Petazzoni` — a 404 that renders as a normal-looking
+link. The normalizer throws with the offending name and talk code so the build fails at the
+point the Sheet and Pretalx disagree about how someone is spelled.
 
 ---
 
@@ -299,30 +320,31 @@ honoured by any transition introduced.
 
 | Test | Asserts |
 |---|---|
-| Normalizer golden test | `toSessionRows` on a committed real `schedule.json` fixture yields 51 sessions, formats 1/29/21, durations, and 51 feedback URLs |
+| Normalizer golden test | `toSessionRows` on a committed real `schedule.json` fixture yields 51 sessions, formats 1/29/21, correct durations, and 51 feedback URLs |
 | Format derivation | The two 10-minute non-`Éclair` sessions classify as lightning |
+| Speaker resolution | All 67 Pretalx person names resolve to a Sheet slug; an unknown name throws with the name and talk code in the message |
 | Fallback path | A failing fetch produces the snapshot's rows and logs a warning; the build does not throw |
-| Slug stability | Every speaker slug in today's `speakers-2026.csv` still resolves |
-| Filter/search reducer | Pure-function unit tests over query + chip combinations |
-| Build | `/programme/2023`, `/programme/2026`, `/en/programme/2026` render; ICS output is byte-identical apart from the recovered talk |
+| Parity with the Sheet | Normalized 2026 output matches the live sessions tab field-by-field on id, title, room, start, duration, format, language and speakers, for all 51 rows |
+| Filter/search reducer *(PR 2)* | Pure-function unit tests over query + chip combinations |
+| Build | `/programme/2023`, `/programme/2026`, `/en/programme/2026` render; ICS output is byte-identical to pre-migration |
 
 Per `superpowers:verification-before-completion`, no completion claim without command
 output. PR 1 additionally requires a visual before/after of `/programme/2026` showing the
-page is unchanged bar the recovered talk and the new feedback links.
+page is unchanged apart from the new feedback links.
 
 ---
 
 ## Migration checklist — replay URLs
 
-The 50 YouTube links are entered into Pretalx once, as talk resources of type link titled
+The 51 YouTube links are entered into Pretalx once, as talk resources of type link titled
 `Replay`. Because the Sheet's `id` column is already the Pretalx code, the checklist is
-generated mechanically from `sessions-2026.csv` as `code → title → url`, ordered by room and
-start time to match the organiser UI's own ordering.
+generated mechanically from the **live** sessions tab as `code → title → url`, ordered by
+room and start time to match the organiser UI's own ordering.
 
 Until every link is entered, `recordingUrl` is empty for the talks still missing one, which
 would empty `/replays`. PR 1 therefore does not merge until the checklist is complete and
-`sync:pretalx` shows 50 replay links present — verified by a test asserting that the 2026
-snapshot carries at least as many recordings as the CSV it replaces.
+`sync:pretalx` shows 51 replay links present — verified by a test asserting that the 2026
+snapshot carries at least as many recordings as the Sheet it replaces.
 
 **This makes PR 1 blocked on manual data entry, which is a real coordination cost.** If
 that blocks for longer than is comfortable, the escape hatch is to merge PR 1 with a
@@ -340,7 +362,7 @@ stay blocked and keep decision 3 clean; take the hatch only if asked.
 - **`.claude/skills/csv-source-of-truth`** — it currently instructs that sessions are
   authored in Google Sheets. Left unchanged it will actively mislead future sessions. It
   must say: sessions and session-attached resources come from Pretalx; the Sheet remains
-  authoritative for speaker overlay fields, sponsors and team.
+  authoritative for speakers, sponsors and team.
 - `DESIGN.md` — a decision entry for the two-view programme.
 
 ---
@@ -348,6 +370,7 @@ stay blocked and keep decision 3 clean; take the hatch only if asked.
 ## Out of scope
 
 - Sponsors and team pipelines — they stay on the Sheet.
-- The speaker detail page design; only its data source changes.
+- **Speakers** — the tab, its schema, its `csvLoader` collections and the `intervenants`
+  pages are all unchanged. See Part 2.
 - 2027 content. The pipeline supports the edition as soon as its Pretalx event is public.
 - Writing back to Pretalx. The site is a read-only consumer.
