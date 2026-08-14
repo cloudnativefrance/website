@@ -1,12 +1,30 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 import {
   toSessionRows,
   durationToMinutes,
   buildSpeakerResolver,
+  fetchScheduleExport,
+  loadSpeakerResolver,
   type PretalxScheduleExport,
   type PretalxTalk,
 } from "../pretalx";
+import { loadSessions, type SessionRow } from "../schedule";
+
+// Only the fetch layer is mocked — toSessionRows keeps its real implementation
+// by default (wrapped so individual tests can still override it with
+// mockReturnValueOnce), so `loadSessions`'s own wiring (which year/slug it
+// fetches with, and the status/id filter it applies to the result) is what
+// each test below actually exercises.
+vi.mock("../pretalx", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../pretalx")>();
+  return {
+    ...actual,
+    fetchScheduleExport: vi.fn(),
+    loadSpeakerResolver: vi.fn(),
+    toSessionRows: vi.fn(actual.toSessionRows),
+  };
+});
 
 const doc = JSON.parse(
   readFileSync("src/content/schedule/pretalx-2026.json", "utf8"),
@@ -187,8 +205,6 @@ describe("toSessionRows edge branches (hand-built talks, not the fixture)", () =
   });
 });
 
-import { loadSessions } from "../schedule";
-
 describe("loadSessions archive path", () => {
   it("reads the frozen JSON for an edition with no Pretalx event", async () => {
     const rows = await loadSessions(2023);
@@ -199,5 +215,79 @@ describe("loadSessions archive path", () => {
 
   it("returns an empty array for an edition with no data at all", async () => {
     await expect(loadSessions(2027)).resolves.toEqual([]);
+  });
+});
+
+describe("loadSessions live-fetch path (edition with a Pretalx event)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const emptyDoc: PretalxScheduleExport = {
+    schedule: {
+      version: "1.0",
+      conference: { title: "Test", tracks: [], days: [] },
+    },
+  };
+
+  function makeRow(overrides: Partial<SessionRow>): SessionRow {
+    return {
+      id: "AAAAAA",
+      title: "Some talk",
+      speakers: [],
+      track: "",
+      level: "",
+      room: "Room A",
+      format: "talk",
+      startTime: "2026-02-03T09:00:00+01:00",
+      durationMin: 30,
+      tags: [],
+      feedbackUrl: "",
+      slidesUrl: "",
+      recordingUrl: "",
+      coverImageUrl: "",
+      language: "",
+      status: "confirmed",
+      description: "",
+      ...overrides,
+    };
+  }
+
+  it("fetches the export and speaker resolver for the edition's slug and year", async () => {
+    vi.mocked(fetchScheduleExport).mockResolvedValue(emptyDoc);
+    vi.mocked(loadSpeakerResolver).mockResolvedValue((name) => name);
+
+    await loadSessions(2026);
+
+    expect(fetchScheduleExport).toHaveBeenCalledWith(2026, "2026");
+    expect(loadSpeakerResolver).toHaveBeenCalledWith(2026);
+  });
+
+  it("returns rows produced by the normalizer", async () => {
+    vi.mocked(fetchScheduleExport).mockResolvedValue(doc);
+    vi.mocked(loadSpeakerResolver).mockResolvedValue(resolve);
+
+    const rows = await loadSessions(2026);
+
+    expect(rows).toHaveLength(51);
+    expect(rows.map((r) => r.id)).toContain("9H9WKR");
+  });
+
+  // toSessionRows itself hard-codes status "confirmed" on every row it emits, so
+  // it can never produce a hidden row — that filtering is loadSessions's own
+  // responsibility. Mock the normalizer's output directly so the assertion
+  // exercises loadSessions's real `.filter(...)`, not a pre-filtered stand-in.
+  it("filters out a hidden session and one with an empty id", async () => {
+    vi.mocked(fetchScheduleExport).mockResolvedValue(emptyDoc);
+    vi.mocked(loadSpeakerResolver).mockResolvedValue((name) => name);
+    vi.mocked(toSessionRows).mockReturnValueOnce([
+      makeRow({ id: "VISIBLE", status: "confirmed" }),
+      makeRow({ id: "HIDDEN1", status: "hidden" }),
+      makeRow({ id: "", status: "confirmed" }),
+    ]);
+
+    const rows = await loadSessions(2026);
+
+    expect(rows.map((r) => r.id)).toEqual(["VISIBLE"]);
   });
 });

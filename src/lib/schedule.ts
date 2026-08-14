@@ -62,29 +62,48 @@ export async function loadSessions(
   year: Edition = CURRENT_EDITION,
 ): Promise<SessionRow[]> {
   const slug = PRETALX_EVENT[year];
-  if (!slug) return loadArchivedSessions(year);
+  let rows: SessionRow[];
+  if (slug) {
+    const [doc, resolveSpeaker] = await Promise.all([
+      fetchScheduleExport(year, slug),
+      loadSpeakerResolver(year),
+    ]);
+    rows = toSessionRows(doc, resolveSpeaker);
+  } else {
+    rows = loadArchivedSessions(year);
+  }
 
-  const [doc, resolveSpeaker] = await Promise.all([
-    fetchScheduleExport(year, slug),
-    loadSpeakerResolver(year),
-  ]);
-  return toSessionRows(doc, resolveSpeaker).filter(
-    (s) => s.status !== "hidden" && s.id,
-  );
+  // Applied at this single exit point so both the live Pretalx branch and the
+  // archived-JSON branch honour the same contract, instead of duplicating the
+  // predicate (or worse, only enforcing it on one branch).
+  return rows.filter((s) => s.status !== "hidden" && s.id);
 }
 
-/** Frozen archive for editions that predate — or do not yet have — a Pretalx event. */
+/**
+ * Frozen archive for editions that predate — or do not yet have — a Pretalx event.
+ *
+ * `sessions-2027.json` is intentionally `[]`. Do not regenerate it from the Sheet:
+ * that tab holds a contaminated scratch copy of the 2026 rows (identical ids, all
+ * dated 2026-02-03, one with a Linear URL pasted into its title). 2027 gets real
+ * data once its Pretalx event is public and `PRETALX_EVENT[2027]` is set.
+ */
 function loadArchivedSessions(year: Edition): SessionRow[] {
   const path = join(process.cwd(), `src/content/schedule/sessions-${year}.json`);
+  // Unlike the live Pretalx fetch — which falls back to a committed snapshot,
+  // so "never fail the build" applies there — this archive has no fallback
+  // beneath it: it is the sole source for the edition. A missing or corrupt
+  // file is a deterministic repo defect (bad merge, accidental deletion, JSON
+  // typo), not transient unreachability, so fail loudly instead of silently
+  // rendering an empty programme.
+  let rows: SessionRow[];
   try {
-    const rows = JSON.parse(readFileSync(path, "utf8")) as SessionRow[];
-    console.log(`[schedule] sessions-${year}.json: ${rows.length} archived sessions`);
-    return rows;
+    rows = JSON.parse(readFileSync(path, "utf8")) as SessionRow[];
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.warn(`[schedule] sessions-${year}.json unreadable (${msg}); rendering empty`);
-    return [];
+    throw new Error(`[schedule] sessions-${year}.json unreadable at ${path}: ${msg}`);
   }
+  console.log(`[schedule] sessions-${year}.json: ${rows.length} archived sessions`);
+  return rows;
 }
 
 /**
