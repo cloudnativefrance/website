@@ -1,0 +1,154 @@
+---
+// src/components/schedule/SessionCard.astro
+import type { SessionRow } from "@/lib/schedule";
+import { endTime, formatTime } from "@/lib/schedule";
+import { pillForeground } from "@/lib/track-pill";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+
+interface SpeakerLink {
+  label: string;
+  company?: string;
+  href: string | null;
+}
+
+interface Props {
+  session: SessionRow;
+  lang: Locale;
+  speakers: SpeakerLink[];
+  /** `grid` is compact and lives in a column; `list` is wide with an avatar rail. */
+  variant: "grid" | "list";
+}
+
+const { session, lang, speakers, variant } = Astro.props;
+const t = useTranslations(lang);
+
+const shown = speakers.slice(0, 2);
+const extra = speakers.length - shown.length;
+const pillBg = session.trackColor;
+const pillFg = pillForeground(pillBg);
+---
+
+<article
+  class:list={["session-card", `session-card--${variant}`]}
+  data-session-id={session.id}
+  data-room={session.room}
+  data-format={session.format}
+  data-track={session.track}
+  data-level={session.level}
+  data-title={session.title}
+  data-start={session.startTime}
+  data-duration={session.durationMin}
+  data-description={session.description}
+  data-feedback-url={session.feedbackUrl}
+  data-slides-url={session.slidesUrl}
+  data-recording-url={session.recordingUrl}
+  data-cover-image={session.coverImageUrl}
+  data-language={session.language}
+  data-speakers={JSON.stringify(speakers)}
+  data-search={[session.title, session.description, session.track, ...speakers.map((s) => s.label)].join(" ")}
+>
+  <div class="session-card-head">
+    <span class="session-card-time">
+      {formatTime(session.startTime)} — {endTime(session)}
+    </span>
+    <button
+      type="button"
+      class="session-card-bookmark"
+      aria-label={t("schedule.bookmark_toggle")}
+      data-bookmark={session.id}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+    </button>
+  </div>
+
+  <h3 class="session-card-title">{session.title}</h3>
+
+  {shown.length > 0 && (
+    <p class="session-card-speakers">
+      {shown.map((s, i) => (
+        <>
+          {i > 0 && <span>, </span>}
+          {s.href ? <a href={s.href}>{s.label}</a> : <span>{s.label}</span>}
+          {s.company && <span class="session-card-company"> · {s.company}</span>}
+        </>
+      ))}
+      {extra > 0 && <span class="session-card-more"> +{extra}</span>}
+    </p>
+  )}
+
+  <div class="session-card-foot">
+    {session.track && (
+      <span class="session-card-pill" style={`background:${pillBg ?? "var(--color-muted)"};color:${pillFg};`}>
+        {session.track}
+      </span>
+    )}
+    {session.format !== "talk" && (
+      <span class="session-card-format">{t(`schedule.format.${session.format}` as any)}</span>
+    )}
+    {session.recordingUrl && (
+      <a
+        href={session.recordingUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="session-card-replay"
+        aria-label={t("schedule.open_recording")}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        {t("schedule.open_recording")}
+      </a>
+    )}
+  </div>
+</article>
+
+<style>
+  /* Equal hairline on all four sides. No accent stripe: a thick coloured edge
+     is a generic-UI tell, and the track colour is already carried by the pill,
+     so an edge would be decoration duplicating a signal. */
+  .session-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    min-width: 0;
+  }
+  .session-card:hover { border-color: var(--color-primary); }
+
+  .session-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .session-card-time { font-size: 12px; color: var(--color-muted-foreground); font-variant-numeric: tabular-nums; }
+  .session-card-bookmark { color: var(--color-muted-foreground); background: none; border: 0; cursor: pointer; padding: 2px; }
+  .session-card-bookmark.is-on svg { fill: currentColor; color: var(--color-primary); }
+
+  .session-card-title {
+    font-size: 14px; font-weight: 600; line-height: 1.35; margin: 0;
+    /* Clamp with a real ellipsis — the old grid cut titles mid-word. */
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .session-card--list .session-card-title { font-size: 17px; -webkit-line-clamp: 2; }
+
+  .session-card-speakers {
+    font-size: 12.5px; color: var(--color-muted-foreground); margin: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .session-card-speakers a:hover { text-decoration: underline; }
+  .session-card-company { opacity: .85; }
+
+  .session-card-foot { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+  .session-card-pill {
+    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+    white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+  }
+  .session-card-format {
+    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+    border: 1px solid var(--color-border); color: var(--color-muted-foreground);
+  }
+  .session-card-replay {
+    margin-left: auto; display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 600; color: var(--color-primary);
+  }
+  .session-card.is-hidden { display: none; }
+</style>
