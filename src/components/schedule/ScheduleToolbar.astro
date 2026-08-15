@@ -1,0 +1,155 @@
+---
+// src/components/schedule/ScheduleToolbar.astro
+import type { SessionRow } from "@/lib/schedule";
+import { listFormats, listLevels, listRooms, listTracks } from "@/lib/schedule";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+
+interface Props { sessions: SessionRow[]; lang: Locale; defaultView: "grid" | "list" }
+const { sessions, lang, defaultView } = Astro.props;
+const t = useTranslations(lang);
+
+const rooms = listRooms(sessions);
+const formats = listFormats(sessions);
+const tracks = listTracks(sessions);
+const levels = listLevels(sessions);
+---
+
+<div class="toolbar" data-default-view={defaultView}>
+  <div class="toolbar-main">
+    <div class="toolbar-search">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input
+        type="search"
+        id="schedule-search"
+        aria-label={t("schedule.search.label")}
+        placeholder={t("schedule.search.placeholder")}
+        autocomplete="off"
+      />
+      <button type="button" id="schedule-search-clear" aria-label={t("schedule.search.clear")} hidden>×</button>
+    </div>
+
+    <div class="toolbar-views" role="group" aria-label={t("schedule.view.toggle")}>
+      <button type="button" id="schedule-view-grid" data-view="grid" aria-pressed={defaultView === "grid"}>
+        {t("schedule.view.grid")}
+      </button>
+      <button type="button" id="schedule-view-list" data-view="list" aria-pressed={defaultView === "list"}>
+        {t("schedule.view.list")}
+      </button>
+    </div>
+
+    <div class="toolbar-actions">
+      <button type="button" id="schedule-agenda-toggle" class="toolbar-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+        <span>{t("schedule.agenda.label")}</span>
+        <span id="schedule-agenda-count" class="toolbar-badge">0</span>
+      </button>
+      <button type="button" id="schedule-export-all" class="toolbar-btn" aria-label={t("schedule.export_all")}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <details class="toolbar-filters">
+    <summary>
+      {t("schedule.filters.button")}
+      <span id="schedule-filter-active-count" class="toolbar-badge" hidden></span>
+    </summary>
+    <div class="toolbar-facets">
+      {[
+        { key: "room", label: t("schedule.filter.label_room"), values: rooms },
+        { key: "format", label: t("schedule.filter.label_format"), values: formats.map(String) },
+        { key: "track", label: t("schedule.filter.label_track"), values: tracks },
+        { key: "level", label: t("schedule.filter.label_level"), values: levels.map(String) },
+      ]
+        .filter((facet) => facet.values.length > 0)
+        .map((facet) => (
+          <div class="toolbar-facet">
+            <span class="toolbar-facet-label">{facet.label}</span>
+            <div class="toolbar-chips">
+              {facet.values.map((value) => (
+                <button
+                  type="button"
+                  class="schedule-filter"
+                  data-filter={facet.key}
+                  data-value={value}
+                  aria-pressed="false"
+                >
+                  {facet.key === "format" || facet.key === "level"
+                    ? t(`schedule.${facet.key === "format" ? "format" : "level"}.${value}` as any)
+                    : value}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      <button type="button" id="schedule-filter-clear" class="toolbar-clear">
+        {t("schedule.filter.clear_all")}
+      </button>
+    </div>
+  </details>
+
+  <p id="schedule-result-count" class="toolbar-count" aria-live="polite" data-total={sessions.length}></p>
+</div>
+
+<style>
+  .toolbar {
+    position: sticky; top: 64px; z-index: 20;
+    background: color-mix(in oklch, var(--color-background) 92%, transparent);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--color-border);
+    padding: 10px 0;
+  }
+  .toolbar-main { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .toolbar-search {
+    display: flex; align-items: center; gap: 8px; flex: 1 1 280px; min-width: 0;
+    border: 1px solid var(--color-border); border-radius: 999px;
+    padding: 0 12px; height: 38px; background: var(--color-card);
+    color: var(--color-muted-foreground);
+  }
+  .toolbar-search input { flex: 1; min-width: 0; border: 0; background: none; outline: none; color: var(--color-foreground); font-size: 14px; }
+  .toolbar-search input::-webkit-search-cancel-button { display: none; }
+  .toolbar-search button { border: 0; background: none; cursor: pointer; font-size: 18px; line-height: 1; color: inherit; }
+
+  .toolbar-views { display: inline-flex; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; }
+  .toolbar-views button {
+    padding: 0 14px; height: 38px; font-size: 13px; font-weight: 600;
+    background: var(--color-card); color: var(--color-foreground); border: 0; cursor: pointer;
+  }
+  .toolbar-views button[aria-pressed="true"] { background: var(--color-primary); color: var(--color-primary-foreground); }
+
+  .toolbar-actions { display: flex; gap: 8px; }
+  .toolbar-btn {
+    display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 12px;
+    border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-card);
+    font-size: 13px; font-weight: 600; color: var(--color-foreground); cursor: pointer;
+  }
+  .toolbar-badge {
+    background: color-mix(in oklch, var(--color-primary) 20%, transparent);
+    color: var(--color-primary); border-radius: 999px; font-size: 11px; font-weight: 700; padding: 1px 7px;
+  }
+
+  .toolbar-filters { margin-top: 8px; }
+  .toolbar-filters summary {
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+    font-size: 13px; font-weight: 600; list-style: none;
+  }
+  .toolbar-facets { display: flex; flex-direction: column; gap: 10px; padding-top: 10px; }
+  .toolbar-facet { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .toolbar-facet-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .1em;
+    color: var(--color-muted-foreground); min-width: 64px;
+  }
+  .toolbar-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .schedule-filter {
+    border: 1px solid var(--color-border); border-radius: 999px; background: var(--color-card);
+    padding: 4px 11px; font-size: 12.5px; color: var(--color-foreground); cursor: pointer;
+  }
+  .schedule-filter.is-active { background: var(--color-primary); color: var(--color-primary-foreground); border-color: var(--color-primary); }
+  .toolbar-clear { align-self: flex-start; background: none; border: 0; padding: 0; font-size: 12.5px; text-decoration: underline; color: var(--color-muted-foreground); cursor: pointer; }
+  .toolbar-count { font-size: 12.5px; color: var(--color-muted-foreground); margin: 8px 0 0; }
+
+  /* On mobile the facets collapse behind the summary — the old bar cost eight
+     stacked rows, roughly 1100px, before the first talk. */
+  @media (min-width: 768px) { .toolbar-filters[open] .toolbar-facets { padding-top: 12px; } }
+</style>
