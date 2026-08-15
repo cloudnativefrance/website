@@ -234,17 +234,31 @@ describe("findGaps", () => {
   });
 
   it("measures the gap from the LATEST end in the slot, not the first", () => {
-    // A slot holds parallel talks of different lengths. Using the first
-    // session's end would invent a gap that does not exist.
+    // A slot holds parallel talks of different lengths: a 10-minute lightning
+    // talk alongside a 45-minute one. Measuring from the FIRST session's end
+    // (10:40) would report a 50-minute break while the long talk is still
+    // running until 11:15 — a break the site would then label on screen.
+    // Measured correctly there are only 15 minutes, below the threshold, so
+    // nothing is reported. This asserts the absence, because that is exactly
+    // what the naive implementation gets wrong.
     const slots = groupIntoSlots([
       row({ id: "SHORT", startTime: "2026-02-03T10:30:00+01:00", durationMin: 10 }),
       row({ id: "LONG", startTime: "2026-02-03T10:30:00+01:00", durationMin: 45, room: "Piaf" }),
       row({ id: "NEXT", startTime: "2026-02-03T11:30:00+01:00", durationMin: 30 }),
     ]);
+    expect(findGaps(slots, 20)).toEqual([]);
+  });
+
+  it("does report the gap once the long talk has finished", () => {
+    // Same slot, but the next one starts at 11:50: 35 minutes after 11:15.
+    const slots = groupIntoSlots([
+      row({ id: "SHORT", startTime: "2026-02-03T10:30:00+01:00", durationMin: 10 }),
+      row({ id: "LONG", startTime: "2026-02-03T10:30:00+01:00", durationMin: 45, room: "Piaf" }),
+      row({ id: "NEXT", startTime: "2026-02-03T11:50:00+01:00", durationMin: 30 }),
+    ]);
     const gaps = findGaps(slots, 20);
     expect(gaps).toHaveLength(1);
-    expect(gaps[0].startTime).toBe("11:15");
-    expect(gaps[0].minutes).toBe(15 + 0);
+    expect(gaps[0]).toMatchObject({ startTime: "11:15", endTime: "11:50", minutes: 35 });
   });
 });
 ```
@@ -407,7 +421,7 @@ export function findGaps(slots: Slot[], minMinutes = 20): Gap[] {
 - [ ] **Step 4: Run the tests**
 
 Run: `pnpm vitest run src/lib/__tests__/schedule-filter.test.ts`
-Expected: PASS, 16 tests.
+Expected: PASS, 17 tests.
 
 - [ ] **Step 5: Verify against the real 2026 data**
 
