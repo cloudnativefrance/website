@@ -61,8 +61,15 @@ function linksFor(s: SessionRow) {
             </div>
           ),
           hasNonKeynote &&
-            rooms.map((room) => (
-              <div class="grid-view-cell">
+            // Explicit column, not auto-placement: when this row also renders
+            // `.grid-view-span` (grid-column: 2 / -1, filling row 1), the auto
+            // placement algorithm can't fit a cell after it on row 1 and wraps
+            // to row 2 starting back at column 1 — the gutter's column, not
+            // room 0's. Every cell then lands one column left of its room,
+            // silently (the room[last] column is left empty instead). The
+            // gutter is column 1, so room index `i` is always column `i + 2`.
+            rooms.map((room, i) => (
+              <div class="grid-view-cell" style={`grid-column:${i + 2};`}>
                 {slot.sessions
                   .filter((s) => s.room === room && s.format !== "keynote")
                   .map((s) => (
