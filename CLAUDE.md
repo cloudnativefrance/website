@@ -29,9 +29,14 @@ Schema changes that span the CSV pipeline (Sheet column → parser → Zod schem
 - **Data pipeline**: sessions come from the self-hosted Pretalx released-schedule export
   (`src/lib/pretalx.ts`), fetched at build time with a committed snapshot fallback in
   `src/content/schedule/pretalx-{year}.json` — refresh it with `pnpm sync:pretalx`.
-  Speakers, sponsors and team are still published Google Sheet CSVs via
-  `src/lib/remote-csv.ts`. Env overrides: `PRETALX_BASE_URL`,
-  `SPEAKERS_CSV_URL_{2023,2026,2027}`, `SPONSORS_CSV_URL_{2023,2026,2027}`, `TEAM_CSV_URL`.
+  Speakers also come from Pretalx (`src/lib/speaker-source.ts`): name, bio and photo
+  from the public export, company/role/socials from speaker questions read with an API
+  token. Two things stay in the repo because Pretalx cannot own them — `src/data/speaker-slugs.ts`
+  (URL identity) and `src/data/keynote-cast.ts` (the opening-keynote running order).
+  Sponsors and team remain Google Sheet CSVs via `src/lib/remote-csv.ts`.
+  Env: `PRETALX_BASE_URL`, `PRETALX_API_TOKEN` or `PRETALX_API_TOKEN_FILE`,
+  `PRETALX_TOKEN_REQUIRED=1` to make a missing token fatal (the image build sets it),
+  `SPONSORS_CSV_URL_{2023,2026,2027}`, `TEAM_CSV_URL`.
   Editions with no Pretalx event read a frozen `src/content/schedule/sessions-{year}.json`.
 - **Site origin**: `PUBLIC_SITE_URL` (build-time only) sets `site` in `astro.config.mjs`, which drives canonical URLs, hreflang, the sitemap, `robots.txt` and the `noindex` meta tag. Falls back to production when unset or empty — the single production-origin literal lives in `src/lib/site-env.ts`. CI sets it to the staging origin for the `staging` branch.
 - **Testing**: `pnpm test` (Vitest). Component tests may mock `astro:content` via `vi.mock`.

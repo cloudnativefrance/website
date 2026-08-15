@@ -41,7 +41,7 @@ When NOT to use:
    - Team → `getCollection("team")`
 3. **Session-attached resources live in Pretalx.** Slides are talk resources; replays are
    talk resources of type link titled `Replay`. There is no Sheet column for either.
-4. **Overrides are env-driven.** `PRETALX_BASE_URL`, `SPEAKERS_CSV_URL_{2023,2026,2027}`,
+4. **Overrides are env-driven.** `PRETALX_BASE_URL`, `PRETALX_API_TOKEN`,
    `SPONSORS_CSV_URL_{2023,2026,2027}`, `TEAM_CSV_URL`. Never hardcode alternate URLs.
 5. **Snapshots must be refreshed, not hand-edited.** `pnpm sync:pretalx` rewrites
    `src/content/schedule/pretalx-{year}.json`. The old sessions CSV fallback silently drifted
@@ -58,7 +58,7 @@ When NOT to use:
 | Data | Source | Override | Loader / collection |
 |---|---|---|---|
 | Sessions | Pretalx released schedule export | `PRETALX_BASE_URL` | `loadSessions(year)` — `src/lib/schedule.ts` |
-| Speakers | Google Sheet | `SPEAKERS_CSV_URL_<year>` | `getCollection("speakers-<year>")` |
+| Speakers | Pretalx (+ repo maps) | `PRETALX_API_TOKEN` | `getCollection("speakers-<year>")` |
 | Sponsors | Google Sheet | `SPONSORS_CSV_URL_<year>` | `getCollection("sponsors-<year>")` |
 | Team | Google Sheet | `TEAM_CSV_URL` | `getCollection("team")` |
 

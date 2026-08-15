@@ -16,7 +16,7 @@ site falls back to the committed CSVs under `src/content/`.
 | Entity | Source | Env var | Local fallback |
 |--------|--------|---------|-----------------|
 | Conference sessions | Pretalx | `PRETALX_BASE_URL` | `src/content/schedule/pretalx-{year}.json` |
-| Speaker profiles | Google Sheet | `SPEAKERS_CSV_URL_{2023,2026,2027}` | `src/content/schedule/speakers-{year}.csv` |
+| Speaker profiles | Pretalx | `PRETALX_BASE_URL` + `PRETALX_API_TOKEN` | `src/content/schedule/speakers-{year}.json` (no-Pretalx editions) |
 | Sponsors | Google Sheet | `SPONSORS_CSV_URL_{2023,2026,2027}` | `src/content/sponsors/sponsors-{year}.csv` |
 | Team members | Google Sheet | `TEAM_CSV_URL` | `src/content/team/team.csv` |
 
@@ -165,12 +165,25 @@ Sessions and the Sheet-backed rosters resolve differently at build time.
 1. Fetch the Pretalx released-schedule export for the edition's event.
 2. If that fetch fails or is invalid, fall back to the committed
    `src/content/schedule/pretalx-{year}.json` snapshot and warn in the build log.
-3. Normalize each talk into a `SessionRow`, resolving speaker names against the Speakers
-   Sheet.
+3. Normalize each talk into a `SessionRow`, resolving speaker names to slugs via
+   `src/data/speaker-slugs.ts`.
+4. Read the "Niveau de la présentation" answers (question 4) with the API token, for
+   the scheduled talks only, and map them onto `level`.
 
-**Speakers, sponsors, team** (`src/lib/remote-csv.ts`):
+**Speakers** (`src/lib/speaker-source.ts`):
 
-1. If the corresponding env var (e.g. `SPEAKERS_CSV_URL_2026`) is set and non-empty, fetch the CSV from that URL.
+1. Take the people from the same released export — that set is the allowlist, so a
+   speaker on an unannounced submission cannot reach the site.
+2. Read their company, role and social links from the Pretalx speaker questions, using
+   the API token. Without a token these are empty and the build warns; with
+   `PRETALX_TOKEN_REQUIRED=1` (set by the image build) it fails instead.
+3. Merge in the two things Pretalx cannot own: the slug from `src/data/speaker-slugs.ts`,
+   and the keynote role from `src/data/keynote-cast.ts`.
+4. Editions with no Pretalx event read `src/content/schedule/speakers-{year}.json`.
+
+**Sponsors, team** (`src/lib/remote-csv.ts`):
+
+1. If the corresponding env var (e.g. `SPONSORS_CSV_URL_2026`) is set and non-empty, fetch the CSV from that URL.
 2. Otherwise, read the local file under `src/content/{…}/*.csv`.
 3. Parse CSV, validate each row against the Zod schema in `src/content.config.ts`, skip invalid rows with a warning, expose a typed list to the rest of the code.
 

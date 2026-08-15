@@ -56,7 +56,7 @@ Sheets (URLs configured via env vars); development falls back to the committed f
 
 | Entity | Env var | Local fallback |
 |--------|---------|----------------|
-| Speakers | `SPEAKERS_CSV_URL_{2023,2026,2027}` | `src/content/schedule/speakers-{year}.csv` |
+| Speakers | Pretalx (`PRETALX_BASE_URL`, `PRETALX_API_TOKEN`) | `src/content/schedule/speakers-{year}.json` (editions with no Pretalx event) |
 | Sponsors | `SPONSORS_CSV_URL_{2023,2026,2027}` | `src/content/sponsors/sponsors-{year}.csv` |
 | Team | `TEAM_CSV_URL` | `src/content/team/team.csv` |
 
