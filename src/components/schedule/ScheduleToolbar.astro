@@ -110,6 +110,12 @@ const levels = listLevels(sessions);
   .toolbar-search input { flex: 1; min-width: 0; border: 0; background: none; outline: none; color: var(--color-foreground); font-size: 14px; }
   .toolbar-search input::-webkit-search-cancel-button { display: none; }
   .toolbar-search button { border: 0; background: none; cursor: pointer; font-size: 18px; line-height: 1; color: inherit; }
+  /* The input itself stays outline:none by design — the visible affordance
+     belongs to the rounded pill that draws the border, not a second ring
+     nested inside it. :has(:focus-visible) keeps this from lighting up on a
+     mouse click, matching the ring/offset treatment every other interactive
+     control in the site uses (e.g. ThemeToggle.astro, Navigation.astro). */
+  .toolbar-search:has(input:focus-visible) { outline: 2px solid var(--color-ring); outline-offset: 2px; }
 
   .toolbar-views { display: inline-flex; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; }
   .toolbar-views button {
@@ -117,6 +123,11 @@ const levels = listLevels(sessions);
     background: var(--color-card); color: var(--color-foreground); border: 0; cursor: pointer;
   }
   .toolbar-views button[aria-pressed="true"] { background: var(--color-primary); color: var(--color-primary-foreground); }
+  /* The container clips overflow to keep only its own rounded corners visible
+     (no square corner from a child button poking out), which also clips a
+     default outline drawn outside the button's border box. A negative offset
+     pulls the ring inside instead, so it survives the clip. */
+  .toolbar-views button:focus-visible { outline: 2px solid var(--color-ring); outline-offset: -2px; }
 
   .toolbar-actions { display: flex; gap: 8px; }
   .toolbar-btn {
