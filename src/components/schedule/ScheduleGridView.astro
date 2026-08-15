@@ -35,31 +35,42 @@ function linksFor(s: SessionRow) {
     {rooms.map((room) => <div class="grid-view-room">{room}</div>)}
   </div>
 
-  {slots.map((slot, i) => (
+  {slots.map((slot, i) => {
+    const hasKeynote = slot.sessions.some((s) => s.format === "keynote");
+    const hasNonKeynote = slot.sessions.some((s) => s.format !== "keynote");
+    // The keynote span and the room cells are ONE array expression, not two
+    // sibling `{}` template blocks: two siblings put a source newline between
+    // them that Astro renders as a stray whitespace text node even when one
+    // side evaluates to `false` — which would break the byte-identical output
+    // a homogeneous slot (keynote-only or non-keynote-only, i.e. every slot
+    // today) must keep.
+    return (
     <>
       <div class="grid-view-row">
         <div class="grid-view-gutter grid-view-time">
           {slot.startTime.slice(11, 16)}
         </div>
-        {slot.sessions.some((s) => s.format === "keynote") ? (
-          <div class="grid-view-span">
-            {slot.sessions
-              .filter((s) => s.format === "keynote")
-              .map((s) => (
-                <SessionCard session={s} lang={lang} speakers={linksFor(s)} variant="grid" />
-              ))}
-          </div>
-        ) : (
-          rooms.map((room) => (
-            <div class="grid-view-cell">
+        {[
+          hasKeynote && (
+            <div class="grid-view-span">
               {slot.sessions
-                .filter((s) => s.room === room)
+                .filter((s) => s.format === "keynote")
                 .map((s) => (
                   <SessionCard session={s} lang={lang} speakers={linksFor(s)} variant="grid" />
                 ))}
             </div>
-          ))
-        )}
+          ),
+          hasNonKeynote &&
+            rooms.map((room) => (
+              <div class="grid-view-cell">
+                {slot.sessions
+                  .filter((s) => s.room === room && s.format !== "keynote")
+                  .map((s) => (
+                    <SessionCard session={s} lang={lang} speakers={linksFor(s)} variant="grid" />
+                  ))}
+              </div>
+            )),
+        ]}
       </div>
       {gapAfter.has(i) && (
         <div class="grid-view-break">
@@ -71,7 +82,8 @@ function linksFor(s: SessionRow) {
         </div>
       )}
     </>
-  ))}
+    );
+  })}
 </div>
 
 <style>
@@ -102,9 +114,15 @@ function linksFor(s: SessionRow) {
      instead of matching its tallest sibling's height. `:global()` is required:
      SessionCard.astro carries its own Astro style scope, so an unscoped
      selector is the only way this rule can reach it (see the two resolutions
-     in the task brief for the identical issue in the list view). */
-  .grid-view-cell > :global(.session-card) { flex: 1; }
-  .grid-view-span { grid-column: 2 / -1; }
+     in the task brief for the identical issue in the list view).
+     Basis is `auto`, not `0`: with a `0` basis the flex algorithm ignores each
+     card's content height and splits the cell equally between children, which
+     is fine for one card (it still grows to fill the cell) but would force two
+     stacked cards to identical heights regardless of their own content. */
+  .grid-view-cell > :global(.session-card) { flex: 1 1 auto; }
+  /* Same column-flex-and-gap treatment as .grid-view-cell, so two keynote-format
+     sessions in one slot stack with a gap instead of as bare abutting blocks. */
+  .grid-view-span { display: flex; flex-direction: column; gap: 8px; grid-column: 2 / -1; }
   .grid-view-break {
     display: flex; align-items: center; gap: 12px;
     font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
