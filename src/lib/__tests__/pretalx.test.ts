@@ -5,7 +5,6 @@ import {
   durationToMinutes,
   buildSpeakerResolver,
   fetchScheduleExport,
-  loadSpeakerResolver,
   type PretalxScheduleExport,
   type PretalxTalk,
 } from "../pretalx";
@@ -21,7 +20,6 @@ vi.mock("../pretalx", async (importOriginal) => {
   return {
     ...actual,
     fetchScheduleExport: vi.fn(),
-    loadSpeakerResolver: vi.fn(),
     toSessionRows: vi.fn(actual.toSessionRows),
   };
 });
@@ -285,22 +283,21 @@ describe("loadSessions live-fetch path (edition with a Pretalx event)", () => {
 
   it("fetches the export and speaker resolver for the edition's slug and year", async () => {
     vi.mocked(fetchScheduleExport).mockResolvedValue(emptyDoc);
-    vi.mocked(loadSpeakerResolver).mockResolvedValue((name) => name);
 
     await loadSessions(2026);
 
     expect(fetchScheduleExport).toHaveBeenCalledWith(2026, "2026");
-    expect(loadSpeakerResolver).toHaveBeenCalledWith(2026);
   });
 
   it("returns rows produced by the normalizer", async () => {
     vi.mocked(fetchScheduleExport).mockResolvedValue(doc);
-    vi.mocked(loadSpeakerResolver).mockResolvedValue(resolve);
 
     const rows = await loadSessions(2026);
 
     expect(rows).toHaveLength(51);
     expect(rows.map((r) => r.id)).toContain("9H9WKR");
+    // Resolved through the committed slug map, not a stand-in.
+    expect(rows.find((r) => r.id === "9H9WKR")?.speakers).toEqual(["vermande"]);
   });
 
   // toSessionRows itself hard-codes status "confirmed" on every row it emits, so
@@ -309,7 +306,6 @@ describe("loadSessions live-fetch path (edition with a Pretalx event)", () => {
   // exercises loadSessions's real `.filter(...)`, not a pre-filtered stand-in.
   it("filters out a hidden session and one with an empty id", async () => {
     vi.mocked(fetchScheduleExport).mockResolvedValue(emptyDoc);
-    vi.mocked(loadSpeakerResolver).mockResolvedValue((name) => name);
     vi.mocked(toSessionRows).mockReturnValueOnce([
       makeRow({ id: "VISIBLE", status: "confirmed" }),
       makeRow({ id: "HIDDEN1", status: "hidden" }),

@@ -161,11 +161,23 @@ export function talkRecordingUrl(talk: PretalxTalk): string {
   return pickResource(talk, (r) => VIDEO_HOST.test(r.url) || REPLAY_LABEL.test(r.title));
 }
 
+/**
+ * Every talk in a released export, flattened.
+ *
+ * The export nests days -> rooms -> talks, and three separate consumers need to
+ * walk it (session rows, the allowlist of codes, the set of people). One shared
+ * traversal means a change to the export's shape is a single edit with a single
+ * compiler error, not three copies that drift.
+ */
+export function allTalks(doc: PretalxScheduleExport): PretalxTalk[] {
+  return doc.schedule.conference.days.flatMap((day) =>
+    Object.values(day.rooms).flatMap((talks) => talks),
+  );
+}
+
 /** Every talk code in a released export — the allowlist for authenticated reads. */
 export function collectTalkCodes(doc: PretalxScheduleExport): string[] {
-  return doc.schedule.conference.days.flatMap((day) =>
-    Object.values(day.rooms).flatMap((talks) => talks.map((t) => t.code)),
-  );
+  return allTalks(doc).map((t) => t.code);
 }
 
 export function toSessionRows(
@@ -178,9 +190,9 @@ export function toSessionRows(
   const trackColor = new Map(conference.tracks.map((t) => [t.name, t.color]));
 
   const rows: SessionRow[] = [];
-  for (const day of conference.days) {
-    for (const talks of Object.values(day.rooms)) {
-      for (const talk of talks) {
+  for (const talk of allTalks(doc)) {
+    {
+      {
         const durationMin = durationToMinutes(talk.duration);
         const track = talk.track ?? "";
         rows.push({
@@ -252,10 +264,6 @@ export function buildSpeakerResolver(
   };
 }
 
-/** Kept async: callers await it alongside the schedule fetch. */
-export async function loadSpeakerResolver(_year: Edition): Promise<SpeakerResolver> {
-  return buildSpeakerResolver();
-}
 
 export async function fetchScheduleExport(
   year: Edition,

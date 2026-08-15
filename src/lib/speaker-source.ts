@@ -18,10 +18,17 @@
  * session — who hosts, who headlines, who sits on the panel — which is a layout
  * decision that changes every edition, not a fact about a person.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { Edition } from "./editions";
-import { PRETALX_EVENT, fetchScheduleExport, type PretalxPerson } from "./pretalx";
+import { loadFrozenArchive } from "./frozen-archive";
+import {
+  PRETALX_EVENT,
+  allTalks,
+  fetchScheduleExport,
+  type PretalxPerson,
+  type PretalxScheduleExport,
+} from "./pretalx";
 import { loadSpeakerEnrichment } from "./pretalx-private";
 import { SPEAKER_SLUGS } from "@/data/speaker-slugs";
 import { keynoteRoleFor } from "@/data/keynote-cast";
@@ -42,17 +49,11 @@ export interface SpeakerRecord {
 }
 
 /** Every distinct person in a released export, keyed by code. */
-function peopleInSchedule(doc: {
-  schedule: { conference: { days: { rooms: Record<string, { persons: PretalxPerson[] }[]> }[] } };
-}): Map<string, PretalxPerson> {
+function peopleInSchedule(doc: PretalxScheduleExport): Map<string, PretalxPerson> {
   const out = new Map<string, PretalxPerson>();
-  for (const day of doc.schedule.conference.days) {
-    for (const talks of Object.values(day.rooms)) {
-      for (const talk of talks) {
-        for (const person of talk.persons) {
-          if (!out.has(person.code)) out.set(person.code, person);
-        }
-      }
+  for (const talk of allTalks(doc)) {
+    for (const person of talk.persons) {
+      if (!out.has(person.code)) out.set(person.code, person);
     }
   }
   return out;
@@ -125,25 +126,6 @@ export async function loadSpeakers(year: Edition): Promise<SpeakerRecord[]> {
   return records;
 }
 
-/**
- * Frozen archive for editions with no Pretalx event.
- *
- * Same reasoning as the session archives: this file is the sole source for the
- * edition, with no fallback beneath it, so a missing or corrupt one is a repo
- * defect and fails loudly rather than silently emptying the speakers page.
- */
 function loadArchivedSpeakers(year: Edition): SpeakerRecord[] {
-  const path = join(process.cwd(), `src/content/schedule/speakers-${year}.json`);
-  let rows: unknown;
-  try {
-    rows = JSON.parse(readFileSync(path, "utf8"));
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    throw new Error(`[speakers] speakers-${year}.json unreadable at ${path}: ${msg}`);
-  }
-  if (!Array.isArray(rows)) {
-    throw new Error(`[speakers] speakers-${year}.json must be a JSON array`);
-  }
-  console.log(`[speakers] ${year}: ${rows.length} archived`);
-  return rows as SpeakerRecord[];
+  return loadFrozenArchive<SpeakerRecord>("speakers", year);
 }

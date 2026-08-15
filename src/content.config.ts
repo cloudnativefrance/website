@@ -12,6 +12,17 @@ import { loadSpeakers } from "./lib/speaker-source";
 
 // -- csvLoader (unchanged) -------------------------------------------------
 
+/**
+ * Store keys carry a zero-padded row index so Astro's alphabetical
+ * `getCollection()` order matches source order, and so an entity appearing twice
+ * (a sponsor in two tiers) gets a unique key per row instead of overwriting
+ * itself. `getSlug()` in src/lib/speakers.ts strips the prefix, so every loader
+ * that feeds a slug-routed collection must use this exact shape.
+ */
+function indexedStoreId(index: number, naturalId: string): string {
+  return `${String(index).padStart(4, "0")}-${naturalId}`;
+}
+
 function csvLoader({ url, fallback, label }: { url?: string; fallback: string; label: string }): Loader {
   return {
     name: `csv:${label}`,
@@ -38,13 +49,8 @@ function csvLoader({ url, fallback, label }: { url?: string; fallback: string; l
         keys.forEach((k, i) => { obj[k] = (row[i] ?? "").trim(); });
         const naturalId = obj.slug || obj.id;
         if (!naturalId) continue;
-        const storeKey = `${String(rowIndex).padStart(4, "0")}-${naturalId}`;
-        const data: Record<string, unknown> = { ...obj };
-        if ("keynote" in obj) {
-          const v = String(obj.keynote || "").toLowerCase();
-          data.keynote = v === "true" || v === "1" || v === "yes";
-        }
-        const parsed = await parseData({ id: storeKey, data });
+        const storeKey = indexedStoreId(rowIndex, naturalId);
+        const parsed = await parseData({ id: storeKey, data: { ...obj } });
         store.set({ id: storeKey, data: parsed });
       }
     },
@@ -63,16 +69,14 @@ const socialUrl = z.preprocess(
     const match = raw.match(/https?:\/\/\S+/);
     if (match) return match[0].replace(/[),.;]+$/, "");
 
-    // Speakers answer these questions in Pretalx by hand, and routinely type a
-    // bare handle or a scheme-less host — "@ada", "linkedin.com/in/ada",
-    // "github.com/ada". Requiring a full URL dropped all of those silently, so
-    // the profile simply lost its link. Normalise the common shapes instead.
+    // Speakers answer these questions in Pretalx by hand and routinely omit the
+    // scheme — "linkedin.com/in/ada", "github.com/ada". Requiring a full URL
+    // dropped those silently and the profile simply lost its link.
+    //
+    // A bare handle ("@ada") is deliberately NOT accepted: turning it into a URL
+    // needs a per-platform base, and guessing one would invent links that 404.
     const value = raw.trim().replace(/[),.;]+$/, "");
-    if (!value) return undefined;
-    if (/^[a-z0-9-]+\.[a-z]{2,}\//i.test(value)) return `https://${value}`;
-    const handle = value.replace(/^@/, "");
-    if (!handle || /\s/.test(handle)) return undefined;
-    if (/^[\w.-]+\.[a-z]{2,}$/i.test(handle)) return `https://${handle}`;
+    if (/^[\w-]+(\.[\w-]+)+\/\S*$/.test(value)) return `https://${value}`;
     return undefined;
   },
   z.string().url().optional(),
@@ -185,10 +189,6 @@ export { TEAM_GROUPS };
 
 /**
  * Speakers come from Pretalx, merged with the repo's slug map and keynote cast.
- *
- * The store key keeps the `${rowIndex}-${slug}` shape the csvLoader used, because
- * `getSlug()` in src/lib/speakers.ts strips that prefix and every speaker URL is
- * built from the result.
  */
 function speakersCollection(year: Edition) {
   return defineCollection({
@@ -198,7 +198,7 @@ function speakersCollection(year: Edition) {
         const records = await loadSpeakers(year);
         store.clear();
         for (let i = 0; i < records.length; i++) {
-          const id = `${String(i).padStart(4, "0")}-${records[i].slug}`;
+          const id = indexedStoreId(i, records[i].slug);
           // Spread into a plain record: parseData wants an index-signature type,
           // and an interface has none.
           const data = { ...records[i] } as Record<string, unknown>;

@@ -88,28 +88,33 @@ function readToken(): string | undefined {
 }
 
 /**
- * Resolve the token, or explain precisely what is missing.
- *
- * Absent token is fatal only when `PRETALX_TOKEN_REQUIRED=1`, which the
- * production image sets. Locally it degrades with a warning so that working on
- * layout does not require a credential — but shipping a speakers page stripped
- * of every company is a visible regression, so production fails instead.
+ * How to obtain a token, appended to whichever error surfaces first.
  */
-export function requireToken(): string | undefined {
-  const token = readToken();
-  if (token) return token;
-  const required = process.env.PRETALX_TOKEN_REQUIRED === "1";
-  const how =
-    "Set PRETALX_API_TOKEN, or PRETALX_API_TOKEN_FILE to a file containing it. " +
-    "Create one at " + PRETALX_BASE + "/orga/me with read access to questions and answers.";
-  if (required) {
-    throw new Error(`[pretalx] No API token, and PRETALX_TOKEN_REQUIRED=1. ${how}`);
+const TOKEN_HELP =
+  "Set PRETALX_API_TOKEN, or PRETALX_API_TOKEN_FILE to a file containing it. " +
+  `Create one at ${PRETALX_BASE}/orga/me with read access to questions and answers.`;
+
+/** Thrown when there is no token at all, so the policy check has one thing to catch. */
+class MissingTokenError extends Error {
+  constructor() {
+    super(`No API token. ${TOKEN_HELP}`);
+    this.name = "MissingTokenError";
   }
-  console.warn(
-    `[pretalx] No API token — speaker company/role/socials and talk levels will be ` +
-      `empty in this build. Fine for local work, never for a release. ${how}`,
-  );
-  return undefined;
+}
+
+/**
+ * Resolve the token or throw.
+ *
+ * Deliberately not deciding whether that is fatal: "no token" and "the fetch
+ * failed" are the same policy — no data, and the flag says whether shipping
+ * without it is acceptable — so `degradeOnFailure` is the single place that
+ * reads `PRETALX_TOKEN_REQUIRED`. Checking it here too produced an error that
+ * asserted the flag twice and buried this message inside a generic wrapper.
+ */
+export function requireToken(): string {
+  const token = readToken();
+  if (!token) throw new MissingTokenError();
+  return token;
 }
 
 const PAGE_SIZE = 50;
@@ -193,12 +198,6 @@ function answersUrl(eventSlug: string, questionId: number): string {
 const ENRICHMENT_CACHE = new Map<string, Promise<SpeakerEnrichment>>();
 const LEVEL_CACHE = new Map<string, Promise<LevelAnswers>>();
 
-/** Test-only: drop the memo so cases can vary the environment independently. */
-export function __clearPrivateCachesForTests(): void {
-  ENRICHMENT_CACHE.clear();
-  LEVEL_CACHE.clear();
-}
-
 /**
  * Run an authenticated read, degrading rather than failing on a transient error.
  *
@@ -217,9 +216,12 @@ async function degradeOnFailure<T>(what: string, run: () => Promise<T>, empty: T
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (process.env.PRETALX_TOKEN_REQUIRED === "1") {
-      throw new Error(`[pretalx] ${what} failed (${msg}), and PRETALX_TOKEN_REQUIRED=1.`);
+      throw new Error(`[pretalx] ${what}: ${msg} (PRETALX_TOKEN_REQUIRED=1)`);
     }
-    console.warn(`[pretalx] ${what} failed (${msg}); continuing without it.`);
+    console.warn(
+      `[pretalx] ${what}: ${msg} — continuing without it. ` +
+        `Fine for local work, never for a release.`,
+    );
     return empty;
   }
 }
@@ -243,7 +245,6 @@ export async function loadSpeakerEnrichment(
     async () => {
       const token = requireToken();
       const out: SpeakerEnrichment = new Map();
-      if (!token) return out;
       const questions = SPEAKER_QUESTIONS[year];
       if (!questions) {
         throw new Error(
@@ -253,15 +254,23 @@ export async function loadSpeakerEnrichment(
         );
       }
 
-      for (const [field, questionId] of Object.entries(questions) as [
-        SpeakerField,
-        number,
-      ][]) {
-        const answers = await fetchAllPages<PretalxAnswer>(
-          answersUrl(eventSlug, questionId),
-          token,
-          `speaker field "${field}" (question ${questionId})`,
-        );
+      // The six questions are independent — each only writes its own key — so
+      // fetch them concurrently. Sequentially this was the sum of six paginated
+      // crawls; now it is the slowest one.
+      const perField = await Promise.all(
+        (Object.entries(questions) as [SpeakerField, number][]).map(
+          async ([field, questionId]) => ({
+            field,
+            answers: await fetchAllPages<PretalxAnswer>(
+              answersUrl(eventSlug, questionId),
+              token,
+              `speaker field "${field}" (question ${questionId})`,
+            ),
+          }),
+        ),
+      );
+
+      for (const { field, answers } of perField) {
         for (const a of answers) {
           // Allowlist: a person absent from the released schedule never reaches the site.
           if (!a.person || !allowedPersonCodes.has(a.person)) continue;
@@ -298,7 +307,6 @@ export async function loadLevelAnswers(
     async () => {
       const token = requireToken();
       const out: LevelAnswers = new Map();
-      if (!token) return out;
       const questionId = LEVEL_QUESTION_ID[year];
       if (!questionId) {
         throw new Error(

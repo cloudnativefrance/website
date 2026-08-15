@@ -26,7 +26,6 @@ import { EDITIONS, type Edition } from "./editions";
  * published-to-web tab in the single upstream Google Sheet.
  *
  * Override via env in staging/preview:
- *   SPEAKERS_CSV_URL_2023 / _2026 / _2027
  *   SPONSORS_CSV_URL_2023 / _2026 / _2027
  *   TEAM_CSV_URL
  *
@@ -38,15 +37,9 @@ const SHEET_BASE =
 const csv = (gid: number) => `${SHEET_BASE}?gid=${gid}&single=true&output=csv`;
 
 export const CSV_URLS: {
-  speakers: Record<Edition, string>;
   sponsors: Record<Edition, string>;
   team: string;
 } = {
-  speakers: {
-    2023: process.env.SPEAKERS_CSV_URL_2023 || csv(762540077),
-    2026: process.env.SPEAKERS_CSV_URL_2026 || csv(124864767),
-    2027: process.env.SPEAKERS_CSV_URL_2027 || csv(1713930040),
-  },
   sponsors: {
     2023: process.env.SPONSORS_CSV_URL_2023 || csv(1892473186),
     2026: process.env.SPONSORS_CSV_URL_2026 || csv(1833117198),
@@ -55,18 +48,12 @@ export const CSV_URLS: {
   team: process.env.TEAM_CSV_URL || csv(440809363),
 };
 
-export type EditionScopedType = "speakers" | "sponsors";
-
-export function getCsvUrl(type: EditionScopedType, year: Edition): string {
-  return CSV_URLS[type][year];
-}
 
 /**
  * Legacy convenience — current-edition (2026) URLs for callers that have not
  * yet been migrated to `getCsvUrl(type, year)`. These back-compat shims are
  * removed by Task 5 (loadSessions) and Task 4 (content.config.ts).
  */
-export const SPEAKERS_CSV_URL = CSV_URLS.speakers[2026];
 export const SPONSORS_CSV_URL = CSV_URLS.sponsors[2026];
 export const TEAM_CSV_URL = CSV_URLS.team;
 
