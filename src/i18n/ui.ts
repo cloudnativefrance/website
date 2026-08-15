@@ -187,7 +187,11 @@ export const ui = {
     "schedule.format.talk": "Talk",
     "schedule.format.lightning": "Lightning",
     "schedule.format.workshop": "Workshop",
-    "schedule.level.beginner": "Debutant",
+    // "Tout public", not "Debutant": the value comes from the Pretalx question
+    // "Niveau de la présentation", whose first option speakers actually answer is
+    // "Tout public" — accessible to anyone. Rendering that as "Debutant" would tell
+    // an experienced attendee the talk is basic, which is not what the speaker said.
+    "schedule.level.beginner": "Tout public",
     "schedule.level.intermediate": "Intermediaire",
     "schedule.level.advanced": "Avance",
     "schedule.open_feedback": "Donner son feedback",
@@ -573,7 +577,7 @@ export const ui = {
     "schedule.format.talk": "Talk",
     "schedule.format.lightning": "Lightning",
     "schedule.format.workshop": "Workshop",
-    "schedule.level.beginner": "Beginner",
+    "schedule.level.beginner": "All levels",
     "schedule.level.intermediate": "Intermediate",
     "schedule.level.advanced": "Advanced",
     "schedule.open_feedback": "Give feedback",
