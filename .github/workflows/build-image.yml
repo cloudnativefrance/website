@@ -73,6 +73,11 @@ jobs:
           push: ${{ env.IS_PUBLISH }}
           build-args: |
             PUBLIC_SITE_URL=${{ github.ref_name == 'staging' && 'https://staging.cloudnativedays.fr' || '' }}
+          # Passed as a secret, never a build-arg: build-args are written into
+          # image history and would be readable by anyone who can pull the image.
+          # The Dockerfile mounts this for the build layer only.
+          secrets: |
+            pretalx_token=${{ secrets.PRETALX_API_TOKEN }}
           # workflow_dispatch is the "rebuild to pick up Google Sheets
           # changes" lever — without bypassing the cache, the pnpm-build
           # layer is reused and the upstream CSVs are never refetched.

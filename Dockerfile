@@ -14,7 +14,20 @@ COPY . .
 # share the install cache.
 ARG PUBLIC_SITE_URL=
 ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
-RUN pnpm run build
+# Pretalx API token, as a BuildKit secret — deliberately NOT a build-arg.
+# Build-args are recorded in image history, so `docker history` on a published
+# image would print the token to anyone who can pull it. A secret mount exists
+# only for this layer and leaves nothing behind.
+#
+# PRETALX_TOKEN_REQUIRED=1 makes a missing token fail the build. Speaker
+# company/role and talk levels are authenticated reads; without them the site
+# still builds, but ships a speakers page with no affiliations and a schedule
+# with no level chips. That is a silent regression, and a red build is the
+# cheaper failure.
+RUN --mount=type=secret,id=pretalx_token \
+    PRETALX_TOKEN_REQUIRED=1 \
+    PRETALX_API_TOKEN_FILE=/run/secrets/pretalx_token \
+    pnpm run build
 
 # Stage 2: Serve with the official rootless nginx image
 #
