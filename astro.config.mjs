@@ -7,6 +7,13 @@ import tailwindcss from "@tailwindcss/vite";
 // Use relative import to resolve @ alias at config load time
 import { generateFlagEnvSchema } from "./src/config/flags-env.ts";
 import { PROD_ORIGIN } from "./src/lib/site-env.ts";
+import { loadLocalEnv } from "./scripts/load-local-env.mjs";
+
+// Astro surfaces .env values through import.meta.env, not process.env, and the
+// Pretalx reads use process.env so the same code works with a Docker secret
+// file. Load them here so `pnpm dev` and `pnpm build` pick up .env.local with no
+// shell ceremony. A real env var still wins, so CI is unaffected.
+loadLocalEnv();
 
 // https://astro.build/config
 // Build is fully static; bump this file to force a CI rebuild that

@@ -1,8 +1,8 @@
 # Updating content — the sessions & CSV runbook
 
 This guide is for anyone adding or editing speakers, sessions, sponsors, or team members.
-Sessions are authored in **Pretalx** (`cfp.cloudnativedays.fr`); speakers, sponsors, and team
-are authored in **Google Sheets**. This doc is written for both developers (who edit the
+Sessions and speakers are authored in **Pretalx** (`cfp.cloudnativedays.fr`); sponsors and
+team are authored in **Google Sheets**. This doc is written for both developers (who edit the
 local fallbacks) and content editors (who maintain the Sheets). You only need to know a bit
 of English and how to click "Publish to web" in Google Sheets.
 
@@ -32,32 +32,43 @@ Ask a maintainer for the live Sheet URLs — they are not checked into this repo
 
 ## Speakers
 
-Sheet columns (header row must match exactly):
+Speakers are authored in **Pretalx**, not in a Sheet. Two fields stay in this repo
+because Pretalx has nowhere to put them.
 
-```
-slug,name,photo_url,company,role,bio,twitter,linkedin,github,bluesky,website,keynote
-```
-
-- **slug** (required) — URL-safe identifier used in `/speakers/{slug}`. Lowercase, hyphen-separated (e.g. `petazzoni`, `arthur-outhenin-chalandre`). Must be unique across the sheet. Never change an existing slug after it has been published — you will break inbound links.
-- **name** (required) — Full display name with diacritics exactly as the speaker wants to be cited (e.g. `Jérôme Petazzoni`, `Aurélie Vache`).
-- **photo_url** (optional) — absolute URL or site-relative path starting with `/`. Leave empty to fall back to the generated initials avatar.
-- **company** (optional) — affiliation shown under the name.
-- **role** (optional) — title shown alongside the company (combined as `{role} — {company}` on the card).
-- **bio** (optional) — one or two paragraphs in the speaker's preferred language. Plain text; no HTML.
-- **twitter, linkedin, github, bluesky, website** (optional) — absolute URLs only (`https://...`). Leave empty to hide the icon.
-- **keynote** (optional, boolean) — set to `true` to pin this speaker to the keynote rail on the /speakers page; leave empty for regular speakers.
+| Field | Where it lives | Notes |
+|---|---|---|
+| `name`, `bio`, `photo_url` | Pretalx speaker profile | photo falls back to `public/speakers/<slug>.jpg` when committed |
+| `company`, `role`, `linkedin`, `github`, `bluesky`, `website` | Pretalx **speaker questions** | needs the API token to read — they are not public |
+| `slug` | `src/data/speaker-slugs.ts` | URL identity. Never change a published one |
+| `keynote`, `keynote_size` | `src/data/keynote-cast.ts` | the opening-keynote running order |
 
 ### How to add a speaker
 
-1. Open the Speakers Google Sheet (ask a maintainer for the URL).
-2. Append a new row at the bottom. Fill the columns above. Required fields are `slug` and `name`.
-3. Click **File → Share → Publish to web → select the Speakers sheet → CSV → Publish**. Copy the resulting URL.
-4. Verify the URL ends with `output=csv` or `gviz/tq?tqx=out:csv`. If the maintainer set the env var once, you can skip steps 3-4 — existing publishes auto-update when the sheet changes.
-5. Trigger a rebuild in production (see below), or in development just re-run `pnpm dev` / `pnpm build`.
+1. Add them in Pretalx as a speaker on their talk. The site only ever sees people
+   who appear in a **released** schedule version.
+2. Fill their `Entreprise`, `Rôle` and social answers on their Pretalx profile.
+3. Add a line to `src/data/speaker-slugs.ts`, keyed by their **exact** Pretalx name:
+   ```ts
+   "Ada Lovelace": "ada-lovelace",
+   ```
+   Without it the build fails naming them — deliberately. Deriving a slug would
+   produce `/intervenants/Ada%20Lovelace`, a 404 that renders as a working link.
+4. Optionally drop an optimised portrait at `public/speakers/<slug>.jpg`; it is
+   preferred over the Pretalx original, which is unoptimised and cross-origin.
+5. Rebuild.
 
-To add a speaker in development without touching the Sheet: append the row to the edition's
-CSV under `src/content/schedule/` (`speakers-2023.csv`, `speakers-2026.csv`, or
-`speakers-2027.csv`), save, and re-run `pnpm dev`. The hot-reload will re-parse the CSV.
+### Adding someone to the opening keynote
+
+`src/data/keynote-cast.ts` holds the running order per edition — who hosts
+(`lead`), who is an invited guest (`guest`), who sits on the panel (`panel`). Those
+drive three different card treatments. Add the slug to the right list; the
+`keynote` boolean is derived from membership, so there is no second flag to keep
+in step.
+
+### Editions with no Pretalx event
+
+2023 reads a frozen `src/content/schedule/speakers-{year}.json`. It is historical
+and not meant to be extended.
 
 ---
 
@@ -82,8 +93,9 @@ lives there, not in a CSV header.
 ### How to add or edit a session
 
 1. Edit the talk directly in Pretalx (title, room, slot, track, resources, …).
-2. If speakers changed, confirm every speaker's Pretalx `name` matches a row in the Speakers
-   Sheet exactly — a mismatch fails the build loudly rather than silently dropping the name.
+2. If speakers changed, confirm every speaker's Pretalx `name` has an entry in
+   `src/data/speaker-slugs.ts` — a mismatch fails the build loudly rather than silently
+   dropping the name.
 3. Trigger a rebuild (see below). Production fetches the released schedule export live; there
    is no separate "publish" step like the Sheet-backed rosters have.
 
@@ -180,6 +192,31 @@ Sessions and the Sheet-backed rosters resolve differently at build time.
 3. Merge in the two things Pretalx cannot own: the slug from `src/data/speaker-slugs.ts`,
    and the keynote role from `src/data/keynote-cast.ts`.
 4. Editions with no Pretalx event read `src/content/schedule/speakers-{year}.json`.
+
+### Running locally with the Pretalx token
+
+Speaker company/role/socials and talk levels are authenticated reads, so they need
+a token. Once, per machine:
+
+```bash
+cp .env.example .env.local     # .env* is gitignored
+$EDITOR .env.local             # paste the token into PRETALX_API_TOKEN
+```
+
+Then `pnpm dev`, `pnpm build` and `pnpm test` all pick it up with no prefix and
+nothing to remember. A real environment variable still wins, so
+`PRETALX_API_TOKEN=other pnpm build` overrides the file and CI is unaffected.
+
+Without a token nothing breaks: the build warns and renders speakers with no
+affiliation and a schedule with no level chips, which is fine for working on
+layout. The production image sets `PRETALX_TOKEN_REQUIRED=1` so a release cannot
+ship in that state.
+
+Note that Astro exposes `.env` values through `import.meta.env`, not
+`process.env`. The Pretalx code reads `process.env` so the same path works with
+the Docker secret file, so `scripts/load-local-env.mjs` bridges the two from
+`astro.config.mjs` and `vitest.config.ts`. Dropping a `.env.local` in without
+that bridge would look correct and load nothing.
 
 **Sponsors, team** (`src/lib/remote-csv.ts`):
 
