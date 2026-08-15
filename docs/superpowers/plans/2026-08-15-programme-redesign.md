@@ -421,7 +421,7 @@ export function findGaps(slots: Slot[], minMinutes = 20): Gap[] {
 - [ ] **Step 4: Run the tests**
 
 Run: `pnpm vitest run src/lib/__tests__/schedule-filter.test.ts`
-Expected: PASS, 17 tests.
+Expected: PASS, 19 tests.
 
 - [ ] **Step 5: Verify against the real 2026 data**
 
