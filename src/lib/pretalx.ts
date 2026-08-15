@@ -7,9 +7,8 @@ import type {
   SessionLevel,
   SessionRow,
 } from "./schedule";
-import { parseCsv } from "./csv";
 import { fetchTextOrFallback } from "./remote-fetch";
-import { fetchCsvOrFallback, getCsvUrl } from "./remote-csv";
+import { SPEAKER_SLUGS } from "@/data/speaker-slugs";
 
 export const PRETALX_BASE =
   process.env.PRETALX_BASE_URL || "https://cfp.cloudnativedays.fr";
@@ -226,59 +225,36 @@ export function toSessionRows(
  * slugs ("petazzoni" for "Jérôme Petazzoni") and that approach misses 8 of 67.
  * Exact match on the `name` column hits 67/67.
  */
-export function buildSpeakerResolver(csvText: string): SpeakerResolver {
-  const rows = parseCsv(csvText);
-  const index = new Map<string, string>();
-  if (rows.length > 0) {
-    const [header, ...body] = rows;
-    const iSlug = header.findIndex((h) => h.trim() === "slug");
-    const iName = header.findIndex((h) => h.trim() === "name");
-    // A missing column yields an empty index, which would otherwise surface as
-    // 67 identical "no row in the speakers Sheet" errors — misdiagnosing a
-    // missing *column* as missing *rows*. Fail loudly once, here, instead.
-    const missing = [
-      iSlug < 0 ? "slug" : null,
-      iName < 0 ? "name" : null,
-    ].filter((c): c is string => c !== null);
-    if (missing.length > 0) {
-      throw new Error(
-        `Speakers CSV is missing column(s): ${missing.join(", ")}. The CSV appears ` +
-          `malformed — check the published Sheet tab and its header row.`,
-      );
-    }
-    for (const row of body) {
-      const name = (row[iName] ?? "").trim();
-      const slug = (row[iSlug] ?? "").trim();
-      if (name && slug) index.set(name, slug);
-    }
-  }
-
+/**
+ * Resolve a Pretalx person name to the slug the site routes on.
+ *
+ * The map is `src/data/speaker-slugs.ts`, committed to the repo — not the
+ * speakers Sheet. Slugs are URL identity: `/intervenants/petazzoni` is live, and
+ * eight of them are hand-shortened in ways no rule derives from the name, so
+ * they cannot be generated and must not be able to drift when a Sheet tab is
+ * edited or emptied.
+ *
+ * An unknown name throws. Emitting the raw name would produce
+ * `/intervenants/Jérôme%20Petazzoni` — a 404 that renders as a working link.
+ */
+export function buildSpeakerResolver(
+  slugs: Readonly<Record<string, string>> = SPEAKER_SLUGS,
+): SpeakerResolver {
   return (personName, talkCode) => {
-    const slug = index.get(personName.trim());
+    const slug = slugs[personName.trim()];
     if (!slug) {
       throw new Error(
-        `Pretalx speaker "${personName}" (talk ${talkCode}) has no row in the ` +
-          `speakers Sheet. Add a row with a matching \`name\`, or correct the ` +
-          `spelling on one side — emitting the raw name would produce a 404 link.`,
+        `Pretalx speaker "${personName}" (talk ${talkCode}) has no entry in ` +
+          `src/data/speaker-slugs.ts. Add one keyed by their exact Pretalx name.`,
       );
     }
     return slug;
   };
 }
 
-export async function loadSpeakerResolver(year: Edition): Promise<SpeakerResolver> {
-  // Use the CSV-validating wrapper, not the bare text fetch: content.config.ts
-  // fetches this exact URL for the speakers collection, and fetchTextOrFallback
-  // memoises by URL alone. Sharing the validated wrapper means whichever caller
-  // runs first, both see a body that passed the "looks like CSV" guard — an
-  // HTML interstitial from a Sheets outage can never win the race and get
-  // cached unvalidated.
-  const csvText = await fetchCsvOrFallback({
-    url: getCsvUrl("speakers", year),
-    fallbackRelPath: `src/content/schedule/speakers-${year}.csv`,
-    label: `speakers-${year}.csv (slug index)`,
-  });
-  return buildSpeakerResolver(csvText);
+/** Kept async: callers await it alongside the schedule fetch. */
+export async function loadSpeakerResolver(_year: Edition): Promise<SpeakerResolver> {
+  return buildSpeakerResolver();
 }
 
 export async function fetchScheduleExport(

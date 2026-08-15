@@ -18,7 +18,7 @@
  * session — who hosts, who headlines, who sits on the panel — which is a layout
  * decision that changes every edition, not a fact about a person.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Edition } from "./editions";
 import { PRETALX_EVENT, fetchScheduleExport, type PretalxPerson } from "./pretalx";
@@ -58,13 +58,28 @@ function peopleInSchedule(doc: {
   return out;
 }
 
+/**
+ * Prefer the committed image over the Pretalx original.
+ *
+ * `public/speakers/<slug>.jpg` holds 78 optimised, self-hosted portraits. Pretalx
+ * serves unoptimised originals from the CFP host, so using those would make every
+ * speaker card a cross-origin request for a larger file — and two of the
+ * scheduled speakers have no Pretalx avatar at all despite having a local photo.
+ * The Pretalx avatar remains the fallback for anyone with no committed image.
+ */
+function photoFor(slug: string, avatar: string | null | undefined): string {
+  const local = `/speakers/${slug}.jpg`;
+  if (existsSync(join(process.cwd(), "public", local))) return local;
+  return avatar ?? "";
+}
+
 export async function loadSpeakers(year: Edition): Promise<SpeakerRecord[]> {
   const eventSlug = PRETALX_EVENT[year];
   if (!eventSlug) return loadArchivedSpeakers(year);
 
   const doc = await fetchScheduleExport(year, eventSlug);
   const people = peopleInSchedule(doc);
-  const enrichment = await loadSpeakerEnrichment(eventSlug, new Set(people.keys()));
+  const enrichment = await loadSpeakerEnrichment(year, eventSlug, new Set(people.keys()));
 
   const records: SpeakerRecord[] = [];
   const unmapped: string[] = [];
@@ -80,7 +95,7 @@ export async function loadSpeakers(year: Edition): Promise<SpeakerRecord[]> {
     records.push({
       slug,
       name: person.name.trim(),
-      photo_url: person.avatar ?? "",
+      photo_url: photoFor(slug, person.avatar),
       company: extra.company ?? "",
       role: extra.role ?? "",
       bio: (person.biography ?? "").trim(),

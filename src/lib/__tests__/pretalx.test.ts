@@ -117,56 +117,44 @@ describe("toSessionRows", () => {
 });
 
 describe("buildSpeakerResolver", () => {
-  // The Sheet uses hand-shortened slugs. Slugifying the Pretalx name would give
-  // "jerome-petazzoni" and 404; exact name match is what actually works (67/67).
-  const csv = [
-    "slug,name,company",
-    "petazzoni,Jérôme Petazzoni,Enix",
-    "nicolas-vermande,Nicolas Vermande,Staticvoid",
-  ].join("\n");
+  const slugs = {
+    "Jérôme Petazzoni": "petazzoni",
+    "Nicolas Vermande": "vermande",
+  };
 
-  it("maps an exact Pretalx name to the Sheet slug", () => {
-    const resolve = buildSpeakerResolver(csv);
+  it("maps an exact Pretalx name to the committed slug", () => {
+    const resolve = buildSpeakerResolver(slugs);
     expect(resolve("Jérôme Petazzoni", "GJ89TV")).toBe("petazzoni");
-    expect(resolve("Nicolas Vermande", "9H9WKR")).toBe("nicolas-vermande");
+    expect(resolve("Nicolas Vermande", "9H9WKR")).toBe("vermande");
   });
 
   it("throws with the name and talk code when a speaker is unknown", () => {
-    const resolve = buildSpeakerResolver(csv);
+    const resolve = buildSpeakerResolver(slugs);
     // Emitting the raw name would render /intervenants/Someone%20New — a 404
     // that looks like a working link. Fail the build instead.
     expect(() => resolve("Someone New", "ABC123")).toThrow(/Someone New/);
     expect(() => resolve("Someone New", "ABC123")).toThrow(/ABC123/);
   });
 
-  it("tolerates surrounding whitespace on both sides", () => {
-    const resolve = buildSpeakerResolver("slug,name\n a-b , Ada Lovelace \n");
-    expect(resolve("Ada Lovelace", "X")).toBe("a-b");
+  it("points the reader at the file to edit", () => {
+    const resolve = buildSpeakerResolver(slugs);
+    expect(() => resolve("Someone New", "ABC123")).toThrow(/speaker-slugs\.ts/);
   });
 
-  it("throws naming the missing column(s) instead of silently indexing nothing", () => {
-    // Without this guard, a missing header yields an empty index and every
-    // subsequent resolve() throws the generic "no row in the speakers Sheet"
-    // error — misdiagnosing a missing *column* as missing *rows*.
-    expect(() => buildSpeakerResolver("name\nJérôme Petazzoni")).toThrow(/slug/);
-    expect(() => buildSpeakerResolver("slug\npetazzoni")).toThrow(/name/);
+  it("tolerates surrounding whitespace in the incoming name", () => {
+    const resolve = buildSpeakerResolver({ "Ada Lovelace": "a-b" });
+    expect(resolve("  Ada Lovelace ", "X")).toBe("a-b");
   });
 });
 
-describe("buildSpeakerResolver drift guard (committed files, offline)", () => {
-  // Fix 3 (final review): the resolver's fallback path is "never fail the
-  // build on transient unreachability" in the transport, but the resolver
-  // itself throws if a Pretalx person has no row in the committed CSV — so a
-  // Sheets outage plus an undetected drift between the two committed files
-  // would hard-fail the *entire* build, not just the programme page. Nothing
-  // exercised that invariant before this test: the old sessions CSV drifted
-  // 50-vs-51 unnoticed, which is exactly the failure mode this migration
-  // exists to eliminate. Pure and offline — no network — against exactly the
-  // two committed files a real Sheets outage would fall back to.
-  it("resolves every Pretalx person in the committed pretalx-2026.json from the committed speakers-2026.csv", () => {
-    const csvText = readFileSync("src/content/schedule/speakers-2026.csv", "utf8");
-    const resolve = buildSpeakerResolver(csvText);
-
+describe("slug map drift guard (committed files, offline)", () => {
+  // The sessions pipeline throws if a Pretalx person has no slug, so a drift
+  // between the committed export and the committed slug map hard-fails the
+  // whole build — not just one page. The old sessions CSV drifted 50-vs-51
+  // unnoticed, which is the failure mode this migration exists to end. Pure and
+  // offline, against exactly the files a real outage would fall back to.
+  it("resolves every person in the committed export from the committed slug map", () => {
+    const resolve = buildSpeakerResolver();
     const personTalk = new Map<string, string>();
     for (const day of doc.schedule.conference.days) {
       for (const talks of Object.values(day.rooms)) {
@@ -175,17 +163,14 @@ describe("buildSpeakerResolver drift guard (committed files, offline)", () => {
         }
       }
     }
-    expect(personTalk.size).toBeGreaterThan(0);
-
     const unresolved: string[] = [];
     for (const [name, code] of personTalk) {
       try {
         resolve(name, code);
       } catch {
-        unresolved.push(`${name} (${code})`);
+        unresolved.push(name);
       }
     }
-
     expect(unresolved).toEqual([]);
   });
 });

@@ -61,7 +61,19 @@ const socialUrl = z.preprocess(
   (raw) => {
     if (typeof raw !== "string") return raw;
     const match = raw.match(/https?:\/\/\S+/);
-    return match ? match[0].replace(/[),.;]+$/, "") : undefined;
+    if (match) return match[0].replace(/[),.;]+$/, "");
+
+    // Speakers answer these questions in Pretalx by hand, and routinely type a
+    // bare handle or a scheme-less host — "@ada", "linkedin.com/in/ada",
+    // "github.com/ada". Requiring a full URL dropped all of those silently, so
+    // the profile simply lost its link. Normalise the common shapes instead.
+    const value = raw.trim().replace(/[),.;]+$/, "");
+    if (!value) return undefined;
+    if (/^[a-z0-9-]+\.[a-z]{2,}\//i.test(value)) return `https://${value}`;
+    const handle = value.replace(/^@/, "");
+    if (!handle || /\s/.test(handle)) return undefined;
+    if (/^[\w.-]+\.[a-z]{2,}$/i.test(handle)) return `https://${handle}`;
+    return undefined;
   },
   z.string().url().optional(),
 );

@@ -54,16 +54,24 @@ describe("toLevel", () => {
 
 describe("level question wiring", () => {
   it("pins the level question id away from the speaker-experience one", () => {
-    expect(LEVEL_QUESTION_ID).toBe(4);
+    expect(LEVEL_QUESTION_ID[2026]).toBe(4);
     // The speaker questions this project created start at 15; if they ever
     // collide with the level id, the enrichment and level reads would cross.
-    expect(Object.values(SPEAKER_QUESTIONS)).not.toContain(LEVEL_QUESTION_ID);
+    expect(Object.values(SPEAKER_QUESTIONS[2026]!)).not.toContain(LEVEL_QUESTION_ID[2026]);
+  });
+
+  it("keys question ids per edition, so a new event cannot silently reuse 2026's", () => {
+    // Pretalx ids belong to the question object, not to a per-event slot. An
+    // edition with no mapping must surface that rather than query ids that do
+    // not exist for it and return an empty, plausible-looking result.
+    expect(SPEAKER_QUESTIONS[2027]).toBeUndefined();
+    expect(LEVEL_QUESTION_ID[2027]).toBeUndefined();
   });
 
   it.skipIf(!hasToken)("returns levels only for talks in the released schedule", async () => {
     const rows = await loadSessions(2026);
     const scheduled = new Set(rows.map((r) => r.id));
-    const answers = await loadLevelAnswers("2026", scheduled);
+    const answers = await loadLevelAnswers(2026, "2026", scheduled);
 
     expect(answers.size).toBeGreaterThan(0);
     for (const code of answers.keys()) {

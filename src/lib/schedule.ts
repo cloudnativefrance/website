@@ -74,7 +74,7 @@ export async function loadSessions(
     // it already contains, so an unannounced submission cannot reach the site
     // through the authenticated answers endpoint.
     const scheduled = new Set(collectTalkCodes(doc));
-    const levels = await loadLevelAnswers(slug, scheduled);
+    const levels = await loadLevelAnswers(year, slug, scheduled);
     rows = toSessionRows(doc, resolveSpeaker, levels);
   } else {
     rows = loadArchivedSessions(year);

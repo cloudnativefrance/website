@@ -23,17 +23,35 @@
  *    Pretalx and rebuilding; there is no snapshot or git history to rewrite.
  */
 import { readFileSync } from "node:fs";
+import type { Edition } from "./editions";
 import { PRETALX_BASE } from "./pretalx";
 
-/** Speaker-target questions created for the website's own fields. */
-export const SPEAKER_QUESTIONS = {
-  company: 15,
-  role: 16,
-  linkedin: 17,
-  github: 18,
-  bluesky: 19,
-  website: 20,
-} as const;
+export type SpeakerField =
+  | "company"
+  | "role"
+  | "linkedin"
+  | "github"
+  | "bluesky"
+  | "website";
+
+/**
+ * Question ids, per edition.
+ *
+ * Pretalx question ids belong to the question object, not to a per-event slot:
+ * the 2027 event's "Entreprise" will not be id 15. Hardcoding one set and
+ * applying it to every event would query ids that do not exist for that event,
+ * get zero results back, and build a site with every company, role and level
+ * blank — while succeeding, because the token was present. That is precisely the
+ * silent regression PRETALX_TOKEN_REQUIRED exists to prevent, so the ids are
+ * keyed per edition and a missing entry is surfaced rather than assumed.
+ *
+ * Find a new edition's ids with:
+ *   curl -H "Authorization: Token $TOKEN" \
+ *     https://cfp.cloudnativedays.fr/api/events/<slug>/questions/
+ */
+export const SPEAKER_QUESTIONS: Partial<Record<Edition, Record<SpeakerField, number>>> = {
+  2026: { company: 15, role: 16, linkedin: 17, github: 18, bluesky: 19, website: 20 },
+};
 
 /**
  * "Niveau de la présentation" — how demanding the TALK is.
@@ -43,9 +61,9 @@ export const SPEAKER_QUESTIONS = {
  * experienced the SPEAKER is. The two read almost identically and mean entirely
  * different things; only this one belongs on the schedule.
  */
-export const LEVEL_QUESTION_ID = 4;
-
-export type SpeakerField = keyof typeof SPEAKER_QUESTIONS;
+export const LEVEL_QUESTION_ID: Partial<Record<Edition, number>> = {
+  2026: 4,
+};
 
 /** Per-speaker answers, keyed by Pretalx person code. */
 export type SpeakerEnrichment = Map<string, Partial<Record<SpeakerField, string>>>;
@@ -123,6 +141,7 @@ export function reanchor(next: string): string {
 async function fetchAllPages<T>(
   url: string,
   token: string,
+  what: string,
   timeoutMs = 30000,
 ): Promise<T[]> {
   const out: T[] = [];
@@ -139,7 +158,7 @@ async function fetchAllPages<T>(
           "User-Agent": "cndfrance-website-build/1.0",
         },
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${what} from ${next}`);
       const body = (await res.json()) as { results: T[]; next: string | null };
       out.push(...body.results);
       next = body.next ? reanchor(body.next) : null;
@@ -162,63 +181,150 @@ function answersUrl(eventSlug: string, questionId: number): string {
 }
 
 /**
+ * Memoised per event slug.
+ *
+ * `fetchTextOrFallback` memoises the public reads, so `loadSessions` is cheap
+ * after its first call. These authenticated crawls had no such cache: every
+ * caller re-ran a full paginated walk. A build currently calls each once — Astro
+ * runs `getStaticPaths` a single time per route — but that is a property of the
+ * page layout, not a guarantee, and one `loadSessions()` added to a per-page
+ * render would quietly multiply it by the number of speakers.
+ */
+const ENRICHMENT_CACHE = new Map<string, Promise<SpeakerEnrichment>>();
+const LEVEL_CACHE = new Map<string, Promise<LevelAnswers>>();
+
+/** Test-only: drop the memo so cases can vary the environment independently. */
+export function __clearPrivateCachesForTests(): void {
+  ENRICHMENT_CACHE.clear();
+  LEVEL_CACHE.clear();
+}
+
+/**
+ * Run an authenticated read, degrading rather than failing on a transient error.
+ *
+ * Without this, the snapshot fallback below it was unreachable: `fetchScheduleExport`
+ * falls back to the committed export when Pretalx is down, and the very next call
+ * would then throw on the same outage — so a blip that the public path survives
+ * killed the build anyway.
+ *
+ * `PRETALX_TOKEN_REQUIRED=1` keeps the strict behaviour where it matters: a
+ * release must not ship a speakers page with no affiliations, so there it still
+ * throws. Local builds warn and carry on.
+ */
+async function degradeOnFailure<T>(what: string, run: () => Promise<T>, empty: T): Promise<T> {
+  try {
+    return await run();
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (process.env.PRETALX_TOKEN_REQUIRED === "1") {
+      throw new Error(`[pretalx] ${what} failed (${msg}), and PRETALX_TOKEN_REQUIRED=1.`);
+    }
+    console.warn(`[pretalx] ${what} failed (${msg}); continuing without it.`);
+    return empty;
+  }
+}
+
+/**
  * Speaker fields for exactly the people in `allowedPersonCodes`.
  *
  * Returns an empty map when there is no token, so callers degrade rather than
  * crash — `requireToken` has already decided whether that is acceptable.
  */
 export async function loadSpeakerEnrichment(
+  year: Edition,
   eventSlug: string,
   allowedPersonCodes: ReadonlySet<string>,
 ): Promise<SpeakerEnrichment> {
-  const token = requireToken();
-  const out: SpeakerEnrichment = new Map();
-  if (!token) return out;
+  const cached = ENRICHMENT_CACHE.get(eventSlug);
+  if (cached) return cached;
 
-  for (const [field, questionId] of Object.entries(SPEAKER_QUESTIONS) as [
-    SpeakerField,
-    number,
-  ][]) {
-    const answers = await fetchAllPages<PretalxAnswer>(
-      answersUrl(eventSlug, questionId),
-      token,
-    );
-    for (const a of answers) {
-      // Allowlist: a person absent from the released schedule never reaches the site.
-      if (!a.person || !allowedPersonCodes.has(a.person)) continue;
-      const value = (a.answer || "").trim();
-      if (!value) continue;
-      const entry = out.get(a.person) ?? {};
-      entry[field] = value;
-      out.set(a.person, entry);
-    }
-  }
-  console.log(
-    `[pretalx] speaker enrichment: ${out.size}/${allowedPersonCodes.size} people have at least one field`,
+  const promise = degradeOnFailure(
+    "speaker enrichment",
+    async () => {
+      const token = requireToken();
+      const out: SpeakerEnrichment = new Map();
+      if (!token) return out;
+      const questions = SPEAKER_QUESTIONS[year];
+      if (!questions) {
+        throw new Error(
+          `No speaker question ids configured for ${year} in SPEAKER_QUESTIONS. ` +
+            `Pretalx ids are per-question, not per-event — list them with ` +
+            `GET /api/events/${eventSlug}/questions/ and add the mapping.`,
+        );
+      }
+
+      for (const [field, questionId] of Object.entries(questions) as [
+        SpeakerField,
+        number,
+      ][]) {
+        const answers = await fetchAllPages<PretalxAnswer>(
+          answersUrl(eventSlug, questionId),
+          token,
+          `speaker field "${field}" (question ${questionId})`,
+        );
+        for (const a of answers) {
+          // Allowlist: a person absent from the released schedule never reaches the site.
+          if (!a.person || !allowedPersonCodes.has(a.person)) continue;
+          const value = (a.answer || "").trim();
+          if (!value) continue;
+          const entry = out.get(a.person) ?? {};
+          entry[field] = value;
+          out.set(a.person, entry);
+        }
+      }
+      console.log(
+        `[pretalx] speaker enrichment: ${out.size}/${allowedPersonCodes.size} people have at least one field`,
+      );
+      return out;
+    },
+    new Map() as SpeakerEnrichment,
   );
-  return out;
+
+  ENRICHMENT_CACHE.set(eventSlug, promise);
+  return promise;
 }
 
 /** Raw "Niveau de la présentation" answers for the given submissions. */
 export async function loadLevelAnswers(
+  year: Edition,
   eventSlug: string,
   allowedSubmissionCodes: ReadonlySet<string>,
 ): Promise<LevelAnswers> {
-  const token = requireToken();
-  const out: LevelAnswers = new Map();
-  if (!token) return out;
+  const cached = LEVEL_CACHE.get(eventSlug);
+  if (cached) return cached;
 
-  const answers = await fetchAllPages<PretalxAnswer>(
-    answersUrl(eventSlug, LEVEL_QUESTION_ID),
-    token,
+  const promise = degradeOnFailure(
+    "talk levels",
+    async () => {
+      const token = requireToken();
+      const out: LevelAnswers = new Map();
+      if (!token) return out;
+      const questionId = LEVEL_QUESTION_ID[year];
+      if (!questionId) {
+        throw new Error(
+          `No level question id configured for ${year} in LEVEL_QUESTION_ID. ` +
+            `List them with GET /api/events/${eventSlug}/questions/ and add the mapping.`,
+        );
+      }
+
+      const answers = await fetchAllPages<PretalxAnswer>(
+        answersUrl(eventSlug, questionId),
+        token,
+        `talk level (question ${questionId})`,
+      );
+      for (const a of answers) {
+        if (!a.submission || !allowedSubmissionCodes.has(a.submission)) continue;
+        const value = (a.answer || "").trim();
+        if (value) out.set(a.submission, value);
+      }
+      console.log(
+        `[pretalx] levels: ${out.size}/${allowedSubmissionCodes.size} scheduled talks answered`,
+      );
+      return out;
+    },
+    new Map() as LevelAnswers,
   );
-  for (const a of answers) {
-    if (!a.submission || !allowedSubmissionCodes.has(a.submission)) continue;
-    const value = (a.answer || "").trim();
-    if (value) out.set(a.submission, value);
-  }
-  console.log(
-    `[pretalx] levels: ${out.size}/${allowedSubmissionCodes.size} scheduled talks answered`,
-  );
-  return out;
+
+  LEVEL_CACHE.set(eventSlug, promise);
+  return promise;
 }
