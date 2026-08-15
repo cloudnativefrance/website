@@ -1,0 +1,53 @@
+---
+// src/components/schedule/ScheduleListView.astro
+import type { SessionRow } from "@/lib/schedule";
+import { groupIntoSlots } from "@/lib/schedule-filter";
+import SessionCard from "./SessionCard.astro";
+import type { Locale } from "@/i18n/ui";
+import { getLocalePath } from "@/i18n/utils";
+
+interface SpeakerInfo { name: string; company?: string }
+interface Props { sessions: SessionRow[]; lang: Locale; speakerInfo: Map<string, SpeakerInfo> }
+
+const { sessions, lang, speakerInfo } = Astro.props;
+const slots = groupIntoSlots(sessions);
+
+function linksFor(s: SessionRow) {
+  return s.speakers.map((ref) => {
+    const info = speakerInfo.get(ref);
+    return {
+      label: info?.name ?? ref,
+      company: info?.company,
+      href: info?.name ? getLocalePath(lang, `/speakers/${ref}`) : null,
+    };
+  });
+}
+---
+
+<div class="list-view">
+  {slots.map((slot) => (
+    <section class="list-view-group">
+      <h2 class="list-view-time">{slot.startTime.slice(11, 16)}</h2>
+      <div class="list-view-items">
+        {slot.sessions.map((s) => (
+          <SessionCard session={s} lang={lang} speakers={linksFor(s)} variant="list" />
+        ))}
+      </div>
+    </section>
+  ))}
+</div>
+
+<style>
+  .list-view { display: flex; flex-direction: column; gap: 26px; max-width: 900px; margin: 0 auto; }
+  .list-view-group { display: flex; flex-direction: column; gap: 10px; }
+  .list-view-time {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--color-muted-foreground); margin: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .list-view-time::after { content: ""; flex: 1; height: 1px; background: var(--color-border); }
+  .list-view-items { display: flex; flex-direction: column; gap: 10px; }
+
+  .list-view-group.is-hidden { display: none; }
+</style>
