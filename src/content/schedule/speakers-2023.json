@@ -1,0 +1,80 @@
+[
+  {
+    "slug": "sophie-lambert-2023",
+    "name": "Sophie Lambert",
+    "photo_url": "",
+    "company": "OVHcloud",
+    "role": "Engineering Manager",
+    "bio": "Cloud-native and platform engineering at scale.",
+    "linkedin": "",
+    "github": "",
+    "bluesky": "",
+    "website": "",
+    "keynote": true
+  },
+  {
+    "slug": "marc-villeneuve",
+    "name": "Marc Villeneuve",
+    "photo_url": "",
+    "company": "Doctolib",
+    "role": "Principal Engineer",
+    "bio": "GitOps practitioner and CI/CD enthusiast.",
+    "linkedin": "",
+    "github": "",
+    "bluesky": "",
+    "website": "",
+    "keynote": false
+  },
+  {
+    "slug": "elena-petrova",
+    "name": "Elena Petrova",
+    "photo_url": "",
+    "company": "BlaBlaCar",
+    "role": "Site Reliability Engineer",
+    "bio": "Service mesh and observability at carpooling scale.",
+    "linkedin": "",
+    "github": "",
+    "bluesky": "",
+    "website": "",
+    "keynote": false
+  },
+  {
+    "slug": "yann-castelnau",
+    "name": "Yann Castelnau",
+    "photo_url": "",
+    "company": "Carrefour",
+    "role": "Cloud Architect",
+    "bio": "Helping retail go cloud-native.",
+    "linkedin": "",
+    "github": "",
+    "bluesky": "",
+    "website": "",
+    "keynote": false
+  },
+  {
+    "slug": "clara-jensen",
+    "name": "Clara Jensen",
+    "photo_url": "",
+    "company": "Spotify",
+    "role": "DevOps Lead",
+    "bio": "CI/CD pipelines and developer experience.",
+    "linkedin": "",
+    "github": "",
+    "bluesky": "",
+    "website": "",
+    "keynote": false
+  },
+  {
+    "slug": "hugo-fontaine-2023",
+    "name": "Hugo Fontaine",
+    "photo_url": "",
+    "company": "Datadog",
+    "role": "Platform Engineer",
+    "bio": "Observability and the meta-observability problem.",
+    "linkedin": "",
+    "github": "",
+    "bluesky": "",
+    "website": "",
+    "keynote": false
+  }
+]

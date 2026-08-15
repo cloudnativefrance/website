@@ -8,6 +8,7 @@ import {
 } from "./lib/remote-csv";
 import type { Edition } from "./lib/editions";
 import { parseCsv } from "./lib/csv";
+import { loadSpeakers } from "./lib/speaker-source";
 
 // -- csvLoader (unchanged) -------------------------------------------------
 
@@ -170,13 +171,29 @@ export { TEAM_GROUPS };
 
 // -- Per-year collection factories -----------------------------------------
 
+/**
+ * Speakers come from Pretalx, merged with the repo's slug map and keynote cast.
+ *
+ * The store key keeps the `${rowIndex}-${slug}` shape the csvLoader used, because
+ * `getSlug()` in src/lib/speakers.ts strips that prefix and every speaker URL is
+ * built from the result.
+ */
 function speakersCollection(year: Edition) {
   return defineCollection({
-    loader: csvLoader({
-      url: CSV_URLS.speakers[year],
-      fallback: `src/content/schedule/speakers-${year}.csv`,
-      label: `speakers-${year}.csv`,
-    }),
+    loader: {
+      name: `pretalx:speakers-${year}`,
+      load: async ({ store, parseData }: LoaderContext) => {
+        const records = await loadSpeakers(year);
+        store.clear();
+        for (let i = 0; i < records.length; i++) {
+          const id = `${String(i).padStart(4, "0")}-${records[i].slug}`;
+          // Spread into a plain record: parseData wants an index-signature type,
+          // and an interface has none.
+          const data = { ...records[i] } as Record<string, unknown>;
+          store.set({ id, data: await parseData({ id, data }) });
+        }
+      },
+    },
     schema: speakerSchema,
   });
 }
