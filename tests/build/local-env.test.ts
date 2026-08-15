@@ -43,7 +43,13 @@ describe("the token cannot reach the browser", () => {
     // Astro inlines PUBLIC_* into the client bundle. This name must stay bare.
     const grep = () => {
       try {
-        return execFileSync("git", ["grep", "-l", "PUBLIC_PRETALX"], { encoding: "utf8" });
+        return execFileSync(
+          "git",
+          // This file is excluded: it names the forbidden prefix in order to
+          // search for it, and would otherwise always match itself.
+          ["grep", "-l", "PUBLIC_PRETALX", "--", ".", ":(exclude)tests/build/local-env.test.ts"],
+          { encoding: "utf8" },
+        );
       } catch {
         return ""; // git grep exits non-zero when there are no matches
       }
