@@ -1,7 +1,12 @@
 import type { Edition } from "./editions";
 // Type-only: schedule.ts imports this module at runtime, so a value import here
 // would create a cycle. TypeScript erases `import type`.
-import type { SessionFormat, SessionLanguage, SessionRow } from "./schedule";
+import type {
+  SessionFormat,
+  SessionLanguage,
+  SessionLevel,
+  SessionRow,
+} from "./schedule";
 import { parseCsv } from "./csv";
 import { fetchTextOrFallback } from "./remote-fetch";
 import { fetchCsvOrFallback, getCsvUrl } from "./remote-csv";
@@ -20,6 +25,33 @@ export const PRETALX_EVENT: Partial<Record<Edition, string>> = {
 
 export function scheduleExportUrl(slug: string): string {
   return `${PRETALX_BASE}/${slug}/schedule/export/schedule.json`;
+}
+
+/**
+ * Map a "Niveau de la présentation" answer to the site's level union.
+ *
+ * "Tout public" is not "débutant" — the speaker said *anyone can follow this*,
+ * not *this is basic*. It maps to `beginner` because that is the union's lowest
+ * rung, and `schedule.level.beginner` is labelled "Tout public" / "All levels"
+ * in `src/i18n/ui.ts` so the display matches what the speaker actually answered.
+ * Keep those two in step if either ever changes.
+ *
+ * Unknown answers return "" rather than guessing: an unclassified talk simply
+ * has no level chip, which is how the UI already handles missing data.
+ */
+export function toLevel(answer: string | undefined): SessionLevel {
+  switch ((answer || "").trim().toLowerCase()) {
+    case "tout public":
+      return "beginner";
+    case "intermédiaire":
+    case "intermediaire":
+      return "intermediate";
+    case "confirmé":
+    case "confirme":
+      return "advanced";
+    default:
+      return "";
+  }
 }
 
 // -- Export document shape (c3voc/frab schema, as emitted by pretalx 2026.2.1) --
@@ -130,9 +162,18 @@ export function talkRecordingUrl(talk: PretalxTalk): string {
   return pickResource(talk, (r) => VIDEO_HOST.test(r.url) || REPLAY_LABEL.test(r.title));
 }
 
+/** Every talk code in a released export — the allowlist for authenticated reads. */
+export function collectTalkCodes(doc: PretalxScheduleExport): string[] {
+  return doc.schedule.conference.days.flatMap((day) =>
+    Object.values(day.rooms).flatMap((talks) => talks.map((t) => t.code)),
+  );
+}
+
 export function toSessionRows(
   doc: PretalxScheduleExport,
   resolveSpeaker: SpeakerResolver,
+  /** Raw "Niveau de la présentation" answers by talk code; empty without a token. */
+  levels: ReadonlyMap<string, string> = new Map(),
 ): SessionRow[] {
   const conference = doc.schedule.conference;
   const trackColor = new Map(conference.tracks.map((t) => [t.name, t.color]));
@@ -149,7 +190,7 @@ export function toSessionRows(
           speakers: talk.persons.map((p) => resolveSpeaker(p.name, talk.code)),
           track,
           trackColor: trackColor.get(track),
-          level: "",
+          level: toLevel(levels.get(talk.code)),
           room: talk.room,
           format: toFormat(talk.type, durationMin),
           startTime: talk.date,

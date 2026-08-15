@@ -3,10 +3,12 @@ import { join } from "node:path";
 import { CURRENT_EDITION, type Edition } from "./editions";
 import {
   PRETALX_EVENT,
+  collectTalkCodes,
   fetchScheduleExport,
   loadSpeakerResolver,
   toSessionRows,
 } from "./pretalx";
+import { loadLevelAnswers } from "./pretalx-private";
 import { ui, type Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 
@@ -68,7 +70,12 @@ export async function loadSessions(
       fetchScheduleExport(year, slug),
       loadSpeakerResolver(year),
     ]);
-    rows = toSessionRows(doc, resolveSpeaker);
+    // The released export is the allowlist: levels are looked up only for talks
+    // it already contains, so an unannounced submission cannot reach the site
+    // through the authenticated answers endpoint.
+    const scheduled = new Set(collectTalkCodes(doc));
+    const levels = await loadLevelAnswers(slug, scheduled);
+    rows = toSessionRows(doc, resolveSpeaker, levels);
   } else {
     rows = loadArchivedSessions(year);
   }

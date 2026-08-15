@@ -1,0 +1,97 @@
+/**
+ * Speaker URL identity, keyed by the name Pretalx knows them by.
+ *
+ * Pretalx has no slug concept, and these slugs are load-bearing: they are the
+ * URLs (`/intervenants/petazzoni`, `/en/speakers/petazzoni`) and the join key
+ * `getTalksForSpeaker` filters on. Eight of them are hand-shortened in ways no
+ * rule derives from the name — slugifying "Jérôme Petazzoni" gives
+ * "jerome-petazzoni", but the live URL is "petazzoni" — so this map is the
+ * authority, not a cache.
+ *
+ * Adding a speaker: add their row here, keyed by their exact Pretalx name.
+ * An unmapped speaker fails the build rather than shipping a 404 link.
+ */
+export const SPEAKER_SLUGS: Readonly<Record<string, string>> = {
+  "Alexandre Buisine": "alexandre-buisine",
+  "Alexandre NGUYEN": "alexandre-nguyen",
+  "Alexis La Goutte": "alexis-la-goutte",
+  "Alice Frosi": "alice-frosi",
+  "Amine AIT AAZIZI": "amine-ait-aazizi",
+  "Amine Alaoui Echerif": "amine-alaoui-echerif",
+  "Antoine Roy": "antoine-roy",
+  "Arthur Outhenin-Chalandre": "arthur-outhenin-chalandre",
+  "Baptiste Assmann": "baptiste-assmann",
+  "Vincent Behar": "behar",
+  "Caroline de Vasson": "caroline-de-vasson",
+  "Luc Chmielowski": "chmielowski",
+  "Christophe Jauffret": "christophe-jauffret",
+  "Christophe Morvan": "christophe-morvan",
+  "Clarence Pouthier": "clarence-pouthier",
+  "Corentin Closs": "corentin-closs",
+  "Dan Maher": "dan-maher",
+  "Denis Germain": "denis-germain",
+  "Diana Todea": "diana-todea",
+  "Dimitris Vassilopoulos": "dimitris-vassilopoulos",
+  "Edgar Halbert": "edgar-halbert",
+  "Etienne Germain": "etienne-germain",
+  "Florian Caringi": "florian-caringi",
+  "Gaspard Plantrou": "gaspard-plantrou",
+  "Gilles Chehade": "gilles-chehade",
+  "Guillaume Legrain": "guillaume-legrain",
+  "Hela Ben Farhat": "hela-ben-farhat",
+  "Hervé Leclerc": "herve-leclerc",
+  "Hugo Simon": "hugo-simon",
+  "Ismail KABOUBI": "ismail-kaboubi",
+  "Jean-Baptiste Kempf": "jean-baptiste-kempf",
+  "Johan Lore": "johan-lore",
+  "Julien Dauphant": "julien-dauphant",
+  "Laurent Bernaille": "laurent-bernaille",
+  "Léonard Suslian": "leonard-suslian",
+  "Luc Juggery": "luc-juggery",
+  "Luckas Bosch": "luckas-bosch",
+  "Maffert Anthony": "maffert-anthony",
+  "Mathieu Tortuyaux": "mathieu-tortuyaux",
+  "Matthieu Strohl": "matthieu-strohl",
+  "Maxime Calves": "maxime-calves",
+  "Maxime Véroone": "maxime-veroone",
+  "Mazlum Tosun": "mazlum-tosun",
+  "Mohammad AMLA": "mohammad-amla",
+  "Mouhamad Koreissi": "mouhamad-koreissi",
+  "Nathan Randriamanana": "nathan-randriamanana",
+  "Nicolas Fidel": "nicolas-fidel",
+  "Paul Gonin": "paul-gonin",
+  "Paul Laffitte": "paul-laffitte",
+  "Jérôme Petazzoni": "petazzoni",
+  "Vincent PIARD": "piard",
+  "Quentin Loupot": "quentin-loupot",
+  "Quentin Swiech": "quentin-swiech",
+  "Raphaël Pinson": "raphael-pinson",
+  "Renaud Fleury": "renaud-fleury",
+  "Henrik Rexed": "rexed",
+  "Ricardo Rocha": "ricardo-rocha",
+  "Amine Saboni": "saboni",
+  "Sébastien Allamand": "sebastien-allamand",
+  "Sébastien Blanc": "sebastien-blanc",
+  "Sherine Khoury": "sherine-khoury",
+  "Solvik Blum": "solvik-blum",
+  "Steeve Delmotte": "steeve-delmotte",
+  "Stéphane ROBERT": "stephane-robert",
+  "Thierry ABALEA": "thierry-abalea",
+  "Timothée Ravier": "timothee-ravier",
+  "Tomy Guichard": "tomy-guichard",
+  "Aurélie Vache": "vache",
+  "Nicolas Vermande": "vermande",
+  "Victor Boissière": "victor-boissiere",
+  "Victor Coutellier": "victor-coutellier",
+  "Vincent Jamois": "vincent-jamois",
+  "Vincent Ledan": "vincent-ledan",
+  "Williams Ahilé": "williams-ahile",
+  "Yann Rotilio": "yann-rotilio",
+  "Yannick Lambruschi": "yannick-lambruschi",
+  "Yousri KOUKI": "yousri-kouki",
+};
+
+/** Reverse lookup, built once. */
+export const SLUG_TO_NAME: Readonly<Record<string, string>> = Object.fromEntries(
+  Object.entries(SPEAKER_SLUGS).map(([name, slug]) => [slug, name]),
+);
