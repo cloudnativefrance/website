@@ -103,6 +103,34 @@ class MissingTokenError extends Error {
 }
 
 /**
+ * 401/403 — the token is wrong or under-permissioned.
+ *
+ * Grouped with `MissingTokenError` as a CONFIGURATION failure: it is our
+ * mistake, retrying cannot fix it, and it must never be degraded past.
+ */
+class PretalxAuthError extends Error {
+  constructor(status: number, what: string) {
+    super(`HTTP ${status} fetching ${what} — token rejected or lacking access. ${TOKEN_HELP}`);
+    this.name = "PretalxAuthError";
+  }
+}
+
+/** Any other non-OK response. 5xx and 429 are worth another attempt; 4xx is not. */
+class PretalxHttpError extends Error {
+  readonly retryable: boolean;
+  constructor(status: number, what: string, url: string) {
+    super(`HTTP ${status} fetching ${what} from ${url}`);
+    this.name = "PretalxHttpError";
+    this.retryable = status >= 500 || status === 429;
+  }
+}
+
+/** True for the failures that mean "we configured this wrong", not "Pretalx is down". */
+function isConfigurationFailure(err: unknown): boolean {
+  return err instanceof MissingTokenError || err instanceof PretalxAuthError;
+}
+
+/**
  * Resolve the token or throw.
  *
  * Deliberately not deciding whether that is fatal: "no token" and "the fetch
@@ -174,10 +202,36 @@ async function fetchAllPages<T>(
     if (++pages > MAX_PAGES) {
       throw new Error(`[pretalx] ${what} exceeded ${MAX_PAGES} pages — cursor is not advancing`);
     }
+    const body = await fetchPage<T>(next, token, what, timeoutMs);
+    out.push(...body.results);
+    next = body.next ? reanchor(body.next) : null;
+  }
+  return out;
+}
+
+/** Backoff between attempts. Length is the retry count; short, since this blocks a build. */
+const RETRY_DELAYS_MS = [500, 2000, 5000];
+
+/**
+ * Fetch one page, retrying only what a retry can actually fix.
+ *
+ * A dropped connection, a timeout, a 5xx or a 429 is Pretalx being briefly
+ * unavailable, and most real outages are brief. A 401/403 is our token being
+ * wrong and any other 4xx is our request being wrong — retrying those just
+ * makes the build slower before it fails the same way.
+ */
+async function fetchPage<T>(
+  url: string,
+  token: string,
+  what: string,
+  timeoutMs: number,
+): Promise<{ results: T[]; next: string | null }> {
+  let lastErr: unknown;
+  for (let attempt = 0; ; attempt++) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const res = await fetch(next, {
+      const res = await fetch(url, {
         signal: controller.signal,
         headers: {
           Authorization: `Token ${token}`,
@@ -185,15 +239,27 @@ async function fetchAllPages<T>(
           "User-Agent": "cndfrance-website-build/1.0",
         },
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${what} from ${next}`);
-      const body = (await res.json()) as { results: T[]; next: string | null };
-      out.push(...body.results);
-      next = body.next ? reanchor(body.next) : null;
+      if (res.status === 401 || res.status === 403) throw new PretalxAuthError(res.status, what);
+      if (!res.ok) throw new PretalxHttpError(res.status, what, url);
+      return (await res.json()) as { results: T[]; next: string | null };
+    } catch (err) {
+      // Never retry a failure that is about us rather than about Pretalx.
+      if (err instanceof PretalxAuthError) throw err;
+      if (err instanceof PretalxHttpError && !err.retryable) throw err;
+      lastErr = err;
     } finally {
       clearTimeout(timer);
     }
+
+    const delay = RETRY_DELAYS_MS[attempt];
+    if (delay === undefined) throw lastErr;
+    const msg = lastErr instanceof Error ? lastErr.message : String(lastErr);
+    console.warn(
+      `[pretalx] ${what}: ${msg} — retrying in ${delay}ms ` +
+        `(${attempt + 1}/${RETRY_DELAYS_MS.length})`,
+    );
+    await new Promise((r) => setTimeout(r, delay));
   }
-  return out;
 }
 
 interface PretalxAnswer {
@@ -238,6 +304,24 @@ const LEVEL_CACHE = new Map<string, Promise<LevelAnswers>>();
  * `PRETALX_TOKEN_REQUIRED=1` keeps the strict behaviour where it matters: a
  * release must not ship a speakers page with no affiliations, so there it still
  * throws. Local builds warn and carry on.
+ *
+ * Under that flag the two failure kinds are NOT the same, though they were
+ * treated as one:
+ *
+ * - A missing or rejected token is a CONFIGURATION error. Ours, permanent until
+ *   someone fixes it, and always fatal — degrading past it is how a release
+ *   silently ships every affiliation blank.
+ * - An unreachable Pretalx is an OUTAGE. Not ours, usually brief (hence the
+ *   retries in `fetchPage`), and the public half of the build has already
+ *   fallen back to the committed snapshot by the time we get here. Failing
+ *   anyway made that fallback unreachable in the one environment that sets this
+ *   flag, so a Pretalx blip blocked every deploy — including deploys that had
+ *   nothing to do with the schedule.
+ *
+ * A sustained outage is still fatal by default, because shipping a speakers page
+ * with no affiliations and a schedule with no level chips is a visible
+ * regression that should be a decision rather than an accident.
+ * `PRETALX_ALLOW_DEGRADED=1` is that decision, made explicitly and logged.
  */
 async function degradeOnFailure<T>(what: string, run: () => Promise<T>, empty: T): Promise<T> {
   try {
@@ -245,7 +329,22 @@ async function degradeOnFailure<T>(what: string, run: () => Promise<T>, empty: T
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (process.env.PRETALX_TOKEN_REQUIRED === "1") {
-      throw new Error(`[pretalx] ${what}: ${msg} (PRETALX_TOKEN_REQUIRED=1)`);
+      if (isConfigurationFailure(err)) {
+        throw new Error(`[pretalx] ${what}: ${msg} (PRETALX_TOKEN_REQUIRED=1)`);
+      }
+      if (process.env.PRETALX_ALLOW_DEGRADED !== "1") {
+        throw new Error(
+          `[pretalx] ${what}: ${msg} (PRETALX_TOKEN_REQUIRED=1). Pretalx looks ` +
+            `unreachable rather than misconfigured, and the retries are spent. ` +
+            `Set PRETALX_ALLOW_DEGRADED=1 to ship this build anyway — it will ` +
+            `have no speaker affiliations and no level chips.`,
+        );
+      }
+      console.warn(
+        `[pretalx] ${what}: ${msg} — PRETALX_ALLOW_DEGRADED=1, shipping without it. ` +
+          `Rebuild once Pretalx is back.`,
+      );
+      return empty;
     }
     console.warn(
       `[pretalx] ${what}: ${msg} — continuing without it. ` +

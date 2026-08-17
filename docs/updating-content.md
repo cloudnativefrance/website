@@ -193,6 +193,30 @@ Sessions and the Sheet-backed rosters resolve differently at build time.
    and the keynote role from `src/data/keynote-cast.ts`.
 4. Editions with no Pretalx event read `src/content/schedule/speakers-{year}.json`.
 
+### When Pretalx is down
+
+The two failure kinds are treated differently, because only one of them is ours:
+
+| Failure | Retried? | Under `PRETALX_TOKEN_REQUIRED=1` |
+|---|---|---|
+| No token, or a token that is rejected (401/403) | no — retrying cannot fix it | **always fatal** |
+| Unreachable, timed out, 5xx, 429 | yes, three times with backoff | fatal, unless `PRETALX_ALLOW_DEGRADED=1` |
+| Any other 4xx | no — the request is wrong | fatal, unless `PRETALX_ALLOW_DEGRADED=1` |
+
+The public schedule read falls back to the committed
+`src/content/schedule/pretalx-{year}.json` snapshot during an outage. The
+authenticated reads have no equivalent — nothing authenticated is cached to
+disk, by design — so a build during a sustained outage would ship a speakers
+page with every affiliation blank and a schedule with no level chips.
+
+That is a real regression, so it stays fatal by default and has to be chosen:
+
+```bash
+PRETALX_ALLOW_DEGRADED=1 docker build .   # Pretalx is down, ship anyway
+```
+
+Rebuild once Pretalx is back — nothing re-fetches on its own.
+
 ### Running locally with the Pretalx token
 
 Speaker company/role/socials and talk levels are authenticated reads, so they need
