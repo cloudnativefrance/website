@@ -47,16 +47,27 @@ function row(over: Partial<SessionRow> = {}): SessionRow {
  * parser (none is a project dependency, and this project's other build
  * tests already assert on raw HTML/source strings the same way).
  */
-function cellsByColumn(html: string): Map<number, string> {
+interface Cell {
+  html: string;
+  rowStart: number;
+  rowEnd: number;
+}
+
+function cellsByColumn(html: string): Map<number, Cell> {
   const starts = [
-    ...html.matchAll(/<div class="grid-view-cell" style="grid-column:(\d+);"[^>]*>/g),
+    ...html.matchAll(
+      /<div class="grid-view-cell" style="grid-column:(\d+); grid-row:(\d+) \/ (\d+);"[^>]*>/g,
+    ),
   ];
-  const cells = new Map<number, string>();
+  const cells = new Map<number, Cell>();
   for (let i = 0; i < starts.length; i++) {
-    const column = Number(starts[i][1]);
     const from = starts[i].index! + starts[i][0].length;
     const to = i + 1 < starts.length ? starts[i + 1].index! : html.length;
-    cells.set(column, html.slice(from, to));
+    cells.set(Number(starts[i][1]), {
+      html: html.slice(from, to),
+      rowStart: Number(starts[i][2]),
+      rowEnd: Number(starts[i][3]),
+    });
   }
   return cells;
 }
@@ -79,25 +90,22 @@ describe("ScheduleGridView — room cell placement", () => {
     ]);
 
     const cells = cellsByColumn(html);
-    // Exactly one cell per room, one column apiece — nothing merged or lost.
-    expect([...cells.keys()].sort()).toEqual([2, 3, 4]);
-
-    // Room[0] (Monet) is column 2, and — since Monet's own session is the
-    // keynote, filtered out of room cells — that cell is empty, not merged
-    // into the time gutter.
-    expect(cells.get(2)).not.toContain("data-session-id");
+    // Monet's only session here is the keynote, which renders in the full-width
+    // span instead — so no room cell is emitted for it. Under explicit
+    // placement an empty cell is a grid item occupying a track for nothing.
+    expect([...cells.keys()].sort()).toEqual([3, 4]);
 
     // The bug's exact symptom: a talk landing one column left of its room.
     // Room[1] (Piaf) must be in column 3, not smeared into column 2.
-    expect(cells.get(3)).toContain('data-session-id="TALK-PIAF"');
-    expect(cells.get(2)).not.toContain('data-session-id="TALK-PIAF"');
+    expect(cells.get(3)!.html).toContain('data-session-id="TALK-PIAF"');
 
     // Room[2] (Debussy) must be in column 4, not column 3.
-    expect(cells.get(4)).toContain('data-session-id="TALK-DEBUSSY"');
-    expect(cells.get(3)).not.toContain('data-session-id="TALK-DEBUSSY"');
+    expect(cells.get(4)!.html).toContain('data-session-id="TALK-DEBUSSY"');
+    expect(cells.get(3)!.html).not.toContain('data-session-id="TALK-DEBUSSY"');
 
     // No room cell ever lands in the 56px time-gutter column.
     expect(cells.has(1)).toBe(false);
+    expect(cells.has(2)).toBe(false);
   });
 
   it("keeps the same column per room index in a homogeneous (no-keynote) slot", async () => {
@@ -111,8 +119,29 @@ describe("ScheduleGridView — room cell placement", () => {
     ]);
 
     const cells = cellsByColumn(html);
-    expect(cells.get(2)).toContain('data-session-id="A"');
-    expect(cells.get(3)).toContain('data-session-id="B"');
-    expect(cells.get(4)).toContain('data-session-id="C"');
+    expect(cells.get(2)!.html).toContain('data-session-id="A"');
+    expect(cells.get(3)!.html).toContain('data-session-id="B"');
+    expect(cells.get(4)!.html).toContain('data-session-id="C"');
+  });
+
+  it("spans each cell to its own end time, so duration is visible", async () => {
+    // The whole point of the single-grid rewrite. Three parallel talks of
+    // different lengths must occupy different numbers of row tracks; the old
+    // per-slot grids stretched them all to one shared height.
+    const html = await renderGrid([
+      row({ id: "SHORT", room: "Monet", durationMin: 10 }),
+      row({ id: "MEDIUM", room: "Piaf", durationMin: 30 }),
+      row({ id: "LONG", room: "Debussy", durationMin: 45 }),
+    ]);
+
+    const cells = cellsByColumn(html);
+    const span = (c: number) => cells.get(c)!.rowEnd - cells.get(c)!.rowStart;
+    // All three begin on the same line...
+    expect(cells.get(2)!.rowStart).toBe(1);
+    expect(cells.get(3)!.rowStart).toBe(1);
+    expect(cells.get(4)!.rowStart).toBe(1);
+    // ...and end on strictly increasing ones. Equal spans is the old bug.
+    expect(span(2)).toBeLessThan(span(3));
+    expect(span(3)).toBeLessThan(span(4));
   });
 });

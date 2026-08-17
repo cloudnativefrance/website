@@ -94,14 +94,118 @@ export function groupIntoSlots(sessions: SessionRow[]): Slot[] {
     .map(([startTime, list]) => ({ startTime, sessions: list }));
 }
 
-/** A labelled break between two slots. */
-export interface Gap {
-  afterSlotIndex: number;
-  /** "HH:MM" when the previous slot finishes. */
+/** Where one session sits in the grid, as CSS grid line numbers. */
+export interface GridPlacement {
+  session: SessionRow;
+  /** 1-based grid line the card starts on. */
+  rowStart: number;
+  /** Grid line the card ends on, exclusive — i.e. the session's end time. */
+  rowEnd: number;
+}
+
+/** A stretch of the day with nothing running in any room. */
+export interface GridGap {
+  rowStart: number;
+  rowEnd: number;
   startTime: string;
-  /** "HH:MM" when the next slot begins. */
   endTime: string;
   minutes: number;
+}
+
+export interface TimeGrid {
+  /** Number of row tracks. Grid lines run 1 … rowCount + 1. */
+  rowCount: number;
+  placements: GridPlacement[];
+  /** Time labels for the gutter, at the lines where something starts. */
+  labels: { line: number; label: string }[];
+  gaps: GridGap[];
+}
+
+/**
+ * Lay the day out so a card's height is its actual duration.
+ *
+ * The grid used to be one independent CSS grid per start time, stacked in a
+ * flex column. Duration could not be expressed at all: every card in a row
+ * stretched to the same height, so a 10-minute lightning talk looked exactly as
+ * long as a 75-minute keynote, and the rows below a long talk sat empty in its
+ * own column — reading as "nothing is on in Monet at 10:45" when the 10:30 talk
+ * still had 30 minutes to run.
+ *
+ * Row lines are every distinct start AND end time, so a card can span from its
+ * own start line to its own end line. Rows are content-sized rather than a
+ * fixed pixels-per-minute scale: at a scale coarse enough to keep a 10-minute
+ * card readable, this day would render about 8550px tall — taller than the list
+ * view, which defeats the point of the grid. Content-sized rows keep the
+ * ordering and the spans honest at roughly a third of that.
+ *
+ * Ordering uses absolute instants, so a multi-day edition cannot interleave
+ * two days that share a wall-clock time.
+ */
+export function buildTimeGrid(sessions: SessionRow[], minGapMinutes = 20): TimeGrid {
+  if (sessions.length === 0) return { rowCount: 0, placements: [], labels: [], gaps: [] };
+
+  const spans = sessions.map((session) => {
+    const startsAt = new Date(session.startTime).getTime();
+    return { session, startsAt, endsAt: startsAt + session.durationMin * 60_000 };
+  });
+
+  const boundaries = [...new Set(spans.flatMap((s) => [s.startsAt, s.endsAt]))].sort(
+    (a, b) => a - b,
+  );
+  const lineOf = new Map(boundaries.map((value, index) => [value, index + 1]));
+
+  const placements = spans.map(({ session, startsAt, endsAt }) => ({
+    session,
+    rowStart: lineOf.get(startsAt)!,
+    rowEnd: lineOf.get(endsAt)!,
+  }));
+
+  // Only start times get a label. An end-only boundary — a lightning talk
+  // finishing at 10:40 with nothing beginning there — would just be clutter,
+  // and it is the one boundary kind with no ISO string to read the time off.
+  const labels: { line: number; label: string }[] = [];
+  const seen = new Set<number>();
+  for (const { session, startsAt } of [...spans].sort((a, b) => a.startsAt - b.startsAt)) {
+    const line = lineOf.get(startsAt)!;
+    if (seen.has(line)) continue;
+    seen.add(line);
+    labels.push({ line, label: session.startTime.slice(11, 16) });
+  }
+
+  // Wall-clock labels are derived by offsetting from a session whose ISO string
+  // we can read, never by formatting an epoch — `new Date(ms).getHours()` would
+  // render the event in the BUILD MACHINE's timezone, so a UTC runner would
+  // print an 12:10 break as 11:10.
+  const reference = spans.reduce((a, b) => (a.startsAt <= b.startsAt ? a : b));
+  const refMinutes = minutesOf(reference.session.startTime);
+  const labelAt = (epoch: number) =>
+    hhmm(refMinutes + Math.round((epoch - reference.startsAt) / 60_000));
+
+  // A gap is a row track no session covers. Derived from coverage rather than
+  // from "the previous slot's end", which is why a slot holding a 10-minute and
+  // a 45-minute talk in parallel cannot invent a break while the long one runs.
+  const gaps: GridGap[] = [];
+  let runStart: number | null = null;
+  for (let row = 1; row <= boundaries.length - 1; row++) {
+    const covered = placements.some((p) => p.rowStart <= row && p.rowEnd > row);
+    if (!covered && runStart === null) runStart = row;
+    if ((covered || row === boundaries.length - 1) && runStart !== null) {
+      const runEnd = covered ? row : row + 1;
+      const minutes = Math.round((boundaries[runEnd - 1] - boundaries[runStart - 1]) / 60_000);
+      if (minutes >= minGapMinutes) {
+        gaps.push({
+          rowStart: runStart,
+          rowEnd: runEnd,
+          startTime: labelAt(boundaries[runStart - 1]),
+          endTime: labelAt(boundaries[runEnd - 1]),
+          minutes,
+        });
+      }
+      runStart = null;
+    }
+  }
+
+  return { rowCount: boundaries.length - 1, placements, labels, gaps };
 }
 
 /** Minutes past midnight, read from the ISO string without timezone maths. */
@@ -111,34 +215,9 @@ function minutesOf(iso: string): number {
 }
 
 function hhmm(minutes: number): string {
-  const h = String(Math.floor(minutes / 60)).padStart(2, "0");
-  const m = String(minutes % 60).padStart(2, "0");
+  // Wrapped so a multi-day edition cannot print "25:30" for a second-day slot.
+  const wrapped = ((minutes % 1440) + 1440) % 1440;
+  const h = String(Math.floor(wrapped / 60)).padStart(2, "0");
+  const m = String(wrapped % 60).padStart(2, "0");
   return `${h}:${m}`;
-}
-
-/**
- * Gaps between slots worth labelling as a break.
- *
- * Measured from the LATEST end in the slot: a slot holds parallel talks of
- * different lengths, so using the first session's end would invent a gap while
- * a 45-minute talk was still running.
- */
-export function findGaps(slots: Slot[], minMinutes = 20): Gap[] {
-  const gaps: Gap[] = [];
-  for (let i = 0; i < slots.length - 1; i++) {
-    const endsAt = Math.max(
-      ...slots[i].sessions.map((s) => minutesOf(s.startTime) + s.durationMin),
-    );
-    const nextStart = minutesOf(slots[i + 1].startTime);
-    const minutes = nextStart - endsAt;
-    if (minutes >= minMinutes) {
-      gaps.push({
-        afterSlotIndex: i,
-        startTime: hhmm(endsAt),
-        endTime: hhmm(nextStart),
-        minutes,
-      });
-    }
-  }
-  return gaps;
 }

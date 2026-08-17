@@ -4,7 +4,7 @@ import {
   matchesSession,
   activeFilterCount,
   groupIntoSlots,
-  findGaps,
+  buildTimeGrid,
 } from "../schedule-filter";
 import type { SessionRow } from "../schedule";
 
@@ -134,56 +134,88 @@ describe("groupIntoSlots", () => {
   });
 });
 
-describe("findGaps", () => {
-  it("reports a lunch-sized gap between slots", () => {
-    const slots = groupIntoSlots([
+describe("buildTimeGrid", () => {
+  it("spans a card from its own start to its own end", () => {
+    // The defect this replaced: every card in a slot stretched to one shared
+    // height, so a 10-minute lightning talk was as tall as a 45-minute talk
+    // beside it and the rows below the long one looked empty in its column.
+    const grid = buildTimeGrid([
+      row({ id: "SHORT", startTime: "2026-02-03T10:30:00+01:00", durationMin: 10 }),
+      row({ id: "LONG", startTime: "2026-02-03T10:30:00+01:00", durationMin: 45, room: "Piaf" }),
+    ]);
+    const short = grid.placements.find((p) => p.session.id === "SHORT")!;
+    const long = grid.placements.find((p) => p.session.id === "LONG")!;
+    // Boundaries are 10:30, 10:40, 11:15 -> lines 1, 2, 3.
+    expect(short).toMatchObject({ rowStart: 1, rowEnd: 2 });
+    expect(long).toMatchObject({ rowStart: 1, rowEnd: 3 });
+    // The long talk must outlast the short one; equal spans is the old bug.
+    expect(long.rowEnd - long.rowStart).toBeGreaterThan(short.rowEnd - short.rowStart);
+  });
+
+  it("gives a later session a line below one still running", () => {
+    // A talk starting at 10:45 in another room must sit BELOW the 10:30 line,
+    // not beside it, while the 10:30-11:15 talk is still going.
+    const grid = buildTimeGrid([
+      row({ id: "LONG", startTime: "2026-02-03T10:30:00+01:00", durationMin: 45 }),
+      row({ id: "LATER", startTime: "2026-02-03T10:45:00+01:00", durationMin: 10, room: "Piaf" }),
+    ]);
+    const long = grid.placements.find((p) => p.session.id === "LONG")!;
+    const later = grid.placements.find((p) => p.session.id === "LATER")!;
+    expect(later.rowStart).toBeGreaterThan(long.rowStart);
+    expect(later.rowStart).toBeLessThan(long.rowEnd);
+  });
+
+  it("labels only the lines where something starts", () => {
+    const grid = buildTimeGrid([
+      row({ id: "A", startTime: "2026-02-03T10:30:00+01:00", durationMin: 10 }),
+      row({ id: "B", startTime: "2026-02-03T11:00:00+01:00", durationMin: 30, room: "Piaf" }),
+    ]);
+    // 10:40 is a boundary (A ends there) but nothing begins, so it gets no label.
+    expect(grid.labels.map((l) => l.label)).toEqual(["10:30", "11:00"]);
+  });
+
+  it("is empty for no sessions", () => {
+    expect(buildTimeGrid([])).toEqual({ rowCount: 0, placements: [], labels: [], gaps: [] });
+  });
+
+  it("reports a lunch-sized gap", () => {
+    const grid = buildTimeGrid([
       row({ id: "A", startTime: "2026-02-03T12:00:00+01:00", durationMin: 10 }),
       row({ id: "B", startTime: "2026-02-03T13:00:00+01:00", durationMin: 30 }),
     ]);
-    const gaps = findGaps(slots);
-    expect(gaps).toHaveLength(1);
-    expect(gaps[0]).toMatchObject({
-      afterSlotIndex: 0,
-      startTime: "12:10",
-      endTime: "13:00",
-      minutes: 50,
-    });
+    expect(grid.gaps).toHaveLength(1);
+    expect(grid.gaps[0]).toMatchObject({ startTime: "12:10", endTime: "13:00", minutes: 50 });
   });
 
   it("ignores a changeover shorter than the threshold", () => {
-    const slots = groupIntoSlots([
+    const grid = buildTimeGrid([
       row({ id: "A", startTime: "2026-02-03T10:30:00+01:00", durationMin: 45 }),
       row({ id: "B", startTime: "2026-02-03T11:30:00+01:00", durationMin: 30 }),
     ]);
     // 15 minutes between talks is a corridor change, not a break worth labelling.
-    expect(findGaps(slots, 20)).toEqual([]);
+    expect(grid.gaps).toEqual([]);
   });
 
-  it("measures the gap from the LATEST end in the slot, not the first", () => {
-    // A slot holds parallel talks of different lengths: a 10-minute lightning
-    // talk alongside a 45-minute one. Measuring from the FIRST session's end
-    // (10:40) would report a 50-minute break while the long talk is still
-    // running until 11:15 — a break the site would then label on screen.
-    // Measured correctly there are only 15 minutes, below the threshold, so
-    // nothing is reported. This asserts the absence, because that is exactly
-    // what the naive implementation gets wrong.
-    const slots = groupIntoSlots([
+  it("does not invent a break while a parallel long talk is still running", () => {
+    // A 10-minute lightning talk ends at 10:40 while a 45-minute talk beside it
+    // runs to 11:15. Measuring from the FIRST end would report a 50-minute
+    // break the site would then draw across the screen. Coverage-based
+    // detection cannot: rows 10:40-11:15 are covered by the long talk.
+    const grid = buildTimeGrid([
       row({ id: "SHORT", startTime: "2026-02-03T10:30:00+01:00", durationMin: 10 }),
       row({ id: "LONG", startTime: "2026-02-03T10:30:00+01:00", durationMin: 45, room: "Piaf" }),
       row({ id: "NEXT", startTime: "2026-02-03T11:30:00+01:00", durationMin: 30 }),
     ]);
-    expect(findGaps(slots, 20)).toEqual([]);
+    expect(grid.gaps).toEqual([]);
   });
 
   it("does report the gap once the long talk has finished", () => {
-    // Same slot, but the next one starts at 11:50: 35 minutes after 11:15.
-    const slots = groupIntoSlots([
+    const grid = buildTimeGrid([
       row({ id: "SHORT", startTime: "2026-02-03T10:30:00+01:00", durationMin: 10 }),
       row({ id: "LONG", startTime: "2026-02-03T10:30:00+01:00", durationMin: 45, room: "Piaf" }),
       row({ id: "NEXT", startTime: "2026-02-03T11:50:00+01:00", durationMin: 30 }),
     ]);
-    const gaps = findGaps(slots, 20);
-    expect(gaps).toHaveLength(1);
-    expect(gaps[0]).toMatchObject({ startTime: "11:15", endTime: "11:50", minutes: 35 });
+    expect(grid.gaps).toHaveLength(1);
+    expect(grid.gaps[0]).toMatchObject({ startTime: "11:15", endTime: "11:50", minutes: 35 });
   });
 });
