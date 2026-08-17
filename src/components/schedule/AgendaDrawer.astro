@@ -6,10 +6,17 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-<!-- Agenda drawer (hidden by default) -->
+<!--
+  Agenda drawer (hidden by default).
+
+  `flex flex-col` is load-bearing: without it the aside computes to
+  `display: block`, the list's `flex-1` is inert and its `overflow-auto` never
+  clips, so the panel grows past the viewport and pushes the export button off
+  screen — unreachable, because a fixed element cannot be scrolled back.
+-->
 <aside
   id="schedule-agenda-drawer"
-  class="fixed right-0 top-0 bottom-0 w-full sm:w-96 max-w-full bg-card border-l border-border z-50 shadow-2xl translate-x-full transition-transform duration-200"
+  class="fixed right-0 top-0 bottom-0 w-full sm:w-96 max-w-full bg-card border-l border-border z-50 shadow-2xl translate-x-full transition-transform duration-200 flex flex-col"
   aria-hidden="true"
   role="dialog"
   aria-label={t("schedule.agenda.label")}

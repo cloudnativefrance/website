@@ -104,7 +104,13 @@ function linksFor(s: SessionRow) {
        any JS — which is what removes the ragged whitespace of the old grid. */
     align-items: stretch;
   }
-  .grid-view-head { position: sticky; top: 64px; z-index: 10; background: var(--color-background); padding: 8px 0; }
+  /* Sits below the sticky toolbar, not behind it: same offset at a lower
+     z-index meant the room labels were hidden the moment the page scrolled. */
+  .grid-view-head {
+    position: sticky;
+    top: calc(var(--schedule-header-h, 64px) + var(--schedule-toolbar-h, 0px));
+    z-index: 10; background: var(--color-background); padding: 8px 0;
+  }
   .grid-view-room {
     font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
     text-align: center; color: var(--color-foreground);
@@ -139,6 +145,10 @@ function linksFor(s: SessionRow) {
   .grid-view-break::after { content: ""; flex: 1; height: 1px; background: var(--color-border); }
 
   .grid-view-row.is-hidden { display: none; }
+  /* schedule-ui.ts toggles `is-hidden` on the break bands when a filter or
+     search is active; without this rule they stayed on screen, leaving orphan
+     "Pause déjeuner" separators above an empty result set. */
+  .grid-view-break.is-hidden { display: none; }
 
   /* Below md the room columns are unusable, and the list view takes over. */
   @media (max-width: 767px) { .grid-view { display: none; } }

@@ -94,7 +94,9 @@ const levels = listLevels(sessions);
 
 <style>
   .toolbar {
-    position: sticky; top: 64px; z-index: 20;
+    /* Measured by schedule-ui.ts — the site header is sticky and taller from md
+       up. The 64px fallback only applies before the island runs. */
+    position: sticky; top: var(--schedule-header-h, 64px); z-index: 20;
     background: color-mix(in oklch, var(--color-background) 92%, transparent);
     backdrop-filter: blur(6px);
     border-bottom: 1px solid var(--color-border);
@@ -118,6 +120,9 @@ const levels = listLevels(sessions);
   .toolbar-search:has(input:focus-visible) { outline: 2px solid var(--color-ring); outline-offset: 2px; }
 
   .toolbar-views { display: inline-flex; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; }
+  /* Grid view does not exist below md, so offering the choice there is a dead
+     control. The island independently forces the list at this width. */
+  @media (max-width: 767px) { .toolbar-views { display: none; } }
   .toolbar-views button {
     padding: 0 14px; height: 38px; font-size: 13px; font-weight: 600;
     background: var(--color-card); color: var(--color-foreground); border: 0; cursor: pointer;

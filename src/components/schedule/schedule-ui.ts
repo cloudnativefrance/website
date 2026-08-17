@@ -98,17 +98,41 @@ if (root) {
     clearSearchEl?.toggleAttribute("hidden", !state.query);
   }
 
+  // Grid view is `display: none` below md — the room columns are unusable at
+  // that width. The stylesheet hiding it does not tell this island anything, so
+  // rendering the user's stored "grid" preference on a phone put `[hidden]` on
+  // the list while CSS hid the grid, and the programme came out BLANK with the
+  // result count still claiming "51 sessions". Reachable three ways: tapping
+  // the toggle on a phone, opening a shared `?view=grid` link on a phone, or
+  // choosing grid on a desktop and later narrowing the window.
+  //
+  // The preference and what is on screen are therefore two different things:
+  // `preferredView` is what the visitor chose and what persists, `renderedView`
+  // is what the viewport can actually display.
+  const narrow = window.matchMedia("(max-width: 767px)");
+  // Placeholder until the stored/URL preference is resolved below; the
+  // `setView(initial, false)` call there is what actually settles it.
+  let preferredView: "grid" | "list" =
+    (root.getAttribute("data-default-view") as "grid" | "list") ?? "grid";
+
   // Hiding relies on Tailwind v4's preflight, which declares
   // `[hidden] { display: none !important }`. Without that `!important` the
   // views' own `.grid-view { display: grid }` / `.list-view { display: flex }`
   // would win — author rules outrank the UA sheet — and both views would render
   // at once with no error anywhere. Disabling preflight breaks this toggle.
-  function setView(view: "grid" | "list", persist = true) {
-    gridView?.toggleAttribute("hidden", view !== "grid");
-    listView?.toggleAttribute("hidden", view !== "list");
+  function renderView() {
+    const renderedView = narrow.matches ? "list" : preferredView;
+    gridView?.toggleAttribute("hidden", renderedView !== "grid");
+    listView?.toggleAttribute("hidden", renderedView !== "list");
     for (const btn of document.querySelectorAll<HTMLElement>("[data-view]")) {
-      btn.setAttribute("aria-pressed", btn.getAttribute("data-view") === view ? "true" : "false");
+      const pressed = btn.getAttribute("data-view") === preferredView;
+      btn.setAttribute("aria-pressed", pressed ? "true" : "false");
     }
+  }
+
+  function setView(view: "grid" | "list", persist = true) {
+    preferredView = view;
+    renderView();
     if (persist) {
       try {
         localStorage.setItem(VIEW_KEY, view);
@@ -119,6 +143,35 @@ if (root) {
       url.searchParams.set("view", view);
       history.replaceState(null, "", url);
     }
+  }
+
+  // Rotating a phone or dragging a desktop window across the breakpoint has to
+  // re-evaluate, or the same blank page appears after the fact.
+  narrow.addEventListener("change", renderView);
+
+  // Both sticky offsets were hardcoded to `top: 64px`. The site header is
+  // sticky and its logo is `h-10 md:h-14`, so it measures 85px on a phone but
+  // 105px from md up — which hid the search field completely behind it on
+  // desktop, and the search field is the whole navigation story of this page.
+  // The grid's room-label row used the same 64px at a LOWER z-index than the
+  // toolbar, so it parked itself underneath and the column-to-room mapping was
+  // invisible below the fold. Measure both and publish them as custom
+  // properties; they inherit to the toolbar and grid head from here.
+  const toolbarEl = document.querySelector<HTMLElement>(".toolbar");
+  function syncStickyOffsets() {
+    const headerH = document.querySelector("header")?.getBoundingClientRect().height ?? 0;
+    root.style.setProperty("--schedule-header-h", `${Math.round(headerH)}px`);
+    root.style.setProperty(
+      "--schedule-toolbar-h",
+      `${Math.round(toolbarEl?.getBoundingClientRect().height ?? 0)}px`,
+    );
+  }
+  syncStickyOffsets();
+  window.addEventListener("resize", syncStickyOffsets);
+  // The filter panel is a <details>; opening it changes the toolbar's height,
+  // and with it where the grid head must sit.
+  if (toolbarEl && "ResizeObserver" in window) {
+    new ResizeObserver(syncStickyOffsets).observe(toolbarEl);
   }
 
   for (const btn of document.querySelectorAll<HTMLElement>("[data-view]")) {
@@ -142,6 +195,11 @@ if (root) {
     state.format.clear();
     state.track.clear();
     state.level.clear();
+    // The search query counts towards the active-filter badge, so leaving it
+    // set meant "clear all" left the badge showing 1 and the results still
+    // narrowed, with nothing in this panel able to explain why.
+    state.query = "";
+    if (searchEl) searchEl.value = "";
     apply();
   });
 
@@ -229,7 +287,15 @@ if (root) {
     }
   }
   function setBookmarks(set: Set<string>): void {
-    localStorage.setItem(BOOKMARKS_KEY, JSON.stringify([...set]));
+    try {
+      localStorage.setItem(BOOKMARKS_KEY, JSON.stringify([...set]));
+    } catch {
+      // Storage can be denied outright (Safari with cookies blocked, some
+      // enterprise policies). The read side already tolerates that; this side
+      // did not, so the click handler threw midway and left the badge, the
+      // bookmark icon and the drawer disagreeing with each other. Losing
+      // persistence is acceptable; losing the rest of the handler is not.
+    }
   }
 
   const bookmarks = getBookmarks();
@@ -338,6 +404,14 @@ if (root) {
       cls: "bg-secondary text-foreground",
     },
   };
+  // The facet buttons translate the level; this path was emitting the raw enum,
+  // so the modal read "beginner" in both locales where the chip beside it read
+  // "Tout public".
+  const levelLabels: Record<string, string> = {
+    beginner: root.getAttribute("data-schedule-level-beginner") || "beginner",
+    intermediate: root.getAttribute("data-schedule-level-intermediate") || "intermediate",
+    advanced: root.getAttribute("data-schedule-level-advanced") || "advanced",
+  };
   const agendaRemoveLabel = root.getAttribute("data-schedule-agenda-remove") || "Remove";
 
   function openModal(card: HTMLElement): void {
@@ -392,7 +466,7 @@ if (root) {
         );
       if (level)
         parts.push(
-          `<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-muted-foreground uppercase tracking-widest">${escHtml(level)}</span>`,
+          `<span class="inline-flex items-center rounded-full bg-background/40 border border-border px-2.5 py-0.5 text-xs text-muted-foreground uppercase tracking-widest">${escHtml(levelLabels[level] ?? level)}</span>`,
         );
       if (language)
         parts.push(
