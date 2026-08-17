@@ -71,6 +71,11 @@ export type SpeakerEnrichment = Map<string, Partial<Record<SpeakerField, string>
 /** Talk level answers, keyed by submission code. */
 export type LevelAnswers = Map<string, string>;
 
+/** What to print for a thrown value. `fetch` rejects with a TypeError; `catch` types it `unknown`. */
+function messageOf(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
 function readToken(): string | undefined {
   const direct = process.env.PRETALX_API_TOKEN?.trim();
   if (direct) return direct;
@@ -81,8 +86,7 @@ function readToken(): string | undefined {
     const body = readFileSync(path, "utf8").trim();
     return body || undefined;
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.warn(`[pretalx] PRETALX_API_TOKEN_FILE unreadable (${msg})`);
+    console.warn(`[pretalx] PRETALX_API_TOKEN_FILE unreadable (${messageOf(err)})`);
     return undefined;
   }
 }
@@ -262,9 +266,8 @@ async function fetchPage<T>(
 
     const delay = RETRY_DELAYS_MS[attempt];
     if (delay === undefined) throw lastErr;
-    const msg = lastErr instanceof Error ? lastErr.message : String(lastErr);
     console.warn(
-      `[pretalx] ${what}: ${msg} — retrying in ${delay}ms ` +
+      `[pretalx] ${what}: ${messageOf(lastErr)} — retrying in ${delay}ms ` +
         `(${attempt + 1}/${RETRY_DELAYS_MS.length})`,
     );
     await new Promise((r) => setTimeout(r, delay));
@@ -336,7 +339,7 @@ async function degradeOnFailure<T>(what: string, run: () => Promise<T>, empty: T
   try {
     return await run();
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = messageOf(err);
     if (process.env.PRETALX_TOKEN_REQUIRED === "1") {
       if (isConfigurationFailure(err)) {
         throw new Error(`[pretalx] ${what}: ${msg} (PRETALX_TOKEN_REQUIRED=1)`);

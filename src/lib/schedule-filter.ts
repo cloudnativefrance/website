@@ -31,14 +31,15 @@ export function emptyFilterState(): FilterState {
  * French talk titles are full of accents and nobody types them into a search
  * box, so an accent-sensitive match would fail on the majority of queries.
  */
-function normalise(value: string): string {
+export function normalise(value: string): string {
   return value
     .toLowerCase()
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "");
 }
 
-function facetMatches(selected: Set<string>, value: string): boolean {
+/** An empty facet means "no opinion"; several values in one mean OR. */
+export function facetMatches(selected: Set<string>, value: string): boolean {
   return selected.size === 0 || selected.has(value);
 }
 
@@ -149,10 +150,17 @@ export function buildTimeGrid(sessions: SessionRow[], minGapMinutes = 20): TimeG
     return { session, startsAt, endsAt: startsAt + session.durationMin * 60_000 };
   });
 
+  // Sorted once and used twice below: the labels come out in line order, and
+  // the first element is the earliest session, which the gap labels offset from.
+  const byStart = [...spans].sort((a, b) => a.startsAt - b.startsAt);
+
   const boundaries = [...new Set(spans.flatMap((s) => [s.startsAt, s.endsAt]))].sort(
     (a, b) => a - b,
   );
   const lineOf = new Map(boundaries.map((value, index) => [value, index + 1]));
+  const rowCount = boundaries.length - 1;
+  /** The instant a grid line sits at. Lines are 1-based, `boundaries` is not. */
+  const epochAt = (line: number) => boundaries[line - 1];
 
   const placements = spans.map(({ session, startsAt, endsAt }) => ({
     session,
@@ -165,7 +173,7 @@ export function buildTimeGrid(sessions: SessionRow[], minGapMinutes = 20): TimeG
   // and it is the one boundary kind with no ISO string to read the time off.
   const labels: { line: number; label: string }[] = [];
   const seen = new Set<number>();
-  for (const { session, startsAt } of [...spans].sort((a, b) => a.startsAt - b.startsAt)) {
+  for (const { session, startsAt } of byStart) {
     const line = lineOf.get(startsAt)!;
     if (seen.has(line)) continue;
     seen.add(line);
@@ -176,7 +184,7 @@ export function buildTimeGrid(sessions: SessionRow[], minGapMinutes = 20): TimeG
   // we can read, never by formatting an epoch — `new Date(ms).getHours()` would
   // render the event in the BUILD MACHINE's timezone, so a UTC runner would
   // print an 12:10 break as 11:10.
-  const reference = spans.reduce((a, b) => (a.startsAt <= b.startsAt ? a : b));
+  const reference = byStart[0];
   const refMinutes = minutesOf(reference.session.startTime);
   const labelAt = (epoch: number) =>
     hhmm(refMinutes + Math.round((epoch - reference.startsAt) / 60_000));
@@ -186,18 +194,18 @@ export function buildTimeGrid(sessions: SessionRow[], minGapMinutes = 20): TimeG
   // a 45-minute talk in parallel cannot invent a break while the long one runs.
   const gaps: GridGap[] = [];
   let runStart: number | null = null;
-  for (let row = 1; row <= boundaries.length - 1; row++) {
+  for (let row = 1; row <= rowCount; row++) {
     const covered = placements.some((p) => p.rowStart <= row && p.rowEnd > row);
     if (!covered && runStart === null) runStart = row;
-    if ((covered || row === boundaries.length - 1) && runStart !== null) {
+    if ((covered || row === rowCount) && runStart !== null) {
       const runEnd = covered ? row : row + 1;
-      const minutes = Math.round((boundaries[runEnd - 1] - boundaries[runStart - 1]) / 60_000);
+      const minutes = Math.round((epochAt(runEnd) - epochAt(runStart)) / 60_000);
       if (minutes >= minGapMinutes) {
         gaps.push({
           rowStart: runStart,
           rowEnd: runEnd,
-          startTime: labelAt(boundaries[runStart - 1]),
-          endTime: labelAt(boundaries[runEnd - 1]),
+          startTime: labelAt(epochAt(runStart)),
+          endTime: labelAt(epochAt(runEnd)),
           minutes,
         });
       }
@@ -205,7 +213,7 @@ export function buildTimeGrid(sessions: SessionRow[], minGapMinutes = 20): TimeG
     }
   }
 
-  return { rowCount: boundaries.length - 1, placements, labels, gaps };
+  return { rowCount, placements, labels, gaps };
 }
 
 /** Minutes past midnight, read from the ISO string without timezone maths. */

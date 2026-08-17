@@ -60,15 +60,6 @@ function peopleInSchedule(doc: PretalxScheduleExport): Map<string, PretalxPerson
 }
 
 /**
- * Prefer the committed image over the Pretalx original.
- *
- * `public/speakers/<slug>.jpg` holds 78 optimised, self-hosted portraits. Pretalx
- * serves unoptimised originals from the CFP host, so using those would make every
- * speaker card a cross-origin request for a larger file — and two of the
- * scheduled speakers have no Pretalx avatar at all despite having a local photo.
- * The Pretalx avatar remains the fallback for anyone with no committed image.
- */
-/**
  * Where a speaker's portrait comes from, in priority order.
  *
  * Pretalx first. This used to be the other way round — a committed file always
@@ -83,8 +74,10 @@ function peopleInSchedule(doc: PretalxScheduleExport): Map<string, PretalxPerson
  * nobody is left the whole directory can be deleted as pure cleanup.
  *
  * The returned string is a URL, not a file: an absolute Pretalx one gets
- * downloaded and optimised at build time by SpeakerAvatar, a `/speakers/…` one
- * is served straight from `public/`, and an empty one renders initials.
+ * downloaded and optimised at build time by SpeakerAvatar — Pretalx serves
+ * unoptimised originals from the CFP host, and no visitor may be sent there —
+ * a `/speakers/…` one is served straight from `public/`, and an empty one
+ * renders initials.
  */
 function photoFor(slug: string, avatar: string | null | undefined): string {
   if (avatar) return avatar;

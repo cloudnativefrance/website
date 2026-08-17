@@ -11,6 +11,8 @@
 import {
   activeFilterCount,
   emptyFilterState,
+  facetMatches,
+  normalise,
   type FilterState,
 } from "@/lib/schedule-filter";
 
@@ -36,27 +38,22 @@ if (root) {
   const countTemplate = root.getAttribute("data-count-template") ?? "{n}/{total}";
   const noneLabel = root.getAttribute("data-none-label") ?? "";
 
-  /** Cards appear once per view, so a session id can match two elements. */
-  const cards = () => Array.from(document.querySelectorAll<HTMLElement>(".session-card"));
-
-  function normalise(v: string): string {
-    return v.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-  }
-
   function apply() {
     const query = normalise(state.query.trim());
     const visible = new Set<string>();
 
-    for (const card of cards()) {
+    for (const card of document.querySelectorAll<HTMLElement>(".session-card")) {
       const room = card.getAttribute("data-room") ?? "";
       const format = card.getAttribute("data-format") ?? "";
       const track = card.getAttribute("data-track") ?? "";
       const level = card.getAttribute("data-level") ?? "";
+      // Same predicate the server render uses, imported rather than restated —
+      // a keynote spans every room, so a room filter must never hide it.
       const facetOk =
-        (format === "keynote" || state.room.size === 0 || state.room.has(room)) &&
-        (state.format.size === 0 || state.format.has(format)) &&
-        (state.track.size === 0 || state.track.has(track)) &&
-        (state.level.size === 0 || state.level.has(level));
+        (format === "keynote" || facetMatches(state.room, room)) &&
+        facetMatches(state.format, format) &&
+        facetMatches(state.track, track) &&
+        facetMatches(state.level, level);
       const searchOk = !query || normalise(card.getAttribute("data-search") ?? "").includes(query);
       const show = facetOk && searchOk;
       card.classList.toggle("is-hidden", !show);
@@ -69,8 +66,12 @@ if (root) {
       const any = container.querySelector(".session-card:not(.is-hidden)");
       container.classList.toggle("is-hidden", !any);
     }
+    // A non-empty query already counts as one active filter, so this single
+    // number covers both. Break bands describe the unfiltered day, so any
+    // narrowing at all hides them.
+    const active = activeFilterCount(state);
     for (const band of document.querySelectorAll<HTMLElement>(".grid-view-break")) {
-      band.classList.toggle("is-hidden", Boolean(state.query.trim()) || activeFilterCount(state) > 0);
+      band.classList.toggle("is-hidden", active > 0);
     }
 
     if (countEl) {
@@ -89,7 +90,6 @@ if (root) {
       btn.setAttribute("aria-pressed", on ? "true" : "false");
     }
 
-    const active = activeFilterCount(state);
     const badge = document.getElementById("schedule-filter-active-count");
     if (badge) {
       badge.textContent = active ? String(active) : "";
@@ -110,10 +110,11 @@ if (root) {
   // `preferredView` is what the visitor chose and what persists, `renderedView`
   // is what the viewport can actually display.
   const narrow = window.matchMedia("(max-width: 767px)");
+  /** The server's edition-aware default: the lowest-priority of the three. */
+  const serverDefaultView = (root.getAttribute("data-default-view") as "grid" | "list") ?? "grid";
   // Placeholder until the stored/URL preference is resolved below; the
   // `setView(initial, false)` call there is what actually settles it.
-  let preferredView: "grid" | "list" =
-    (root.getAttribute("data-default-view") as "grid" | "list") ?? "grid";
+  let preferredView: "grid" | "list" = serverDefaultView;
 
   // Hiding relies on Tailwind v4's preflight, which declares
   // `[hidden] { display: none !important }`. Without that `!important` the
@@ -233,13 +234,11 @@ if (root) {
   } catch {
     /* private mode */
   }
-  const initial =
-    fromUrl === "grid" || fromUrl === "list"
-      ? fromUrl
-      : stored === "grid" || stored === "list"
-        ? stored
-        : ((root.getAttribute("data-default-view") as "grid" | "list") ?? "grid");
-  setView(initial, false);
+  /** A candidate is only a view if it names one — anything else falls through. */
+  function asView(value: string | null): "grid" | "list" | null {
+    return value === "grid" || value === "list" ? value : null;
+  }
+  setView(asView(fromUrl) ?? asView(stored) ?? serverDefaultView, false);
   apply();
 
   // -----------------------------------------------------------------------
@@ -275,9 +274,15 @@ if (root) {
     return String(v ?? "").replace(/[^A-Za-z0-9_.-]/g, "_");
   }
 
-  /** Any one card carrying this session id, regardless of which view it lives in. */
-  function findCard(id: string): HTMLElement | undefined {
-    return cards().find((c) => c.getAttribute("data-session-id") === id);
+  /**
+   * Any one card carrying this session id. A session renders once per view, so
+   * two elements can match; every caller here only wants the data attributes,
+   * which are identical on both, so the first in document order will do.
+   */
+  function findCard(id: string): HTMLElement | null {
+    return document.querySelector<HTMLElement>(
+      `.session-card[data-session-id="${CSS.escape(id)}"]`,
+    );
   }
 
   // -----------------------------------------------------------------------

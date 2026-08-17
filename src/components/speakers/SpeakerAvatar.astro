@@ -34,7 +34,6 @@ const RENDER_WIDTH = { sm: 128, lg: 256 };
  */
 let src = photo;
 if (photo && /^https?:\/\//.test(photo)) {
-  src = undefined;
   try {
     // `inferSize` is required for a remote source: Astro cannot know the aspect
     // ratio without reading the file, and without dimensions it declines to
@@ -49,6 +48,8 @@ if (photo && /^https?:\/\//.test(photo)) {
       })
     ).src;
   } catch (err) {
+    // Initials, not the remote URL — see above.
+    src = undefined;
     const reason = err instanceof Error ? err.message : String(err);
     console.warn(
       `[speakers] ${name}: could not read the Pretalx portrait ${photo} (${reason}) — ` +

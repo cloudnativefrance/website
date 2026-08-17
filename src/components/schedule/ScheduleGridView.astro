@@ -34,9 +34,15 @@ function linksFor(s: SessionRow) {
   });
 }
 
-/** The span a group of cards should occupy: earliest start to latest end. */
+/**
+ * The span a group of cards should occupy: earliest start to latest end.
+ *
+ * Every session here came from the same array `buildTimeGrid` was given, so
+ * `rowsFor` has a placement for each. Callers guarantee a non-empty list —
+ * `Math.min()` of nothing is Infinity.
+ */
 function spanOf(list: SessionRow[]): { start: number; end: number } {
-  const placed = list.map((s) => rowsFor.get(s.id)!).filter(Boolean);
+  const placed = list.map((s) => rowsFor.get(s.id)!);
   return {
     start: Math.min(...placed.map((p) => p.rowStart)),
     end: Math.max(...placed.map((p) => p.rowEnd)),
@@ -55,6 +61,8 @@ function spanOf(list: SessionRow[]): { start: number; end: number } {
       const keynotes = slot.sessions.filter((s) => s.format === "keynote");
       const others = slot.sessions.filter((s) => s.format !== "keynote");
       const line = lineForStart.get(slot.startTime);
+      // A keynote occupies every room, so its cards share one full-width span.
+      const keynoteSpan = keynotes.length > 0 ? spanOf(keynotes) : null;
       // `.grid-view-row` is `display: contents`, so these children are laid out
       // by `.grid-view-body` directly while the wrapper stays as the single
       // thing the filter code toggles `is-hidden` on (setting `display: none`
@@ -65,38 +73,34 @@ function spanOf(list: SessionRow[]): { start: number; end: number } {
           <div class="grid-view-gutter grid-view-time" style={`grid-row:${line};`}>
             {slot.startTime.slice(11, 16)}
           </div>
-          {[
-            keynotes.length > 0 &&
-              (() => {
-                const { start, end } = spanOf(keynotes);
-                return (
-                  <div class="grid-view-span" style={`grid-row:${start} / ${end};`}>
-                    {keynotes.map((s) => (
-                      <SessionCard session={s} lang={lang} speakers={linksFor(s)} variant="grid" />
-                    ))}
-                  </div>
-                );
-              })(),
-            // One cell per room that actually has a session starting here.
-            // Empty cells are not emitted at all: with explicit placement they
-            // would only add grid items that occupy a track for nothing.
-            others.length > 0 &&
-              rooms.map((room, i) => {
-                const inRoom = others.filter((s) => s.room === room);
-                if (inRoom.length === 0) return false;
-                const { start, end } = spanOf(inRoom);
-                return (
-                  <div
-                    class="grid-view-cell"
-                    style={`grid-column:${i + 2}; grid-row:${start} / ${end};`}
-                  >
-                    {inRoom.map((s) => (
-                      <SessionCard session={s} lang={lang} speakers={linksFor(s)} variant="grid" />
-                    ))}
-                  </div>
-                );
-              }),
-          ]}
+          {keynoteSpan && (
+            <div
+              class="grid-view-span"
+              style={`grid-row:${keynoteSpan.start} / ${keynoteSpan.end};`}
+            >
+              {keynotes.map((s) => (
+                <SessionCard session={s} lang={lang} speakers={linksFor(s)} variant="grid" />
+              ))}
+            </div>
+          )}
+          {/* One cell per room that actually has a session starting here.
+              Empty cells are not emitted at all: with explicit placement they
+              would only add grid items that occupy a track for nothing. */}
+          {rooms.map((room, i) => {
+            const inRoom = others.filter((s) => s.room === room);
+            if (inRoom.length === 0) return null;
+            const { start, end } = spanOf(inRoom);
+            return (
+              <div
+                class="grid-view-cell"
+                style={`grid-column:${i + 2}; grid-row:${start} / ${end};`}
+              >
+                {inRoom.map((s) => (
+                  <SessionCard session={s} lang={lang} speakers={linksFor(s)} variant="grid" />
+                ))}
+              </div>
+            );
+          })}
         </div>
       );
     })}
