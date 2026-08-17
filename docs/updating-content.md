@@ -45,7 +45,12 @@ because Pretalx has nowhere to put them.
 ### How to add a speaker
 
 1. Add them in Pretalx as a speaker on their talk. The site only ever sees people
-   who appear in a **released** schedule version.
+   who appear in a **released** schedule version — but adding a speaker to a talk
+   that is already released shows up in the export immediately, with no need to
+   cut a new schedule version (verified when the keynote cast was added).
+   Pretalx requires an email and a biography. Adding a co-speaker queues a
+   notification in `Mails → Outbox` rather than sending it, so discard it there
+   if the person should not be contacted.
 2. Fill their `Entreprise`, `Rôle` and social answers on their Pretalx profile.
 3. Add a line to `src/data/speaker-slugs.ts`, keyed by their **exact** Pretalx name:
    ```ts
@@ -56,6 +61,37 @@ because Pretalx has nowhere to put them.
 4. Optionally drop an optimised portrait at `public/speakers/<slug>.jpg`; it is
    preferred over the Pretalx original, which is unoptimised and cross-origin.
 5. Rebuild.
+
+### Speaker photos — the committed file always wins
+
+There is no photo sync. `photoFor()` in `src/lib/speaker-source.ts` resolves in one
+direction only:
+
+```
+public/speakers/<slug>.jpg exists?  → use it
+otherwise                           → hotlink the Pretalx avatar
+```
+
+78 photos are committed; one speaker (`maffert-anthony`) has no local file and
+falls back to Pretalx.
+
+**The consequence, which surprises people:** a speaker who updates their photo in
+Pretalx will not see it change on the site. The committed file keeps winning,
+silently and indefinitely. Changing a published photo is a repo commit, not a
+Pretalx edit.
+
+That is deliberate rather than an oversight. The Pretalx original is unoptimised
+and served cross-origin, so preferring it would put one third-party request per
+speaker on the speakers page — 68 of them — and make the page's rendering depend
+on Pretalx being up.
+
+To change a photo: drop an optimised JPEG at `public/speakers/<slug>.jpg`,
+commit, rebuild. To *stop* overriding a Pretalx avatar, delete the local file.
+
+If this drift ever becomes a real chore, the natural fix is a
+`pnpm sync:speaker-photos` script alongside `pnpm sync:pretalx` — pull the
+avatars, optimise, write them into `public/speakers/`. It does not exist yet
+because nobody has needed it; do not build it speculatively.
 
 ### Adding someone to the opening keynote
 
