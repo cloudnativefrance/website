@@ -53,6 +53,15 @@ const SPEAKER_ORDER_EXCEPTIONS = new Set(["DHAXQN", "V7UJ7V", "8HZM98"]);
 const TITLE_EXCEPTION_ID = "ADHUPC";
 const TITLE_EXCEPTION_PREFIX = "(Talk EN) ";
 
+// The opening keynote. The Sheet only ever listed its MC, because the other
+// eleven participants existed nowhere as people — they were named in the
+// abstract and nothing else, which is why /intervenants had no page for the
+// CERN, Scaleway, Datadog or Qonto speakers. They are now real Pretalx persons
+// attached to this talk, so Pretalx deliberately carries MORE speakers here
+// than the Sheet ever did. Pinned by id, and asserted as a superset below, so
+// this cannot quietly excuse a talk LOSING speakers.
+const KEYNOTE_ID = "GJ89TV";
+
 describe("Pretalx output matches the Sheet it replaced", () => {
   it.skipIf(!sheet)("has the same talks", async () => {
     const rows = await loadSessions(2026);
@@ -90,11 +99,18 @@ describe("Pretalx output matches the Sheet it replaced", () => {
       const theirSpeakers = new Set(
         s.speakers.split(",").map((sp) => sp.trim()).filter(Boolean),
       );
-      check(
-        "speakers (set)",
-        [...mineSpeakers].sort().join(","),
-        [...theirSpeakers].sort().join(","),
-      );
+      if (row.id === KEYNOTE_ID) {
+        // Superset, not equality — see KEYNOTE_ID. Every speaker the Sheet knew
+        // must still be there; the additions are the point of the migration.
+        const dropped = [...theirSpeakers].filter((sp) => !mineSpeakers.has(sp));
+        check("keynote speakers (dropped)", dropped.join(","), "");
+      } else {
+        check(
+          "speakers (set)",
+          [...mineSpeakers].sort().join(","),
+          [...theirSpeakers].sort().join(","),
+        );
+      }
     }
 
     expect(mismatches).toEqual([]);
@@ -120,7 +136,9 @@ describe("Pretalx output matches the Sheet it replaced", () => {
       }
     }
 
-    expect(new Set(reordered)).toEqual(SPEAKER_ORDER_EXCEPTIONS);
+    // The keynote is in here for a different reason than the other three: not a
+    // reordering but ten added people, already asserted as a superset above.
+    expect(new Set(reordered)).toEqual(new Set([...SPEAKER_ORDER_EXCEPTIONS, KEYNOTE_ID]));
   });
 
   // Pretalx's only content locale is French, so there's no structured field to

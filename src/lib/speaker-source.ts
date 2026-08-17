@@ -68,10 +68,29 @@ function peopleInSchedule(doc: PretalxScheduleExport): Map<string, PretalxPerson
  * scheduled speakers have no Pretalx avatar at all despite having a local photo.
  * The Pretalx avatar remains the fallback for anyone with no committed image.
  */
+/**
+ * Where a speaker's portrait comes from, in priority order.
+ *
+ * Pretalx first. This used to be the other way round — a committed file always
+ * won — which made the portrait the one field Pretalx did not own, and left the
+ * module docstring's erasure promise (delete in Pretalx, rebuild, gone) false
+ * for photos specifically, since they also lived in git. It also meant a
+ * speaker who updated their portrait in Pretalx never saw it change on the site.
+ *
+ * `public/speakers/<slug>.jpg` survives as a FALLBACK for the people who have
+ * no Pretalx avatar yet — 12 of 77 at the time of writing. Each avatar uploaded
+ * moves one more person onto the Pretalx path with no code change, and once
+ * nobody is left the whole directory can be deleted as pure cleanup.
+ *
+ * The returned string is a URL, not a file: an absolute Pretalx one gets
+ * downloaded and optimised at build time by SpeakerAvatar, a `/speakers/…` one
+ * is served straight from `public/`, and an empty one renders initials.
+ */
 function photoFor(slug: string, avatar: string | null | undefined): string {
+  if (avatar) return avatar;
   const local = `/speakers/${slug}.jpg`;
   if (existsSync(join(process.cwd(), "public", local))) return local;
-  return avatar ?? "";
+  return "";
 }
 
 export async function loadSpeakers(year: Edition): Promise<SpeakerRecord[]> {

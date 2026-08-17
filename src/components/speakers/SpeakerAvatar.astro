@@ -1,5 +1,6 @@
 ---
 import { cn } from "@/lib/utils";
+import { getImage } from "astro:assets";
 
 interface Props {
   name: string;
@@ -9,6 +10,52 @@ interface Props {
 }
 
 const { name, photo, size = "sm", class: className } = Astro.props;
+
+/** 2x the CSS box, so the portrait stays sharp on a retina screen. */
+const RENDER_WIDTH = { sm: 128, lg: 256 };
+
+/**
+ * Portraits come from Pretalx as absolute URLs. Left alone they would be
+ * hotlinked: one cross-origin request per speaker on a page that shows 77 of
+ * them, unoptimised, and broken for visitors whenever Pretalx is down.
+ * `getImage()` downloads and re-encodes each one at build time into
+ * `/_astro/`, so the browser only ever talks to our own origin.
+ *
+ * The try/catch is the point. A remote fetch inside a build is exactly the
+ * dependency that made a Pretalx outage fatal once already, so a failure here
+ * must never fail the deploy.
+ *
+ * It degrades to INITIALS rather than to the original URL. Falling back to the
+ * URL looks kinder but is worse in the case that actually occurs: this fires
+ * when the image could not be read, and one of the 2026 avatars is a zero-byte
+ * file in Pretalx — hotlinking that renders a broken-image icon, where initials
+ * always render. It also keeps "no portrait is ever hotlinked" a property the
+ * build can be tested against, instead of a usual-case.
+ */
+let src = photo;
+if (photo && /^https?:\/\//.test(photo)) {
+  src = undefined;
+  try {
+    // `inferSize` is required for a remote source: Astro cannot know the aspect
+    // ratio without reading the file, and without dimensions it declines to
+    // optimise and hands the original URL straight back — silently, which is
+    // how this first appeared to "work" while still emitting 65 hotlinks.
+    src = (
+      await getImage({
+        src: photo,
+        inferSize: true,
+        width: RENDER_WIDTH[size],
+        format: "webp",
+      })
+    ).src;
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    console.warn(
+      `[speakers] ${name}: could not read the Pretalx portrait ${photo} (${reason}) — ` +
+        `showing initials. Re-upload the avatar in Pretalx.`,
+    );
+  }
+}
 
 const initials = name
   .split(" ")
@@ -29,10 +76,12 @@ const initialsSizeClasses = {
 ---
 
 {
-  photo ? (
+  src ? (
     <img
-      src={photo}
+      src={src}
       alt={name}
+      loading="lazy"
+      decoding="async"
       class={cn(
         sizeClasses[size],
         "object-cover",
