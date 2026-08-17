@@ -98,6 +98,11 @@ if (root) {
     clearSearchEl?.toggleAttribute("hidden", !state.query);
   }
 
+  // Hiding relies on Tailwind v4's preflight, which declares
+  // `[hidden] { display: none !important }`. Without that `!important` the
+  // views' own `.grid-view { display: grid }` / `.list-view { display: flex }`
+  // would win — author rules outrank the UA sheet — and both views would render
+  // at once with no error anywhere. Disabling preflight breaks this toggle.
   function setView(view: "grid" | "list", persist = true) {
     gridView?.toggleAttribute("hidden", view !== "grid");
     listView?.toggleAttribute("hidden", view !== "list");
