@@ -6,11 +6,18 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-<!-- Session detail modal (hidden by default) -->
+<!--
+  Session detail modal (hidden by default).
+
+  `tabindex="-1"` is the focus target on open: aria-labelledby makes focusing
+  this element announce the session title and the dialog role, where focusing
+  the X button would announce only "Close, button".
+-->
 <div
   id="schedule-session-modal"
   class="fixed inset-0 z-50 hidden items-center justify-center p-4 md:p-6"
   aria-hidden="true"
+  tabindex="-1"
   role="dialog"
   aria-modal="true"
   aria-labelledby="schedule-session-modal-title"

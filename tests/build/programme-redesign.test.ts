@@ -51,3 +51,36 @@ describe("programme page", () => {
     expect(html).toMatch(/id="schedule-result-count"[^>]*aria-live="polite"/);
   });
 });
+
+/**
+ * The focus behaviour itself needs a browser and this repo has no browser test
+ * runner, but it rests on markup that CAN be checked here — and every one of
+ * these attributes fails silently when removed. Dropping `tabindex="-1"` makes
+ * `.focus()` on the dialog a no-op, so the modal opens with focus still on the
+ * card behind it and Tab walks into the page, with no error anywhere.
+ */
+describe("overlay focus contract", () => {
+  const tagFor = (id: string) => {
+    const at = html.indexOf(`id="${id}"`);
+    expect(at, `${id} missing from the page`).toBeGreaterThan(-1);
+    return html.slice(html.lastIndexOf("<", at), html.indexOf(">", at) + 1);
+  };
+
+  it("gives the modal a focus target and the dialog semantics to match", () => {
+    const tag = tagFor("schedule-session-modal");
+    expect(tag).toContain('tabindex="-1"');
+    expect(tag).toContain('role="dialog"');
+    // aria-modal is what tells a screen reader the rest of the page is out of
+    // play; the Tab trap in schedule-ui.ts is the keyboard half of that promise.
+    expect(tag).toContain('aria-modal="true"');
+    expect(tag).toContain('aria-labelledby="schedule-session-modal-title"');
+  });
+
+  it("ships the drawer inert, so a closed drawer is not two phantom tab stops", () => {
+    // It is only slid off-screen by a transform, so without `inert` its Close
+    // and Export buttons stay focusable at the end of every page.
+    const tag = tagFor("schedule-agenda-drawer");
+    expect(tag).toMatch(/\sinert(\s|>|=)/);
+    expect(tag).toContain('tabindex="-1"');
+  });
+});

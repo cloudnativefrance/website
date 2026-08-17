@@ -386,6 +386,78 @@ if (root) {
   const modalCover = document.getElementById("schedule-session-modal-cover") as HTMLImageElement | null;
   let modalSessionId: string | null = null;
 
+  // ---- Focus management for the two overlays ------------------------------
+  //
+  // The modal already declared `role="dialog" aria-modal="true"`, which tells a
+  // screen reader the rest of the page is unavailable — but nothing made that
+  // true for the keyboard. Opening a session left focus on the card behind the
+  // backdrop, Tab walked out into the ~200 background stops, and Escape dropped
+  // focus on whatever link happened to follow. WCAG 2.4.3.
+  //
+  // The drawer is deliberately treated more lightly: it has no backdrop and the
+  // page behind it stays interactive, so it is not modal and trapping the
+  // keyboard inside it would be wrong. It gets focus-in, focus-restore and
+  // Escape, but no trap.
+
+  const FOCUSABLE = [
+    "a[href]",
+    "button:not([disabled])",
+    "input:not([disabled])",
+    "select:not([disabled])",
+    "textarea:not([disabled])",
+    '[tabindex]:not([tabindex="-1"])',
+  ].join(",");
+
+  /** Openers, per overlay, so a drawer and a modal cannot clobber each other. */
+  const overlayOpeners = new WeakMap<HTMLElement, HTMLElement>();
+
+  function focusableWithin(container: HTMLElement): HTMLElement[] {
+    return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+      // The selector matches controls that are hidden (a link toggled off, the
+      // export button in a closed drawer). They cannot take focus, and including
+      // them makes Tab appear to do nothing when it wraps onto one.
+      (el) => el.offsetWidth > 0 || el.offsetHeight > 0 || el === document.activeElement,
+    );
+  }
+
+  /** Remember what had focus, then move it into the overlay. */
+  function captureFocus(overlay: HTMLElement, initial: HTMLElement | null): void {
+    const opener = document.activeElement;
+    if (opener instanceof HTMLElement) overlayOpeners.set(overlay, opener);
+    (initial ?? focusableWithin(overlay)[0] ?? overlay).focus();
+  }
+
+  /** Put focus back where it was, so the keyboard resumes rather than restarts. */
+  function restoreFocus(overlay: HTMLElement): void {
+    const opener = overlayOpeners.get(overlay);
+    overlayOpeners.delete(overlay);
+    // Skip an opener that has since been filtered out of the DOM or hidden —
+    // focusing it would silently drop focus to <body>.
+    if (opener?.isConnected && (opener.offsetWidth > 0 || opener.offsetHeight > 0)) opener.focus();
+  }
+
+  /** Cycle Tab within the modal. Called only while it is open. */
+  function trapTab(container: HTMLElement, ev: KeyboardEvent): void {
+    const items = focusableWithin(container);
+    if (items.length === 0) {
+      ev.preventDefault();
+      container.focus();
+      return;
+    }
+    const first = items[0];
+    const last = items[items.length - 1];
+    const active = document.activeElement;
+    const leavingBackwards = ev.shiftKey && (active === first || active === container);
+    const leavingForwards = !ev.shiftKey && active === last;
+    if (leavingBackwards) {
+      ev.preventDefault();
+      last.focus();
+    } else if (leavingForwards || !container.contains(active)) {
+      ev.preventDefault();
+      first.focus();
+    }
+  }
+
   const formatPalette: Record<string, { label: string; cls: string }> = {
     keynote: {
       label: root.getAttribute("data-schedule-format-keynote") || "Keynote",
@@ -543,6 +615,10 @@ if (root) {
     modal.classList.add("flex");
     modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("overflow-hidden");
+    // Focus the dialog itself rather than its first control: aria-labelledby
+    // points at the title, so this announces the session name and the dialog
+    // role, where focusing the X would announce only "Close, button".
+    captureFocus(modal, modal);
   }
 
   function closeModal(): void {
@@ -552,6 +628,7 @@ if (root) {
     modal.setAttribute("aria-hidden", "true");
     document.body.classList.remove("overflow-hidden");
     modalSessionId = null;
+    restoreFocus(modal);
   }
 
   // Open modal on card click (but not when clicking the inline bookmark icon)
@@ -579,7 +656,20 @@ if (root) {
     el.addEventListener("click", closeModal);
   });
   document.addEventListener("keydown", (ev) => {
-    if (ev.key === "Escape" && modal && !modal.classList.contains("hidden")) closeModal();
+    const modalOpen = !!modal && !modal.classList.contains("hidden");
+    if (ev.key === "Escape") {
+      if (modalOpen) {
+        closeModal();
+      } else if (drawer && drawer.getAttribute("aria-hidden") === "false") {
+        // The drawer had no Escape at all: once open, the only way out was to
+        // find and click its X.
+        closeDrawer();
+      }
+      return;
+    }
+    // Bound at document level rather than on the modal, so a Tab pressed while
+    // focus has somehow landed outside is still pulled back in.
+    if (ev.key === "Tab" && modalOpen && modal) trapTab(modal, ev);
   });
 
   // Auto-open a session modal when the URL hash matches #session-{id}
@@ -638,11 +728,20 @@ if (root) {
     if (!drawer) return;
     drawer.classList.remove("translate-x-full");
     drawer.setAttribute("aria-hidden", "false");
+    drawer.removeAttribute("inert");
+    captureFocus(drawer, drawer);
   }
   function closeDrawer(): void {
     if (!drawer) return;
     drawer.classList.add("translate-x-full");
     drawer.setAttribute("aria-hidden", "true");
+    // A closed drawer is only slid off-screen by a transform, so its Close and
+    // Export buttons stayed in the tab order — two phantom stops at the end of
+    // every page, inside an element already marked aria-hidden. `inert` removes
+    // it from both the tab order and the accessibility tree, which is the pair
+    // aria-hidden alone cannot deliver.
+    drawer.setAttribute("inert", "");
+    restoreFocus(drawer);
   }
   document.getElementById("schedule-agenda-toggle")?.addEventListener("click", () => {
     refreshAgenda();
