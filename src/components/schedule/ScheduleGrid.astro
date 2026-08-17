@@ -1,5 +1,5 @@
 ---
-import { defaultScheduleView, type SessionRow } from "@/lib/schedule";
+import type { SessionRow } from "@/lib/schedule";
 import ScheduleToolbar from "./ScheduleToolbar.astro";
 import ScheduleGridView from "./ScheduleGridView.astro";
 import ScheduleListView from "./ScheduleListView.astro";
@@ -33,12 +33,17 @@ const t = useTranslations(lang);
 /**
  * Which view opens first.
  *
- * A past edition is browsed for a replay, where the room is noise and a
- * scannable list wins. A live or upcoming one is browsed to plan a day
- * across parallel rooms, which is what the grid is for. See
- * `defaultScheduleView` for how "past" is decided.
+ * Grid, for every edition. This used to branch on whether the event had
+ * already happened, on the reasoning that a past edition is browsed for a
+ * replay where the room is noise. That reasoning was really about the grid
+ * being bad: it stretched every card in a slot to one height, so it neither
+ * showed durations nor saved space. Now that a card's height is its duration,
+ * the grid is both the more informative view and about half the height of the
+ * list (4809px against 9386px on the 2026 day), which leaves the branch with
+ * nothing to buy. The list is one click away, remembered per visitor, and
+ * still the only view below md where the room columns cannot fit.
  */
-const defaultView = defaultScheduleView(sessions);
+const defaultView = "grid" as const;
 ---
 
 <div

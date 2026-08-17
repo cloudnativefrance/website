@@ -154,40 +154,6 @@ export function endTime(session: SessionRow): string {
   return `${h}:${mn}`;
 }
 
-/**
- * Which view a schedule page opens in by default.
- *
- * `list` for a past edition: the visitor is hunting a replay, and the room
- * column is noise. `grid` for a live or upcoming one: the visitor is
- * planning a day across parallel rooms, which is what the grid is for. An
- * edition with no sessions yet has nothing to be "past", so it defaults to
- * `grid` too.
- *
- * "Past" is whether the LAST session has actually ended, not whether the
- * edition's year is below some constant — the current edition's event date
- * passes months before its year number changes, and this function exists
- * for that edition.
- *
- * Unlike `formatTime`/`endTime`, this compares full instants rather than
- * extracting a wall-clock component, so it does not need their regex trick.
- * `.getHours()`-style getters read a Date in the *runtime's* local timezone,
- * which is the shift those two avoid; `new Date(iso).getTime()` instead
- * yields the absolute instant the ISO string's own offset encodes, and two
- * instants compare correctly with a plain `<` regardless of either side's
- * timezone. No timezone arithmetic of our own is introduced.
- */
-export function defaultScheduleView(
-  sessions: SessionRow[],
-  now: Date = new Date(),
-): "grid" | "list" {
-  if (sessions.length === 0) return "grid";
-  const lastSessionEndsAt = sessions.reduce(
-    (latest, s) => Math.max(latest, new Date(s.startTime).getTime() + s.durationMin * 60_000),
-    -Infinity,
-  );
-  return lastSessionEndsAt < now.getTime() ? "list" : "grid";
-}
-
 /** Round-trip an ISO datetime into the YYYYMMDDTHHMMSS format ICS wants, preserving the offset. */
 function icsDate(iso: string): string {
   // Strip punctuation and keep up to seconds, remove the trailing offset (ics expects Z or floating).
