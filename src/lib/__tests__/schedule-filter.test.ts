@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   emptyFilterState,
   matchesSession,
@@ -209,5 +209,46 @@ describe("buildTimeGrid", () => {
     ]);
     expect(grid.gaps).toHaveLength(1);
     expect(grid.gaps[0]).toMatchObject({ startTime: "11:15", endTime: "11:50", minutes: 35 });
+  });
+});
+
+describe("buildTimeGrid across days", () => {
+  it("does not label the space between two days as a break", () => {
+    // The gap between day 1 ending and day 2 starting is not a break in either
+    // day. Left unbounded it rendered as "Pause déjeuner · 10:00 — 09:00",
+    // because the label wraps to wall-clock and 1380 minutes reads as lunch.
+    const grid = buildTimeGrid([
+      row({ id: "D1", startTime: "2026-02-03T09:00:00+01:00", durationMin: 60 }),
+      row({ id: "D2", startTime: "2026-02-04T09:00:00+01:00", durationMin: 60 }),
+    ]);
+    expect(grid.gaps).toEqual([]);
+    // The placements themselves still order correctly across the boundary.
+    const [d1, d2] = ["D1", "D2"].map((id) => grid.placements.find((p) => p.session.id === id)!);
+    expect(d2.rowStart).toBeGreaterThanOrEqual(d1.rowEnd);
+  });
+});
+
+describe("buildTimeGrid overlap detection", () => {
+  it("warns when two sessions share a room and a time range", () => {
+    // Same column, intersecting rows: the cards render stacked on top of each
+    // other, which looks like a rendering bug rather than the double-booking
+    // it actually is.
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    buildTimeGrid([
+      row({ id: "A", room: "Monet", startTime: "2026-02-03T10:00:00+01:00", durationMin: 60 }),
+      row({ id: "B", room: "Monet", startTime: "2026-02-03T10:30:00+01:00", durationMin: 30 }),
+    ]);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("overlap in time"));
+    warn.mockRestore();
+  });
+
+  it("stays quiet for parallel sessions in different rooms", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    buildTimeGrid([
+      row({ id: "A", room: "Monet", startTime: "2026-02-03T10:00:00+01:00", durationMin: 60 }),
+      row({ id: "B", room: "Piaf", startTime: "2026-02-03T10:00:00+01:00", durationMin: 60 }),
+    ]);
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
   });
 });

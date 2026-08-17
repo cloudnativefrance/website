@@ -37,6 +37,7 @@ export interface SpeakerRecord {
   slug: string;
   name: string;
   photo_url: string;
+  photo_fallback: string;
   company: string;
   role: string;
   bio: string;
@@ -79,11 +80,13 @@ function peopleInSchedule(doc: PretalxScheduleExport): Map<string, PretalxPerson
  * a `/speakers/…` one is served straight from `public/`, and an empty one
  * renders initials.
  */
-function photoFor(slug: string, avatar: string | null | undefined): string {
-  if (avatar) return avatar;
+function committedPhoto(slug: string): string {
   const local = `/speakers/${slug}.jpg`;
-  if (existsSync(join(process.cwd(), "public", local))) return local;
-  return "";
+  return existsSync(join(process.cwd(), "public", local)) ? local : "";
+}
+
+function photoFor(slug: string, avatar: string | null | undefined): string {
+  return avatar || committedPhoto(slug);
 }
 
 export async function loadSpeakers(year: Edition): Promise<SpeakerRecord[]> {
@@ -109,6 +112,12 @@ export async function loadSpeakers(year: Edition): Promise<SpeakerRecord[]> {
       slug,
       name: person.name.trim(),
       photo_url: photoFor(slug, person.avatar),
+      // Carried separately, not collapsed into photo_url, because the Pretalx
+      // URL can only be found unreadable at RENDER time — by which point the
+      // knowledge that a committed portrait exists would otherwise be gone. An
+      // avatar outage would then blank 65 of 77 faces in a release image, past
+      // the very flag that exists to stop silent regressions shipping.
+      photo_fallback: person.avatar ? committedPhoto(slug) : "",
       company: extra.company ?? "",
       role: extra.role ?? "",
       bio: (person.biography ?? "").trim(),

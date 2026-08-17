@@ -37,7 +37,9 @@ const t = useTranslations(lang);
  * already happened, on the reasoning that a past edition is browsed for a
  * replay where the room is noise. That reasoning was really about the grid
  * being bad: it stretched every card in a slot to one height, so it neither
- * showed durations nor saved space. Now that a card's height is its duration,
+ * showed durations nor saved space. Now that concurrent cards are ordered by
+ * duration — rows are content-sized, so heights are not proportional across the
+ * whole day, only honest where a visitor actually compares them —
  * the grid is both the more informative view and about half the height of the
  * list (4809px against 9386px on the 2026 day), which leaves the branch with
  * nothing to buy. The list is one click away, remembered per visitor, and

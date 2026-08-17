@@ -20,7 +20,18 @@ loadLocalEnv();
 // refuses the URL and every portrait silently falls back to a hotlink.
 // Derived from the same env var the rest of the Pretalx code reads, so pointing
 // a build at a different instance does not need a second edit here.
-const pretalxUrl = new URL(process.env.PRETALX_BASE_URL || "https://cfp.cloudnativedays.fr");
+const pretalxBase = process.env.PRETALX_BASE_URL || "https://cfp.cloudnativedays.fr";
+let pretalxUrl;
+try {
+  pretalxUrl = new URL(pretalxBase);
+} catch {
+  // Without this, a schemeless value dies as a bare ERR_INVALID_URL inside
+  // Vite's module runner, naming neither the variable nor the value.
+  throw new Error(
+    `PRETALX_BASE_URL must be an absolute URL including the scheme — got "${pretalxBase}". ` +
+      `Try https://${pretalxBase}`,
+  );
+}
 
 // https://astro.build/config
 // Build is fully static; bump this file to force a CI rebuild that

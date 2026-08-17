@@ -70,6 +70,10 @@ if (root) {
     // number covers both. Break bands describe the unfiltered day, so any
     // narrowing at all hides them.
     const active = activeFilterCount(state);
+    // Hiding every row leaves the explicit row tracks and their gaps behind —
+    // 360px of void under a "no results" message, where the list view collapses
+    // to nothing. Collapse the whole body instead.
+    gridView?.classList.toggle("is-empty", visible.size === 0);
     for (const band of document.querySelectorAll<HTMLElement>(".grid-view-break")) {
       band.classList.toggle("is-hidden", active > 0);
     }

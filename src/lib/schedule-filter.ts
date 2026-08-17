@@ -168,8 +168,12 @@ export function buildTimeGrid(sessions: SessionRow[], minGapMinutes = 20): TimeG
   // print an 12:10 break as 11:10.
   const reference = spans.reduce((a, b) => (a.startsAt <= b.startsAt ? a : b));
   const refMinutes = minutesOf(reference.session.startTime);
-  const labelAt = (epoch: number) =>
-    hhmm(refMinutes + Math.round((epoch - reference.startsAt) / 60_000));
+  /** Minutes past midnight of the FIRST day, so day boundaries are countable. */
+  const minutesFromReference = (epoch: number) =>
+    refMinutes + Math.round((epoch - reference.startsAt) / 60_000);
+  /** Which day of the edition an instant falls on, 0-based, in the event's own offset. */
+  const dayIndexAt = (epoch: number) => Math.floor(minutesFromReference(epoch) / 1440);
+  const labelAt = (epoch: number) => hhmm(minutesFromReference(epoch));
 
   // A gap is a row track no session covers. Derived from coverage rather than
   // from "the previous slot's end", which is why a slot holding a 10-minute and
@@ -182,7 +186,16 @@ export function buildTimeGrid(sessions: SessionRow[], minGapMinutes = 20): TimeG
     if ((covered || row === rowCount) && runStart !== null) {
       const runEnd = covered ? row : row + 1;
       const minutes = Math.round((epochAt(runEnd) - epochAt(runStart)) / 60_000);
-      if (minutes >= minGapMinutes) {
+      // A stretch that runs overnight is the space BETWEEN two days, not a
+      // break within one. A two-day edition rendered it as a full-width
+      // "Pause déjeuner · 10:00 — 09:00" band: the labels wrap to wall-clock,
+      // and ScheduleGridView reads `minutes >= 40` as lunch.
+      //
+      // Tested by calendar day, not by duration — the overnight stretch between
+      // two 09:00 days is 23 hours, so any "less than a day" threshold lets it
+      // straight through.
+      const sameDay = dayIndexAt(epochAt(runStart)) === dayIndexAt(epochAt(runEnd));
+      if (sameDay && minutes >= minGapMinutes) {
         gaps.push({
           rowStart: runStart,
           rowEnd: runEnd,
@@ -192,6 +205,25 @@ export function buildTimeGrid(sessions: SessionRow[], minGapMinutes = 20): TimeG
         });
       }
       runStart = null;
+    }
+  }
+
+  // Two sessions in one room at overlapping times get the same grid column and
+  // intersecting row ranges, so their cards render physically stacked and
+  // obscure each other. Not reachable from the 2026 data, but a Pretalx
+  // double-booking or a duration edit would produce it, and stacked cards read
+  // as a rendering bug rather than as the scheduling mistake they are.
+  for (let i = 0; i < placements.length; i++) {
+    for (let j = i + 1; j < placements.length; j++) {
+      const a = placements[i];
+      const b = placements[j];
+      if (a.session.room !== b.session.room || !a.session.room) continue;
+      if (a.rowStart < b.rowEnd && b.rowStart < a.rowEnd) {
+        console.warn(
+          `[schedule] ${a.session.room}: "${a.session.title}" and "${b.session.title}" ` +
+            `overlap in time — their cards will stack. Fix the slots in Pretalx.`,
+        );
+      }
     }
   }
 

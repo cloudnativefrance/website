@@ -37,7 +37,7 @@ because Pretalx has nowhere to put them.
 
 | Field | Where it lives | Notes |
 |---|---|---|
-| `name`, `bio`, `photo_url` | Pretalx speaker profile | a committed `public/speakers/<slug>.jpg` is **preferred** over the Pretalx avatar |
+| `name`, `bio`, `photo_url` | Pretalx speaker profile | the Pretalx avatar wins; a committed `public/speakers/<slug>.jpg` is the fallback |
 | `company`, `role`, `linkedin`, `github`, `bluesky`, `website` | Pretalx **speaker questions** | needs the API token to read — they are not public |
 | `slug` | `src/data/speaker-slugs.ts` | URL identity. Never change a published one |
 | `keynote`, `keynote_size` | `src/data/keynote-cast.ts` | the opening-keynote running order |
@@ -58,40 +58,41 @@ because Pretalx has nowhere to put them.
    ```
    Without it the build fails naming them — deliberately. Deriving a slug would
    produce `/intervenants/Ada%20Lovelace`, a 404 that renders as a working link.
-4. Optionally drop an optimised portrait at `public/speakers/<slug>.jpg`; it is
-   preferred over the Pretalx original, which is unoptimised and cross-origin.
+4. Upload their portrait in Pretalx. Nothing needs committing — see
+   "Speaker photos" below for the resolution order and the fallback.
 5. Rebuild.
 
-### Speaker photos — the committed file always wins
+### Speaker photos
 
-There is no photo sync. `photoFor()` in `src/lib/speaker-source.ts` resolves in one
-direction only:
+Pretalx owns portraits. `photoFor()` in `src/lib/speaker-source.ts` resolves:
 
 ```
-public/speakers/<slug>.jpg exists?  → use it
-otherwise                           → hotlink the Pretalx avatar
+Pretalx avatar?                      → optimised at build time into /_astro/
+else public/speakers/<slug>.jpg?     → served from public/
+else                                 → initials
 ```
 
-78 photos are committed; one speaker (`maffert-anthony`) has no local file and
-falls back to Pretalx.
+The Pretalx one is downloaded and re-encoded by `SpeakerAvatar.astro`, so the
+browser only ever talks to our origin — a portrait is never hotlinked from the
+CFP host. `image.remotePatterns` in `astro.config.mjs` is what authorises that;
+without the entry Astro silently declines to optimise and hands back the
+original URL, which is how this first shipped with 65 hotlinks.
 
-**The consequence, which surprises people:** a speaker who updates their photo in
-Pretalx will not see it change on the site. The committed file keeps winning,
-silently and indefinitely. Changing a published photo is a repo commit, not a
-Pretalx edit.
+`public/speakers/` is a **shrinking fallback**, not a source. It covers the
+people with no Pretalx avatar yet — 12 of 77 at the time of writing — and each
+avatar uploaded moves one more person across with no code change. When none are
+left the directory can be deleted outright.
 
-That is deliberate rather than an oversight. The Pretalx original is unoptimised
-and served cross-origin, so preferring it would put one third-party request per
-speaker on the speakers page — 68 of them — and make the page's rendering depend
-on Pretalx being up.
+It also covers a Pretalx avatar that cannot be read at build time, whether from
+an outage or a corrupt upload. Without that rung an avatar outage would blank
+65 of 77 faces in a release image while exiting 0.
 
-To change a photo: drop an optimised JPEG at `public/speakers/<slug>.jpg`,
-commit, rebuild. To *stop* overriding a Pretalx avatar, delete the local file.
+**To change a published portrait:** upload it in Pretalx. That is now the whole
+procedure — no commit, no rebuild of committed assets.
 
-If this drift ever becomes a real chore, the natural fix is a
-`pnpm sync:speaker-photos` script alongside `pnpm sync:pretalx` — pull the
-avatars, optimise, write them into `public/speakers/`. It does not exist yet
-because nobody has needed it; do not build it speculatively.
+**A note on `bio`:** Pretalx requires one when creating a speaker and there is
+no setting to make it optional; the CfP editor's required/optional toggles cover
+submission fields, not speaker-profile fields.
 
 ### Adding someone to the opening keynote
 

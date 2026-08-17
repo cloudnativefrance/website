@@ -132,13 +132,30 @@ describe("a release build (PRETALX_TOKEN_REQUIRED=1)", () => {
     expect(vi.mocked(fetch)).toHaveBeenCalledTimes(4);
   });
 
-  it("does not retry a 400 — the request is wrong, not the server", async () => {
+  it("treats a 400 as configuration: no retry, and ALLOW_DEGRADED does not excuse it", async () => {
+    // A 4xx is our request being wrong, not Pretalx being down. It used to be
+    // classified as an outage, so the build told the operator Pretalx looked
+    // unreachable and advised PRETALX_ALLOW_DEGRADED=1 — which then shipped a
+    // release with every company and role blank, the exact regression the
+    // required-token flag exists to prevent.
     process.env[REQUIRED] = "1";
     process.env[ALLOW] = "1";
     process.env[TOKEN] = "good-token";
     stubFetch(status(400));
-    await loadLevelAnswers(2026, freshSlug(), new Set());
+    await expect(loadLevelAnswers(2026, freshSlug(), new Set())).rejects.toThrow(/HTTP 400/);
     expect(vi.mocked(fetch)).toHaveBeenCalledTimes(1);
+  });
+
+  it("treats a missing question-id mapping as configuration, not an outage", async () => {
+    // Adding an edition without its question ids is the realistic way to hit
+    // this: 2027 has no SPEAKER_QUESTIONS / LEVEL_QUESTION_ID entry.
+    process.env[REQUIRED] = "1";
+    process.env[ALLOW] = "1";
+    process.env[TOKEN] = "good-token";
+    stubFetch(ok);
+    await expect(loadLevelAnswers(2027, freshSlug(), new Set())).rejects.toThrow(
+      /No level question id configured/,
+    );
   });
 
   it("recovers when a retry succeeds", async () => {

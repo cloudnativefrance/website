@@ -129,9 +129,29 @@ class PretalxHttpError extends Error {
   }
 }
 
-/** True for the failures that mean "we configured this wrong", not "Pretalx is down". */
+/** Raised when an edition has no question-id mapping — ours to fix, never an outage. */
+class MissingQuestionIdError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "MissingQuestionIdError";
+  }
+}
+
+/**
+ * True for the failures that mean "we configured this wrong", not "Pretalx is
+ * down" — the ones PRETALX_ALLOW_DEGRADED must never wave through.
+ *
+ * A non-retryable HTTP error belongs here too. A 404 or a 400 is our request
+ * being wrong, which `PretalxHttpError` already knows via `retryable`; without
+ * this the build told the operator Pretalx looked unreachable and advised them
+ * to set PRETALX_ALLOW_DEGRADED, which shipped a release with every company and
+ * role blank — the precise regression the flag exists to prevent.
+ */
 function isConfigurationFailure(err: unknown): boolean {
-  return err instanceof MissingTokenError || err instanceof PretalxAuthError;
+  if (err instanceof MissingTokenError) return true;
+  if (err instanceof PretalxAuthError) return true;
+  if (err instanceof MissingQuestionIdError) return true;
+  return err instanceof PretalxHttpError && !err.retryable;
 }
 
 /**
@@ -387,7 +407,7 @@ export async function loadSpeakerEnrichment(
       const out: SpeakerEnrichment = new Map();
       const questions = SPEAKER_QUESTIONS[year];
       if (!questions) {
-        throw new Error(
+        throw new MissingQuestionIdError(
           `No speaker question ids configured for ${year} in SPEAKER_QUESTIONS. ` +
             `Pretalx ids are per-question, not per-event — list them with ` +
             `GET /api/events/${eventSlug}/questions/ and add the mapping.`,
@@ -449,7 +469,7 @@ export async function loadLevelAnswers(
       const out: LevelAnswers = new Map();
       const questionId = LEVEL_QUESTION_ID[year];
       if (!questionId) {
-        throw new Error(
+        throw new MissingQuestionIdError(
           `No level question id configured for ${year} in LEVEL_QUESTION_ID. ` +
             `List them with GET /api/events/${eventSlug}/questions/ and add the mapping.`,
         );

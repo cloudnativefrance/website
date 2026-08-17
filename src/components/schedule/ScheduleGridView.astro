@@ -182,6 +182,10 @@ function spanOf(list: SessionRow[]): { start: number; end: number } {
   .grid-view-break::after { content: ""; flex: 1; height: 1px; background: var(--color-border); }
 
   .grid-view-row.is-hidden { display: none; }
+  /* Hiding every row leaves the 37 explicit row tracks and their 10px gaps
+     behind — 360px of void under a "no results" message, where the list view
+     collapses to nothing. schedule-ui.ts sets this when the visible count is 0. */
+  .grid-view.is-empty .grid-view-body { display: none; }
   /* schedule-ui.ts toggles `is-hidden` on the break bands when a filter or
      search is active; without this rule they stayed on screen, leaving orphan
      "Pause déjeuner" separators above an empty result set. */

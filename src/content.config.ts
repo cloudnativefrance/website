@@ -86,6 +86,8 @@ const speakerSchema = z.object({
   slug: z.string(),
   name: z.string(),
   photo_url: z.string().optional(),
+  /** Committed portrait, used only when the Pretalx one cannot be read. */
+  photo_fallback: z.string().optional(),
   company: z.string().optional(),
   role: z.string().optional(),
   bio: z.string().optional(),

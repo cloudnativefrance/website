@@ -140,9 +140,14 @@ const pill = pillColors(session.trackColor);
   .session-card-bookmark::after {
     content: "";
     position: absolute;
-    top: 50%; left: 50%;
-    width: 44px; height: 44px;
-    transform: translate(-50%, -50%);
+    /* Anchored to the glyph's own top, growing UP into the card's padding
+       rather than centred. Centred, the box reached 7px into the title's first
+       line and up to the card's top border, so clicking the last word of the
+       title bookmarked instead of opening — the inverse of the mis-target this
+       exists to fix. Measured with elementFromPoint, not eyeballed. */
+    bottom: -4px; left: 50%;
+    width: 44px; height: 40px;
+    transform: translateX(-50%);
   }
   .session-card-bookmark.is-on svg { fill: currentColor; color: var(--color-primary); }
   .session-card-bookmark { transition: scale 120ms ease-out; }
