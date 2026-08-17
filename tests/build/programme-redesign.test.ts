@@ -13,14 +13,28 @@ describe("programme page", () => {
   });
 
   it("offers both views", () => {
-    expect(html).toMatch(/data-view="grid"/);
-    expect(html).toMatch(/data-view="list"/);
+    // Assert the view CONTAINERS, not `data-view="…"` — that attribute is on the
+    // toolbar's toggle buttons, which render whether or not the view they switch
+    // to still exists.
+    expect(html).toMatch(/class="grid-view"/);
+    expect(html).toMatch(/class="list-view"/);
   });
 
   it("renders every session in both views", () => {
-    const ids = [...html.matchAll(/data-session-id="([A-Z0-9]{6})"/g)].map((m) => m[1]);
-    // 51 sessions, once per view.
-    expect(new Set(ids).size).toBe(51);
+    const gridAt = html.indexOf('class="grid-view"');
+    const listAt = html.indexOf('class="list-view"');
+    expect(gridAt).toBeGreaterThan(-1);
+    // Grid is emitted first; the slice below depends on it.
+    expect(listAt).toBeGreaterThan(gridAt);
+
+    const idsIn = (s: string) =>
+      new Set([...s.matchAll(/data-session-id="([A-Z0-9]{6})"/g)].map((m) => m[1]));
+
+    // Counted PER VIEW. A single `new Set` over the whole page cannot tell 51
+    // sessions rendered twice from 51 rendered once, so it stayed green with an
+    // entire view deleted.
+    expect(idsIn(html.slice(gridAt, listAt)).size).toBe(51);
+    expect(idsIn(html.slice(listAt)).size).toBe(51);
   });
 
   it("labels the breaks instead of leaving empty gaps", () => {
