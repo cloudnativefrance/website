@@ -118,6 +118,8 @@ export function requireToken(): string {
 }
 
 const PAGE_SIZE = 50;
+/** Backstop for a non-advancing cursor; see `fetchAllPages`. */
+const MAX_PAGES = 200;
 
 /**
  * Re-anchor a paginated `next` link onto the configured origin.
@@ -132,8 +134,20 @@ const PAGE_SIZE = 50;
 export function reanchor(next: string): string {
   const base = new URL(PRETALX_BASE);
   const url = new URL(next);
+  // Both setters below are no-ops on opaque-path schemes, so a `data:` or
+  // `file:` link would pass through UNCHANGED rather than being pinned to the
+  // configured origin — the opposite of what this function promises. Reject
+  // those outright instead of returning something that only looks re-anchored.
+  if (url.protocol !== "http:" && url.protocol !== "https:") {
+    throw new Error(`[pretalx] refusing a non-HTTP pagination link (${url.protocol})`);
+  }
   url.protocol = base.protocol;
   url.host = base.host;
+  // Credentials in `next` would be sent to the real host and echoed into build
+  // logs by the error path below. Only a compromised Pretalx could plant them,
+  // but dropping them costs nothing.
+  url.username = "";
+  url.password = "";
   return url.toString();
 }
 
@@ -151,7 +165,15 @@ async function fetchAllPages<T>(
 ): Promise<T[]> {
   const out: T[] = [];
   let next: string | null = url;
+  // A `next` that points back at a page already fetched would loop forever:
+  // the per-request timeout bounds each hop, nothing bounds the walk. The
+  // largest endpoint here is ~310 rows at PAGE_SIZE, so this cap is far above
+  // any real crawl and only trips on a cursor that is not advancing.
+  let pages = 0;
   while (next) {
+    if (++pages > MAX_PAGES) {
+      throw new Error(`[pretalx] ${what} exceeded ${MAX_PAGES} pages — cursor is not advancing`);
+    }
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -194,6 +216,13 @@ function answersUrl(eventSlug: string, questionId: number): string {
  * runs `getStaticPaths` a single time per route — but that is a property of the
  * page layout, not a guarantee, and one `loadSessions()` added to a per-page
  * render would quietly multiply it by the number of speakers.
+ *
+ * The key is the event slug ALONE, not the allowlist — so a second caller
+ * passing a NARROWER set would be served the wider cached map. That is safe
+ * only because both callers derive their set from the same memoised export,
+ * and because consumers read the map with `.get(code)` for a code taken from
+ * the public export rather than iterating it. Narrow the allowlist for one
+ * caller and you must key the cache on it too.
  */
 const ENRICHMENT_CACHE = new Map<string, Promise<SpeakerEnrichment>>();
 const LEVEL_CACHE = new Map<string, Promise<LevelAnswers>>();

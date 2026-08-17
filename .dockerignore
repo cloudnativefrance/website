@@ -9,3 +9,12 @@ dist
 !README.md
 dagger
 .github
+# Keep local secrets out of the build context. Without this, `COPY . .` copies a
+# developer's .env.local into the build stage, where astro.config.mjs's
+# loadLocalEnv() reads it — so the personal token silently WINS over the
+# BuildKit secret mount (readToken prefers PRETALX_API_TOKEN over
+# PRETALX_API_TOKEN_FILE) and lands in that stage's layer. The published image
+# is unaffected (it only copies dist/), but `--target build`, `docker save` and
+# cache exports would carry the token. Nothing in the build reads these files.
+.env
+.env.*
