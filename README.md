@@ -9,7 +9,7 @@ The bilingual (French / English) marketing and program site for [Cloud Native Da
 - **Tailwind CSS 4** with `shadcn/ui` primitives for the design system.
 - **DM Sans** as the single typeface family (Google Fonts, self-hosted at build time).
 - **Node 22 + pnpm** package manager.
-- **Content pipeline** — sessions come from the self-hosted Pretalx instance; speaker, sponsor, and team rosters live in published Google Sheets consumed as CSV. Both are fetched at build time.
+- **Content pipeline** — sessions and speakers come from the self-hosted Pretalx instance; sponsor and team rosters live in published Google Sheets consumed as CSV. Both are fetched at build time.
 
 ## Deployment
 
@@ -40,8 +40,8 @@ snapshots as JSON, speaker/sponsor/team rosters as CSV).
 
 The site is small but deliberate. Start with the doc that matches what you're doing:
 
-- **Adding a speaker, session, sponsor, or team member?** → [`docs/updating-content.md`](docs/updating-content.md) — the content runbook. Covers Pretalx for sessions, which Google Sheet backs each other entity, the required/optional columns sourced from the Zod schemas in `src/content.config.ts`, and how to trigger a rebuild.
-- **Getting oriented in the codebase?** → [`docs/repo-structure.md`](docs/repo-structure.md) — a short tour of `src/`, `tests/`, and the `.planning/` GSD workflow artifacts.
+- **Adding a speaker, session, sponsor, or team member?** → [`docs/updating-content.md`](docs/updating-content.md) — the content runbook. Covers Pretalx for sessions and speakers, which Google Sheet backs sponsors and team, the required/optional columns sourced from the Zod schemas in `src/content.config.ts`, and how to trigger a rebuild.
+- **Getting oriented in the codebase?** → [`docs/repo-structure.md`](docs/repo-structure.md) — a short tour of `src/`, `tests/`, and where planning artifacts live.
 - **Running tests / triaging failures?** → [`docs/testing.md`](docs/testing.md) — what each command covers, plus the currently known non-blocking failures.
 - **Contributing a PR?** → [`CONTRIBUTING.md`](CONTRIBUTING.md) — branching, commit style, and the three non-negotiable rules.
 

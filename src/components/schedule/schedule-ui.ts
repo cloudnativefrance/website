@@ -158,10 +158,14 @@ if (root) {
   // invisible below the fold. Measure both and publish them as custom
   // properties; they inherit to the toolbar and grid head from here.
   const toolbarEl = document.querySelector<HTMLElement>(".toolbar");
+  // Captured out here rather than reaching through `root` inside the closure:
+  // the null-narrowing from the enclosing `if (root)` does not survive into a
+  // deferred callback, and this is the reference the callback actually needs.
+  const rootStyle = root.style;
   function syncStickyOffsets() {
     const headerH = document.querySelector("header")?.getBoundingClientRect().height ?? 0;
-    root.style.setProperty("--schedule-header-h", `${Math.round(headerH)}px`);
-    root.style.setProperty(
+    rootStyle.setProperty("--schedule-header-h", `${Math.round(headerH)}px`);
+    rootStyle.setProperty(
       "--schedule-toolbar-h",
       `${Math.round(toolbarEl?.getBoundingClientRect().height ?? 0)}px`,
     );

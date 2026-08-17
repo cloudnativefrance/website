@@ -18,7 +18,7 @@ There is no persistent per-phase state directory. Historical GSD-era planning ar
 Auto-discovered from `.claude/skills/`. They surface themselves when conditions match — don't re-state their rules from memory, invoke them:
 
 - **`stitch-first`** — every new page, component, or significant UI change is designed in Google Stitch first, validated by the user, then implemented. Triggers on any visual work.
-- **`csv-source-of-truth`** — sessions are authored in Pretalx; speakers, sponsors, and team are authored in Google Sheets. Never hardcode rows in `.astro`/`.ts`/`.tsx`; always load via the helper or `getCollection(...)`. Triggers when touching those data types.
+- **`csv-source-of-truth`** — sessions and speakers are authored in Pretalx; sponsors and team are authored in Google Sheets. Never hardcode rows in `.astro`/`.ts`/`.tsx`; always load via the helper or `getCollection(...)`. Triggers when touching those data types.
 
 Schema changes that span the CSV pipeline (Sheet column → parser → Zod schema → consumers) must ship as one atomic change — see `csv-source-of-truth` for the sequence.
 

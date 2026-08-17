@@ -33,10 +33,16 @@ jobs:
       # part of the test setup rather than a separate concern. Skipping it makes
       # discover-page.test.ts silently skip and the two speaker specs throw.
       #
-      # This step fetches the published Google Sheets. If that fails,
-      # src/lib/remote-csv.ts falls back to the copies committed under
-      # src/content/, which carry the same speaker anchors the specs rely on —
-      # so the suite passes on either path, with or without network.
+      # This step fetches the Pretalx released-schedule export (sessions and
+      # speakers) and the published Google Sheets (sponsors, team). If either
+      # fails, the loaders fall back to the copies committed under src/content/,
+      # which carry the same speaker anchors the specs rely on — so the suite
+      # passes on either path, with or without network.
+      #
+      # KNOWN GAP: no PRETALX_API_TOKEN is set here, so the authenticated reads
+      # degrade. Every test gated on `!hasToken` SKIPS rather than fails —
+      # including the keynote MERGE GATE — and this build produces a dist/ with
+      # no speaker companies, roles or level chips. See docs/testing.md.
       - run: pnpm build
 
       - run: pnpm test

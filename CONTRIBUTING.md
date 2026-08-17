@@ -8,11 +8,22 @@ Read [`CLAUDE.md`](CLAUDE.md). It holds the canonical Design Rules and Data Rule
 
 ## The three non-negotiable rules
 
-### 1. CSVs are the single source of truth
+### 1. Upstream is the single source of truth
 
-Never hardcode speaker, session, sponsor, or team data in `.astro`, `.ts`, or `.tsx` files. Always fetch it through the CSV loader helpers (`loadSessions`, speaker / sponsor / team equivalents under `src/lib/`). If you need to add or rename a column, update the Google Sheet, the CSV parser, the Zod schema in `src/content.config.ts`, and every downstream consumer in the same PR — a partial change ships broken types.
+Never hardcode speaker, session, sponsor, or team data in `.astro`, `.ts`, or `.tsx` files. Always fetch it through the loaders under `src/lib/` (`loadSessions`, `loadSpeakers`) or `getCollection(...)`.
 
-The full editor runbook — which Sheet backs which entity, how to publish CSV, how to trigger a rebuild — lives at [`docs/updating-content.md`](docs/updating-content.md).
+Which upstream depends on the entity:
+
+| Entity | Authored in |
+|---|---|
+| Sessions, speakers | Pretalx (`cfp.cloudnativedays.fr`) |
+| Sponsors, team | Google Sheets published as CSV |
+
+Two speaker fields are repo-owned on purpose, because Pretalx has nowhere to put them: the URL slug (`src/data/speaker-slugs.ts`) and the opening-keynote running order (`src/data/keynote-cast.ts`).
+
+If you add or rename a field, ship the whole chain in one PR — upstream, the parser, the Zod schema in `src/content.config.ts`, and every downstream consumer. A partial change ships broken types.
+
+The full editor runbook — which source backs which entity, how to publish, how to trigger a rebuild — lives at [`docs/updating-content.md`](docs/updating-content.md).
 
 ### 2. Stitch-first for any visual change
 

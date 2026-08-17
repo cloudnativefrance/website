@@ -12,7 +12,7 @@
  * "page exists per speaker, wired to i18n" signal here.
  *
  * IMPORTANT: run `pnpm build` before this test — it reads from dist/.
- * Before removing any anchor row from speakers.csv, update tests/build/_anchors.md AND this file.
+ * Before removing any anchor speaker from Pretalx, update tests/build/_anchors.md AND this file.
  */
 
 import { describe, it, expect } from "vitest";
@@ -31,7 +31,7 @@ function readPage(relativePath: string): string {
   return readFileSync(fullPath, "utf-8");
 }
 
-// See tests/build/_anchors.md for rationale. Names MUST match speakers.csv verbatim (diacritics included).
+// See tests/build/_anchors.md for rationale. Names MUST match the Pretalx speaker name verbatim (diacritics included).
 const ANCHORS: ReadonlyArray<{ slug: string; name: string }> = [
   { slug: "petazzoni", name: "Jérôme Petazzoni" },
   { slug: "arthur-outhenin-chalandre", name: "Arthur Outhenin-Chalandre" },

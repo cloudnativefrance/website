@@ -29,7 +29,9 @@ import { EDITIONS, type Edition } from "./editions";
  *   SPONSORS_CSV_URL_2023 / _2026 / _2027
  *   TEAM_CSV_URL
  *
- * Empty string → the content loader falls back to the committed local CSV.
+ * An UNSET or empty override falls through to the hardcoded published URL
+ * below, not to the committed local CSV — `||` cannot distinguish the two.
+ * The local copies are the fallback for a failed *fetch*, in `remote-fetch.ts`.
  */
 const SHEET_BASE =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdET7nAGsbCoHlOzCICGvGHKOB6OYeqgiJPiWtXBjUCg818TFJ2-pQnEtMzyBaAsGaIQr475Q50mkM/pub";
@@ -47,15 +49,6 @@ export const CSV_URLS: {
   },
   team: process.env.TEAM_CSV_URL || csv(440809363),
 };
-
-
-/**
- * Legacy convenience — current-edition (2026) URLs for callers that have not
- * yet been migrated to `getCsvUrl(type, year)`. These back-compat shims are
- * removed by Task 5 (loadSessions) and Task 4 (content.config.ts).
- */
-export const SPONSORS_CSV_URL = CSV_URLS.sponsors[2026];
-export const TEAM_CSV_URL = CSV_URLS.team;
 
 // Exported for iteration in collections config.
 export { EDITIONS };

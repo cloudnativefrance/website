@@ -71,7 +71,7 @@ describe("SPKR-03: EN co-speaker cross-references are bidirectional (session S3S
   });
 });
 
-describe("SPKR-03: Speaker profile lists their session from sessions.csv (single-talk anchor)", () => {
+describe("SPKR-03: Speaker profile lists their session from Pretalx (single-talk anchor)", () => {
   it("petazzoni FR profile contains the keynote session title fragment", () => {
     const html = readPage("intervenants/2026/petazzoni/index.html");
     // Apostrophe is HTML-entity encoded in the built output — check for both fragments instead.

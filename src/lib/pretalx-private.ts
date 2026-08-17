@@ -202,11 +202,20 @@ async function fetchAllPages<T>(
     if (++pages > MAX_PAGES) {
       throw new Error(`[pretalx] ${what} exceeded ${MAX_PAGES} pages — cursor is not advancing`);
     }
-    const body = await fetchPage<T>(next, token, what, timeoutMs);
+    // Annotated because `next` is both the input here and assigned from the
+    // result below; without it the inference is circular and `body` lands as
+    // an implicit `any`, silently dropping the shape check on `results`.
+    const body: PretalxPage<T> = await fetchPage<T>(next, token, what, timeoutMs);
     out.push(...body.results);
     next = body.next ? reanchor(body.next) : null;
   }
   return out;
+}
+
+/** One page of a paginated Pretalx list endpoint. */
+interface PretalxPage<T> {
+  results: T[];
+  next: string | null;
 }
 
 /** Backoff between attempts. Length is the retry count; short, since this blocks a build. */
@@ -225,7 +234,7 @@ async function fetchPage<T>(
   token: string,
   what: string,
   timeoutMs: number,
-): Promise<{ results: T[]; next: string | null }> {
+): Promise<PretalxPage<T>> {
   let lastErr: unknown;
   for (let attempt = 0; ; attempt++) {
     const controller = new AbortController();
@@ -241,7 +250,7 @@ async function fetchPage<T>(
       });
       if (res.status === 401 || res.status === 403) throw new PretalxAuthError(res.status, what);
       if (!res.ok) throw new PretalxHttpError(res.status, what, url);
-      return (await res.json()) as { results: T[]; next: string | null };
+      return (await res.json()) as PretalxPage<T>;
     } catch (err) {
       // Never retry a failure that is about us rather than about Pretalx.
       if (err instanceof PretalxAuthError) throw err;

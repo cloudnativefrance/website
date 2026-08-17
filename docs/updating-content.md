@@ -37,7 +37,7 @@ because Pretalx has nowhere to put them.
 
 | Field | Where it lives | Notes |
 |---|---|---|
-| `name`, `bio`, `photo_url` | Pretalx speaker profile | photo falls back to `public/speakers/<slug>.jpg` when committed |
+| `name`, `bio`, `photo_url` | Pretalx speaker profile | a committed `public/speakers/<slug>.jpg` is **preferred** over the Pretalx avatar |
 | `company`, `role`, `linkedin`, `github`, `bluesky`, `website` | Pretalx **speaker questions** | needs the API token to read — they are not public |
 | `slug` | `src/data/speaker-slugs.ts` | URL identity. Never change a published one |
 | `keynote`, `keynote_size` | `src/data/keynote-cast.ts` | the opening-keynote running order |
@@ -82,8 +82,9 @@ lives there, not in a CSV header.
 - **Title, room, format, start time, duration, track, language, description** — edited
   directly on the talk in Pretalx.
 - **Speakers** — Pretalx's own speaker list for the talk, resolved to the site's speaker
-  slugs by matching against the Speakers Sheet's `name` column (see below). A speaker must
-  have a row in that Sheet before their talk will build.
+  slugs via `src/data/speaker-slugs.ts`, keyed by the speaker's exact Pretalx name. A
+  speaker must have an entry there before their talk will build — the failure is loud and
+  names them.
 - **Slides** — a talk resource (file or link) in Pretalx.
 - **Replay** — a talk resource of type link, titled `Replay`, pointing at the YouTube/Vimeo
   URL. Setting this is what drives a talk onto `/replays`.

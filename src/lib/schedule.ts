@@ -19,7 +19,7 @@ export type SessionLanguage = "fr" | "en" | "";
 export interface SessionRow {
   id: string;
   title: string;
-  /** Array of speaker slug references (every speaker has a row in speakers.csv). */
+  /** Array of speaker slug references (every speaker has an entry in `src/data/speaker-slugs.ts`). */
   speakers: string[];
   /** Optional thematic track (e.g. 'FinOps'). Free text; empty when not classified. */
   track: string;

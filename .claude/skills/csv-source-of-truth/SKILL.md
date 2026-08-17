@@ -7,8 +7,11 @@ description: Use when editing or creating code that reads or writes speaker, ses
 
 ## Overview
 
-Sessions are authored in **Pretalx** (`cfp.cloudnativedays.fr`). Speakers, sponsors and team
-members are authored in **Google Sheets** by staff. The site fetches both at build time.
+Sessions and speakers are authored in **Pretalx** (`cfp.cloudnativedays.fr`). Sponsors and
+team members are authored in **Google Sheets** by staff. The site fetches both at build time.
+Two speaker fields stay in the repo because Pretalx has nowhere to put them: the URL slug
+(`src/data/speaker-slugs.ts`) and the opening-keynote running order
+(`src/data/keynote-cast.ts`).
 Hardcoding any row into `.astro`, `.ts`, or `.tsx` will drift within a day and mislead the
 next person who updates the upstream expecting the site to follow. Always go through the
 loader helpers.
@@ -17,7 +20,8 @@ loader helpers.
 
 Triggers:
 - User asks "add session Y / speaker X / sponsor Z / team member W" (first instinct must be
-  "edit Pretalx" for a session, "edit the Google Sheet" for the rest — not "edit a file").
+  "edit Pretalx" for a session or speaker, "edit the Google Sheet" for a sponsor or team
+  member — not "edit a file").
 - Code touches `src/lib/pretalx.ts`, `src/lib/schedule.ts`, `src/lib/speakers.ts`,
   `src/lib/remote-csv.ts`, or any component rendering session/speaker/sponsor/team rows.
 - A PR introduces a literal session title, speaker name, sponsor slug, or team member in a
@@ -31,9 +35,10 @@ When NOT to use:
 
 ## Core Rules
 
-1. **Upstream first.** A session change starts in Pretalx; a speaker/sponsor/team change
-   starts in the Google Sheet. If the user cannot edit upstream right now, say so — do not
-   bypass by committing to a `.ts` file.
+1. **Upstream first.** A session or speaker change starts in Pretalx; a sponsor or team
+   change starts in the Google Sheet. If the user cannot edit upstream right now, say so —
+   do not bypass by committing to a `.ts` file. The two exceptions are the speaker slug map
+   and the keynote cast, which are repo-owned by design.
 2. **Fetch via loaders, never inline.**
    - Sessions → `loadSessions(year)` from `src/lib/schedule.ts`
    - Speakers → `getCollection("speakers-<year>")` (helpers in `src/lib/speakers.ts`)
