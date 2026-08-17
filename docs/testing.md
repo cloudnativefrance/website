@@ -22,9 +22,17 @@ The authenticated Pretalx tests are gated on a token being present:
 
 Without a token these **skip — they do not pass**. A green run proves nothing about them.
 
-This matters because **CI has no `PRETALX_API_TOKEN`**: `.github/workflows/test.yml` sets no `env:` block, so every CI run skips all 9 and exits 0. The same job's `pnpm build` therefore also produces a `dist/` with no speaker companies, no roles and no level chips, and nothing asserts otherwise.
+Where the token comes from:
 
-Locally the token comes from `.env.local` (see [`updating-content.md`](./updating-content.md#running-locally-with-the-pretalx-token)), so these run for real. Check the run's **skip count**, not just the pass count, before treating a green suite as clearance.
+| Context | Token | Effect |
+|---|---|---|
+| Local | `.env.local` (see [`updating-content.md`](./updating-content.md#running-locally-with-the-pretalx-token)) | all 9 run |
+| CI, this repo | `secrets.PRETALX_API_TOKEN`, passed to the `pnpm build` and `pnpm test` steps | all 9 run |
+| CI, **fork PR** | none — GitHub withholds secrets from forks | all 9 skip |
+
+`PRETALX_TOKEN_REQUIRED` is deliberately not set in `test.yml`: making a missing token fatal would fail every outside contributor's build. Forks therefore keep the degraded path, and a fork PR's green run has not exercised the authenticated half.
+
+Check the run's **skip count**, not just the pass count, before treating a green suite as clearance.
 
 ## Known failures
 
