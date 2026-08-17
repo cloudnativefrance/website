@@ -7,11 +7,41 @@ import tailwindcss from "@tailwindcss/vite";
 // Use relative import to resolve @ alias at config load time
 import { generateFlagEnvSchema } from "./src/config/flags-env.ts";
 import { PROD_ORIGIN } from "./src/lib/site-env.ts";
+import { loadLocalEnv } from "./scripts/load-local-env.mjs";
+
+// Astro surfaces .env values through import.meta.env, not process.env, and the
+// Pretalx reads use process.env so the same code works with a Docker secret
+// file. Load them here so `pnpm dev` and `pnpm build` pick up .env.local with no
+// shell ceremony. A real env var still wins, so CI is unaffected.
+loadLocalEnv();
+
+// Speaker portraits are authored in Pretalx, so Astro has to be told that host
+// is allowed to have its images optimised. Without this entry `getImage()`
+// refuses the URL and every portrait silently falls back to a hotlink.
+// Derived from the same env var the rest of the Pretalx code reads, so pointing
+// a build at a different instance does not need a second edit here.
+const pretalxBase = process.env.PRETALX_BASE_URL || "https://cfp.cloudnativedays.fr";
+let pretalxUrl;
+try {
+  pretalxUrl = new URL(pretalxBase);
+} catch {
+  // Without this, a schemeless value dies as a bare ERR_INVALID_URL inside
+  // Vite's module runner, naming neither the variable nor the value.
+  throw new Error(
+    `PRETALX_BASE_URL must be an absolute URL including the scheme — got "${pretalxBase}". ` +
+      `Try https://${pretalxBase}`,
+  );
+}
 
 // https://astro.build/config
 // Build is fully static; bump this file to force a CI rebuild that
 // re-fetches the upstream Google Sheets at compile time.
 export default defineConfig({
+  image: {
+    remotePatterns: [
+      { protocol: pretalxUrl.protocol.replace(":", ""), hostname: pretalxUrl.hostname },
+    ],
+  },
   // Driven by PUBLIC_SITE_URL so staging builds advertise their own origin in
   // canonical URLs, hreflang, OG image URLs and the sitemap. Defaults to
   // production (`||`, not `??`, so an empty string also falls back), so every

@@ -1,5 +1,13 @@
-import { fetchCsvOrFallback, getCsvUrl } from "./remote-csv";
 import { CURRENT_EDITION, type Edition } from "./editions";
+import { loadFrozenArchive } from "./frozen-archive";
+import {
+  PRETALX_EVENT,
+  collectTalkCodes,
+  fetchScheduleExport,
+  buildSpeakerResolver,
+  toSessionRows,
+} from "./pretalx";
+import { loadLevelAnswers } from "./pretalx-private";
 import { ui, type Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 
@@ -11,10 +19,16 @@ export type SessionLanguage = "fr" | "en" | "";
 export interface SessionRow {
   id: string;
   title: string;
-  /** Array of speaker slug references (every speaker has a row in speakers.csv). */
+  /** Array of speaker slug references (every speaker has an entry in `src/data/speaker-slugs.ts`). */
   speakers: string[];
   /** Optional thematic track (e.g. 'FinOps'). Free text; empty when not classified. */
   track: string;
+  /**
+   * Curated per-track accent colour from Pretalx, as a hex string. Undefined for
+   * archived editions and unclassified talks. Carried but not yet rendered — the
+   * schedule redesign (PR 2) consumes it and drops the name-hash fallback.
+   */
+  trackColor?: string;
   /** Target audience proficiency. Empty when unclassified. */
   level: SessionLevel;
   /** Physical room — Monet / Debussy / Dumas / Piaf / Ravel. */
@@ -38,134 +52,46 @@ export interface SessionRow {
 }
 
 /**
- * Minimal CSV parser — handles RFC-4180-style quoted fields with escaped `""`.
- * Not a general purpose CSV lib; tailored to the known shape of sessions.csv.
- */
-function parseCsv(text: string): string[][] {
-  const rows: string[][] = [];
-  let i = 0;
-  const n = text.length;
-
-  while (i < n) {
-    const row: string[] = [];
-    let field = "";
-    let inQuotes = false;
-
-    while (i < n) {
-      const ch = text[i];
-
-      if (inQuotes) {
-        if (ch === '"') {
-          if (text[i + 1] === '"') {
-            field += '"';
-            i += 2;
-          } else {
-            inQuotes = false;
-            i++;
-          }
-        } else {
-          field += ch;
-          i++;
-        }
-        continue;
-      }
-
-      if (ch === '"') {
-        inQuotes = true;
-        i++;
-      } else if (ch === ",") {
-        row.push(field);
-        field = "";
-        i++;
-      } else if (ch === "\n" || ch === "\r") {
-        row.push(field);
-        // Skip \r\n
-        if (ch === "\r" && text[i + 1] === "\n") i++;
-        i++;
-        break;
-      } else {
-        field += ch;
-        i++;
-      }
-    }
-
-    // End-of-file flush when the file doesn't end with a newline
-    if (i >= n && (field.length > 0 || row.length > 0)) {
-      row.push(field);
-    }
-
-    if (row.length > 0 && !(row.length === 1 && row[0] === "")) {
-      rows.push(row);
-    }
-  }
-
-  return rows;
-}
-
-/**
- * Load all sessions. Fetches the published Google Sheet at build time and
- * falls back to the repo-committed CSV on network failure. Result is cached
- * for the process lifetime (see src/lib/remote-csv.ts).
+ * Load all sessions for an edition.
+ *
+ * Editions with a public Pretalx event are fetched from its released schedule
+ * export at build time, falling back to the committed snapshot when Pretalx is
+ * unreachable. Editions without one (2023, and 2027 until its event opens) read
+ * a frozen JSON archive.
  */
 export async function loadSessions(
   year: Edition = CURRENT_EDITION,
 ): Promise<SessionRow[]> {
-  const raw = await fetchCsvOrFallback({
-    url: getCsvUrl("sessions", year),
-    fallbackRelPath: `src/content/schedule/sessions-${year}.csv`,
-    label: `sessions-${year}.csv`,
-  });
-  const rows = parseCsv(raw);
-  if (rows.length === 0) return [];
+  const slug = PRETALX_EVENT[year];
+  let rows: SessionRow[];
+  if (slug) {
+    const doc = await fetchScheduleExport(year, slug);
+    // Pure lookup against the committed slug map — no I/O, so nothing to await.
+    const resolveSpeaker = buildSpeakerResolver();
+    // The released export is the allowlist: levels are looked up only for talks
+    // it already contains, so an unannounced submission cannot reach the site
+    // through the authenticated answers endpoint.
+    const scheduled = new Set(collectTalkCodes(doc));
+    const levels = await loadLevelAnswers(year, slug, scheduled);
+    rows = toSessionRows(doc, resolveSpeaker, levels);
+  } else {
+    rows = loadArchivedSessions(year);
+  }
 
-  const [header, ...body] = rows;
-  const idx = (col: string) => header.indexOf(col);
+  // Applied at this single exit point so both the live Pretalx branch and the
+  // archived-JSON branch honour the same contract, instead of duplicating the
+  // predicate (or worse, only enforcing it on one branch).
+  return rows.filter((s) => s.status !== "hidden" && s.id);
+}
 
-  const iId = idx("id");
-  const iTitle = idx("title");
-  const iSpeakers = idx("speakers");
-  const iTrack = idx("track");
-  const iLevel = idx("level");
-  const iRoom = idx("room");
-  const iFormat = idx("format");
-  const iStart = idx("start_time");
-  const iDuration = idx("duration_min");
-  const iTags = idx("tags");
-  const iFeedback = idx("feedback_url");
-  const iSlides = idx("slides_url");
-  const iRecording = idx("recording_url");
-  const iCover = idx("cover_image_url");
-  const iLanguage = idx("language");
-  const iStatus = idx("status");
-  const iDescription = idx("description");
-
-  return body
-    .map((r): SessionRow => ({
-      id: r[iId] ?? "",
-      title: r[iTitle] ?? "",
-      speakers: (r[iSpeakers] ?? "")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
-      track: r[iTrack] ?? "",
-      level: iLevel >= 0 ? ((r[iLevel] as SessionLevel) || "") : "",
-      room: r[iRoom] ?? "",
-      format: ((r[iFormat] as SessionFormat) || "talk"),
-      startTime: r[iStart] ?? "",
-      durationMin: Number(r[iDuration] ?? 0),
-      tags: (r[iTags] ?? "")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
-      feedbackUrl: r[iFeedback] ?? "",
-      slidesUrl: iSlides >= 0 ? (r[iSlides] ?? "") : "",
-      recordingUrl: iRecording >= 0 ? (r[iRecording] ?? "") : "",
-      coverImageUrl: iCover >= 0 ? (r[iCover] ?? "") : "",
-      language: iLanguage >= 0 ? ((r[iLanguage] as SessionLanguage) || "") : "",
-      status: ((r[iStatus] as SessionStatus) || "confirmed"),
-      description: r[iDescription] ?? "",
-    }))
-    .filter((s) => s.status !== "hidden" && s.id);
+/**
+ * `sessions-2027.json` is intentionally `[]`. Do not regenerate it from the Sheet:
+ * that tab holds a contaminated scratch copy of the 2026 rows (identical ids, all
+ * dated 2026-02-03, one with a Linear URL pasted into its title). 2027 gets real
+ * data once its Pretalx event is public and `PRETALX_EVENT[2027]` is set.
+ */
+function loadArchivedSessions(year: Edition): SessionRow[] {
+  return loadFrozenArchive<SessionRow>("sessions", year);
 }
 
 /**

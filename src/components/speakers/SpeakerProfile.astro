@@ -9,6 +9,7 @@ interface Props {
   company?: string;
   role?: string;
   photo?: string;
+  fallback?: string;
   social?: {
     github?: string;
     linkedin?: string;
@@ -19,7 +20,7 @@ interface Props {
   backHref?: string;
 }
 
-const { name, company, role, photo, social, lang, backHref } = Astro.props;
+const { name, company, role, photo, fallback, social, lang, backHref } = Astro.props;
 const t = useTranslations(lang);
 ---
 
@@ -44,7 +45,7 @@ const t = useTranslations(lang);
     {t("speakers.back")}
   </a>
 
-  <SpeakerAvatar name={name} photo={photo} size="lg" class="mx-auto" />
+  <SpeakerAvatar name={name} photo={photo} fallback={fallback} size="lg" class="mx-auto" />
 
   <h1
     class="text-4xl font-bold text-foreground text-center mt-4"

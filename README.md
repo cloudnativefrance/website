@@ -9,7 +9,7 @@ The bilingual (French / English) marketing and program site for [Cloud Native Da
 - **Tailwind CSS 4** with `shadcn/ui` primitives for the design system.
 - **DM Sans** as the single typeface family (Google Fonts, self-hosted at build time).
 - **Node 22 + pnpm** package manager.
-- **CSV content** — speakers, sessions, sponsors, and team rosters live in published Google Sheets consumed as CSV at build time.
+- **Content pipeline** — sessions and speakers come from the self-hosted Pretalx instance; sponsor and team rosters live in published Google Sheets consumed as CSV. Both are fetched at build time.
 
 ## Deployment
 
@@ -33,26 +33,31 @@ pnpm build
 pnpm test
 ```
 
-The dev server watches `src/` and the local CSV fallbacks under `src/content/`.
+The dev server watches `src/` and the local fallbacks under `src/content/` (Pretalx session
+snapshots as JSON, speaker/sponsor/team rosters as CSV).
 
 ## Where to find what
 
 The site is small but deliberate. Start with the doc that matches what you're doing:
 
-- **Adding a speaker, session, sponsor, or team member?** → [`docs/updating-content.md`](docs/updating-content.md) — the CSV runbook. Covers which Google Sheet backs each entity, the required/optional columns sourced from the Zod schemas in `src/content.config.ts`, and how to trigger a rebuild.
-- **Getting oriented in the codebase?** → [`docs/repo-structure.md`](docs/repo-structure.md) — a short tour of `src/`, `tests/`, and the `.planning/` GSD workflow artifacts.
+- **Adding a speaker, session, sponsor, or team member?** → [`docs/updating-content.md`](docs/updating-content.md) — the content runbook. Covers Pretalx for sessions and speakers, which Google Sheet backs sponsors and team, the required/optional columns sourced from the Zod schemas in `src/content.config.ts`, and how to trigger a rebuild.
+- **Getting oriented in the codebase?** → [`docs/repo-structure.md`](docs/repo-structure.md) — a short tour of `src/`, `tests/`, and where planning artifacts live.
 - **Running tests / triaging failures?** → [`docs/testing.md`](docs/testing.md) — what each command covers, plus the currently known non-blocking failures.
 - **Contributing a PR?** → [`CONTRIBUTING.md`](CONTRIBUTING.md) — branching, commit style, and the three non-negotiable rules.
 
 ## Data sources
 
-Four CSVs back the site. Production reads them from published Google Sheets (URLs configured via env vars); development falls back to the committed files under `src/content/`:
+Sessions come from the self-hosted Pretalx instance (`cfp.cloudnativedays.fr`), fetched at
+build time via its released-schedule export; production falls back to a committed snapshot
+under `src/content/schedule/pretalx-{year}.json` if Pretalx is unreachable (refresh it with
+`pnpm sync:pretalx`). Speakers, sponsors, and team roster CSVs are still published Google
+Sheets (URLs configured via env vars); development falls back to the committed files under
+`src/content/`:
 
 | Entity | Env var | Local fallback |
 |--------|---------|----------------|
-| Sessions | `SCHEDULE_SESSIONS_CSV_URL` | `src/content/schedule/sessions.csv` |
-| Speakers | `SCHEDULE_SPEAKERS_CSV_URL` | `src/content/schedule/speakers.csv` |
-| Sponsors | `SPONSORS_CSV_URL` | `src/content/sponsors/sponsors.csv` |
+| Speakers | Pretalx (`PRETALX_BASE_URL`, `PRETALX_API_TOKEN`) | `src/content/schedule/speakers-{year}.json` (editions with no Pretalx event) |
+| Sponsors | `SPONSORS_CSV_URL_{2023,2026,2027}` | `src/content/sponsors/sponsors-{year}.csv` |
 | Team | `TEAM_CSV_URL` | `src/content/team/team.csv` |
 
 One more build-time env var, unrelated to content: `PUBLIC_SITE_URL` sets the build's origin (`site` in `astro.config.mjs`), which drives canonical URLs, hreflang, the sitemap, `robots.txt`, and the `noindex` meta tag. Empty or unset falls back to the production origin (`src/lib/site-env.ts`); CI sets it to `https://staging.cloudnativedays.fr` for the `staging` branch.
@@ -66,7 +71,7 @@ See [`docs/updating-content.md`](docs/updating-content.md) for the editor runboo
 - [`STITCH_WORKFLOW.md`](STITCH_WORKFLOW.md) — how we drive Google Stitch from Claude Code for visual work.
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — contribution rules and PR flow.
 - [`docs/repo-structure.md`](docs/repo-structure.md) — repository layout.
-- [`docs/updating-content.md`](docs/updating-content.md) — CSV editor runbook.
+- [`docs/updating-content.md`](docs/updating-content.md) — sessions & CSV editor runbook.
 - [`docs/testing.md`](docs/testing.md) — test commands and known non-blockers.
 
 ## License

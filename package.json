@@ -12,7 +12,8 @@
     "astro": "astro",
     "test": "vitest run",
     "test:watch": "vitest",
-    "optimize:photos": "tsx scripts/optimize-photos.ts"
+    "optimize:photos": "tsx scripts/optimize-photos.ts",
+    "sync:pretalx": "tsx scripts/sync-pretalx.ts"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.3",

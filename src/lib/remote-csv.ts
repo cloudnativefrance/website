@@ -1,20 +1,4 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-
-/**
- * Fetch a CSV from a remote URL (Google Sheets publish-to-web) with a
- * build-tolerant fallback: if the remote is unreachable or times out, use
- * the committed repo copy at `fallbackRelPath`.
- *
- * Returns the CSV body as a UTF-8 string, and logs which source was used
- * so build logs make the data provenance obvious.
- *
- * Results are memoized per URL for the lifetime of the process — Astro calls
- * loaders multiple times during a single build, and we want the same snapshot
- * across all pages.
- */
-const CACHE = new Map<string, Promise<string>>();
-const DEFAULT_TIMEOUT_MS = 8000;
+import { fetchTextOrFallback } from "./remote-fetch";
 
 export interface FetchOptions {
   url?: string;
@@ -23,52 +7,16 @@ export interface FetchOptions {
   timeoutMs?: number;
 }
 
-export async function fetchCsvOrFallback({
-  url,
-  fallbackRelPath,
-  label = fallbackRelPath,
-  timeoutMs = DEFAULT_TIMEOUT_MS,
-}: FetchOptions): Promise<string> {
-  const cacheKey = url || `file:${fallbackRelPath}`;
-  const cached = CACHE.get(cacheKey);
-  if (cached) return cached;
-
-  const promise = (async () => {
-    const fallbackPath = join(process.cwd(), fallbackRelPath);
-    if (!url) {
-      const body = readFileSync(fallbackPath, "utf8");
-      console.log(`[csv] ${label}: using local fallback (no URL configured, ${body.length} bytes)`);
-      return body;
-    }
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const res = await fetch(url, {
-        signal: controller.signal,
-        redirect: "follow",
-        headers: { "User-Agent": "cndfrance-website-build/1.0" },
-      });
-      clearTimeout(timer);
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-      const body = await res.text();
+/** CSV-validating wrapper over the shared transport. */
+export async function fetchCsvOrFallback(opts: FetchOptions): Promise<string> {
+  return fetchTextOrFallback({
+    ...opts,
+    validate: (body) => {
       if (!body || body.length < 20 || !body.includes(",")) {
         throw new Error("Response does not look like CSV");
       }
-      console.log(`[csv] ${label}: fetched remote (${body.length} bytes)`);
-      return body;
-    } catch (err) {
-      clearTimeout(timer);
-      const msg = err instanceof Error ? err.message : String(err);
-      const body = readFileSync(fallbackPath, "utf8");
-      console.warn(`[csv] ${label}: remote fetch failed (${msg}); using local fallback (${body.length} bytes)`);
-      return body;
-    }
-  })();
-
-  CACHE.set(cacheKey, promise);
-  return promise;
+    },
+  });
 }
 
 import { EDITIONS, type Edition } from "./editions";
@@ -78,12 +26,12 @@ import { EDITIONS, type Edition } from "./editions";
  * published-to-web tab in the single upstream Google Sheet.
  *
  * Override via env in staging/preview:
- *   SESSIONS_CSV_URL_2023 / _2026 / _2027
- *   SPEAKERS_CSV_URL_2023 / _2026 / _2027
  *   SPONSORS_CSV_URL_2023 / _2026 / _2027
  *   TEAM_CSV_URL
  *
- * Empty string → the content loader falls back to the committed local CSV.
+ * An UNSET or empty override falls through to the hardcoded published URL
+ * below, not to the committed local CSV — `||` cannot distinguish the two.
+ * The local copies are the fallback for a failed *fetch*, in `remote-fetch.ts`.
  */
 const SHEET_BASE =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRdET7nAGsbCoHlOzCICGvGHKOB6OYeqgiJPiWtXBjUCg818TFJ2-pQnEtMzyBaAsGaIQr475Q50mkM/pub";
@@ -91,21 +39,9 @@ const SHEET_BASE =
 const csv = (gid: number) => `${SHEET_BASE}?gid=${gid}&single=true&output=csv`;
 
 export const CSV_URLS: {
-  sessions: Record<Edition, string>;
-  speakers: Record<Edition, string>;
   sponsors: Record<Edition, string>;
   team: string;
 } = {
-  sessions: {
-    2023: process.env.SESSIONS_CSV_URL_2023 || csv(985867274),
-    2026: process.env.SESSIONS_CSV_URL_2026 || csv(178765557),
-    2027: process.env.SESSIONS_CSV_URL_2027 || csv(299000330),
-  },
-  speakers: {
-    2023: process.env.SPEAKERS_CSV_URL_2023 || csv(762540077),
-    2026: process.env.SPEAKERS_CSV_URL_2026 || csv(124864767),
-    2027: process.env.SPEAKERS_CSV_URL_2027 || csv(1713930040),
-  },
   sponsors: {
     2023: process.env.SPONSORS_CSV_URL_2023 || csv(1892473186),
     2026: process.env.SPONSORS_CSV_URL_2026 || csv(1833117198),
@@ -113,22 +49,6 @@ export const CSV_URLS: {
   },
   team: process.env.TEAM_CSV_URL || csv(440809363),
 };
-
-export type EditionScopedType = "sessions" | "speakers" | "sponsors";
-
-export function getCsvUrl(type: EditionScopedType, year: Edition): string {
-  return CSV_URLS[type][year];
-}
-
-/**
- * Legacy convenience — current-edition (2026) URLs for callers that have not
- * yet been migrated to `getCsvUrl(type, year)`. These back-compat shims are
- * removed by Task 5 (loadSessions) and Task 4 (content.config.ts).
- */
-export const SESSIONS_CSV_URL = CSV_URLS.sessions[2026];
-export const SPEAKERS_CSV_URL = CSV_URLS.speakers[2026];
-export const SPONSORS_CSV_URL = CSV_URLS.sponsors[2026];
-export const TEAM_CSV_URL = CSV_URLS.team;
 
 // Exported for iteration in collections config.
 export { EDITIONS };

@@ -4,31 +4,63 @@ Three commands cover the automated surface. Run them before opening a PR and kee
 
 ## Commands
 
-- **`pnpm test`** — alias for `pnpm vitest run`. Runs every unit test (`src/lib/__tests__/*.test.ts`) and every build-output integration test (`tests/build/*.test.ts`).
-- **`pnpm vitest run {file}`** — run a single test file. Useful for tight feedback loops: `pnpm vitest run src/lib/__tests__/cfp.test.ts`.
+- **`pnpm test`** — alias for `pnpm vitest run`. Two Vitest projects (see `vitest.config.ts`):
+  - `unit` — everything except the component tests: `src/lib/__tests__/*.test.ts` and the build-output integration tests in `tests/build/*.test.ts`.
+  - `astro-components` — `src/components/**/__tests__/*.test.ts`, which render real components through the Astro container API.
+- **`pnpm vitest run {file}`** — run a single test file. Useful for tight feedback loops: `pnpm vitest run src/lib/__tests__/schedule-filter.test.ts`.
 - **`pnpm astro check`** — TypeScript + Astro diagnostics over the whole source tree. Catches schema drift, broken imports, type mismatches.
 - **`pnpm astro build`** — end-to-end static bundle build. Produces `dist/` and surfaces any build-time runtime errors (CSV parse issues, i18n lookup misses, Astro component mount errors).
 
-The build-output tests under `tests/build/` read from `dist/` via a `readPage(relativePath)` helper. **Run `pnpm astro build` before running them.** If `dist/` is stale, the helper throws with a "Run 'pnpm build' before running tests" message pointing at the exact missing path.
+The build-output tests under `tests/build/` read from `dist/`. **Run `pnpm build` before running them** — roughly two dozen tests fail spuriously against a missing or stale `dist/`. There is no shared helper: `speaker-profile.test.ts` and `speaker-talks.test.ts` each define a local `readPage()` that throws a "Run 'pnpm build'" message, while newer files such as `programme-redesign.test.ts` call `readFileSync` directly and surface a raw `ENOENT`.
 
-## Known pre-existing failures (non-blocking)
+## The token-skip hazard
 
-Do not fix these in an unrelated PR. They are documented, scoped, and tracked.
+The authenticated Pretalx tests are gated on a token being present:
 
-### `pnpm astro check` — 3 errors in `src/content.config.ts`
+- `tests/build/pretalx-speakers.test.ts` — `describe.skipIf(!hasToken)`, 6 tests
+- `tests/build/pretalx-levels.test.ts` — 3 tests, including the only assertion that the level allowlist actually filters
 
-Three `ts(2322) LoaderConstraint` errors on the Astro glob loaders at roughly lines 88, 110, 127. They come from an Astro minor bump that changed the loader's return-type constraint. Behavior is unaffected — loaders still run correctly, the CSV pipeline still produces the right shapes at runtime. Surface drift only. Cleanup pass belongs to a later housekeeping phase.
+Without a token these **skip — they do not pass**. A green run proves nothing about them.
 
-### `pnpm vitest run tests/build/speakers-grid.test.ts` — SPKR-01 failures
+Where the token comes from:
 
-The grid test (`tests/build/speakers-grid.test.ts`) still asserts on fixture speaker names (`Marie Laurent`, `Thomas Nguyen`, etc.) that were replaced with the real 65-speaker CFP roster. Phase 13 closed SPKR-02 and SPKR-03 by rewriting the profile + co-speaker tests against real anchors (see `.planning/phases/13-speaker-schema-drift-cleanup/13-02-SUMMARY.md`) but intentionally left SPKR-01 for a follow-up. Residual drift from the same migration — same fix pattern as 13-02 Task 2 when we get to it.
+| Context | Token | Effect |
+|---|---|---|
+| Local | `.env.local` (see [`updating-content.md`](./updating-content.md#running-locally-with-the-pretalx-token)) | all 9 run |
+| CI, this repo | `secrets.PRETALX_API_TOKEN`, passed to the `pnpm build` and `pnpm test` steps | all 9 run |
+| CI, **fork PR** | none — GitHub withholds secrets from forks | all 9 skip |
+
+`PRETALX_TOKEN_REQUIRED` is deliberately not set in `test.yml`: making a missing token fatal would fail every outside contributor's build. Forks therefore keep the degraded path, and a fork PR's green run has not exercised the authenticated half.
+
+Check the run's **skip count**, not just the pass count, before treating a green suite as clearance.
+
+## Known failures
+
+### Blocking — the keynote merge gates
+
+`tests/build/pretalx-speakers.test.ts`:
+
+- `MERGE GATE: every keynote cast member exists in Pretalx`
+- `no speaker page that exists today silently disappears`
+
+Both are **red on purpose** and must be green before this branch merges. Ten keynote speakers listed in `src/data/keynote-cast.ts` do not yet exist as people in Pretalx — they are currently folded into the "Keynote d'ouverture" submission, whose only declared speaker is the MC. Create them in the Pretalx organiser UI (`/speakers/` is read-only over the API) and both go green.
+
+Do **not** reclassify these as non-blocking. Note also that they are token-gated, so per the section above they vanish silently in CI rather than failing.
+
+### Non-blocking
+
+None currently.
 
 ## What to do when a test fails in your PR
 
-1. If the failure is one of the two listed above → note it in the PR description, do not block on it.
+1. If the failure is one of the two keynote gates above → note it in the PR description, do not block on it.
 2. If the failure is new → fix it. "New" means: did not exist before your branch; introduced by your changes; or was flagged as newly uncovered code.
 3. Uncertain which bucket you're in? Rebase onto `main`, run the commands, and compare. If the same failure reproduces on `main`, it's pre-existing.
 
+A font-fetch error (`Cannot fetch the given font file`) in the `astro-components` project means Astro's cached font URL has gone stale, usually after a `rm -rf .astro`. Clear `.astro/fonts` and re-run.
+
 ## What is NOT covered by automated tests
 
-Visual correctness, copy tone, accessibility beyond keyboard semantics, and Stitch-design fidelity are all human-review concerns. The Stitch-first rule (see `CONTRIBUTING.md`) means visual work arrives with a design artefact reviewers can diff against the implementation — that IS the visual test.
+Visual correctness, copy tone, and Stitch-design fidelity are human-review concerns. The Stitch-first rule (see `CONTRIBUTING.md`) means visual work arrives with a design artefact reviewers can diff against the implementation — that IS the visual test.
+
+Accessibility is partly covered and partly not. The build-output tests pin the *markup* that a11y behaviour rests on — the modal's `tabindex="-1"`/`role="dialog"`/`aria-modal`, the drawer's `inert`, the result count's `aria-live`. The **behaviour** — focus trapping, focus restore, Escape handling — is not tested, because there is no browser test runner in this repo. Changes to `src/components/schedule/schedule-ui.ts` around focus need manual keyboard verification.

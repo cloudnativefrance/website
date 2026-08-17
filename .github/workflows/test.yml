@@ -33,13 +33,28 @@ jobs:
       # part of the test setup rather than a separate concern. Skipping it makes
       # discover-page.test.ts silently skip and the two speaker specs throw.
       #
-      # This step fetches the published Google Sheets. If that fails,
-      # src/lib/remote-csv.ts falls back to the copies committed under
-      # src/content/, which carry the same speaker anchors the specs rely on —
-      # so the suite passes on either path, with or without network.
+      # This step fetches the Pretalx released-schedule export (sessions and
+      # speakers) and the published Google Sheets (sponsors, team). If either
+      # fails, the loaders fall back to the copies committed under src/content/,
+      # which carry the same speaker anchors the specs rely on — so the suite
+      # passes on either path, with or without network.
+      #
+      # The token is what makes the authenticated half real. Without it the
+      # build ships no speaker companies, roles or level chips, and every test
+      # gated on `hasToken` SKIPS rather than fails — including the keynote
+      # MERGE GATE, so the run went green having tested none of it.
+      #
+      # PRETALX_TOKEN_REQUIRED is deliberately NOT set: fork pull requests
+      # receive no secrets, and making a missing token fatal would fail every
+      # outside contributor's build. They still get the skip behaviour; runs on
+      # this repo get the real thing. Check the skip count, per docs/testing.md.
       - run: pnpm build
+        env:
+          PRETALX_API_TOKEN: ${{ secrets.PRETALX_API_TOKEN }}
 
       - run: pnpm test
+        env:
+          PRETALX_API_TOKEN: ${{ secrets.PRETALX_API_TOKEN }}
 
       # Type-checks .astro, .ts and .tsx. Kept after the tests so a type
       # regression is reported alongside a green suite rather than masking it.

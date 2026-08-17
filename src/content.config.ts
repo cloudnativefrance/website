@@ -7,42 +7,21 @@ import {
   EDITIONS,
 } from "./lib/remote-csv";
 import type { Edition } from "./lib/editions";
-
-// -- CSV parser (unchanged) ------------------------------------------------
-
-function parseCsv(text: string): string[][] {
-  const rows: string[][] = [];
-  let i = 0;
-  const n = text.length;
-  while (i < n) {
-    const row: string[] = [];
-    let field = "";
-    let inQ = false;
-    while (i < n) {
-      const ch = text[i];
-      if (inQ) {
-        if (ch === '"') {
-          if (text[i + 1] === '"') { field += '"'; i += 2; }
-          else { inQ = false; i++; }
-        } else { field += ch; i++; }
-        continue;
-      }
-      if (ch === '"') { inQ = true; i++; }
-      else if (ch === ",") { row.push(field); field = ""; i++; }
-      else if (ch === "\n" || ch === "\r") {
-        row.push(field);
-        if (ch === "\r" && text[i + 1] === "\n") i++;
-        i++;
-        break;
-      } else { field += ch; i++; }
-    }
-    if (i >= n && (field.length > 0 || row.length > 0)) row.push(field);
-    if (row.length > 0 && !(row.length === 1 && row[0] === "")) rows.push(row);
-  }
-  return rows;
-}
+import { parseCsv } from "./lib/csv";
+import { loadSpeakers } from "./lib/speaker-source";
 
 // -- csvLoader (unchanged) -------------------------------------------------
+
+/**
+ * Store keys carry a zero-padded row index so Astro's alphabetical
+ * `getCollection()` order matches source order, and so an entity appearing twice
+ * (a sponsor in two tiers) gets a unique key per row instead of overwriting
+ * itself. `getSlug()` in src/lib/speakers.ts strips the prefix, so every loader
+ * that feeds a slug-routed collection must use this exact shape.
+ */
+function indexedStoreId(index: number, naturalId: string): string {
+  return `${String(index).padStart(4, "0")}-${naturalId}`;
+}
 
 function csvLoader({ url, fallback, label }: { url?: string; fallback: string; label: string }): Loader {
   return {
@@ -70,13 +49,8 @@ function csvLoader({ url, fallback, label }: { url?: string; fallback: string; l
         keys.forEach((k, i) => { obj[k] = (row[i] ?? "").trim(); });
         const naturalId = obj.slug || obj.id;
         if (!naturalId) continue;
-        const storeKey = `${String(rowIndex).padStart(4, "0")}-${naturalId}`;
-        const data: Record<string, unknown> = { ...obj };
-        if ("keynote" in obj) {
-          const v = String(obj.keynote || "").toLowerCase();
-          data.keynote = v === "true" || v === "1" || v === "yes";
-        }
-        const parsed = await parseData({ id: storeKey, data });
+        const storeKey = indexedStoreId(rowIndex, naturalId);
+        const parsed = await parseData({ id: storeKey, data: { ...obj } });
         store.set({ id: storeKey, data: parsed });
       }
     },
@@ -93,7 +67,17 @@ const socialUrl = z.preprocess(
   (raw) => {
     if (typeof raw !== "string") return raw;
     const match = raw.match(/https?:\/\/\S+/);
-    return match ? match[0].replace(/[),.;]+$/, "") : undefined;
+    if (match) return match[0].replace(/[),.;]+$/, "");
+
+    // Speakers answer these questions in Pretalx by hand and routinely omit the
+    // scheme — "linkedin.com/in/ada", "github.com/ada". Requiring a full URL
+    // dropped those silently and the profile simply lost its link.
+    //
+    // A bare handle ("@ada") is deliberately NOT accepted: turning it into a URL
+    // needs a per-platform base, and guessing one would invent links that 404.
+    const value = raw.trim().replace(/[),.;]+$/, "");
+    if (/^[\w-]+(\.[\w-]+)+\/\S*$/.test(value)) return `https://${value}`;
+    return undefined;
   },
   z.string().url().optional(),
 );
@@ -102,6 +86,8 @@ const speakerSchema = z.object({
   slug: z.string(),
   name: z.string(),
   photo_url: z.string().optional(),
+  /** Committed portrait, used only when the Pretalx one cannot be read. */
+  photo_fallback: z.string().optional(),
   company: z.string().optional(),
   role: z.string().optional(),
   bio: z.string().optional(),
@@ -203,13 +189,25 @@ export { TEAM_GROUPS };
 
 // -- Per-year collection factories -----------------------------------------
 
+/**
+ * Speakers come from Pretalx, merged with the repo's slug map and keynote cast.
+ */
 function speakersCollection(year: Edition) {
   return defineCollection({
-    loader: csvLoader({
-      url: CSV_URLS.speakers[year],
-      fallback: `src/content/schedule/speakers-${year}.csv`,
-      label: `speakers-${year}.csv`,
-    }),
+    loader: {
+      name: `pretalx:speakers-${year}`,
+      load: async ({ store, parseData }: LoaderContext) => {
+        const records = await loadSpeakers(year);
+        store.clear();
+        for (let i = 0; i < records.length; i++) {
+          const id = indexedStoreId(i, records[i].slug);
+          // Spread into a plain record: parseData wants an index-signature type,
+          // and an interface has none.
+          const data = { ...records[i] } as Record<string, unknown>;
+          store.set({ id, data: await parseData({ id, data }) });
+        }
+      },
+    },
     schema: speakerSchema,
   });
 }

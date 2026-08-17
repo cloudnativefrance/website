@@ -1,14 +1,83 @@
 ---
 import { cn } from "@/lib/utils";
+import { getImage } from "astro:assets";
 
 interface Props {
   name: string;
   photo?: string;
+  /** Committed portrait, used only if the Pretalx one cannot be read. */
+  fallback?: string;
   size?: "sm" | "lg";
   class?: string;
 }
 
-const { name, photo, size = "sm", class: className } = Astro.props;
+const { name, photo, fallback, size = "sm", class: className } = Astro.props;
+
+/** 2x the CSS box, so the portrait stays sharp on a retina screen. */
+const RENDER_WIDTH = { sm: 128, lg: 256 };
+
+/**
+ * Astro's remote-size probe is not memoised, and each speaker is rendered on
+ * four pages (FR index, EN index, FR detail, EN detail). Without this the 2026
+ * build made 260 HTTP round-trips for 65 distinct avatars and a cold build —
+ * which is every CI and Docker build — cost about 74 seconds more than a warm
+ * one. Keyed by URL and width because the two sizes are different derivatives.
+ */
+// On `globalThis`, not a module-level const: Astro re-instantiates this
+// component's module per page, so a plain module scope gave 260 misses for 65
+// avatars — measured, not assumed. The build process is the natural lifetime.
+const optimised: Map<string, Promise<string>> = ((globalThis as Record<string, unknown>)
+  .__cndSpeakerPortraits ??= new Map<string, Promise<string>>()) as Map<string, Promise<string>>;
+function optimise(url: string, width: number): Promise<string> {
+  const key = `${width}|${url}`;
+  let pending = optimised.get(key);
+  if (!pending) {
+    // `inferSize` is required for a remote source: Astro cannot know the aspect
+    // ratio without reading the file, and without dimensions it declines to
+    // optimise and hands the original URL straight back — silently, which is
+    // how this first appeared to "work" while still emitting 65 hotlinks.
+    pending = getImage({ src: url, inferSize: true, width, format: "webp" }).then((r) => r.src);
+    optimised.set(key, pending);
+  }
+  return pending;
+}
+
+/**
+ * Portraits come from Pretalx as absolute URLs. Left alone they would be
+ * hotlinked: one cross-origin request per speaker on a page that shows 77 of
+ * them, unoptimised, and broken for visitors whenever Pretalx is down.
+ * `getImage()` downloads and re-encodes each one at build time into
+ * `/_astro/`, so the browser only ever talks to our own origin.
+ *
+ * The try/catch is the point. A remote fetch inside a build is exactly the
+ * dependency that made a Pretalx outage fatal once already, so a failure here
+ * must never fail the deploy.
+ *
+ * On failure it degrades to the COMMITTED portrait, and only to initials if
+ * there is none. Never to the original URL: this fires when the image could not
+ * be read — one 2026 avatar is a zero-byte file in Pretalx — so hotlinking it
+ * renders a broken-image icon where initials render fine, and it keeps "no
+ * portrait is ever hotlinked" a property the build can be tested against.
+ *
+ * The committed rung is load-bearing, not belt-and-braces. Without it a Pretalx
+ * avatar outage blanks 65 of 77 faces, exit 0, inside a release image built with
+ * PRETALX_TOKEN_REQUIRED=1 — the exact class of silent regression that flag
+ * exists to stop. Verified by stubbing 503 on /media/avatars/.
+ */
+let src = photo;
+if (photo && /^https?:\/\//.test(photo)) {
+  try {
+    src = await optimise(photo, RENDER_WIDTH[size]);
+  } catch (err) {
+    src = fallback || undefined;
+    const reason = err instanceof Error ? err.message : String(err);
+    console.warn(
+      `[speakers] ${name}: could not read the Pretalx portrait ${photo} (${reason}) — ` +
+        `${src ? "using the committed portrait" : "showing initials"}. ` +
+        `Re-upload the avatar in Pretalx.`,
+    );
+  }
+}
 
 const initials = name
   .split(" ")
@@ -29,10 +98,12 @@ const initialsSizeClasses = {
 ---
 
 {
-  photo ? (
+  src ? (
     <img
-      src={photo}
+      src={src}
       alt={name}
+      loading="lazy"
+      decoding="async"
       class={cn(
         sizeClasses[size],
         "object-cover",

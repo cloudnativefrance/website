@@ -2,6 +2,8 @@ node_modules/
 dist/
 .env
 .env.*
+# ...but the template is committed: it documents the variables and holds no values.
+!.env.example
 .claude.json
 .DS_Store
 .astro/

@@ -1,0 +1,319 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { readFileSync } from "node:fs";
+import {
+  toSessionRows,
+  durationToMinutes,
+  buildSpeakerResolver,
+  fetchScheduleExport,
+  type PretalxScheduleExport,
+  type PretalxTalk,
+} from "../pretalx";
+import { loadSessions, type SessionRow } from "../schedule";
+
+// Only the fetch layer is mocked — toSessionRows keeps its real implementation
+// by default (wrapped so individual tests can still override it with
+// mockReturnValueOnce), so `loadSessions`'s own wiring (which year/slug it
+// fetches with, and the status/id filter it applies to the result) is what
+// each test below actually exercises.
+vi.mock("../pretalx", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../pretalx")>();
+  return {
+    ...actual,
+    fetchScheduleExport: vi.fn(),
+    toSessionRows: vi.fn(actual.toSessionRows),
+  };
+});
+
+const doc = JSON.parse(
+  readFileSync("src/content/schedule/pretalx-2026.json", "utf8"),
+) as PretalxScheduleExport;
+
+// The real index is built from the speakers Sheet (Task 5). Here we only need a
+// resolver that is deterministic, so lowercase-hyphenate and assert on that.
+const resolve = (name: string) =>
+  name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+describe("toSessionRows", () => {
+  const rows = toSessionRows(doc, resolve);
+
+  it("returns every released talk", () => {
+    expect(rows).toHaveLength(51);
+  });
+
+  it("uses the Pretalx code as the session id, matching existing bookmarks", () => {
+    expect(rows.map((r) => r.id)).toContain("9H9WKR");
+    expect(rows.every((r) => /^[A-Z0-9]{6}$/.test(r.id))).toBe(true);
+  });
+
+  it("derives formats the way the Sheet was hand-classified", () => {
+    const count = (f: string) => rows.filter((r) => r.format === f).length;
+    expect(count("keynote")).toBe(1);
+    expect(count("talk")).toBe(29);
+    expect(count("lightning")).toBe(21);
+  });
+
+  it("classifies short sessions as lightning even when their type is not Éclair", () => {
+    const shorts = rows.filter((r) => r.durationMin <= 15);
+    expect(shorts).toHaveLength(21);
+    expect(shorts.every((r) => r.format === "lightning")).toBe(true);
+  });
+
+  it("converts HH:MM durations to minutes", () => {
+    const keynote = rows.find((r) => r.format === "keynote");
+    expect(keynote?.durationMin).toBe(75);
+    expect(rows.find((r) => r.id === "9H9WKR")?.durationMin).toBe(45);
+  });
+
+  it("preserves the ISO offset instead of shifting to the build machine's zone", () => {
+    const s = rows.find((r) => r.id === "9H9WKR");
+    expect(s?.startTime).toBe("2026-02-03T10:30:00+01:00");
+  });
+
+  it("carries the feedback URL the Sheet never had", () => {
+    expect(rows.every((r) => r.feedbackUrl.startsWith("https://"))).toBe(true);
+  });
+
+  it("carries the curated track colour", () => {
+    const s = rows.find((r) => r.id === "9H9WKR");
+    expect(s?.track).toBe("Infrastructure et opérations");
+    expect(s?.trackColor).toBe("#edbb45");
+  });
+
+  it("resolves speakers through the resolver, never raw names", () => {
+    const s = rows.find((r) => r.id === "9H9WKR");
+    expect(s?.speakers).toEqual(["nicolas-vermande"]);
+  });
+
+  it("absolutises relative attachment URLs", () => {
+    const withSlides = rows.filter((r) => r.slidesUrl);
+    expect(withSlides.length).toBeGreaterThanOrEqual(1);
+    expect(withSlides.every((r) => r.slidesUrl.startsWith("https://"))).toBe(true);
+  });
+
+  it("sorts by start time then room for a deterministic order", () => {
+    const starts = rows.map((r) => r.startTime);
+    expect([...starts].sort()).toEqual(starts);
+  });
+
+  it("marks every exported talk confirmed", () => {
+    expect(rows.every((r) => r.status === "confirmed")).toBe(true);
+  });
+
+  // The stand-in resolver above ignores its second argument, so nothing else
+  // in this file proves talk.code (not some other field) reaches the
+  // resolver. A swapped argument order would type-check and pass silently.
+  it("passes the talk's own code as the resolver's second argument", () => {
+    const withCode = toSessionRows(doc, (name, code) => `${name}@${code}`);
+    const s = withCode.find((r) => r.id === "9H9WKR");
+    expect(s?.speakers).toEqual(["Nicolas Vermande@9H9WKR"]);
+  });
+});
+
+describe("buildSpeakerResolver", () => {
+  const slugs = {
+    "Jérôme Petazzoni": "petazzoni",
+    "Nicolas Vermande": "vermande",
+  };
+
+  it("maps an exact Pretalx name to the committed slug", () => {
+    const resolve = buildSpeakerResolver(slugs);
+    expect(resolve("Jérôme Petazzoni", "GJ89TV")).toBe("petazzoni");
+    expect(resolve("Nicolas Vermande", "9H9WKR")).toBe("vermande");
+  });
+
+  it("throws with the name and talk code when a speaker is unknown", () => {
+    const resolve = buildSpeakerResolver(slugs);
+    // Emitting the raw name would render /intervenants/Someone%20New — a 404
+    // that looks like a working link. Fail the build instead.
+    expect(() => resolve("Someone New", "ABC123")).toThrow(/Someone New/);
+    expect(() => resolve("Someone New", "ABC123")).toThrow(/ABC123/);
+  });
+
+  it("points the reader at the file to edit", () => {
+    const resolve = buildSpeakerResolver(slugs);
+    expect(() => resolve("Someone New", "ABC123")).toThrow(/speaker-slugs\.ts/);
+  });
+
+  it("tolerates surrounding whitespace in the incoming name", () => {
+    const resolve = buildSpeakerResolver({ "Ada Lovelace": "a-b" });
+    expect(resolve("  Ada Lovelace ", "X")).toBe("a-b");
+  });
+});
+
+describe("slug map drift guard (committed files, offline)", () => {
+  // The sessions pipeline throws if a Pretalx person has no slug, so a drift
+  // between the committed export and the committed slug map hard-fails the
+  // whole build — not just one page. The old sessions CSV drifted 50-vs-51
+  // unnoticed, which is the failure mode this migration exists to end. Pure and
+  // offline, against exactly the files a real outage would fall back to.
+  it("resolves every person in the committed export from the committed slug map", () => {
+    const resolve = buildSpeakerResolver();
+    const personTalk = new Map<string, string>();
+    for (const day of doc.schedule.conference.days) {
+      for (const talks of Object.values(day.rooms)) {
+        for (const talk of talks) {
+          for (const p of talk.persons) personTalk.set(p.name, talk.code);
+        }
+      }
+    }
+    const unresolved: string[] = [];
+    for (const [name, code] of personTalk) {
+      try {
+        resolve(name, code);
+      } catch {
+        unresolved.push(name);
+      }
+    }
+    expect(unresolved).toEqual([]);
+  });
+});
+
+describe("durationToMinutes edge cases", () => {
+  it("throws on a malformed duration", () => {
+    expect(() => durationToMinutes("not-a-duration")).toThrow(/unparseable duration/);
+  });
+});
+
+describe("toSessionRows edge branches (hand-built talks, not the fixture)", () => {
+  const baseTalk: PretalxTalk = {
+    code: "ZZZZZZ",
+    title: "Edge case talk",
+    date: "2026-02-03T09:00:00+01:00",
+    duration: "00:20",
+    room: "Room A",
+    track: null,
+    type: "Conférence",
+    language: "fr",
+    abstract: null,
+    description: null,
+    logo: null,
+    url: "https://cfp.example/talk/ZZZZZZ",
+    persons: [{ code: "P1", name: "Edge Speaker" }],
+  };
+
+  function docWith(talk: PretalxTalk): PretalxScheduleExport {
+    return {
+      schedule: {
+        version: "1.0",
+        conference: {
+          title: "Test",
+          tracks: [],
+          days: [{ date: "2026-02-03", rooms: { "Room A": [talk] } }],
+        },
+      },
+    };
+  }
+
+  const resolve = (name: string) => name;
+
+  it("yields an empty track and undefined trackColor when track is null", () => {
+    const rows = toSessionRows(docWith(baseTalk), resolve);
+    expect(rows[0].track).toBe("");
+    expect(rows[0].trackColor).toBeUndefined();
+  });
+
+  it("yields empty slidesUrl and recordingUrl when links/attachments are absent", () => {
+    const rows = toSessionRows(docWith(baseTalk), resolve);
+    expect(rows[0].slidesUrl).toBe("");
+    expect(rows[0].recordingUrl).toBe("");
+  });
+
+  it("picks a YouTube link as the recordingUrl", () => {
+    const talk: PretalxTalk = {
+      ...baseTalk,
+      links: [{ title: "Watch it", url: "https://youtube.com/watch?v=abc123" }],
+    };
+    const rows = toSessionRows(docWith(talk), resolve);
+    expect(rows[0].recordingUrl).toBe("https://youtube.com/watch?v=abc123");
+  });
+});
+
+describe("loadSessions archive path", () => {
+  it("reads the frozen JSON for an edition with no Pretalx event", async () => {
+    const rows = await loadSessions(2023);
+    expect(rows).toHaveLength(6);
+    expect(rows[0].id).toBeTruthy();
+    expect(rows.every((r) => r.recordingUrl.startsWith("https://"))).toBe(true);
+  });
+
+  it("returns an empty array for an edition with no data at all", async () => {
+    await expect(loadSessions(2027)).resolves.toEqual([]);
+  });
+});
+
+describe("loadSessions live-fetch path (edition with a Pretalx event)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const emptyDoc: PretalxScheduleExport = {
+    schedule: {
+      version: "1.0",
+      conference: { title: "Test", tracks: [], days: [] },
+    },
+  };
+
+  function makeRow(overrides: Partial<SessionRow>): SessionRow {
+    return {
+      id: "AAAAAA",
+      title: "Some talk",
+      speakers: [],
+      track: "",
+      level: "",
+      room: "Room A",
+      format: "talk",
+      startTime: "2026-02-03T09:00:00+01:00",
+      durationMin: 30,
+      tags: [],
+      feedbackUrl: "",
+      slidesUrl: "",
+      recordingUrl: "",
+      coverImageUrl: "",
+      language: "",
+      status: "confirmed",
+      description: "",
+      ...overrides,
+    };
+  }
+
+  it("fetches the export and speaker resolver for the edition's slug and year", async () => {
+    vi.mocked(fetchScheduleExport).mockResolvedValue(emptyDoc);
+
+    await loadSessions(2026);
+
+    expect(fetchScheduleExport).toHaveBeenCalledWith(2026, "2026");
+  });
+
+  it("returns rows produced by the normalizer", async () => {
+    vi.mocked(fetchScheduleExport).mockResolvedValue(doc);
+
+    const rows = await loadSessions(2026);
+
+    expect(rows).toHaveLength(51);
+    expect(rows.map((r) => r.id)).toContain("9H9WKR");
+    // Resolved through the committed slug map, not a stand-in.
+    expect(rows.find((r) => r.id === "9H9WKR")?.speakers).toEqual(["vermande"]);
+  });
+
+  // toSessionRows itself hard-codes status "confirmed" on every row it emits, so
+  // it can never produce a hidden row — that filtering is loadSessions's own
+  // responsibility. Mock the normalizer's output directly so the assertion
+  // exercises loadSessions's real `.filter(...)`, not a pre-filtered stand-in.
+  it("filters out a hidden session and one with an empty id", async () => {
+    vi.mocked(fetchScheduleExport).mockResolvedValue(emptyDoc);
+    vi.mocked(toSessionRows).mockReturnValueOnce([
+      makeRow({ id: "VISIBLE", status: "confirmed" }),
+      makeRow({ id: "HIDDEN1", status: "hidden" }),
+      makeRow({ id: "", status: "confirmed" }),
+    ]);
+
+    const rows = await loadSessions(2026);
+
+    expect(rows.map((r) => r.id)).toEqual(["VISIBLE"]);
+  });
+});

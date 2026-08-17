@@ -1,0 +1,196 @@
+---
+// src/components/schedule/ScheduleGridView.astro
+import type { SessionRow } from "@/lib/schedule";
+import { listRooms } from "@/lib/schedule";
+import { buildTimeGrid, groupIntoSlots } from "@/lib/schedule-filter";
+import SessionCard from "./SessionCard.astro";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations, getLocalePath } from "@/i18n/utils";
+
+interface SpeakerInfo { name: string; company?: string }
+interface Props { sessions: SessionRow[]; lang: Locale; speakerInfo: Map<string, SpeakerInfo> }
+
+const { sessions, lang, speakerInfo } = Astro.props;
+const t = useTranslations(lang);
+const rooms = listRooms(sessions);
+const slots = groupIntoSlots(sessions);
+const grid = buildTimeGrid(sessions);
+
+// Row lines keyed by session id, so each card can be placed by its own start
+// and end rather than by the slot it happens to share a start time with.
+const rowsFor = new Map(grid.placements.map((p) => [p.session.id, p]));
+// Keyed by the full ISO start, not by the "HH:MM" label: two days of the same
+// edition would both hold a 09:00 and collide on the shorter key.
+const lineForStart = new Map(grid.placements.map((p) => [p.session.startTime, p.rowStart]));
+
+function linksFor(s: SessionRow) {
+  return s.speakers.map((ref) => {
+    const info = speakerInfo.get(ref);
+    return {
+      label: info?.name ?? ref,
+      company: info?.company,
+      href: info?.name ? getLocalePath(lang, `/speakers/${ref}`) : null,
+    };
+  });
+}
+
+/**
+ * The span a group of cards should occupy: earliest start to latest end.
+ *
+ * Every session here came from the same array `buildTimeGrid` was given, so
+ * `rowsFor` has a placement for each. Callers guarantee a non-empty list —
+ * `Math.min()` of nothing is Infinity.
+ */
+function spanOf(list: SessionRow[]): { start: number; end: number } {
+  const placed = list.map((s) => rowsFor.get(s.id)!);
+  return {
+    start: Math.min(...placed.map((p) => p.rowStart)),
+    end: Math.max(...placed.map((p) => p.rowEnd)),
+  };
+}
+---
+
+<div class="grid-view" style={`--room-count:${rooms.length};`}>
+  <div class="grid-view-head">
+    <div class="grid-view-gutter"></div>
+    {rooms.map((room) => <div class="grid-view-room">{room}</div>)}
+  </div>
+
+  <div class="grid-view-body" style={`--row-count:${grid.rowCount};`}>
+    {slots.map((slot) => {
+      const keynotes = slot.sessions.filter((s) => s.format === "keynote");
+      const others = slot.sessions.filter((s) => s.format !== "keynote");
+      const line = lineForStart.get(slot.startTime);
+      // A keynote occupies every room, so its cards share one full-width span.
+      const keynoteSpan = keynotes.length > 0 ? spanOf(keynotes) : null;
+      // `.grid-view-row` is `display: contents`, so these children are laid out
+      // by `.grid-view-body` directly while the wrapper stays as the single
+      // thing the filter code toggles `is-hidden` on (setting `display: none`
+      // on it removes the whole group). Keeping that element is what lets a card
+      // span rows without changing the JS contract.
+      return (
+        <div class="grid-view-row">
+          <div class="grid-view-gutter grid-view-time" style={`grid-row:${line};`}>
+            {slot.startTime.slice(11, 16)}
+          </div>
+          {keynoteSpan && (
+            <div
+              class="grid-view-span"
+              style={`grid-row:${keynoteSpan.start} / ${keynoteSpan.end};`}
+            >
+              {keynotes.map((s) => (
+                <SessionCard session={s} lang={lang} speakers={linksFor(s)} variant="grid" />
+              ))}
+            </div>
+          )}
+          {/* One cell per room that actually has a session starting here.
+              Empty cells are not emitted at all: with explicit placement they
+              would only add grid items that occupy a track for nothing. */}
+          {rooms.map((room, i) => {
+            const inRoom = others.filter((s) => s.room === room);
+            if (inRoom.length === 0) return null;
+            const { start, end } = spanOf(inRoom);
+            return (
+              <div
+                class="grid-view-cell"
+                style={`grid-column:${i + 2}; grid-row:${start} / ${end};`}
+              >
+                {inRoom.map((s) => (
+                  <SessionCard session={s} lang={lang} speakers={linksFor(s)} variant="grid" />
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      );
+    })}
+
+    {grid.gaps.map((gap) => (
+      <div class="grid-view-break" style={`grid-row:${gap.rowStart} / ${gap.rowEnd};`}>
+        <span>
+          {gap.minutes >= 40 ? t("schedule.break.lunch") : t("schedule.break.label")}
+          {" · "}
+          {gap.startTime} — {gap.endTime}
+        </span>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .grid-view { display: flex; flex-direction: column; gap: 10px; }
+  .grid-view-head,
+  .grid-view-body {
+    display: grid;
+    grid-template-columns: 56px repeat(var(--room-count), minmax(0, 1fr));
+    gap: 10px;
+  }
+  /* ONE grid for the whole day, not one per start time.
+     A card's height is its duration: it is placed from its own start line to
+     its own end line, so a 10:30–11:15 talk visibly runs past the 10:45 and
+     11:00 rows beside it. Stacking independent per-slot grids made that
+     impossible — every card in a slot stretched to the same height, so a
+     10-minute lightning talk looked as long as a 75-minute keynote and the
+     rows under a long talk sat empty in its own column.
+     Rows are content-sized rather than a fixed pixels-per-minute scale: at a
+     scale coarse enough to keep a 10-minute card readable this day would be
+     about 8550px, taller than the list view it is meant to beat. */
+  .grid-view-body { grid-template-rows: repeat(var(--row-count), auto); }
+  /* The wrapper contributes no box of its own — its children are the grid
+     items. It exists only so the filter code has one element per start-time
+     group to hide. */
+  .grid-view-row { display: contents; }
+  /* Sits below the sticky toolbar, not behind it: same offset at a lower
+     z-index meant the room labels were hidden the moment the page scrolled. */
+  .grid-view-head {
+    position: sticky;
+    top: calc(var(--schedule-header-h, 64px) + var(--schedule-toolbar-h, 0px));
+    z-index: 10; background: var(--color-background); padding: 8px 0;
+  }
+  .grid-view-room {
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+    text-align: center; color: var(--color-foreground);
+  }
+  .grid-view-gutter { min-width: 0; }
+  .grid-view-time {
+    grid-column: 1;
+    font-size: 12px; color: var(--color-muted-foreground);
+    font-variant-numeric: tabular-nums; padding-top: 12px;
+  }
+  .grid-view-cell { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  /* The cell stretches to its span's height, but a flex column never grows its
+     own child along the main axis on its own — without this a card would sit
+     top-aligned in a taller cell instead of filling it, which is what makes a
+     long session visibly reach its end time. `:global()` is required:
+     SessionCard.astro carries its own Astro style scope, so an unscoped
+     selector is the only way this rule can reach it.
+     Basis is `auto`, not `0`: with a `0` basis the flex algorithm ignores each
+     card's content height and splits the cell equally between children, which
+     is fine for one card but would force two stacked cards to identical
+     heights regardless of their own content. */
+  .grid-view-cell > :global(.session-card) { flex: 1 1 auto; }
+  /* Same column-flex-and-gap treatment as .grid-view-cell, so two keynote-format
+     sessions in one slot stack with a gap instead of as bare abutting blocks. */
+  .grid-view-span { display: flex; flex-direction: column; gap: 8px; grid-column: 2 / -1; }
+  .grid-view-break {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; gap: 12px;
+    font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--color-muted-foreground);
+  }
+  .grid-view-break::before,
+  .grid-view-break::after { content: ""; flex: 1; height: 1px; background: var(--color-border); }
+
+  .grid-view-row.is-hidden { display: none; }
+  /* Hiding every row leaves the 37 explicit row tracks and their 10px gaps
+     behind — 360px of void under a "no results" message, where the list view
+     collapses to nothing. schedule-ui.ts sets this when the visible count is 0. */
+  .grid-view.is-empty .grid-view-body { display: none; }
+  /* schedule-ui.ts toggles `is-hidden` on the break bands when a filter or
+     search is active; without this rule they stayed on screen, leaving orphan
+     "Pause déjeuner" separators above an empty result set. */
+  .grid-view-break.is-hidden { display: none; }
+
+  /* Below md the room columns are unusable, and the list view takes over. */
+  @media (max-width: 767px) { .grid-view { display: none; } }
+</style>
