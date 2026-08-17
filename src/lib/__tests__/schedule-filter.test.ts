@@ -165,17 +165,9 @@ describe("buildTimeGrid", () => {
     expect(later.rowStart).toBeLessThan(long.rowEnd);
   });
 
-  it("labels only the lines where something starts", () => {
-    const grid = buildTimeGrid([
-      row({ id: "A", startTime: "2026-02-03T10:30:00+01:00", durationMin: 10 }),
-      row({ id: "B", startTime: "2026-02-03T11:00:00+01:00", durationMin: 30, room: "Piaf" }),
-    ]);
-    // 10:40 is a boundary (A ends there) but nothing begins, so it gets no label.
-    expect(grid.labels.map((l) => l.label)).toEqual(["10:30", "11:00"]);
-  });
 
   it("is empty for no sessions", () => {
-    expect(buildTimeGrid([])).toEqual({ rowCount: 0, placements: [], labels: [], gaps: [] });
+    expect(buildTimeGrid([])).toEqual({ rowCount: 0, placements: [], gaps: [] });
   });
 
   it("reports a lunch-sized gap", () => {

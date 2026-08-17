@@ -117,8 +117,6 @@ export interface TimeGrid {
   /** Number of row tracks. Grid lines run 1 … rowCount + 1. */
   rowCount: number;
   placements: GridPlacement[];
-  /** Time labels for the gutter, at the lines where something starts. */
-  labels: { line: number; label: string }[];
   gaps: GridGap[];
 }
 
@@ -143,16 +141,12 @@ export interface TimeGrid {
  * two days that share a wall-clock time.
  */
 export function buildTimeGrid(sessions: SessionRow[], minGapMinutes = 20): TimeGrid {
-  if (sessions.length === 0) return { rowCount: 0, placements: [], labels: [], gaps: [] };
+  if (sessions.length === 0) return { rowCount: 0, placements: [], gaps: [] };
 
   const spans = sessions.map((session) => {
     const startsAt = new Date(session.startTime).getTime();
     return { session, startsAt, endsAt: startsAt + session.durationMin * 60_000 };
   });
-
-  // Sorted once and used twice below: the labels come out in line order, and
-  // the first element is the earliest session, which the gap labels offset from.
-  const byStart = [...spans].sort((a, b) => a.startsAt - b.startsAt);
 
   const boundaries = [...new Set(spans.flatMap((s) => [s.startsAt, s.endsAt]))].sort(
     (a, b) => a - b,
@@ -168,23 +162,11 @@ export function buildTimeGrid(sessions: SessionRow[], minGapMinutes = 20): TimeG
     rowEnd: lineOf.get(endsAt)!,
   }));
 
-  // Only start times get a label. An end-only boundary — a lightning talk
-  // finishing at 10:40 with nothing beginning there — would just be clutter,
-  // and it is the one boundary kind with no ISO string to read the time off.
-  const labels: { line: number; label: string }[] = [];
-  const seen = new Set<number>();
-  for (const { session, startsAt } of byStart) {
-    const line = lineOf.get(startsAt)!;
-    if (seen.has(line)) continue;
-    seen.add(line);
-    labels.push({ line, label: session.startTime.slice(11, 16) });
-  }
-
   // Wall-clock labels are derived by offsetting from a session whose ISO string
   // we can read, never by formatting an epoch — `new Date(ms).getHours()` would
   // render the event in the BUILD MACHINE's timezone, so a UTC runner would
   // print an 12:10 break as 11:10.
-  const reference = byStart[0];
+  const reference = spans.reduce((a, b) => (a.startsAt <= b.startsAt ? a : b));
   const refMinutes = minutesOf(reference.session.startTime);
   const labelAt = (epoch: number) =>
     hhmm(refMinutes + Math.round((epoch - reference.startsAt) / 60_000));
@@ -213,7 +195,7 @@ export function buildTimeGrid(sessions: SessionRow[], minGapMinutes = 20): TimeG
     }
   }
 
-  return { rowCount, placements, labels, gaps };
+  return { rowCount, placements, gaps };
 }
 
 /** Minutes past midnight, read from the ISO string without timezone maths. */
