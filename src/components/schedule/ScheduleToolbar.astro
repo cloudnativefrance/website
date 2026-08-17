@@ -18,7 +18,7 @@ const levels = listLevels(sessions);
 <div class="toolbar" data-default-view={defaultView}>
   <div class="toolbar-main">
     <div class="toolbar-search">
-      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
       <input
         type="search"
         id="schedule-search"
@@ -140,9 +140,29 @@ const levels = listLevels(sessions);
     border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-card);
     font-size: 13px; font-weight: 600; color: var(--color-foreground); cursor: pointer;
   }
+  /* Tactile press feedback. `scale` only, never `transition: all` — that would
+     also animate the colour and border changes these controls need instant. */
+  .toolbar-btn,
+  .schedule-filter,
+  .toolbar-views button {
+    transition-property: scale;
+    transition-duration: 120ms;
+    transition-timing-function: ease-out;
+  }
+  .toolbar-btn:active,
+  .schedule-filter:active,
+  .toolbar-views button:active { scale: 0.96; }
+  @media (prefers-reduced-motion: reduce) {
+    .toolbar-btn, .schedule-filter, .toolbar-views button { transition-duration: 0s; }
+    .toolbar-btn:active, .schedule-filter:active, .toolbar-views button:active { scale: 1; }
+  }
   .toolbar-badge {
     background: color-mix(in oklch, var(--color-primary) 20%, transparent);
     color: var(--color-primary); border-radius: 999px; font-size: 11px; font-weight: 700; padding: 1px 7px;
+    /* Counts up and down as the visitor filters or bookmarks. Proportional
+       digits make the badge jitter on every change — exactly when the eye is
+       on it. */
+    font-variant-numeric: tabular-nums;
   }
 
   .toolbar-filters { margin-top: 8px; }
@@ -163,7 +183,11 @@ const levels = listLevels(sessions);
   }
   .schedule-filter.is-active { background: var(--color-primary); color: var(--color-primary-foreground); border-color: var(--color-primary); }
   .toolbar-clear { align-self: flex-start; background: none; border: 0; padding: 0; font-size: 12.5px; text-decoration: underline; color: var(--color-muted-foreground); cursor: pointer; }
-  .toolbar-count { font-size: 12.5px; color: var(--color-muted-foreground); margin: 8px 0 0; }
+  .toolbar-count {
+    font-size: 12.5px; color: var(--color-muted-foreground); margin: 8px 0 0;
+    /* "51 sessions sur 51" rewrites on every keystroke in the search box. */
+    font-variant-numeric: tabular-nums;
+  }
 
   /* On mobile the facets collapse behind the summary — the old bar cost eight
      stacked rows, roughly 1100px, before the first talk. */

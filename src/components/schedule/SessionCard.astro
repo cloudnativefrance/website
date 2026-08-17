@@ -123,11 +123,40 @@ const pill = pillColors(session.trackColor);
      header in the grid, so the card carries it itself only where there are no
      columns to label it. */
   .session-card-room { font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
-  .session-card-bookmark { color: var(--color-muted-foreground); background: none; border: 0; cursor: pointer; padding: 2px; }
+  .session-card-bookmark {
+    color: var(--color-muted-foreground); background: none; border: 0; cursor: pointer;
+    padding: 2px;
+    /* The visible glyph stays 18x18 so the header row keeps its height — card
+       heights are duration-driven now, and growing this to a real 44px box
+       would inflate every row in the grid. */
+    position: relative;
+  }
+  /* Hit area, not decoration: 2px of padding around a 14px icon gave an 18x18
+     target, below the 24x24 WCAG 2.5.8 minimum and far below the 44x44 that a
+     thumb needs. It sits inside the card's own click region, so a near-miss did
+     not just fail — it opened the modal instead. The card's click handler bails
+     on `closest("[data-bookmark]")`, and a click on this pseudo-element targets
+     the button, so the enlarged area bookmarks correctly. */
+  .session-card-bookmark::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 44px; height: 44px;
+    transform: translate(-50%, -50%);
+  }
   .session-card-bookmark.is-on svg { fill: currentColor; color: var(--color-primary); }
+  .session-card-bookmark { transition: scale 120ms ease-out; }
+  .session-card-bookmark:active { scale: 0.96; }
+  @media (prefers-reduced-motion: reduce) {
+    .session-card-bookmark { transition-duration: 0s; }
+    .session-card-bookmark:active { scale: 1; }
+  }
 
   .session-card-title {
     font-size: 14px; font-weight: 600; line-height: 1.35; margin: 0;
+    /* Clamped to 3 lines, so a one-word last line wastes a third of the budget.
+       `pretty` pulls a word down instead of leaving an orphan. */
+    text-wrap: pretty;
     /* Clamp with a real ellipsis — the old grid cut titles mid-word. */
     display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
     overflow: hidden;
