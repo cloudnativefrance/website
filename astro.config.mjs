@@ -21,6 +21,14 @@ export default defineConfig({
     "/programme":    "/programme/2026",
     "/sponsors":     "/sponsors/2026",
     "/speakers":     "/speakers/2026",
+    // The FR slugs need their own entries: nginx rewrites /sponsors ->
+    // /partenaires and /speakers -> /intervenants before Astro's redirects
+    // above ever run, and with no year in the path that lands on a bare
+    // /partenaires or /intervenants, which the build does not emit. Both were
+    // a 404 on production — /speakers has been a dead link, first behind a
+    // wrong port and then behind a missing page.
+    "/partenaires":  "/partenaires/2026",
+    "/intervenants": "/intervenants/2026",
     "/en/programme": "/en/programme/2026",
     "/en/sponsors":  "/en/sponsors/2026",
     "/en/speakers":  "/en/speakers/2026",
