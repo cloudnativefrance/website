@@ -311,9 +311,25 @@ describe("build-image.yml FLAG_OVERRIDES", () => {
   });
 
   it("keeps the token a secret rather than a build-arg", () => {
-    // Regression guard: build-args land in image history. Adding FLAG_OVERRIDES
-    // next to PUBLIC_SITE_URL must not tempt anyone to move the token there too.
-    expect(WORKFLOW).not.toMatch(/build-args:[\s\S]*pretalx_token/);
+    // Regression guard: build-args land in image history, readable by anyone who
+    // can pull the image. Adding FLAG_OVERRIDES next to PUBLIC_SITE_URL must not
+    // tempt anyone to move the token there too.
+    //
+    // Scoped to the build-args block by indentation rather than by regexing the
+    // whole file: `secrets: pretalx_token=` legitimately appears later on, so a
+    // `[\s\S]*` scan would match it and the assertion could never pass.
+    const lines = WORKFLOW.split("\n");
+    const start = lines.findIndex((l) => l.trim().startsWith("build-args:"));
+    expect(start).toBeGreaterThan(-1);
+    const indent = lines[start].search(/\S/);
+    const block: string[] = [];
+    for (const line of lines.slice(start + 1)) {
+      if (line.trim() && line.search(/\S/) <= indent) break;
+      block.push(line);
+    }
+    expect(block.join("\n")).toContain("FLAG_OVERRIDES=");
+    expect(block.join("\n")).not.toContain("pretalx_token");
+    expect(WORKFLOW).toMatch(/secrets:\s*\|\s*\n\s*pretalx_token=/);
   });
 });
 ```
