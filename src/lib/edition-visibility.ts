@@ -1,9 +1,14 @@
 /**
  * May an edition's data be fetched, and may its pages be shown?
  *
- * One question, one answer, one function — used by the data layer
- * (`loadSessions`, `loadSpeakers`) and by every route gate. Splitting it in two
- * is how "the page is hidden but the data is published" happens.
+ * One question, one answer, one function — consulted by every route that can
+ * reach a preview edition, deciding both whether to fetch and whether to
+ * render from the same call. The data layer (`loadSessions`, `loadSpeakers`)
+ * does not call it yet; wiring the two together so a route can no longer
+ * forget the gate is deliberately deferred to a later PR. Until then, a route
+ * that omits the check is how "the page is hidden but the data is published"
+ * would happen — which is exactly what the route-gate tests under
+ * `tests/build/` exist to catch.
  *
  * This lives here rather than in `editions.ts` because it needs `PRETALX_EVENT`,
  * which transitively pulls in `node:fs` via `remote-fetch.ts`. `editions.ts` is
