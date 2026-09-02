@@ -109,6 +109,13 @@ describe("parseFlagOverrides", () => {
       /programme/,
     );
   });
+
+  it.each(["constructor", "toString", "hasOwnProperty", "valueOf", "__proto__"])(
+    "throws on the Object.prototype member %s rather than accepting it",
+    (name) => {
+      expect(() => parseFlagOverrides(`${name}=on`)).toThrow(new RegExp(name));
+    },
+  );
 });
 
 describe("readEnvOverride", () => {

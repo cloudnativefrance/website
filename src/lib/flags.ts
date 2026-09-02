@@ -66,7 +66,7 @@ export function parseFlagOverrides(raw: string): Map<FlagName, "on" | "off"> {
     }
     const name = entry.slice(0, eq).trim();
     const value = entry.slice(eq + 1).trim();
-    if (!(name in FLAGS)) {
+    if (!Object.hasOwn(FLAGS, name)) {
       throw new Error(
         `[flags] FLAG_OVERRIDES names unknown flag "${name}". Known flags: ${Object.keys(FLAGS).join(", ")}`,
       );
