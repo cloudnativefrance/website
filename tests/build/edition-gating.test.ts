@@ -95,3 +95,22 @@ describe.each(SPEAKER_DETAIL_ROUTES)("%s", (rel) => {
     expect(source).toMatch(/if\s*\(!isEditionLoadable\(year\)\)\s*continue;/);
   });
 });
+
+describe("src/pages/programme.ics.ts", () => {
+  const source = read("src/pages/programme.ics.ts");
+
+  it("names the edition it serves instead of defaulting implicitly", () => {
+    expect(source).toMatch(/loadSessions\(year\)/);
+    expect(source).not.toMatch(/loadSessions\(\)/);
+  });
+
+  it("refuses to serve a non-loadable edition", () => {
+    expect(source).toContain("isEditionLoadable");
+    expect(source).toMatch(/throw new Error/);
+  });
+
+  it("derives the filename from that edition rather than hardcoding a year", () => {
+    expect(source).toMatch(/cnd-france-\$\{year\}\.ics/);
+    expect(source).not.toContain("cnd-france-2027.ics");
+  });
+});
