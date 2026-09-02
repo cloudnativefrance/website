@@ -273,15 +273,37 @@ Recorded here because it is a live trap. Today's programme gate is `year > CURRE
 production** — the exact outcome this spec exists to prevent, caused by an edit that looks
 like routine housekeeping.
 
-Two defences, because the consequence is severe:
+Three defences, because the consequence is severe:
 
 1. `CURRENT_EDITION` stays 2026. It moves to 2027 as part of the launch, after the reveal.
 2. `isEditionLoadable` (D-3) checks `access === "preview"` **before** it consults
-   `CURRENT_EDITION`, so a 2027 marked `preview` stays hidden regardless of what
-   `CURRENT_EDITION` says. The arithmetic branch survives only for editions with no Pretalx
-   entry, where it is still the right rule.
+   `CURRENT_EDITION`, so an edition explicitly marked `preview` stays hidden regardless of
+   what `CURRENT_EDITION` says.
+3. A guard test (`src/lib/__tests__/edition-visibility.test.ts`) asserts that **every edition
+   `<= CURRENT_EDITION` has public data** — a `PRETALX_EVENT` entry with `access: "public"`,
+   or a populated frozen archive at `src/content/schedule/sessions-<year>.json`. Bumping
+   `CURRENT_EDITION` to an edition that has neither fails the test with an explanation.
 
-Defence 2 is what makes defence 1 a preference rather than a landmine.
+Defence 2 is narrower than it first appears, and defence 3 exists because of that. It only
+covers editions explicitly marked `preview`. An edition that is `public` in Pretalx — or has
+no `PRETALX_EVENT` entry at all, which is 2027's state today — falls through to the
+arithmetic and becomes loadable the instant `CURRENT_EDITION` reaches it:
+
+| `access` | `year` | `CURRENT_EDITION` | flag | loadable |
+|---|---|---|---|---|
+| `preview` | 2027 | 2027 | off | **false** — defence 2 holds |
+| `public` | 2027 | 2027 | off | **true** — defence 2 does not apply |
+| *unset* | 2027 | 2027 | off | **true** — 2027's shape today |
+
+The arithmetic is not a bug to be fixed. Making the flag authoritative for
+`year >= currentEdition` would gate the *current* edition too, so `/programme/2026` — a past
+event whose archive is legitimately public — would render "coming soon" until the flag opens
+on 2027-04-01. Past and current editions are public history; that is the right rule.
+
+So the correct reading is: **defence 2 makes the bump safe for a `preview` edition;
+defence 3 makes it loud for every other one.** Defence 1 — `CURRENT_EDITION` stays 2026 until
+after the reveal — remains the actual policy, now with a failing test behind it rather than a
+comment.
 
 ### D-6 — `FLAG_*` as a build-arg
 
