@@ -202,8 +202,11 @@ The format is `name=on,name2=off`, parsed by `parseFlagOverrides()` in
 `src/lib/flags.ts`; an unknown flag name, a value other than `on`/`off`, or the
 same name listed twice all throw and fail the build rather than being ignored.
 A per-flag `FLAG_<NAME>` variable (e.g. `.env.local` in development) still
-takes precedence over `FLAG_OVERRIDES` when both are set — see
-`readEnvOverride()` in `src/lib/flags.ts`.
+takes precedence over `FLAG_OVERRIDES` when both are set — but only when its
+value is exactly `on` or `off`. Anything else (`FLAG_PROGRAMME=true`, a typo,
+an empty string) is not recognised as a direct override and silently falls
+through to `FLAG_OVERRIDES` instead of erroring — see `readEnvOverride()` in
+`src/lib/flags.ts`.
 
 **Emergency kill switch** — hide a page immediately without editing dates:
 ```bash
