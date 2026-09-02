@@ -24,11 +24,21 @@ import { PRETALX_EVENT, type EditionAccess } from "./pretalx";
  * The rule, as a pure function of its four inputs, so the whole truth table is
  * testable without mocking a module registry or a clock.
  *
- * Order matters. `access === "preview"` is checked FIRST, before the
- * `year > currentEdition` arithmetic. Otherwise moving `CURRENT_EDITION` to
- * 2027 — an edit that looks like routine housekeeping at launch time — would
- * make the arithmetic branch return true and un-hide the entire unannounced
- * programme in production.
+ * Order matters, but only so far. `access === "preview"` is checked FIRST, so
+ * an edition explicitly marked `preview` stays hidden no matter where
+ * `CURRENT_EDITION` points — moving `CURRENT_EDITION` to a preview edition is
+ * safe *for that edition*.
+ *
+ * That is the whole of the protection, and it is narrower than it looks. An
+ * edition that is `public` in Pretalx, or has no `PRETALX_EVENT` entry at all
+ * (2027 today), falls through to the arithmetic and becomes loadable the
+ * instant `CURRENT_EDITION` reaches it. The arithmetic is not wrong — past and
+ * current editions are public history and must render without a flag, which is
+ * why the flag cannot be made authoritative for `year >= currentEdition`
+ * without hiding `/programme/2026` after the 2027 bump. So the dangerous edit
+ * is caught elsewhere instead: `edition-visibility.test.ts` asserts that every
+ * edition `<= CURRENT_EDITION` actually has public data, which turns a
+ * premature bump into a failing test rather than a published programme.
  *
  * `year` and `currentEdition` are plain numbers, not `Edition`: this is a year
  * comparison, and the "unmapped future edition" branch exists exactly for years
