@@ -23,7 +23,7 @@ export const GET: APIRoute = async () => {
 
   const all = await loadSessions(year);
   const sessions = all.filter((s) => s.status !== "cancelled");
-  return new Response(buildIcs(sessions), {
+  return new Response(buildIcs(sessions, year), {
     status: 200,
     headers: {
       "Content-Type": "text/calendar; charset=utf-8",

@@ -211,12 +211,18 @@ export function sessionToIcs(session: SessionRow): string {
   ].join("\r\n");
 }
 
-/** Wrap VEVENTs in a VCALENDAR envelope. */
-export function buildIcs(sessions: SessionRow[]): string {
+/**
+ * Wrap VEVENTs in a VCALENDAR envelope for the given edition.
+ *
+ * `year` names the PRODID rather than being inferred from `sessions` — an
+ * empty schedule (no sessions yet) must still stamp its own edition, not
+ * silently fall back to whichever year last shipped.
+ */
+export function buildIcs(sessions: SessionRow[], year: Edition): string {
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Cloud Native Days France 2027//Schedule//FR",
+    `PRODID:-//Cloud Native Days France ${year}//Schedule//FR`,
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     ...sessions.map(sessionToIcs),
