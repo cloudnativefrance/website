@@ -83,3 +83,29 @@ describe("non-route consumers of an edition's data", () => {
     expect(read(entry.file), entry.why).toMatch(LOADER_CALL_RE);
   });
 });
+
+describe("scripts/sync-pretalx.ts cannot commit a non-public programme", () => {
+  const source = read("scripts/sync-pretalx.ts");
+
+  // The snapshot it writes is a committed file in a public repository, so this
+  // script is a leak path that no route gate covers. A source-shape guard is
+  // the honest test here: the script is a top-level-await module whose import
+  // *is* its execution (it fetches, writes and process.exit()s), so importing
+  // it to exercise the loop would run the real thing.
+  it("skips any edition that is not access: \"public\"", () => {
+    expect(source).toMatch(/event\.access\s*!==\s*"public"/);
+  });
+
+  it("makes that decision before it writes anything", () => {
+    const guard = source.search(/event\.access\s*!==\s*"public"/);
+    const write = source.indexOf("writeFileSync(out");
+    expect(guard).toBeGreaterThan(-1);
+    expect(write).toBeGreaterThan(-1);
+    expect(
+      guard,
+      "the access check must precede writeFileSync — a snapshot written first " +
+        "and skipped afterwards is still a published programme",
+    ).toBeLessThan(write);
+  });
+});
+
