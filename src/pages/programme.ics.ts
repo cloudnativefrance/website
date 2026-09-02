@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { buildIcs, loadSessions } from "@/lib/schedule";
 import { CURRENT_EDITION } from "@/lib/editions";
-import { isEditionLoadable } from "@/lib/edition-visibility";
+import { assertEditionPublishable } from "@/lib/edition-visibility";
 
 /**
  * The calendar feed serves one edition: the current one.
@@ -14,12 +14,7 @@ import { isEditionLoadable } from "@/lib/edition-visibility";
  */
 export const GET: APIRoute = async () => {
   const year = CURRENT_EDITION;
-  if (!isEditionLoadable(year)) {
-    throw new Error(
-      `[programme.ics] refusing to serve edition ${year}: it is not publicly ` +
-        `loadable. This feed has no coming-soon state — pin it to a public edition.`,
-    );
-  }
+  assertEditionPublishable(year, "programme.ics");
 
   const all = await loadSessions(year);
   const sessions = all.filter((s) => s.status !== "cancelled");

@@ -47,8 +47,10 @@ describe("preview editions are unreachable in a production build", () => {
     expect(resolveEditionLoadable("preview", 2027, 2026, true)).toBe(true);
   });
 
+  // `assertEditionPublishable` is the shared rule too: it is a thin throwing
+  // wrapper over `isEditionLoadable`, for the routes with no coming-soon state.
   it.each(GUARDED_ROUTES)("%s consults the shared rule", (rel) => {
-    expect(read(rel)).toContain("isEditionLoadable");
+    expect(read(rel)).toMatch(/isEditionLoadable|assertEditionPublishable/);
   });
 
   it.each(GUARDED_ROUTES)("%s imports it from the one module", (rel) => {

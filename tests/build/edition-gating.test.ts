@@ -151,8 +151,8 @@ describe("src/pages/programme.ics.ts", () => {
   });
 
   it("refuses to serve a non-loadable edition", () => {
-    expect(source).toContain("isEditionLoadable");
-    expect(source).toMatch(/throw new Error/);
+    expect(source).toMatch(/assertEditionPublishable\(\s*year\s*,/);
+    expect(source).toContain("@/lib/edition-visibility");
   });
 
   it("derives the filename from that edition rather than hardcoding a year", () => {
@@ -169,8 +169,8 @@ const REPLAYS_ROUTES = [
 describe.each(REPLAYS_ROUTES)("%s", (rel) => {
   const source = read(rel);
 
-  it("imports isEditionLoadable", () => {
-    expect(source).toContain("isEditionLoadable");
+  it("imports the shared gate", () => {
+    expect(source).toContain("assertEditionPublishable");
     expect(source).toContain("@/lib/edition-visibility");
   });
 
@@ -179,8 +179,10 @@ describe.each(REPLAYS_ROUTES)("%s", (rel) => {
     expect(source).not.toMatch(/loadSessions\(\)/);
   });
 
-  it("refuses to serve a non-loadable edition", () => {
-    expect(source).toMatch(/throw new Error/);
+  it("refuses to serve a non-loadable edition, naming itself", () => {
+    // The label is what tells the build log which page refused — three call
+    // sites share one assertion, so a bare "[replays]" would be ambiguous.
+    expect(source).toMatch(/assertEditionPublishable\(\s*year\s*,\s*"[^"]+"\s*\)/);
   });
 });
 

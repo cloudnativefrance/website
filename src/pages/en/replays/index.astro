@@ -8,22 +8,17 @@ import {
 } from "@/i18n/utils";
 import { loadSessions, type SessionRow } from "@/lib/schedule";
 import { CURRENT_EDITION } from "@/lib/editions";
-import { isEditionLoadable } from "@/lib/edition-visibility";
+import { assertEditionPublishable } from "@/lib/edition-visibility";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
 // This page has no coming-soon state of its own: it serves the current
-// edition's recordings, or an empty state if there are none yet. Refusing
-// to serve a non-loadable edition here mirrors the same guard on the ICS
-// feed (src/pages/programme.ics.ts) rather than silently defaulting to it.
+// edition's recordings, or an empty state if there are none yet. It refuses a
+// non-loadable edition through the same shared assertion as the ICS feed
+// (src/pages/programme.ics.ts) rather than silently defaulting to it.
 const year = CURRENT_EDITION;
-if (!isEditionLoadable(year)) {
-  throw new Error(
-    `[replays] refusing to serve edition ${year}: it is not publicly ` +
-      `loadable. This page has no coming-soon state — pin it to a public edition.`,
-  );
-}
+assertEditionPublishable(year, "replays (en)");
 
 const all = await loadSessions(year);
 const withRecordings = all.filter((s) => s.recordingUrl !== "");

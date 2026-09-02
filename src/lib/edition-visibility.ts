@@ -52,11 +52,30 @@ export function resolveEditionLoadable(
 }
 
 /** Whether `year`'s sessions and speakers may be loaded and rendered. */
-export function isEditionLoadable(year: Edition, now?: Date): boolean {
+export function isEditionLoadable(year: Edition): boolean {
   return resolveEditionLoadable(
     PRETALX_EVENT[year]?.access,
     year,
     CURRENT_EDITION,
-    isFlagActive("programme", now),
+    isFlagActive("programme"),
+  );
+}
+
+/**
+ * Fail the build rather than serve an edition that may not be published.
+ *
+ * For the routes with no coming-soon state — a static build cannot serve a 404,
+ * and an ICS feed or a replays page has nothing sensible to render instead. They
+ * assert instead of branching, so a future edit ("point this at next year")
+ * turns into a red build rather than a silent leak of an unannounced schedule.
+ *
+ * `label` names the feed or page that refused, so the build log says *which*
+ * route needs re-pinning without a stack trace read.
+ */
+export function assertEditionPublishable(year: Edition, label: string): void {
+  if (isEditionLoadable(year)) return;
+  throw new Error(
+    `[${label}] refusing to serve edition ${year}: it is not publicly ` +
+      `loadable. ${label} has no coming-soon state — pin it to a public edition.`,
   );
 }
