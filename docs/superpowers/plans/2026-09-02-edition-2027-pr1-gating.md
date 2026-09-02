@@ -507,8 +507,11 @@ import { PRETALX_EVENT, type EditionAccess } from "./pretalx";
  */
 export function resolveEditionLoadable(
   access: EditionAccess | undefined,
-  year: Edition,
-  currentEdition: Edition,
+  // Plain numbers, not `Edition`: this is a year comparison, and the
+  // "unmapped future edition" branch exists exactly for years that are not
+  // yet in the `Edition` union. `isEditionLoadable` is the typed entry point.
+  year: number,
+  currentEdition: number,
   flagActive: boolean,
 ): boolean {
   if (access === "preview") return flagActive;
