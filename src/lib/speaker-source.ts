@@ -90,12 +90,12 @@ function photoFor(slug: string, avatar: string | null | undefined): string {
 }
 
 export async function loadSpeakers(year: Edition): Promise<SpeakerRecord[]> {
-  const eventSlug = PRETALX_EVENT[year];
-  if (!eventSlug) return loadArchivedSpeakers(year);
+  const event = PRETALX_EVENT[year];
+  if (!event) return loadArchivedSpeakers(year);
 
-  const doc = await fetchScheduleExport(year, eventSlug);
+  const doc = await fetchScheduleExport(year, event.slug);
   const people = peopleInSchedule(doc);
-  const enrichment = await loadSpeakerEnrichment(year, eventSlug, new Set(people.keys()));
+  const enrichment = await loadSpeakerEnrichment(year, event.slug, new Set(people.keys()));
 
   const records: SpeakerRecord[] = [];
   const unmapped: string[] = [];

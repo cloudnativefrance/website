@@ -14,12 +14,30 @@ export const PRETALX_BASE =
   process.env.PRETALX_BASE_URL || "https://cfp.cloudnativedays.fr";
 
 /**
- * Editions whose Pretalx event is public. 2023 predates the instance; 2027 is
- * added here the day its event goes public — until then the fetch would 404 on
- * every build, so it is deliberately absent rather than mapped and failing.
+ * How an edition's Pretalx event may be read.
+ *
+ *   "public"  — the event's released schedule is served anonymously at
+ *               /<slug>/schedule/export/schedule.json.
+ *   "preview" — the event is not public. Its schedule is readable only through
+ *               the authenticated REST API, and only in a build where the
+ *               `programme` flag is active (see src/lib/edition-visibility.ts).
+ *
+ * This single word decides the fetch path, whether the edition may be loaded in
+ * a production build at all, and which event /cfp links submitters to. Flipping
+ * "preview" to "public" moves all three together.
  */
-export const PRETALX_EVENT: Partial<Record<Edition, string>> = {
-  2026: "2026",
+export type EditionAccess = "public" | "preview";
+
+/**
+ * Editions with a Pretalx event. 2023 predates the instance and reads a frozen
+ * archive. 2027 is added here — as `preview` — once its event exists; until
+ * then the fetch would 404 on every build, so it is deliberately absent rather
+ * than mapped and failing.
+ */
+export const PRETALX_EVENT: Partial<
+  Record<Edition, { slug: string; access: EditionAccess }>
+> = {
+  2026: { slug: "2026", access: "public" },
 };
 
 export function scheduleExportUrl(slug: string): string {

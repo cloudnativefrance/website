@@ -62,17 +62,17 @@ export interface SessionRow {
 export async function loadSessions(
   year: Edition = CURRENT_EDITION,
 ): Promise<SessionRow[]> {
-  const slug = PRETALX_EVENT[year];
+  const event = PRETALX_EVENT[year];
   let rows: SessionRow[];
-  if (slug) {
-    const doc = await fetchScheduleExport(year, slug);
+  if (event) {
+    const doc = await fetchScheduleExport(year, event.slug);
     // Pure lookup against the committed slug map — no I/O, so nothing to await.
     const resolveSpeaker = buildSpeakerResolver();
     // The released export is the allowlist: levels are looked up only for talks
     // it already contains, so an unannounced submission cannot reach the site
     // through the authenticated answers endpoint.
     const scheduled = new Set(collectTalkCodes(doc));
-    const levels = await loadLevelAnswers(year, slug, scheduled);
+    const levels = await loadLevelAnswers(year, event.slug, scheduled);
     rows = toSessionRows(doc, resolveSpeaker, levels);
   } else {
     rows = loadArchivedSessions(year);

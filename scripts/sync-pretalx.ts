@@ -30,9 +30,9 @@ const allowShrink = process.argv.includes("--allow-shrink");
 
 let failed = false;
 
-for (const [yearStr, slug] of Object.entries(PRETALX_EVENT)) {
+for (const [yearStr, event] of Object.entries(PRETALX_EVENT)) {
   const year = Number(yearStr) as Edition;
-  const url = scheduleExportUrl(slug as string);
+  const url = scheduleExportUrl(event.slug);
   const out = `src/content/schedule/pretalx-${year}.json`;
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(30000) });
