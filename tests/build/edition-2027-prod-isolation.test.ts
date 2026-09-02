@@ -30,6 +30,8 @@ const GUARDED_ROUTES = [
   "src/pages/intervenants/[slug].astro",
   "src/pages/en/speakers/[slug].astro",
   "src/pages/programme.ics.ts",
+  "src/pages/replays/index.astro",
+  "src/pages/en/replays/index.astro",
 ];
 
 describe("preview editions are unreachable in a production build", () => {
