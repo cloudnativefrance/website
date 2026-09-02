@@ -189,9 +189,21 @@ Flags resolve from `process.env` at **build** time (`src/lib/flags.ts`), and the
 shipped artifact is a static nginx image — a Kubernetes-level env var on the
 running pod cannot change it. The override must be present when the *image*
 is built, e.g. as a `--build-arg` threaded through to `ENV` before `pnpm run
-build`, the same pattern this repo now uses for `PUBLIC_SITE_URL` (see the
-`Dockerfile` and `.github/workflows/build-image.yml`). `FLAG_*` does not use
-that pattern yet — wiring it up is a separate, not-yet-made decision.
+build`, the same pattern this repo uses for `PUBLIC_SITE_URL` (see the
+`Dockerfile` and `.github/workflows/build-image.yml`).
+
+`FLAG_*` uses that pattern via one bundled build-arg, `FLAG_OVERRIDES`, rather
+than one `ARG`/`ENV` pair per flag — adding a flag needs no `Dockerfile` edit.
+The `Dockerfile` declares `ARG FLAG_OVERRIDES=` and forwards it to
+`ENV FLAG_OVERRIDES=$FLAG_OVERRIDES`; `.github/workflows/build-image.yml`
+passes it as `FLAG_OVERRIDES=programme=on` for the `staging` branch and empty
+for everything else, so production images always build with no overrides.
+The format is `name=on,name2=off`, parsed by `parseFlagOverrides()` in
+`src/lib/flags.ts`; an unknown flag name, a value other than `on`/`off`, or the
+same name listed twice all throw and fail the build rather than being ignored.
+A per-flag `FLAG_<NAME>` variable (e.g. `.env.local` in development) still
+takes precedence over `FLAG_OVERRIDES` when both are set — see
+`readEnvOverride()` in `src/lib/flags.ts`.
 
 **Emergency kill switch** — hide a page immediately without editing dates:
 ```bash
