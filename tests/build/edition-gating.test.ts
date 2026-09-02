@@ -12,6 +12,12 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve, relative } from "node:path";
+import {
+  DATA_LAYER,
+  LOADER_CALL_RE,
+  NON_ROUTE_CONSUMERS,
+  ROUTE_CONSUMERS,
+} from "./edition-consumers";
 
 const REPO_ROOT = resolve(import.meta.dirname, "../../");
 
@@ -215,3 +221,83 @@ describe("no route under src/pages calls loadSessions() with no argument", () =>
     expect(offenders, message).toEqual([]);
   });
 });
+
+/**
+ * The sweep that enumerates instead of trusting a list.
+ *
+ * The hand-written GUARDED_ROUTES list in edition-2027-prod-isolation.test.ts
+ * missed `src/content.config.ts` — the single largest speaker-data consumer in
+ * the codebase — precisely because it was hand-written and only looked at
+ * routes. So this walks `src/` for real and classifies what it finds: a
+ * consumer is either a route that consults the gate, or a declared non-route
+ * consumer in ./edition-consumers.ts (which carries the PR 2 warning), or the
+ * test fails.
+ */
+describe("every consumer of an edition's data is accounted for", () => {
+  /**
+   * Loader names appear in prose too (docstrings in edition-visibility.ts and
+   * pretalx-private.ts both name `loadSessions`). Strip comments so the sweep
+   * flags call sites, not documentation.
+   */
+  const stripComments = (source: string): string =>
+    source
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/^[ \t]*\/\/.*$/gm, "");
+
+  const sourceFiles = listFiles(resolve(REPO_ROOT, "src"))
+    .map((f) => relative(REPO_ROOT, f))
+    .filter((rel) => /\.(astro|ts|tsx)$/.test(rel))
+    .filter((rel) => !rel.includes("__tests__") && !rel.endsWith(".test.ts"))
+    .filter((rel) => !(DATA_LAYER as readonly string[]).includes(rel));
+
+  const consumers = sourceFiles.filter((rel) =>
+    LOADER_CALL_RE.test(stripComments(read(rel))),
+  );
+
+  const declaredRoutes = ROUTE_CONSUMERS as readonly string[];
+  const declaredNonRoutes: readonly string[] = NON_ROUTE_CONSUMERS.map(
+    (c) => c.file,
+  );
+
+  it("finds at least the routes it already knows about", () => {
+    // Sanity check on the sweep itself: a regex that matched nothing would make
+    // every assertion below vacuously pass.
+    expect(consumers.length).toBeGreaterThanOrEqual(declaredRoutes.length);
+  });
+
+  it("finds no undeclared consumer", () => {
+    const undeclared = consumers.filter(
+      (rel) => !declaredRoutes.includes(rel) && !declaredNonRoutes.includes(rel),
+    );
+
+    expect(
+      undeclared,
+      `${undeclared.join(", ")} read an edition's sessions or speakers but are ` +
+        `declared in neither ROUTE_CONSUMERS nor NON_ROUTE_CONSUMERS ` +
+        `(tests/build/edition-consumers.ts).\n\n` +
+        `If it is a route under src/pages: gate it with isEditionLoadable — in ` +
+        `getStaticPaths for a [slug] route, since a gated body still emits one ` +
+        `HTML file per speaker — and add it to ROUTE_CONSUMERS.\n\n` +
+        `If it is NOT a route (a content collection loader, an integration, a ` +
+        `script): it runs on every build regardless of which pages render, so a ` +
+        `route-level gate cannot protect it. Add it to NON_ROUTE_CONSUMERS with ` +
+        `what keeps it harmless, and read the PR 2 warning above that list.`,
+    ).toEqual([]);
+  });
+
+  it("every declared non-route consumer is one the sweep actually finds", () => {
+    // A declared entry the sweep cannot see is either a typo'd path or a stale
+    // record of a consumer that no longer exists — both make the list lie.
+    for (const rel of declaredNonRoutes) {
+      expect(consumers, `${rel} is declared but reads no edition data`).toContain(rel);
+    }
+  });
+
+  it("src/content.config.ts is the known non-route consumer", () => {
+    // Named explicitly so a future reader hits it without decoding the sweep:
+    // speakersCollection(2027)'s loader calls loadSpeakers(2027) on EVERY build,
+    // including a production build with every route correctly gated.
+    expect(declaredNonRoutes).toContain("src/content.config.ts");
+  });
+});
+
