@@ -14,6 +14,18 @@ COPY . .
 # share the install cache.
 ARG PUBLIC_SITE_URL=
 ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
+# Feature-flag overrides for this image, as `name=on,name2=off`.
+#
+# Flags resolve from process.env at BUILD time and the artifact is a static
+# nginx image, so a Kubernetes-level env var on the running pod cannot change
+# them — the override has to be present when the image is built. Empty by
+# default so an argument-less `docker build` still produces the production
+# site, driven purely by the dates in src/config/flags.ts.
+#
+# One bundle rather than one ARG per flag: adding a flag needs no edit here.
+# An unknown name or a value other than on/off fails the build (src/lib/flags.ts).
+ARG FLAG_OVERRIDES=
+ENV FLAG_OVERRIDES=$FLAG_OVERRIDES
 # Pretalx API token, as a BuildKit secret — deliberately NOT a build-arg.
 # Build-args are recorded in image history, so `docker history` on a published
 # image would print the token to anyone who can pull it. A secret mount exists

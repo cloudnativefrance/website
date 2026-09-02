@@ -73,6 +73,7 @@ jobs:
           push: ${{ env.IS_PUBLISH }}
           build-args: |
             PUBLIC_SITE_URL=${{ github.ref_name == 'staging' && 'https://staging.cloudnativedays.fr' || '' }}
+            FLAG_OVERRIDES=${{ github.ref_name == 'staging' && 'programme=on' || '' }}
           # Passed as a secret, never a build-arg: build-args are written into
           # image history and would be readable by anyone who can pull the image.
           # The Dockerfile mounts this for the build layer only.
