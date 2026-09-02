@@ -24,11 +24,16 @@ import { PRETALX_EVENT, type EditionAccess } from "./pretalx";
  * 2027 — an edit that looks like routine housekeeping at launch time — would
  * make the arithmetic branch return true and un-hide the entire unannounced
  * programme in production.
+ *
+ * `year` and `currentEdition` are plain numbers, not `Edition`: this is a year
+ * comparison, and the "unmapped future edition" branch exists exactly for years
+ * that are not yet in the `Edition` union. `isEditionLoadable` below is the
+ * typed entry point.
  */
 export function resolveEditionLoadable(
   access: EditionAccess | undefined,
-  year: Edition,
-  currentEdition: Edition,
+  year: number,
+  currentEdition: number,
   flagActive: boolean,
 ): boolean {
   if (access === "preview") return flagActive;
