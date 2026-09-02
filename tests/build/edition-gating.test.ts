@@ -48,3 +48,50 @@ describe.each(PROGRAMME_ROUTES)("%s", (rel) => {
     expect(source).toContain('<ComingSoonLayout flag="programme"');
   });
 });
+
+const SPEAKER_INDEX_ROUTES = [
+  "src/pages/intervenants/[year]/index.astro",
+  "src/pages/en/speakers/[year]/index.astro",
+];
+
+describe.each(SPEAKER_INDEX_ROUTES)("%s", (rel) => {
+  const source = read(rel);
+
+  it("imports isEditionLoadable and ComingSoonLayout", () => {
+    expect(source).toContain("isEditionLoadable");
+    expect(source).toContain("ComingSoonLayout");
+  });
+
+  it("renders ComingSoonLayout for a non-loadable edition", () => {
+    expect(source).toContain('<ComingSoonLayout flag="programme"');
+  });
+
+  it("does not load speakers for an edition it will not render", () => {
+    expect(source).toMatch(
+      /speakersReady\s*\?\s*await getSpeakersByLocale\(lang,\s*year\)/,
+    );
+  });
+});
+
+const SPEAKER_DETAIL_ROUTES = [
+  "src/pages/intervenants/[year]/[slug].astro",
+  "src/pages/en/speakers/[year]/[slug].astro",
+  "src/pages/intervenants/[slug].astro",
+  "src/pages/en/speakers/[slug].astro",
+];
+
+describe.each(SPEAKER_DETAIL_ROUTES)("%s", (rel) => {
+  const source = read(rel);
+
+  it("filters editions in getStaticPaths, not only in the body", () => {
+    const paths = source.slice(
+      source.indexOf("getStaticPaths"),
+      source.indexOf("---", source.indexOf("getStaticPaths")),
+    );
+    expect(paths).toContain("isEditionLoadable");
+  });
+
+  it("skips a non-loadable edition before enumerating its speakers", () => {
+    expect(source).toMatch(/if\s*\(!isEditionLoadable\(year\)\)\s*continue;/);
+  });
+});
