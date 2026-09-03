@@ -60,6 +60,14 @@ export interface PreviewSlot {
    * DTSTART in the ICS feed. The slot carries a real number on every row.
    */
   duration: number;
+  /**
+   * Which schedule version this slot belongs to.
+   *
+   * Read by exactly one thing — `fetchPreviewSlots`'s guard — and carried for
+   * that reason alone. See the guard for why the request's own `?schedule=`
+   * parameter is not enough.
+   */
+  schedule: number;
 }
 
 /** One answer, with `?expand=answers.question` so `question` arrives as an object. */
@@ -244,6 +252,7 @@ function projectSlot(row: unknown): PreviewSlot {
     start: asString(r.start),
     is_visible: slotIsVisible(r.is_visible),
     duration: asNumber(r.duration),
+    schedule: asNumber(r.schedule),
   };
 }
 
@@ -318,19 +327,52 @@ export async function fetchWipScheduleId(
   return wip.id;
 }
 
-/** Every slot of the given schedule version. Always pinned with `?schedule=`, never left to default. */
+/**
+ * Every slot of the given schedule version. Always pinned with `?schedule=`,
+ * never left to default — and then VERIFIED, because sending the parameter and
+ * having it honoured are two different facts.
+ *
+ * `fetchWipScheduleId` exists to stop the released grid rendering in place of
+ * the wip one, and it throws rather than fall back precisely because that
+ * substitution is invisible: same rooms, same shape, older content. But an API
+ * that ignored, renamed or dropped support for `?schedule=` would deliver the
+ * released grid anyway, past a guard that had already "passed". The rows say
+ * which version they belong to, so ask them.
+ *
+ * The filter is honoured today, across pagination — measured, not assumed.
+ * This is a regression guard, and it is the only reason `PreviewSlot` carries
+ * `schedule` at all.
+ */
 export async function fetchPreviewSlots(
   slug: string,
   scheduleId: number,
   token: string,
 ): Promise<PreviewSlot[]> {
-  return fetchAllPages<PreviewSlot>({
+  const slots = await fetchAllPages<PreviewSlot>({
     url: `${PRETALX_BASE}/api/events/${slug}/slots/?schedule=${scheduleId}&limit=${PAGE_SIZE}`,
     token,
     what: `slots for ${slug} (schedule ${scheduleId})`,
     project: projectSlot,
     logPrefix: LOG_PREFIX,
   });
+
+  const foreign = slots.filter((slot) => slot.schedule !== scheduleId);
+  if (foreign.length > 0) {
+    // Ids only — these are integers, never body text. Same rule as everything
+    // else this module logs.
+    const versions = [...new Set(foreign.map((slot) => slot.schedule))].sort(
+      (a, b) => a - b,
+    );
+    throw new Error(
+      `[preview] GET /slots/?schedule=${scheduleId} for "${slug}" returned ` +
+        `${foreign.length} of ${slots.length} rows belonging to schedule ` +
+        `version(s) ${versions.join(", ")}. The wip schedule was resolved and ` +
+        `requested, but the response is not it — rendering these rows would show ` +
+        `a schedule nobody asked for, most likely the released one. Refusing, for ` +
+        `the same reason fetchWipScheduleId refuses to fall back.`,
+    );
+  }
+  return slots;
 }
 
 /**

@@ -135,7 +135,9 @@ describe("fetchPreviewSlots", () => {
         jsonOnce({
           count: 1,
           next: null,
-          results: [{ submission: "AAA", room: 1, start: "s", duration: 30, ...row }],
+          results: [
+            { submission: "AAA", room: 1, start: "s", duration: 30, schedule: 12, ...row },
+          ],
         }),
       );
       const [slot] = await fetchPreviewSlots("democon", 12, TOKEN);
@@ -155,6 +157,60 @@ describe("fetchPreviewSlots", () => {
     it("still honours a literal true and a literal false", async () => {
       await expect(visibilityOf({ is_visible: true })).resolves.toBe(true);
       await expect(visibilityOf({ is_visible: false })).resolves.toBe(false);
+    });
+  });
+
+  /**
+   * `?schedule=` is sent; nothing used to check it was obeyed.
+   *
+   * `/slots/` defaults to the RELEASED schedule, so an API that ignored,
+   * renamed or dropped the parameter would hand back the released grid — same
+   * rooms, same shape, older content — past a `fetchWipScheduleId` that had
+   * already "passed". The rows carry their own version; the walk asserts on it.
+   */
+  describe("verifies the response is the schedule that was asked for", () => {
+    it("throws when a row belongs to another schedule version", async () => {
+      vi.stubGlobal("fetch", () =>
+        jsonOnce({
+          count: 2,
+          next: null,
+          results: [
+            { submission: "AAA", room: 1, start: "s", duration: 30, is_visible: true, schedule: 12 },
+            { submission: "BBB", room: 1, start: "s", duration: 30, is_visible: true, schedule: 9 },
+          ],
+        }),
+      );
+      await expect(fetchPreviewSlots("democon", 12, TOKEN)).rejects.toThrow(
+        /returned 1 of 2 rows belonging to schedule version\(s\) 9/,
+      );
+    });
+
+    it("throws when the field is absent, rather than assuming the filter held", async () => {
+      vi.stubGlobal("fetch", () =>
+        jsonOnce({
+          count: 1,
+          next: null,
+          results: [
+            { submission: "AAA", room: 1, start: "s", duration: 30, is_visible: true },
+          ],
+        }),
+      );
+      await expect(fetchPreviewSlots("democon", 12, TOKEN)).rejects.toThrow(
+        /not it/,
+      );
+    });
+
+    it("accepts a response whose rows all match", async () => {
+      vi.stubGlobal("fetch", () =>
+        jsonOnce({
+          count: 1,
+          next: null,
+          results: [
+            { submission: "AAA", room: 1, start: "s", duration: 30, is_visible: true, schedule: 12 },
+          ],
+        }),
+      );
+      await expect(fetchPreviewSlots("democon", 12, TOKEN)).resolves.toHaveLength(1);
     });
   });
 
@@ -267,6 +323,9 @@ describe("the fetch boundary is where PII stops", () => {
       start: "2027-06-03T10:30:00+02:00",
       is_visible: true,
       duration: 30,
+      // `schedule` is kept, and read by exactly one thing: the guard that
+      // checks the API honoured `?schedule=`. `id` and `end` still go.
+      schedule: 12,
     });
   });
 

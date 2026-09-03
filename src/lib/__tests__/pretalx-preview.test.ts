@@ -34,6 +34,7 @@ const slot = {
   start: "2027-06-03T10:30:00+02:00",
   is_visible: true,
   duration: 30,
+  schedule: 12,
 };
 
 const resolve = () => "ada-lovelace";
