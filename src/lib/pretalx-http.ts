@@ -252,6 +252,16 @@ export function asString(value: unknown): string {
   return typeof value === "string" ? value : "";
 }
 
+/**
+ * Coerce an unknown row to something indexable, for projections. Never throws.
+ *
+ * A non-object value yields an empty record, so every `asString`/`asNumber`
+ * read off it falls back rather than throwing on a null row.
+ */
+export function asRecord(value: unknown): Record<string, unknown> {
+  return (value ?? {}) as Record<string, unknown>;
+}
+
 /** Coerce an unknown field to a number, for projections. Never throws. */
 export function asNumber(value: unknown): number {
   return typeof value === "number" && Number.isFinite(value) ? value : 0;

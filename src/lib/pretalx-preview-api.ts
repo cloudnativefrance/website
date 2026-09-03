@@ -32,6 +32,7 @@ import { PRETALX_BASE } from "./pretalx";
 import {
   PAGE_SIZE,
   asNumber,
+  asRecord,
   asString,
   fetchAllPages,
 } from "./pretalx-http";
@@ -124,14 +125,14 @@ function projectLocalised(value: unknown): Localised {
 function projectAnswers(value: unknown): PreviewAnswer[] {
   if (!Array.isArray(value)) return [];
   return value.map((row) => {
-    const r = (row ?? {}) as Record<string, unknown>;
-    const question = (r.question ?? {}) as Record<string, unknown>;
+    const r = asRecord(row);
+    const question = asRecord(r.question);
     return { question: { id: asNumber(question.id) }, answer: asString(r.answer) };
   });
 }
 
 function projectSlot(row: unknown): PreviewSlot {
-  const r = (row ?? {}) as Record<string, unknown>;
+  const r = asRecord(row);
   return {
     submission: asString(r.submission),
     room: asNumber(r.room),
@@ -143,7 +144,7 @@ function projectSlot(row: unknown): PreviewSlot {
 }
 
 function projectSubmission(row: unknown): PreviewSubmission {
-  const r = (row ?? {}) as Record<string, unknown>;
+  const r = asRecord(row);
   const track = (r.track ?? null) as Record<string, unknown> | null;
   const type = (r.submission_type ?? null) as Record<string, unknown> | null;
   const speakers = Array.isArray(r.speakers) ? r.speakers : [];
@@ -160,7 +161,7 @@ function projectSubmission(row: unknown): PreviewSubmission {
       : null,
     submission_type: type ? { name: projectLocalised(type.name) } : null,
     speakers: speakers.map((person) => {
-      const p = (person ?? {}) as Record<string, unknown>;
+      const p = asRecord(person);
       return { code: asString(p.code), name: asString(p.name) };
     }),
     answers: projectAnswers(r.answers),
@@ -168,7 +169,7 @@ function projectSubmission(row: unknown): PreviewSubmission {
 }
 
 function projectScheduleVersion(row: unknown): PreviewScheduleVersion {
-  const r = (row ?? {}) as Record<string, unknown>;
+  const r = asRecord(row);
   return {
     id: asNumber(r.id),
     published: typeof r.published === "string" ? r.published : null,
@@ -176,7 +177,7 @@ function projectScheduleVersion(row: unknown): PreviewScheduleVersion {
 }
 
 function projectRoom(row: unknown): PreviewRoom {
-  const r = (row ?? {}) as Record<string, unknown>;
+  const r = asRecord(row);
   return { id: asNumber(r.id), name: projectLocalised(r.name) };
 }
 
@@ -283,7 +284,7 @@ export interface PreviewSpeaker {
 }
 
 function projectSpeaker(row: unknown): PreviewSpeaker {
-  const r = (row ?? {}) as Record<string, unknown>;
+  const r = asRecord(row);
   return {
     code: asString(r.code),
     name: asString(r.name),

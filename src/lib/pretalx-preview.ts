@@ -61,15 +61,58 @@ export interface PreviewEdition {
   speakers: SpeakerRecord[];
 }
 
+/** One wip-schedule slot paired with the submission it schedules. */
+export interface ScheduledTalk {
+  slot: PreviewSlot;
+  submission: PreviewSubmission;
+  /**
+   * Whether the organisers have this slot visible on the wip schedule.
+   *
+   * Derived HERE and nowhere else, which is the point of this type. The two
+   * consumers below used to each restate the coercion, and they disagreed: the
+   * session mapper honoured it and the speaker allowlist did not, so a talk the
+   * organisers had deliberately hidden left the grid while still publishing its
+   * speaker's name, bio, employer and photo.
+   */
+  visible: boolean;
+}
+
+/**
+ * The one join between the wip schedule's slots and their submissions.
+ *
+ * Iterates `slots`, not `submissions`: a slot whose submission is missing is
+ * dropped, and a submission with no slot in the wip schedule is never visited
+ * at all. That is the allowlist rule from the module docstring, enforced by the
+ * shape of the loop rather than by a separate filter step — and enforced once,
+ * for sessions and for speakers alike.
+ *
+ * Order is preserved from `slots`; callers sort their own output.
+ */
+export function joinScheduledTalks(
+  slots: readonly PreviewSlot[],
+  submissions: readonly PreviewSubmission[],
+): ScheduledTalk[] {
+  const byCode = new Map(submissions.map((s) => [s.code, s] as const));
+  const talks: ScheduledTalk[] = [];
+  for (const slot of slots) {
+    const submission = byCode.get(slot.submission);
+    if (!submission) continue;
+    // `!== false`, not `=== true`: a null is visible on this path, matching
+    // `projectSlot`'s own coercion.
+    talks.push({ slot, submission, visible: slot.is_visible !== false });
+  }
+  return talks;
+}
+
 /**
  * Join the wip schedule's slots to their submissions and shape the result as
  * `SessionRow[]`.
  *
- * Pure — no network, so the test suite exercises this directly. Iterates
- * `slots`, not `submissions`: a slot whose submission is missing is dropped,
- * and a submission with no slot in the wip schedule is never visited at all.
- * That is the allowlist rule from the module docstring, enforced by the shape
- * of the loop rather than by a separate filter step.
+ * Pure — no network, so the test suite exercises this directly. The
+ * slot/submission pairing comes from `joinScheduledTalks`; this function only
+ * reshapes. An invisible slot still produces a row, marked `status: "hidden"`,
+ * which `loadSessions`'s shared exit filter drops — the grid must not render it
+ * and neither must any other consumer decide that for itself.
  *
  * `levelQuestionId` is `undefined` when the edition has no configured
  * question id yet (see `loadPreviewEdition`) — every row then gets
@@ -83,13 +126,8 @@ export function toPreviewSessions(
   resolveSpeaker: SpeakerResolver,
   levelQuestionId: number | undefined,
 ): SessionRow[] {
-  const byCode = new Map(submissions.map((s) => [s.code, s] as const));
-
   const rows: SessionRow[] = [];
-  for (const slot of slots) {
-    const submission = byCode.get(slot.submission);
-    if (!submission) continue;
-
+  for (const { slot, submission, visible } of joinScheduledTalks(slots, submissions)) {
     const durationMin = submission.duration;
     const levelAnswer =
       levelQuestionId === undefined
@@ -122,7 +160,7 @@ export function toPreviewSessions(
       recordingUrl: "",
       coverImageUrl: "",
       language,
-      status: slot.is_visible === false ? "hidden" : "confirmed",
+      status: visible ? "confirmed" : "hidden",
       description: submission.description ?? submission.abstract ?? "",
     });
   }
@@ -200,16 +238,18 @@ export function toPreviewSpeakers(
 /**
  * The person codes a preview edition is allowed to publish.
  *
- * The same slot→submission join `toPreviewSessions` walks, restated because
- * that function returns rows rather than codes — and `/speakers/` must never be
- * iterated directly (module docstring, rule 1).
+ * The same `joinScheduledTalks` result `toPreviewSessions` reshapes, read for
+ * codes rather than rows — and `/speakers/` must never be iterated directly
+ * (module docstring, rule 1).
  *
  * An INVISIBLE slot is skipped here, exactly as its session is dropped at
  * `loadSessions`'s exit filter. Without that the two halves were asymmetric:
  * a talk the organisers had deliberately hidden left the grid, but still
  * published its speaker's `SpeakerRecord` and their `/intervenants/<year>/<slug>`
  * page — name, bio, employer and photo, for a talk nobody was meant to see yet.
- * A person with a second, visible slot still qualifies through that one.
+ * That asymmetry was possible because each half owned its own copy of the join;
+ * now there is one, and `visible` means the same thing on both sides. A person
+ * with a second, visible slot still qualifies through that one.
  *
  * Pure, so the asymmetry is testable without a network stub.
  */
@@ -217,12 +257,9 @@ export function scheduledPersonCodes(
   slots: readonly PreviewSlot[],
   submissions: readonly PreviewSubmission[],
 ): Set<string> {
-  const byCode = new Map(submissions.map((s) => [s.code, s] as const));
   const codes = new Set<string>();
-  for (const slot of slots) {
-    if (slot.is_visible === false) continue;
-    const submission = byCode.get(slot.submission);
-    if (!submission) continue;
+  for (const { submission, visible } of joinScheduledTalks(slots, submissions)) {
+    if (!visible) continue;
     for (const person of submission.speakers) codes.add(person.code);
   }
   return codes;
@@ -282,9 +319,13 @@ export async function loadPreviewEdition(
 
   const promise = (async (): Promise<PreviewEdition> => {
     const token = requireToken();
-    const scheduleId = await fetchWipScheduleId(slug, token);
+    // Only the slot list depends on which schedule version is the wip one; the
+    // other three are addressed by event slug alone. Starting all four together
+    // takes the schedule-version round trip off the critical path instead of
+    // making every other request queue behind it.
+    const scheduleId = fetchWipScheduleId(slug, token);
     const [slots, submissions, rooms, speakers] = await Promise.all([
-      fetchPreviewSlots(slug, scheduleId, token),
+      scheduleId.then((id) => fetchPreviewSlots(slug, id, token)),
       fetchPreviewSubmissions(slug, token),
       fetchRoomNames(slug, token),
       fetchPreviewSpeakers(slug, token),
