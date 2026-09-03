@@ -22,7 +22,12 @@
  * loads this same config through `getViteConfig`) with a bare "Cannot find
  * module '@/…'" that names neither the alias nor the reason.
  */
-import { CURRENT_EDITION, EDITIONS_DESC, type Edition } from "./editions";
+import {
+  CURRENT_EDITION,
+  EDITIONS_DESC,
+  FIRST_PROGRAMME_EDITION,
+  type Edition,
+} from "./editions";
 import { isFlagActive } from "./flags";
 import { PRETALX_EVENT, type EditionAccess } from "./edition-registry";
 
@@ -135,11 +140,14 @@ export function featuredEdition(now?: Date): Edition {
  *
  * Everything shown that is not the current headline — `slice(1)`, since the
  * headline is by definition the newest shown one — EXCEPT anything older than
- * `CURRENT_EDITION`: 2023 predates the site's programme pages and has its own
- * dedicated /2023 retrospective, which the About menu already links, so listing
- * it again under Programme would be a second, worse route to the same content.
- * `>= CURRENT_EDITION` expresses that without hardcoding a year — it yields []
- * in production and [2026] on staging, which is exactly the requirement.
+ * `FIRST_PROGRAMME_EDITION`, i.e. 2023, which has its own /2023 retrospective
+ * linked from the About menu.
+ *
+ * The bound is a fixed year, not `CURRENT_EDITION`. `>= CURRENT_EDITION` gave
+ * the right answer only while CURRENT_EDITION was 2026; bumping it to 2027
+ * would have emptied this list and dropped "Programme 2026" out of the nav —
+ * using a moving value to express a fixed intent, in the one edit the design
+ * anticipates. See FIRST_PROGRAMME_EDITION.
  *
  * That filter used to live at the one call site in Navigation.astro, which made
  * this function's own return value something no caller wanted.
@@ -147,7 +155,7 @@ export function featuredEdition(now?: Date): Edition {
 export function archivedEditions(now?: Date): Edition[] {
   return shownEditionsCached(now)
     .slice(1)
-    .filter((y) => y >= CURRENT_EDITION);
+    .filter((y) => y >= FIRST_PROGRAMME_EDITION);
 }
 
 /**
