@@ -22,8 +22,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
   // vi.doMock registrations outlive resetModules() — it only clears the module
   // cache, not the mock registry — so without this the second test's unmocked
-  // "@/lib/pretalx" import would still see the first test's mocked PRETALX_EVENT.
-  vi.doUnmock("@/lib/pretalx");
+  // registry import would still see the first test's mocked PRETALX_EVENT.
+  vi.doUnmock("@/lib/edition-registry");
   vi.doUnmock("@/lib/edition-visibility");
   vi.resetModules();
 });
@@ -34,8 +34,8 @@ describe("loadSessions / loadSpeakers gate", () => {
       isEditionLoadable: () => false,
       assertEditionPublishable: () => {},
     }));
-    vi.doMock("@/lib/pretalx", async (orig) => {
-      const actual = await orig<typeof import("@/lib/pretalx")>();
+    vi.doMock("@/lib/edition-registry", async (orig) => {
+      const actual = await orig<typeof import("@/lib/edition-registry")>();
       return {
         ...actual,
         PRETALX_EVENT: { 2027: { slug: "democon", access: "preview" } },

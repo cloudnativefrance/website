@@ -7,7 +7,7 @@ import {
   resolveEditionLoadable,
 } from "@/lib/edition-visibility";
 import { CURRENT_EDITION, EDITIONS } from "@/lib/editions";
-import { PRETALX_EVENT } from "@/lib/pretalx";
+import { PRETALX_EVENT } from "@/lib/edition-registry";
 
 const CURRENT = 2026 as const;
 

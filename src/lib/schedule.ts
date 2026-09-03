@@ -2,8 +2,8 @@ import { CURRENT_EDITION, type Edition } from "./editions";
 import { isEditionLoadable } from "./edition-visibility";
 import { loadFrozenArchive } from "./frozen-archive";
 import { fixtureEvent } from "./preview-fixture";
+import { PRETALX_EVENT } from "./edition-registry";
 import {
-  PRETALX_EVENT,
   collectTalkCodes,
   fetchScheduleExport,
   buildSpeakerResolver,

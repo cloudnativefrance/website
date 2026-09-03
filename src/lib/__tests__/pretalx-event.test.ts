@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { PRETALX_EVENT, cfpEventUrl, pickCfpEvent, PRETALX_BASE } from "@/lib/pretalx";
+import { cfpEventUrl, pickCfpEvent, PRETALX_BASE } from "@/lib/pretalx";
+import { PRETALX_EVENT } from "@/lib/edition-registry";
 
 describe("PRETALX_EVENT", () => {
   it("marks 2026 as public and as the current CFP target", () => {

@@ -32,7 +32,7 @@
  */
 import { isEdition, type Edition } from "./editions";
 import { PROD_ORIGIN, isProductionOrigin, resolveSiteOrigin } from "./site-env";
-import type { PretalxEventEntry } from "./pretalx";
+import type { PretalxEventEntry } from "./edition-registry";
 
 const DEFAULT_FIXTURE_EDITION = 2027;
 

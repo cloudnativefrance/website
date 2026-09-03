@@ -15,8 +15,8 @@
  *                    snapshot is refused — see the shrink guard below.
  */
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { PRETALX_EVENT } from "../src/lib/edition-registry";
 import {
-  PRETALX_EVENT,
   scheduleExportUrl,
   talkRecordingUrl,
   type PretalxScheduleExport,

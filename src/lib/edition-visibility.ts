@@ -10,15 +10,21 @@
  * catch a route rendering facts it should not — the two gates cover
  * different failure modes, not the same one twice.
  *
- * This lives here rather than in `editions.ts` because it needs `PRETALX_EVENT`,
- * which transitively pulls in `node:fs` via `remote-fetch.ts`. `editions.ts` is
- * dependency-free and safe to import from a React island; keeping it that way is
- * the point. No island imports it today, which is exactly why the trap would be
- * set silently.
+ * This lives here rather than in `editions.ts` because it needs `PRETALX_EVENT`
+ * and the flag registry. `editions.ts` is dependency-free and safe to import
+ * from a React island; keeping it that way is the point. No island imports it
+ * today, which is exactly why the trap would be set silently.
+ *
+ * `astro.config.mjs` imports this module, so everything it reaches — `flags.ts`,
+ * `config/flags.ts`, `edition-registry.ts`, `editions.ts` — is loaded by Vite's
+ * config runner, which does NOT resolve the `@/` alias. Keep those imports
+ * relative. Breaking that fails `pnpm build` AND `pnpm test` (vitest.config.ts
+ * loads this same config through `getViteConfig`) with a bare "Cannot find
+ * module '@/…'" that names neither the alias nor the reason.
  */
 import { CURRENT_EDITION, EDITIONS_DESC, type Edition } from "./editions";
 import { isFlagActive } from "./flags";
-import { PRETALX_EVENT, type EditionAccess } from "./pretalx";
+import { PRETALX_EVENT, type EditionAccess } from "./edition-registry";
 
 /**
  * The rule, as a pure function of its four inputs, so the whole truth table is
