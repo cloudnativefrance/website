@@ -2,6 +2,7 @@
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { TARGET_DATE } from "@/lib/event";
 import { EDITIONS, CURRENT_EDITION } from "@/lib/editions";
+import { featuredEdition, archivedEditions } from "@/lib/edition-visibility";
 import LanguageToggle from "@/components/LanguageToggle.astro";
 import ThemeToggle from "@/components/ThemeToggle.astro";
 import NavDropdown from "@/components/NavDropdown.astro";
@@ -70,14 +71,29 @@ const programmeDD = (() => {
   const onProgramme   = currentPath.startsWith(programmeBase);
   const onSpeakers    = currentPath.startsWith(speakersBase);
   const onCfp         = currentPath.startsWith(cfpPath);
+  const featured      = featuredEdition();
+  const archives      = archivedEditions();
   return {
     key: "nav.programme.label",
     label: t("nav.programme.label"),
     active: onProgramme || onCfp || onSpeakers,
     items: [
-      { href: `${programmeBase}/${CURRENT_EDITION}`, label: t("nav.programme.submenu.programme"),    current: onProgramme },
-      { href: cfpPath,                                label: t("nav.programme.submenu.cfp"),          current: onCfp },
-      { href: `${speakersBase}/${CURRENT_EDITION}`,   label: t("nav.programme.submenu.intervenants"), current: onSpeakers },
+      { href: `${programmeBase}/${featured}`, label: t("nav.programme.submenu.programme"),    current: onProgramme },
+      { href: cfpPath,                        label: t("nav.programme.submenu.cfp"),          current: onCfp },
+      { href: `${speakersBase}/${featured}`,  label: t("nav.programme.submenu.intervenants"), current: onSpeakers },
+      // Finished editions stay one click away once a newer programme leads.
+      // Only editions that were themselves the headline programme qualify:
+      // 2023 predates that and has its own dedicated /2023 retrospective, which
+      // the About menu already links. `>= CURRENT_EDITION` expresses that
+      // without hardcoding a year — it yields [] in production and [2026] on
+      // staging, which is exactly the requirement.
+      ...archives
+        .filter((y) => y >= CURRENT_EDITION)
+        .map((y) => ({
+          href: `${programmeBase}/${y}`,
+          label: t("nav.programme.submenu.archive").replace("{year}", String(y)),
+          current: currentPath === `${programmeBase}/${y}`,
+        })),
     ],
   };
 })();

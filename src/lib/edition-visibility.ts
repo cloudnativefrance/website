@@ -16,7 +16,7 @@
  * the point. No island imports it today, which is exactly why the trap would be
  * set silently.
  */
-import { CURRENT_EDITION, type Edition } from "./editions";
+import { CURRENT_EDITION, EDITIONS, type Edition } from "./editions";
 import { isFlagActive } from "./flags";
 import { PRETALX_EVENT, type EditionAccess } from "./pretalx";
 
@@ -62,13 +62,36 @@ export function resolveEditionLoadable(
 }
 
 /** Whether `year`'s sessions and speakers may be loaded and rendered. */
-export function isEditionLoadable(year: Edition): boolean {
+export function isEditionLoadable(year: Edition, now?: Date): boolean {
   return resolveEditionLoadable(
     PRETALX_EVENT[year]?.access,
     year,
     CURRENT_EDITION,
-    isFlagActive("programme"),
+    isFlagActive("programme", now),
   );
+}
+
+/**
+ * The edition whose programme the site currently leads with.
+ *
+ * Deliberately NOT `CURRENT_EDITION`, which must stay pinned to the last
+ * edition with public data — moving it forward re-opens the production gate
+ * (see the guard test in edition-visibility.test.ts). This asks the live
+ * question instead: which is the newest edition we are allowed to show? On
+ * production that is 2026; on staging, where the programme flag is forced on,
+ * it is 2027. The staging-only behaviour therefore falls out of the existing
+ * flag rather than needing a second switch to keep in step.
+ */
+export function featuredEdition(now?: Date): Edition {
+  const shown = [...EDITIONS].sort((a, b) => b - a).filter((y) => isEditionLoadable(y, now));
+  // EDITIONS always contains at least one past edition, so `shown` is non-empty.
+  return shown[0] ?? CURRENT_EDITION;
+}
+
+/** Finished editions, newest first — everything shown that is not the headline. */
+export function archivedEditions(now?: Date): Edition[] {
+  const featured = featuredEdition(now);
+  return [...EDITIONS].sort((a, b) => b - a).filter((y) => y !== featured && isEditionLoadable(y, now));
 }
 
 /**
