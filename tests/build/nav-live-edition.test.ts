@@ -82,14 +82,35 @@ describe("after CURRENT_EDITION is bumped to 2027", () => {
     // not the mock registry — so the static import at the top of this file must
     // not inherit the mocked constant.
     vi.doUnmock("@/lib/editions");
+    vi.doUnmock("@/lib/edition-registry");
     vi.resetModules();
   });
 
+  /**
+   * Bumping CURRENT_EDITION is not, by itself, a legitimate state: the guard
+   * in edition-visibility.test.ts ("every edition up to CURRENT_EDITION has
+   * public data") only lets the bump happen once PRETALX_EVENT[2027].access is
+   * "public" — the real-world release-day sequencing this whole design assumes
+   * (see edition-registry.ts). 2027 now has a real, mapped `access: "preview"`
+   * entry (it did not when this helper was written), so mocking CURRENT_EDITION
+   * alone models an inconsistent state — a bumped edition still marked
+   * `preview` NEVER un-gates via arithmetic (`resolveEditionLoadable` checks
+   * `access === "preview"` first, unconditionally) — precisely the trap this
+   * describe block exists to guard against. Mock the access flip alongside the
+   * bump, matching what actually happens on release day.
+   */
   async function visibilityWithCurrentEdition2027() {
     vi.resetModules();
     vi.doMock("@/lib/editions", async (orig) => {
       const actual = await orig<typeof import("@/lib/editions")>();
       return { ...actual, CURRENT_EDITION: 2027 };
+    });
+    vi.doMock("@/lib/edition-registry", async (orig) => {
+      const actual = await orig<typeof import("@/lib/edition-registry")>();
+      return {
+        ...actual,
+        PRETALX_EVENT: { ...actual.PRETALX_EVENT, 2027: { slug: "2027", access: "public" } },
+      };
     });
     return import("@/lib/edition-visibility");
   }

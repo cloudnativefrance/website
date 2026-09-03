@@ -31,6 +31,7 @@
 import { readFileSync } from "node:fs";
 import type { Edition } from "./editions";
 import { PRETALX_BASE } from "./pretalx";
+import { localised, type Localised } from "./pretalx-preview-api";
 import {
   PAGE_SIZE,
   PretalxAuthError,
@@ -71,18 +72,29 @@ export type SpeakerField =
  */
 export const SPEAKER_QUESTIONS: Partial<Record<Edition, Record<SpeakerField, number>>> = {
   2026: { company: 15, role: 16, linkedin: 17, github: 18, bluesky: 19, website: 20 },
+  2027: { company: 32, role: 33, linkedin: 34, github: 35, bluesky: 36, website: 37 },
 };
 
 /**
  * "Niveau de la présentation" — how demanding the TALK is.
  *
- * Pinned by id, not by matching on the word "niveau": question 1 is
- * "Quel est votre niveau en tant qu'intervenant(e) ?", which records how
- * experienced the SPEAKER is. The two read almost identically and mean entirely
- * different things; only this one belongs on the schedule.
+ * Pinned by id, not by matching on the word "niveau": on both 2026 (question 1)
+ * and 2027 (question 23) there is a second question, "Quel est votre niveau en
+ * tant qu'intervenant(e) ?", which records how experienced the SPEAKER is. The
+ * two read almost identically, their option sets overlap, and only one belongs
+ * on the schedule.
+ *
+ * An id alone is not proof it is still the right one — a question could be
+ * deleted and its id reused, or this constant edited by hand and pointed at
+ * the wrong row. `assertLevelQuestionText` / `verifyLevelQuestion` below fetch
+ * the id's actual text at build time and refuse to proceed if it does not look
+ * like the talk-level question; every reader of this map (`loadLevelAnswers`
+ * here, `loadPreviewEdition` in pretalx-preview.ts) calls one of them before
+ * trusting the id.
  */
 export const LEVEL_QUESTION_ID: Partial<Record<Edition, number>> = {
   2026: 4,
+  2027: 22,
 };
 
 /** Per-speaker answers, keyed by Pretalx person code. */
@@ -123,6 +135,21 @@ class MissingQuestionIdError extends Error {
 }
 
 /**
+ * Raised by `assertLevelQuestionText` when `LEVEL_QUESTION_ID[year]` does not
+ * point at the talk-level question — see that function for the check itself.
+ * Ours to fix, never an outage: grouped with `MissingQuestionIdError` in
+ * `isConfigurationFailure` and never degraded past, because a wrong question
+ * id does not fail the build — it ships every level chip wrong on an
+ * otherwise green one, which is strictly worse than shipping none.
+ */
+class LevelQuestionMismatchError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "LevelQuestionMismatchError";
+  }
+}
+
+/**
  * True for the failures that mean "we configured this wrong", not "Pretalx is
  * down" — the ones PRETALX_ALLOW_DEGRADED must never wave through.
  *
@@ -136,6 +163,7 @@ function isConfigurationFailure(err: unknown): boolean {
   if (err instanceof MissingTokenError) return true;
   if (err instanceof PretalxAuthError) return true;
   if (err instanceof MissingQuestionIdError) return true;
+  if (err instanceof LevelQuestionMismatchError) return true;
   return err instanceof PretalxHttpError && !err.retryable;
 }
 
@@ -187,6 +215,127 @@ function projectAnswer(row: unknown): PretalxAnswer {
 
 function answersUrl(eventSlug: string, questionId: number): string {
   return `${PRETALX_BASE}/api/events/${eventSlug}/answers/?question=${questionId}&limit=${PAGE_SIZE}`;
+}
+
+// -- Level-question hardening ------------------------------------------------
+//
+// `LEVEL_QUESTION_ID[year]` is a number someone typed by hand from a `curl`
+// output. Nothing before this stopped a transposed digit, or the id of the
+// SPEAKER-experience question ("Quel est votre niveau en tant
+// qu'intervenant(e) ?") being copied in by mistake, from silently shipping
+// every level chip wrong on an otherwise green build — plausible values, all
+// of them meaningless, because the design spec's first draft of this check
+// ("does the text contain the word niveau?") passes on EITHER question: both
+// contain it. That is not a hypothetical — it is the exact mistake that draft
+// made.
+
+/** One row of `GET /questions/`, narrowed to id and localised text. */
+interface PretalxQuestionRow {
+  id: number;
+  text: Localised;
+}
+
+function questionsUrl(eventSlug: string): string {
+  return `${PRETALX_BASE}/api/events/${eventSlug}/questions/?limit=${PAGE_SIZE}`;
+}
+
+function projectQuestionRow(row: unknown): PretalxQuestionRow {
+  const r = (row ?? {}) as Record<string, unknown>;
+  const id = typeof r.id === "number" ? r.id : -1;
+  const question = r.question;
+  const text =
+    typeof question === "string" || (question && typeof question === "object")
+      ? (question as Localised)
+      : "";
+  return { id, text };
+}
+
+/**
+ * Every question's id and localised text for the event, fetched once per
+ * build and memoised per slug — this is the ONE extra authenticated request
+ * `verifyLevelQuestion` costs, beyond what `loadLevelAnswers` /
+ * `loadPreviewEdition` already make. `/answers/?question=<id>` (the endpoint
+ * both readers use for the actual data) never echoes the question's own text,
+ * only ids — this is the cheapest correct way to see it.
+ */
+const QUESTION_TEXT_CACHE = new Map<string, Promise<Map<number, string>>>();
+
+function fetchQuestionTexts(
+  eventSlug: string,
+  token: string,
+): Promise<Map<number, string>> {
+  const cached = QUESTION_TEXT_CACHE.get(eventSlug);
+  if (cached) return cached;
+  const promise = fetchAllPages<PretalxQuestionRow>({
+    url: questionsUrl(eventSlug),
+    token,
+    what: `questions for ${eventSlug}`,
+    project: projectQuestionRow,
+  }).then((rows) => new Map(rows.map((q) => [q.id, localised(q.text)])));
+  QUESTION_TEXT_CACHE.set(eventSlug, promise);
+  return promise;
+}
+
+/**
+ * Confirms `questionId` is actually "Niveau de la présentation" (the TALK's
+ * level) rather than its near-identical sibling, "Quel est votre niveau en
+ * tant qu'intervenant(e) ?" (the SPEAKER's own experience) — see
+ * `LEVEL_QUESTION_ID` above for why the two must never be swapped.
+ *
+ * "Contains niveau" is NOT the check, on purpose: both questions contain that
+ * word, so a check that only looked for it would pass on either one — the
+ * exact swap this function exists to catch. The rule is instead two-sided:
+ * the text must contain "niveau" AND must NOT contain "intervenant". That is
+ * the actual semantic split between "how demanding is the TALK" and "how
+ * experienced is the SPEAKER" rather than a substring the two happen to
+ * share, so id 23's real 2027 text ("Quel est votre niveau en tant
+ * qu'intervenant(e) ?") is correctly rejected — it contains both words — while
+ * id 22's ("Niveau de la présentation") passes.
+ *
+ * A pure function of the fetched text, so it is unit-testable without a
+ * network stub: the three cases that matter are the right question passing,
+ * id 23's text being rejected, and a missing/renamed question (no id 22 in
+ * the response at all) being rejected too.
+ */
+export function assertLevelQuestionText(
+  year: Edition,
+  eventSlug: string,
+  questionId: number,
+  text: string | undefined,
+): void {
+  const normalized = (text ?? "").toLowerCase();
+  const mentionsLevel = normalized.includes("niveau");
+  const mentionsSpeakerExperience = normalized.includes("intervenant");
+  if (mentionsLevel && !mentionsSpeakerExperience) return;
+
+  throw new LevelQuestionMismatchError(
+    `[pretalx] LEVEL_QUESTION_ID[${year}] = ${questionId} on event "${eventSlug}" does ` +
+      `not look like the talk-level question. Its text is ` +
+      `${text ? JSON.stringify(text) : "(no question with that id in GET /questions/)"}, ` +
+      `but the talk-level question must contain "niveau" and must NOT contain ` +
+      `"intervenant" (e.g. "Niveau de la présentation"). This is very likely question ` +
+      `23, "Quel est votre niveau en tant qu'intervenant(e) ?" — the SPEAKER's own ` +
+      `experience, which reads almost identically but means something else, and reading ` +
+      `it as the level would ship every level chip wrong on an otherwise green build. ` +
+      `Fix LEVEL_QUESTION_ID[${year}] in pretalx-private.ts; do not remove this check.`,
+  );
+}
+
+/**
+ * Fetches `questionId`'s text for `eventSlug` and asserts it is the
+ * talk-level question. Exported so both live Pretalx readers run the exact
+ * same check before trusting `LEVEL_QUESTION_ID[year]`: `loadLevelAnswers`
+ * below (released schedule) and `loadPreviewEdition` in `pretalx-preview.ts`
+ * (wip schedule, no release yet).
+ */
+export async function verifyLevelQuestion(
+  year: Edition,
+  eventSlug: string,
+  questionId: number,
+  token: string,
+): Promise<void> {
+  const texts = await fetchQuestionTexts(eventSlug, token);
+  assertLevelQuestionText(year, eventSlug, questionId, texts.get(questionId));
 }
 
 /**
@@ -359,6 +508,12 @@ export async function loadLevelAnswers(
             `List them with GET /api/events/${eventSlug}/questions/ and add the mapping.`,
         );
       }
+
+      // Refuse to read answers for a question that is not actually the
+      // talk-level one — see assertLevelQuestionText's docstring. Runs before
+      // the answers fetch below: a wrong id must fail loudly, never blank the
+      // level or (worse) silently render the speaker-experience answer as it.
+      await verifyLevelQuestion(year, eventSlug, questionId, token);
 
       const answers = await fetchAllPages<PretalxAnswer>({
         url: answersUrl(eventSlug, questionId),

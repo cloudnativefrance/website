@@ -1,9 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
+  loadPreviewEdition,
   scheduledPersonCodes,
   toPreviewSessions,
   toPreviewSpeakers,
 } from "@/lib/pretalx-preview";
+import { stashEnv } from "../../../tests/support/env-stash";
 
 const rooms = new Map([
   [1, "Monet"],
@@ -336,5 +338,75 @@ describe("scheduledPersonCodes", () => {
     expect(
       scheduledPersonCodes([{ ...slot, submission: "GONE" }], [submission]),
     ).toEqual(new Set());
+  });
+});
+
+/**
+ * `loadPreviewEdition` wires the same level-question guard as the public
+ * path's `loadLevelAnswers` (pretalx-degrade.test.ts covers that one) — but
+ * this path never degrades (see the module docstring above `loadPreviewEdition`),
+ * so there is no ALLOW_DEGRADED interaction to test: any failure here is
+ * already fatal by construction. What is worth pinning is that the guard
+ * actually RUNS on this path at all, using LEVEL_QUESTION_ID[2027] = 22 for
+ * real — a swap here would ship every 2027 preview session's level wrong.
+ */
+describe("loadPreviewEdition's level-question guard", () => {
+  stashEnv(["PRETALX_API_TOKEN", "PRETALX_API_TOKEN_FILE"]);
+
+  let slugCounter = 0;
+  const freshSlug = () => `preview-guard-${++slugCounter}`;
+
+  function jsonPage(results: unknown[]) {
+    return Promise.resolve({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ results, next: null }),
+    } as Response);
+  }
+
+  /** An event with no rooms, slots, submissions or speakers — the real 2027 event today. */
+  function stubEmptyEvent(questionRows: unknown[]) {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((url: string) => {
+        if (url.includes("/schedules/")) {
+          return jsonPage([{ id: 12, version: "wip", published: null }]);
+        }
+        if (url.includes("/questions/")) return jsonPage(questionRows);
+        // /slots/, /submissions/, /rooms/, /speakers/ — all empty.
+        return jsonPage([]);
+      }),
+    );
+  }
+
+  beforeEach(() => {
+    process.env.PRETALX_API_TOKEN = "t0ken";
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("resolves an empty edition when the configured question matches", async () => {
+    stubEmptyEvent([{ id: 22, question: { fr: "Niveau de la présentation" } }]);
+    await expect(loadPreviewEdition(2027, freshSlug())).resolves.toEqual({
+      sessions: [],
+      speakers: [],
+    });
+  });
+
+  it("fails loudly when id 22 is actually the speaker-experience question", async () => {
+    stubEmptyEvent([
+      { id: 22, question: { fr: "Quel est votre niveau en tant qu'intervenant(e) ?" } },
+    ]);
+    await expect(loadPreviewEdition(2027, freshSlug())).rejects.toThrow(
+      /does not look like the talk-level question/,
+    );
+  });
+
+  it("fails loudly when the configured question id does not exist on this event", async () => {
+    stubEmptyEvent([]);
+    await expect(loadPreviewEdition(2027, freshSlug())).rejects.toThrow(
+      /does not look like the talk-level question/,
+    );
   });
 });

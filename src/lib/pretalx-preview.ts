@@ -41,6 +41,7 @@ import {
   LEVEL_QUESTION_ID,
   SPEAKER_QUESTIONS,
   requireToken,
+  verifyLevelQuestion,
   type SpeakerField,
 } from "./pretalx-private";
 import {
@@ -337,24 +338,21 @@ export async function loadPreviewEdition(
 
   const promise = (async (): Promise<PreviewEdition> => {
     const token = requireToken();
-    // Only the slot list depends on which schedule version is the wip one; the
-    // other three are addressed by event slug alone. Starting all four together
-    // takes the schedule-version round trip off the critical path instead of
-    // making every other request queue behind it.
-    const scheduleId = fetchWipScheduleId(slug, token);
-    const [slots, submissions, rooms, speakers] = await Promise.all([
-      scheduleId.then((id) => fetchPreviewSlots(slug, id, token)),
-      fetchPreviewSubmissions(slug, token),
-      fetchRoomNames(slug, token),
-      fetchPreviewSpeakers(slug, token),
-    ]);
 
-    const resolveSpeaker = buildSpeakerResolver();
-
-    // Neither question id is configured for a fixture event (democon has zero
-    // questions) and 2027's cannot be read until its event exists — so these
-    // warn once per build rather than throwing. See the module docstring and
-    // the corresponding jsdoc on toPreviewSessions/toPreviewSpeakers.
+    // Not every `year` has these configured — `2023` predates the mapping
+    // entirely (see LEVEL_QUESTION_ID / SPEAKER_QUESTIONS), and the
+    // `PRETALX_PREVIEW_SLUG` fixture workflow can point a configured year at
+    // an unrelated event (e.g. democon) whose own question ids differ. Warn
+    // once per build rather than throwing when absent. See the module
+    // docstring and the corresponding jsdoc on
+    // toPreviewSessions/toPreviewSpeakers.
+    //
+    // NOTE: when the id IS configured but points at an event whose matching
+    // question means something else (the fixture case above), the guard below
+    // does not stay quiet — it fetches that event's actual text and throws.
+    // That is deliberate: a wrong id should fail loudly here exactly as it
+    // does on the public path, even when what made it wrong was a fixture
+    // slug rather than a typo.
     const levelQuestionId = LEVEL_QUESTION_ID[year];
     if (levelQuestionId === undefined) {
       console.warn(
@@ -371,6 +369,26 @@ export async function loadPreviewEdition(
           `exists in Pretalx and its question ids are read.`,
       );
     }
+
+    // Only the slot list depends on which schedule version is the wip one; the
+    // other requests are addressed by event slug alone. Starting them all
+    // together takes each round trip off the others' critical path. The
+    // level-question guard rides along here too, when a level question id IS
+    // configured — this path never degrades past a failure (see the docstring
+    // above this function), so a mismatch fails the build loudly, exactly
+    // like the public path's `loadLevelAnswers`.
+    const scheduleId = fetchWipScheduleId(slug, token);
+    const [slots, submissions, rooms, speakers] = await Promise.all([
+      scheduleId.then((id) => fetchPreviewSlots(slug, id, token)),
+      fetchPreviewSubmissions(slug, token),
+      fetchRoomNames(slug, token),
+      fetchPreviewSpeakers(slug, token),
+      levelQuestionId === undefined
+        ? Promise.resolve()
+        : verifyLevelQuestion(year, slug, levelQuestionId, token),
+    ]);
+
+    const resolveSpeaker = buildSpeakerResolver();
 
     const sessions = toPreviewSessions(
       slots,

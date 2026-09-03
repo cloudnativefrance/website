@@ -39,10 +39,19 @@ export interface PretalxEventEntry {
 }
 
 /**
- * Editions with a Pretalx event. 2023 predates the instance. 2027 is added here
- * once its event exists; until then the fetch would 404 on every build, so it is
- * deliberately absent rather than mapped and failing.
+ * Editions with a Pretalx event. 2023 predates the instance.
+ *
+ * 2027's event now exists (slug "2027", `is_public: false`), so it is mapped
+ * with `access: "preview"` — no schedule has been released, so the wip
+ * schedule is read through the authenticated REST API, gated behind the
+ * `programme` flag same as any other preview edition.
+ *
+ * Deliberately no `cfpOpen` here. The event is non-public: a submitter who
+ * reached it would hit a login redirect, not a submission form. `/cfp` keeps
+ * pointing at 2026 until the organiser flips the Pretalx event public — that
+ * is a one-word edit here, independent of when the schedule itself releases.
  */
 export const PRETALX_EVENT: Partial<Record<Edition, PretalxEventEntry>> = {
   2026: { slug: "2026", access: "public", cfpOpen: true },
+  2027: { slug: "2027", access: "preview" },
 };
