@@ -16,9 +16,9 @@
  * today, which is exactly why the trap would be set silently.
  *
  * `astro.config.mjs` imports this module, so everything it reaches — `flags.ts`,
- * `config/flags.ts`, `edition-registry.ts`, `editions.ts` — is loaded by Vite's
- * config runner, which does NOT resolve the `@/` alias. Keep those imports
- * relative. Breaking that fails `pnpm build` AND `pnpm test` (vitest.config.ts
+ * `config/flags.ts`, `edition-registry.ts`, `editions.ts`, `preview-fixture.ts`,
+ * `site-env.ts` — is loaded by Vite's config runner, which does NOT resolve the
+ * `@/` alias. Keep those imports relative. Breaking that fails `pnpm build` AND `pnpm test` (vitest.config.ts
  * loads this same config through `getViteConfig`) with a bare "Cannot find
  * module '@/…'" that names neither the alias nor the reason.
  */
@@ -30,6 +30,7 @@ import {
 } from "./editions";
 import { isFlagActive } from "./flags";
 import { PRETALX_EVENT, type EditionAccess } from "./edition-registry";
+import { fixtureEvent } from "./preview-fixture";
 
 /**
  * The rule, as a pure function of its four inputs, so the whole truth table is
@@ -72,10 +73,27 @@ export function resolveEditionLoadable(
   return year <= currentEdition || flagActive;
 }
 
-/** Whether `year`'s sessions and speakers may be loaded and rendered. */
+/**
+ * Whether `year`'s sessions and speakers may be loaded and rendered.
+ *
+ * `PRETALX_EVENT[year] ?? fixtureEvent(year)` — the SAME resolution
+ * `loadSessions` and `loadSpeakers` perform, and it has to be, because this
+ * decides whether they may run at all. Reading the registry alone let a fixture
+ * pointed at a PAST edition walk straight past the flag: with
+ * `PRETALX_PREVIEW_EDITION=2023` and the programme flag closed, `access` read
+ * as `undefined`, the arithmetic branch answered `2023 <= 2026` → loadable, and
+ * the loaders then took the fixture's `access: "preview"` branch and served
+ * democon's UNRELEASED schedule at /programme/2023. Two resolutions of "which
+ * event is this?", disagreeing.
+ *
+ * `fixtureEvent` throws on a production build (see `preview-fixture.ts`), so a
+ * misconfigured pipeline now fails at config load rather than at the first
+ * loader call. Earlier and louder, which is the direction this path fails in.
+ */
 export function isEditionLoadable(year: Edition, now?: Date): boolean {
+  const event = PRETALX_EVENT[year] ?? fixtureEvent(year);
   return resolveEditionLoadable(
-    PRETALX_EVENT[year]?.access,
+    event?.access,
     year,
     CURRENT_EDITION,
     isFlagActive("programme", now),

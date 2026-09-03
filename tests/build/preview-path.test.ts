@@ -52,6 +52,37 @@ describe("the preview branch stays gated behind isEditionLoadable", () => {
   });
 });
 
+/**
+ * The fixture used to be able to bypass the flag entirely.
+ *
+ * `isEditionLoadable` resolved `access` from PRETALX_EVENT alone and never from
+ * the fixture, so `PRETALX_PREVIEW_EDITION=2023` read as `access: undefined`,
+ * fell through to the arithmetic (`2023 <= 2026` → loadable) and let the
+ * loaders take the fixture's own `access: "preview"` branch — serving democon's
+ * UNRELEASED schedule at /programme/2023 with the programme flag closed. The
+ * gate and the loaders were resolving "which event is this?" differently.
+ */
+describe("a fixture pointed at a PAST edition is still gated by the flag", () => {
+  it("fetches nothing for 2023 and serves the frozen archive instead", async () => {
+    process.env.PRETALX_PREVIEW_SLUG = "democon";
+    process.env.PRETALX_PREVIEW_EDITION = "2023";
+    process.env.PUBLIC_SITE_URL = "http://localhost:4321";
+    // Pinned rather than left to the wall clock: `programme` opens 2027-04-01,
+    // and a test that depends on today's date starts failing on that date.
+    process.env.FLAG_PROGRAMME = "off";
+
+    const { isEditionLoadable } = await import("@/lib/edition-visibility");
+    const { loadSessions } = await import("@/lib/schedule");
+
+    expect(isEditionLoadable(2023)).toBe(false);
+    const rows = await loadSessions(2023);
+    // The committed 2023 archive, not democon's wip schedule.
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows.every((r) => r.startTime.startsWith("2023-"))).toBe(true);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+});
+
 describe("the fixture refuses the pipeline shape a release build actually has", () => {
   it("throws out of loadSessions when PUBLIC_SITE_URL is empty", async () => {
     // build-image.yml passes PUBLIC_SITE_URL='' on every non-staging branch,
