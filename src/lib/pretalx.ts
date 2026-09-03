@@ -235,6 +235,10 @@ export function toSessionRows(
           format: toFormat(talk.type, durationMin),
           startTime: talk.date,
           durationMin,
+          // The released export carries no tags. The preview path used to read
+          // them off /submissions/ and now matches this, so releasing a
+          // schedule — a one-word `access` change — cannot silently empty a
+          // field. Only the frozen 2023 archive has values.
           tags: [],
           feedbackUrl: talk.feedback_url ?? "",
           slidesUrl: pickResource(talk, (r) => SLIDES_LABEL.test(r.title)),

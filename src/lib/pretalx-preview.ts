@@ -161,7 +161,18 @@ export function toPreviewSessions(
       ),
       startTime: slot.start,
       durationMin,
-      tags: submission.tags,
+      // Deliberately empty, matching `toSessionRows` on the public path.
+      //
+      // The two live Pretalx paths must agree, because `access: "public"` is a
+      // one-word edit made on the day a schedule is released — and a field that
+      // one path fills and the other hardcodes to [] silently empties itself
+      // that day, with no error and no failing test. Parity in the direction of
+      // NOT fetching: the released agenda export carries no tags at all, so the
+      // alternative was a second authenticated round trip per build to populate
+      // a field nothing renders (`schedule-ui.ts` clears the modal's tag
+      // container and never fills it). `SessionRow.tags` stays in the type for
+      // the frozen 2023 archive, which does carry values.
+      tags: [],
       feedbackUrl: "",
       slidesUrl: "",
       recordingUrl: "",

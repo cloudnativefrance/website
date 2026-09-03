@@ -91,7 +91,6 @@ export interface PreviewSubmission {
   abstract: string | null;
   duration: number;
   content_locale: string;
-  tags: string[];
   track: { name: Localised; color: string } | null;
   submission_type: { name: Localised } | null;
   speakers: Array<{ code: string; name: string }>;
@@ -268,7 +267,6 @@ function projectSubmission(row: unknown): PreviewSubmission {
     abstract: typeof r.abstract === "string" ? r.abstract : null,
     duration: asNumber(r.duration),
     content_locale: asString(r.content_locale),
-    tags: Array.isArray(r.tags) ? r.tags.filter((t) => typeof t === "string") : [],
     track: track
       ? { name: projectLocalised(track.name), color: asString(track.color) }
       : null,

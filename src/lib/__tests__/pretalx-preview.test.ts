@@ -21,7 +21,6 @@ const submission = {
   abstract: null,
   duration: 30,
   content_locale: "fr",
-  tags: ["ops"],
   track: { name: { fr: "Infrastructure" }, color: "#edbb45" },
   submission_type: { name: { fr: "Talk" } },
   speakers: [{ code: "S1", name: "Ada Lovelace" }],
@@ -121,6 +120,14 @@ describe("toPreviewSessions", () => {
       4,
     );
     expect(rows.map((r) => r.id)).toEqual(["ABC123"]);
+  });
+
+  it("leaves tags empty, exactly as the public path does", () => {
+    // `access: "public"` is a one-word edit on release day. A field this path
+    // filled and `toSessionRows` hardcoded to [] would silently empty itself
+    // that day; nothing renders tags, and the released export has none to read.
+    const [row] = toPreviewSessions([slot], [submission], rooms, resolve, 4);
+    expect(row.tags).toEqual([]);
   });
 
   it("does not route duration through the HH:MM parser", () => {
