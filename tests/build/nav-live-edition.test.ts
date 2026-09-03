@@ -29,11 +29,20 @@ describe("featuredEdition", () => {
 
 describe("archivedEditions", () => {
   it("is empty while the featured edition is the newest one shown", () => {
-    expect(archivedEditions(new Date("2026-09-03T12:00:00+02:00"))).toEqual([2023]);
+    expect(archivedEditions(new Date("2026-09-03T12:00:00+02:00"))).toEqual([]);
   });
 
   it("includes 2026 once 2027 is featured", () => {
-    expect(archivedEditions(new Date("2027-04-02T12:00:00+02:00"))).toEqual([2026, 2023]);
+    expect(archivedEditions(new Date("2027-04-02T12:00:00+02:00"))).toEqual([2026]);
+  });
+
+  it("never offers 2023, which has its own retrospective", () => {
+    // The `>= CURRENT_EDITION` rule used to live in Navigation.astro, so this
+    // function returned a list its only caller immediately re-filtered. It is
+    // part of the answer now, and this pins it so it cannot drift back out.
+    for (const now of ["2026-09-03T12:00:00+02:00", "2027-04-02T12:00:00+02:00"]) {
+      expect(archivedEditions(new Date(now))).not.toContain(2023);
+    }
   });
 });
 
@@ -47,5 +56,9 @@ describe("Navigation.astro", () => {
   it("offers an archive entry per finished edition", () => {
     expect(NAV).toContain("archivedEditions");
     expect(NAV).toContain("nav.programme.submenu.archive");
+  });
+
+  it("does not re-filter what archivedEditions already decided", () => {
+    expect(NAV).not.toMatch(/y\s*>=\s*CURRENT_EDITION/);
   });
 });

@@ -83,15 +83,32 @@ export function isEditionLoadable(year: Edition, now?: Date): boolean {
  * flag rather than needing a second switch to keep in step.
  */
 export function featuredEdition(now?: Date): Edition {
-  const shown = [...EDITIONS].sort((a, b) => b - a).filter((y) => isEditionLoadable(y, now));
-  // EDITIONS always contains at least one past edition, so `shown` is non-empty.
-  return shown[0] ?? CURRENT_EDITION;
+  // EDITIONS always contains at least one past edition (2023), and a past
+  // edition is loadable unconditionally, so this list is never empty. There is
+  // deliberately no `?? CURRENT_EDITION` fallback: it was unreachable by that
+  // same argument, and an unreachable fallback only invites the reader to
+  // believe the two answers could differ.
+  return [...EDITIONS].sort((a, b) => b - a).filter((y) => isEditionLoadable(y, now))[0];
 }
 
-/** Finished editions, newest first — everything shown that is not the headline. */
+/**
+ * Finished editions that were themselves the headline programme, newest first.
+ *
+ * Everything shown that is not the current headline, EXCEPT anything older than
+ * `CURRENT_EDITION`: 2023 predates the site's programme pages and has its own
+ * dedicated /2023 retrospective, which the About menu already links, so listing
+ * it again under Programme would be a second, worse route to the same content.
+ * `>= CURRENT_EDITION` expresses that without hardcoding a year — it yields []
+ * in production and [2026] on staging, which is exactly the requirement.
+ *
+ * That filter used to live at the one call site in Navigation.astro, which made
+ * this function's own return value something no caller wanted.
+ */
 export function archivedEditions(now?: Date): Edition[] {
   const featured = featuredEdition(now);
-  return [...EDITIONS].sort((a, b) => b - a).filter((y) => y !== featured && isEditionLoadable(y, now));
+  return [...EDITIONS]
+    .sort((a, b) => b - a)
+    .filter((y) => y !== featured && y >= CURRENT_EDITION && isEditionLoadable(y, now));
 }
 
 /**

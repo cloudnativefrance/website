@@ -28,16 +28,16 @@ export const LOADER_CALL_RE = new RegExp(
 
 /**
  * The data layer itself: these modules define the loaders above and call each
- * other. They are not consumers, and they are where PR 2's gate belongs — see
+ * other. They are not consumers — they are where the gate lives, see
  * NON_ROUTE_CONSUMERS.
  */
 export const DATA_LAYER = [
   "src/lib/schedule.ts",
   "src/lib/speakers.ts",
   "src/lib/speaker-source.ts",
-  // The authenticated preview reader (PR 2): schedule.ts and speaker-source.ts
-  // call into loadPreviewEdition for an access: "preview" edition instead of
-  // calling loadSessions/loadSpeakers on themselves, so neither file matches
+  // The authenticated preview reader: schedule.ts and speaker-source.ts call
+  // into loadPreviewEdition for an access: "preview" edition instead of calling
+  // loadSessions/loadSpeakers on themselves, so neither file matches
   // LOADER_CALL_RE — they belong here, not in NON_ROUTE_CONSUMERS, whose test
   // requires every declared entry to match that regex.
   "src/lib/pretalx-preview.ts",
@@ -63,20 +63,24 @@ export const ROUTE_CONSUMERS = [
  * Consumers that reach an edition's data WITHOUT being a route.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- *  READ THIS BEFORE WRITING PR 2 (the authenticated Pretalx reader).
+ *  WHY THE GATE IS NOT IN THE ROUTES ALONE.
  *
- *  `isEditionLoadable` must move INSIDE `loadSessions` / `loadSpeakers`
- *  themselves. Gating the routes is NOT sufficient and never was.
+ *  `isEditionLoadable` is called INSIDE `loadSessions` and `loadSpeakers`
+ *  themselves. That is where it lives now; keep it there.
  *
  *  A content collection loader is not a route. It runs during `astro sync`,
  *  before any page is rendered, on every single build — including a production
- *  build with every route correctly gated. If PR 2 puts the authenticated fetch
- *  behind `loadSpeakers(2027)` and the gate only in `src/pages/**`, then a
- *  production build *fetches the 2027 speaker records, parses them against
- *  `speakerSchema`, and holds them in the content store* while faithfully
- *  rendering "coming soon". The invariant — no fact about a preview edition may
- *  appear in a production build — is enforced by never fetching the data, and
- *  this is the code path that fetches it.
+ *  build with every route correctly gated. With the authenticated fetch behind
+ *  `loadSpeakers(2027)` and the gate only in `src/pages/**`, a production build
+ *  would *fetch the 2027 speaker records, parse them against `speakerSchema`,
+ *  and hold them in the content store* while faithfully rendering "coming
+ *  soon". The invariant — no fact about a preview edition may appear in a
+ *  production build — is enforced by never fetching the data, and this is the
+ *  code path that would fetch it.
+ *
+ *  `src/lib/__tests__/data-layer-gate.test.ts` pins the gate where it is, by
+ *  stubbing `fetch` and asserting it is never called. The list below stays
+ *  because a NEW non-route consumer still has to be declared and justified.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 export const NON_ROUTE_CONSUMERS = [
@@ -87,11 +91,14 @@ export const NON_ROUTE_CONSUMERS = [
       "speakersCollection(year)'s loader calls loadSpeakers(year) unconditionally, " +
       "for every edition registered in `collections` — speakers-2027 included. It " +
       "runs at `astro sync` time, so it cannot consult a route's gate.",
-    /** What keeps it harmless *today*, and only today. */
+    /** What keeps it harmless. */
     safeBecause:
-      "loadSpeakers(2027) resolves to the frozen archive at " +
+      "loadSpeakers now consults isEditionLoadable itself, so a preview-access " +
+      "edition short-circuits before any request: with the `programme` flag " +
+      "closed it returns the frozen archive at " +
       "src/content/schedule/speakers-2027.json, which is [] and is asserted to " +
-      "stay [] by edition-2027-prod-isolation.test.ts. The moment PR 2 gives " +
-      "loadSpeakers a real 2027 source, that assurance is gone.",
+      "stay [] by edition-2027-prod-isolation.test.ts. 2027 does now have a " +
+      "real source behind that gate — the authenticated preview reader — so " +
+      "what makes this harmless is the gate, not the absence of data to fetch.",
   },
 ] as const;

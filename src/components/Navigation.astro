@@ -1,7 +1,7 @@
 ---
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { TARGET_DATE } from "@/lib/event";
-import { EDITIONS, CURRENT_EDITION } from "@/lib/editions";
+import { EDITIONS } from "@/lib/editions";
 import { featuredEdition, archivedEditions } from "@/lib/edition-visibility";
 import LanguageToggle from "@/components/LanguageToggle.astro";
 import ThemeToggle from "@/components/ThemeToggle.astro";
@@ -82,18 +82,13 @@ const programmeDD = (() => {
       { href: cfpPath,                        label: t("nav.programme.submenu.cfp"),          current: onCfp },
       { href: `${speakersBase}/${featured}`,  label: t("nav.programme.submenu.intervenants"), current: onSpeakers },
       // Finished editions stay one click away once a newer programme leads.
-      // Only editions that were themselves the headline programme qualify:
-      // 2023 predates that and has its own dedicated /2023 retrospective, which
-      // the About menu already links. `>= CURRENT_EDITION` expresses that
-      // without hardcoding a year — it yields [] in production and [2026] on
-      // staging, which is exactly the requirement.
-      ...archives
-        .filter((y) => y >= CURRENT_EDITION)
-        .map((y) => ({
-          href: `${programmeBase}/${y}`,
-          label: t("nav.programme.submenu.archive").replace("{year}", String(y)),
-          current: currentPath === `${programmeBase}/${y}`,
-        })),
+      // `archivedEditions` already excludes 2023, which has its own dedicated
+      // retrospective linked from the About menu.
+      ...archives.map((y) => ({
+        href: `${programmeBase}/${y}`,
+        label: t("nav.programme.submenu.archive").replace("{year}", String(y)),
+        current: currentPath === `${programmeBase}/${y}`,
+      })),
     ],
   };
 })();
