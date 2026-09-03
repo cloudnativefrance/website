@@ -14,8 +14,10 @@
  *
  * 1. **The wip schedule's slots are the allowlist**, for speakers too. A
  *    person is only ever mapped when their code appears on a submission that
- *    has a slot in the wip schedule — never by iterating `/speakers/`
+ *    has a VISIBLE slot in the wip schedule — never by iterating `/speakers/`
  *    directly, which (with a token) returns every person who ever submitted.
+ *    Visibility matters on both halves: `scheduledPersonCodes` skips an
+ *    invisible slot for the same reason `loadSessions` filters out its row.
  * 2. **Nothing is cached to disk.** Fetched at build time and discarded.
  */
 import type { Edition } from "./editions";
@@ -190,6 +192,37 @@ export function toPreviewSpeakers(
 }
 
 /**
+ * The person codes a preview edition is allowed to publish.
+ *
+ * The same slot→submission join `toPreviewSessions` walks, restated because
+ * that function returns rows rather than codes — and `/speakers/` must never be
+ * iterated directly (module docstring, rule 1).
+ *
+ * An INVISIBLE slot is skipped here, exactly as its session is dropped at
+ * `loadSessions`'s exit filter. Without that the two halves were asymmetric:
+ * a talk the organisers had deliberately hidden left the grid, but still
+ * published its speaker's `SpeakerRecord` and their `/intervenants/<year>/<slug>`
+ * page — name, bio, employer and photo, for a talk nobody was meant to see yet.
+ * A person with a second, visible slot still qualifies through that one.
+ *
+ * Pure, so the asymmetry is testable without a network stub.
+ */
+export function scheduledPersonCodes(
+  slots: readonly PreviewSlot[],
+  submissions: readonly PreviewSubmission[],
+): Set<string> {
+  const byCode = new Map(submissions.map((s) => [s.code, s] as const));
+  const codes = new Set<string>();
+  for (const slot of slots) {
+    if (slot.is_visible === false) continue;
+    const submission = byCode.get(slot.submission);
+    if (!submission) continue;
+    for (const person of submission.speakers) codes.add(person.code);
+  }
+  return codes;
+}
+
+/**
  * Memoised per `(year, slug)` for the process lifetime — Astro invokes
  * loaders many times per build and every page must see the same data. The
  * promise itself is cached (not just its resolved value), matching
@@ -248,19 +281,7 @@ export async function loadPreviewEdition(
       levelQuestionId,
     );
 
-    // Same allowlist join as toPreviewSessions, restated for speakers because
-    // toPreviewSessions returns rows, not the set of scheduled person codes —
-    // /speakers/ must never be iterated directly (module docstring, rule 1).
-    const submissionByCode = new Map(
-      submissions.map((s) => [s.code, s] as const),
-    );
-    const allowedPersonCodes = new Set<string>();
-    for (const slot of slots) {
-      const submission = submissionByCode.get(slot.submission);
-      if (!submission) continue;
-      for (const person of submission.speakers)
-        allowedPersonCodes.add(person.code);
-    }
+    const allowedPersonCodes = scheduledPersonCodes(slots, submissions);
     const speakerRecords = toPreviewSpeakers(
       speakers,
       allowedPersonCodes,

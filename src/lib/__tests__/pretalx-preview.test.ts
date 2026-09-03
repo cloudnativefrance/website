@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { toPreviewSessions, toPreviewSpeakers } from "@/lib/pretalx-preview";
+import {
+  scheduledPersonCodes,
+  toPreviewSessions,
+  toPreviewSpeakers,
+} from "@/lib/pretalx-preview";
 
 const rooms = new Map([
   [1, "Monet"],
@@ -224,5 +228,69 @@ describe("toPreviewSpeakers", () => {
       2027,
     );
     expect(record.photo_url).toBe("");
+  });
+});
+
+/**
+ * The asymmetry an earlier review claimed was already fixed, and was not.
+ *
+ * `toPreviewSessions` maps an invisible slot to `status: "hidden"` and
+ * `loadSessions`'s exit filter drops it. The speaker allowlist used to iterate
+ * every slot regardless, so a talk the organisers had deliberately hidden still
+ * published its speaker's record and their `/intervenants/<year>/<slug>` page.
+ */
+describe("scheduledPersonCodes", () => {
+  const hidden = { ...slot, id: 2, submission: "HID999", is_visible: false };
+  const hiddenSubmission = {
+    ...submission,
+    code: "HID999",
+    title: "Embargoed keynote",
+    speakers: [{ code: "S9", name: "Grace Hopper", biography: "bio" }],
+  };
+
+  it("collects the speakers of a visible slot", () => {
+    expect(scheduledPersonCodes([slot], [submission])).toEqual(new Set(["S1"]));
+  });
+
+  it("does NOT collect a speaker whose only slot is invisible", () => {
+    const codes = scheduledPersonCodes(
+      [slot, hidden],
+      [submission, hiddenSubmission],
+    );
+    expect(codes.has("S9")).toBe(false);
+    expect(codes).toEqual(new Set(["S1"]));
+  });
+
+  it("never reaches toPreviewSpeakers for that person, end to end", () => {
+    const codes = scheduledPersonCodes([hidden], [hiddenSubmission]);
+    const records = toPreviewSpeakers(
+      [
+        {
+          code: "S9",
+          name: "Grace Hopper",
+          biography: "bio",
+          avatar_url: null,
+          answers: [],
+        },
+      ],
+      codes,
+      () => "grace-hopper",
+      undefined,
+      2027,
+    );
+    expect(records).toEqual([]);
+  });
+
+  it("still collects a person who also has a visible slot", () => {
+    const alsoVisible = { ...hidden, id: 3, is_visible: true };
+    expect(
+      scheduledPersonCodes([hidden, alsoVisible], [hiddenSubmission]),
+    ).toEqual(new Set(["S9"]));
+  });
+
+  it("skips a slot whose submission is absent", () => {
+    expect(
+      scheduledPersonCodes([{ ...slot, submission: "GONE" }], [submission]),
+    ).toEqual(new Set());
   });
 });
