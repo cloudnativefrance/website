@@ -52,8 +52,14 @@ export interface SpeakerRecord {
   keynote_size?: "lead" | "guest" | "panel";
 }
 
-/** Every distinct person in a released export, keyed by code. */
-function peopleInSchedule(doc: PretalxScheduleExport): Map<string, PretalxPerson> {
+/**
+ * Every distinct person in a released export, keyed by code.
+ *
+ * Exported so `scripts/sync-speaker-slugs.ts` can reuse this exact join for
+ * the public-edition path instead of re-deriving it — the join, not just the
+ * shape, is what must not drift between the two.
+ */
+export function peopleInSchedule(doc: PretalxScheduleExport): Map<string, PretalxPerson> {
   const out = new Map<string, PretalxPerson>();
   for (const talk of allTalks(doc)) {
     for (const person of talk.persons) {
