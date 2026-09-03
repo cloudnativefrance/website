@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { stashEnv } from "../../../tests/support/env-stash";
 
 // The gate must short-circuit BEFORE any network call. Stubbing fetch and
 // asserting it was never invoked is the only test that proves "never fetched"
@@ -11,16 +12,11 @@ const fetchSpy = vi.fn();
 // which pretalx-private.ts treats as a retryable failure and retries three
 // times over several real seconds before degrading. Clearing the token here
 // keeps this file's timing independent of whichever machine runs it.
-const TOKEN_ENV_KEYS = ["PRETALX_API_TOKEN", "PRETALX_API_TOKEN_FILE"] as const;
-const savedTokenEnv = new Map<string, string | undefined>();
+stashEnv(["PRETALX_API_TOKEN", "PRETALX_API_TOKEN_FILE"]);
 
 beforeEach(() => {
   vi.stubGlobal("fetch", fetchSpy);
   fetchSpy.mockReset();
-  for (const key of TOKEN_ENV_KEYS) {
-    savedTokenEnv.set(key, process.env[key]);
-    delete process.env[key];
-  }
 });
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -30,10 +26,6 @@ afterEach(() => {
   vi.doUnmock("@/lib/pretalx");
   vi.doUnmock("@/lib/edition-visibility");
   vi.resetModules();
-  for (const [key, value] of savedTokenEnv) {
-    if (value === undefined) delete process.env[key];
-    else process.env[key] = value;
-  }
 });
 
 describe("loadSessions / loadSpeakers gate", () => {

@@ -13,33 +13,25 @@
  * data-layer-gate.test.ts already covers.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { stashEnv } from "../support/env-stash";
 
 const fetchSpy = vi.fn();
 
-const ENV_KEYS = [
+stashEnv([
   "PRETALX_PREVIEW_SLUG",
   "PRETALX_PREVIEW_EDITION",
   "FLAG_PROGRAMME",
   "FLAG_OVERRIDES",
   "PUBLIC_SITE_URL",
-] as const;
-const savedEnv = new Map<string, string | undefined>();
+]);
 
 beforeEach(() => {
   vi.stubGlobal("fetch", fetchSpy);
   fetchSpy.mockReset();
-  for (const key of ENV_KEYS) {
-    savedEnv.set(key, process.env[key]);
-    delete process.env[key];
-  }
 });
 
 afterEach(() => {
   vi.unstubAllGlobals();
-  for (const [key, value] of savedEnv) {
-    if (value === undefined) delete process.env[key];
-    else process.env[key] = value;
-  }
 });
 
 describe("the preview branch stays gated behind isEditionLoadable", () => {

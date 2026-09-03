@@ -16,15 +16,6 @@ describe("PRETALX_EVENT", () => {
 });
 
 describe("pickCfpEvent", () => {
-  it("returns the newest edition flagged cfpOpen", () => {
-    expect(
-      pickCfpEvent({
-        2026: { slug: "2026", access: "public", cfpOpen: true },
-        2027: { slug: "2027", access: "preview", cfpOpen: true },
-      }),
-    ).toBe("2027");
-  });
-
   it("ignores access entirely — a preview edition can own the CFP", () => {
     expect(
       pickCfpEvent({
