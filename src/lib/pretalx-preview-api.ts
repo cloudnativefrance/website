@@ -270,3 +270,37 @@ export async function fetchRoomNames(
   );
   return new Map(rooms.map((r) => [r.id, localised(r.name)]));
 }
+
+/**
+ * One row of `GET /speakers/`, narrowed to the fields the mapper is allowed to
+ * read. The live endpoint also returns `email` and `internal_notes` — this
+ * type deliberately omits both so nothing downstream can read them, mirroring
+ * the PII note in `pretalx-private.ts`.
+ */
+export interface PreviewSpeaker {
+  code: string;
+  name: string;
+  biography: string | null;
+  avatar_url: string | null;
+  answers: Array<{ question: { id: number }; answer: string }>;
+}
+
+/**
+ * Every speaker who ever submitted to the event — including people whose talk
+ * was rejected or is still pending. Same allowlist rule as submissions: the
+ * caller must filter to codes that appear on a submission scheduled in the
+ * wip slot list before any of this reaches the site.
+ *
+ * `expand=answers.question` matches `fetchPreviewSubmissions`'s expand, so an
+ * answer's `question` always arrives as `{ id, ... }` rather than a bare id.
+ */
+export async function fetchPreviewSpeakers(
+  slug: string,
+  token: string,
+): Promise<PreviewSpeaker[]> {
+  return fetchAllPages<PreviewSpeaker>(
+    `${PRETALX_BASE}/api/events/${slug}/speakers/?expand=answers.question&limit=${PAGE_SIZE}`,
+    token,
+    `speakers for ${slug}`,
+  );
+}
