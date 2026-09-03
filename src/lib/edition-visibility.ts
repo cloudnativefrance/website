@@ -4,11 +4,11 @@
  * One question, one answer, one function — consulted by every route that can
  * reach a preview edition, deciding both whether to fetch and whether to
  * render from the same call. The data layer (`loadSessions`, `loadSpeakers`)
- * does not call it yet; wiring the two together so a route can no longer
- * forget the gate is deliberately deferred to a later PR. Until then, a route
- * that omits the check is how "the page is hidden but the data is published"
- * would happen — which is exactly what the route-gate tests under
- * `tests/build/` exist to catch.
+ * calls it too, so a route that forgets the check no longer publishes the
+ * data either: a non-loadable edition never leaves its frozen archive, in
+ * either place. The route-gate tests under `tests/build/` still exist to
+ * catch a route rendering facts it should not — the two gates cover
+ * different failure modes, not the same one twice.
  *
  * This lives here rather than in `editions.ts` because it needs `PRETALX_EVENT`,
  * which transitively pulls in `node:fs` via `remote-fetch.ts`. `editions.ts` is

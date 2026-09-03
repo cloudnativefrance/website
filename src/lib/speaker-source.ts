@@ -21,6 +21,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { Edition } from "./editions";
+import { isEditionLoadable } from "./edition-visibility";
 import { loadFrozenArchive } from "./frozen-archive";
 import {
   PRETALX_EVENT,
@@ -91,7 +92,8 @@ function photoFor(slug: string, avatar: string | null | undefined): string {
 
 export async function loadSpeakers(year: Edition): Promise<SpeakerRecord[]> {
   const event = PRETALX_EVENT[year];
-  if (!event) return loadArchivedSpeakers(year);
+  // See the matching comment in schedule.ts's loadSessions.
+  if (!event || !isEditionLoadable(year)) return loadArchivedSpeakers(year);
 
   const doc = await fetchScheduleExport(year, event.slug);
   const people = peopleInSchedule(doc);
