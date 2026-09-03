@@ -123,16 +123,51 @@ export const PRETALX_EVENT: Partial<Record<Edition, { slug: string; access: Edit
 };
 ```
 
-One word is the single source of truth for three otherwise-scattered decisions:
+> **Correction, 2026-09-03.** This section originally claimed one word was the single
+> source of truth for three decisions — fetch path, loadability, and the `/cfp` target —
+> "moved together in a one-word PR". They do not move together, and the coupling is unsafe.
+>
+> *Is the event public?* must become true around 2026-09 so the CFP can accept 2027
+> proposals. *Is a schedule released?* must stay false until the 2027-04-01 announcement,
+> or the programme is public at `cfp.cloudnativedays.fr/2027/schedule/` no matter what this
+> site renders. The anonymous agenda export only exists once a schedule is **released**, so
+> flipping `access` to `"public"` on the day the event opens for submissions would ask for
+> an export that does not exist, 404, and fall back to a `pretalx-2027.json` snapshot that
+> also does not exist — the unguarded `readFileSync` crash in `remote-fetch.ts:66`.
+>
+> This is the same defect as D-2's: one marker asserted to mean several things that move on
+> different days.
 
-- which fetch path is used (anonymous agenda export vs authenticated REST);
-- whether the edition's data may be loaded in a production build at all;
-- which event `/cfp` links submitters to.
+`access` therefore means exactly one thing — **how the schedule is fetched**:
 
-Flipping `preview` → `public` on the day the Pretalx event goes public moves all three
-together, in a one-word PR. That is deliberately *not* the same switch as the `programme`
-flag: the CFP must target the 2027 event from the moment it opens (2026-09-01), months
-before the programme is announced (2027-04-01). Two facts, two switches.
+```ts
+export type EditionAccess = "public" | "preview";
+
+export const PRETALX_EVENT: Partial<Record<Edition, {
+  slug: string;
+  /** "preview" = authenticated REST against the wip schedule; "public" = anonymous
+   *  agenda export. Flips only when a schedule is actually RELEASED, never merely
+   *  when the event becomes visible to submitters. */
+  access: EditionAccess;
+  /** Whether the event accepts submissions publicly — drives the /cfp target only.
+   *  Independent of `access`, and safe to turn on months earlier. */
+  cfpOpen?: boolean;
+}>> = {
+  2026: { slug: "2026", access: "public" },
+  2027: { slug: "2027", access: "preview" },   // added when the event exists
+};
+```
+
+Two independent switches, each individually safe:
+
+| Switch | Means | Flips when | Affects |
+|---|---|---|---|
+| `cfpOpen` | submitters may reach this event | the 2027 event opens for proposals | `/cfp` link only |
+| `access` | a schedule is released | the announcement | fetch path only |
+
+Neither is the `programme` flag, which governs whether the pages render at all. Three
+facts, three switches — and the operator can perform each without reasoning about the
+others.
 
 ### D-2 — `src/lib/pretalx-preview.ts`, the authenticated reader
 
