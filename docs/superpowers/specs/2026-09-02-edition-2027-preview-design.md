@@ -106,7 +106,18 @@ levels or speaker enrichment.
 
 > **PII note.** `/api/events/{slug}/speakers/` returns `email` and `internal_notes`. The
 > mapper reads `code`, `name`, `biography`, `avatar_url` and `answers` and nothing else.
-> Like `pretalx-private.ts`, nothing from this path is ever written to disk.
+>
+> *Amended 2026-09-03.* "Reads nothing else" is not enough on its own, twice over. Each row
+> is **projected** into that shape at the fetch boundary (`pretalx-http.ts`), so the two
+> fields stop existing in memory rather than merely going unread — a `res.json() as T` is a
+> type assertion, not a filter. And a `res.json()` that *rejects* throws a V8 `SyntaxError`
+> whose message quotes the surrounding body text; that error is re-thrown body-free, because
+> the retry path prints it into the build log.
+>
+> Like `pretalx-private.ts`, this **client** never persists a response and no snapshot of a
+> preview edition is committed. The mapped records do reach Astro's content store under
+> `.astro/` via `src/content.config.ts` — a staging-only build artefact, carrying no PII
+> field, absent from the runtime image.
 
 ---
 
@@ -446,7 +457,8 @@ twenty speakers is one command plus one review, not twenty edits.
 | Token rejected (401/403) | **Build fails**, not degradable | `isConfigurationFailure` — ours to fix, never an outage |
 | `SPEAKER_QUESTIONS[2027]` missing | **Build fails** naming the edition | `MissingQuestionIdError`, existing behaviour |
 | `LEVEL_QUESTION_ID[2027]` points at the wrong question | **Build fails** naming both questions | New assertion, D-2 |
-| Pretalx unreachable, staging | Retry, then fail under `PRETALX_TOKEN_REQUIRED` unless `PRETALX_ALLOW_DEGRADED=1` | Matches the existing deliberate override |
+| Pretalx unreachable, staging — *speaker enrichment / levels* (`pretalx-private.ts`) | Retry, then fail under `PRETALX_TOKEN_REQUIRED` unless `PRETALX_ALLOW_DEGRADED=1` | Matches the existing deliberate override |
+| Pretalx unreachable, staging — *preview reader* (`pretalx-preview.ts`) | Retry, then **fail. `PRETALX_ALLOW_DEGRADED` does not apply to this path** | Amended 2026-09-03. The override degrades onto a committed snapshot the public half of the build already loaded; a preview edition has none and cannot have one (public repo), so "degraded" means the whole programme is missing. That result is byte-identical to the legitimate "wip schedule has no slots yet" row below, so allowing it would make an outage indistinguishable from an empty grid. The flag's own message promises "no affiliations and no level chips", never "no schedule". And nothing is unblocked by allowing it: production never fetches a preview edition, so no release is ever held up by this path — only staging, which has nothing worth shipping without the programme. Rationale in full on `loadPreviewEdition` |
 | Pretalx unreachable, production | **Unaffected** — 2027 is never fetched | D-3 |
 | 2027 event exists but wip schedule has no slots yet | Empty session list on staging, build succeeds | Genuinely empty ≠ broken. Distinguished from a failed fetch, which throws |
 | `PRETALX_EVENT[2027]` set before the event exists | **Build fails** with a named 404 | Non-retryable HTTP is a configuration failure. Note: with the *anonymous* path this crashes on an unguarded `readFileSync` of a non-existent `pretalx-2027.json` (`remote-fetch.ts:66`) — the preview path must not inherit that, and reports the 404 instead |

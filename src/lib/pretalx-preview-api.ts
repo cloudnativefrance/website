@@ -6,51 +6,81 @@
  * event whose schedule IS released. This module is the third case — an event
  * with no released schedule at all, whose grid exists only as a wip version.
  *
+ * The transport is not restated here: `pretalx-http.ts` owns pagination,
+ * re-anchoring, retries and the error taxonomy, and both authenticated readers
+ * import it. This module is only the endpoint list and the row projections.
+ *
  * Two rules inherited from `pretalx-private.ts`, both enforced here:
  *
  * 1. **The wip schedule's slots are the allowlist.** With a token,
  *    `/submissions/` returns rejected and pending proposals too. Only
  *    submissions that appear in a slot of the wip schedule may reach the site.
- * 2. **Nothing is cached to disk.** Fetched at build time and discarded.
+ * 2. **This client never persists a response.** Every request is made at build
+ *    time and nothing here writes a file; there is no snapshot of a preview
+ *    edition anywhere in the repo, and there deliberately cannot be — the repo
+ *    is public. The mapped `SessionRow`s and `SpeakerRecord`s that come out of
+ *    `pretalx-preview.ts` do land in Astro's content store under `.astro/`
+ *    (`src/content.config.ts`), which is a build artefact, staging-only, and
+ *    absent from the runtime image.
+ *
+ * **PII.** `/speakers/` returns `email` and `internal_notes`. `projectSpeaker`
+ * below builds a new object from the five fields the mapper reads, so neither
+ * ever exists in memory past the fetch boundary — see rule 3 in
+ * `pretalx-http.ts` for why a `res.json() as T` is not good enough.
  */
 import { PRETALX_BASE } from "./pretalx";
-import { reanchor } from "./pretalx-private";
+import {
+  PAGE_SIZE,
+  asNumber,
+  asString,
+  fetchAllPages,
+} from "./pretalx-http";
+
+/** Log tag, so a preview build's warnings are attributable to this path. */
+const LOG_PREFIX = "[preview]";
 
 /** Localised Pretalx fields come back as `{ "fr": "...", "en": "..." }`, sometimes as a plain string. */
 export type Localised = Record<string, string> | string;
 
 /** One row of `GET /slots/` — a talk's placement on the grid. `room` is an id, not an object. */
 export interface PreviewSlot {
-  id: number;
   submission: string;
   room: number;
   start: string;
-  end: string;
-  duration: number;
   is_visible: boolean;
-  schedule: number;
 }
 
-/** One row of `GET /submissions/`, expanded so track/type/speakers arrive nested rather than as ids. */
+/** One answer, with `?expand=answers.question` so `question` arrives as an object. */
+interface PreviewAnswer {
+  question: { id: number };
+  answer: string;
+}
+
+/**
+ * One row of `GET /submissions/`, expanded so track/type/speakers arrive nested
+ * rather than as ids.
+ *
+ * No `state`: the query pins `?state=confirmed`, so every row that arrives is
+ * confirmed by construction and re-reading the field would only invite a second,
+ * divergent filter.
+ */
 export interface PreviewSubmission {
   code: string;
   title: string;
   description: string | null;
-  abstract?: string | null;
+  abstract: string | null;
   duration: number;
   content_locale: string;
   tags: string[];
-  state: string;
   track: { name: Localised; color: string } | null;
   submission_type: { name: Localised } | null;
-  speakers: Array<{ code: string; name: string; biography: string | null }>;
-  answers: Array<{ question: { id: number }; answer: string }>;
+  speakers: Array<{ code: string; name: string }>;
+  answers: PreviewAnswer[];
 }
 
 /** One row of `GET /schedules/` — a version of the schedule, released or not. */
 interface PreviewScheduleVersion {
   id: number;
-  version: string;
   published: string | null;
 }
 
@@ -71,132 +101,83 @@ export function localised(v: Localised | null | undefined): string {
   return "";
 }
 
-/**
- * Pretalx caps page size well below what `limit` requests — asking for 100
- * returns 50 — so a single request silently truncates. Always follow `next`.
- * Mirrors `PAGE_SIZE` in `pretalx-private.ts`.
- */
-const PAGE_SIZE = 50;
-/** Backstop for a non-advancing cursor; see `fetchAllPages` in `pretalx-private.ts`. */
-const MAX_PAGES = 200;
-/** Backoff between attempts. Length is the retry count; short, since this blocks a build. */
-const RETRY_DELAYS_MS = [500, 2000, 5000];
+// -- Row projections --------------------------------------------------------
+//
+// Each builds a NEW object holding only the declared fields. None of them
+// throws and none of them puts a body value into an error message: an
+// unexpected shape degrades to an empty/zero value that `localised`, `toLevel`
+// and `toFormat` already handle, rather than failing a build over a field
+// nobody reads.
 
-/** What to print for a thrown value. `fetch` rejects with a TypeError; `catch` types it `unknown`. */
-function messageOf(err: unknown): string {
-  return err instanceof Error ? err.message : String(err);
-}
-
-/** 401/403 — the token is wrong or under-permissioned. Never worth a retry. */
-class PretalxAuthError extends Error {
-  constructor(status: number, what: string) {
-    super(
-      `HTTP ${status} fetching ${what} — token rejected or lacking access.`,
-    );
-    this.name = "PretalxAuthError";
-  }
-}
-
-/** Any other non-OK response. 5xx and 429 are worth another attempt; 4xx is not. */
-class PretalxHttpError extends Error {
-  readonly retryable: boolean;
-  constructor(status: number, what: string, url: string) {
-    super(`HTTP ${status} fetching ${what} from ${url}`);
-    this.name = "PretalxHttpError";
-    this.retryable = status >= 500 || status === 429;
-  }
-}
-
-/** One page of a paginated Pretalx list endpoint. */
-interface PretalxPage<T> {
-  results: T[];
-  next: string | null;
-}
-
-/**
- * Fetch one page, retrying only what a retry can actually fix.
- *
- * A dropped connection, a timeout, a 5xx or a 429 is Pretalx being briefly
- * unavailable. A 401/403 is our token being wrong and any other 4xx is our
- * request being wrong — retrying those just makes the build slower before it
- * fails the same way.
- */
-async function fetchPage<T>(
-  url: string,
-  token: string,
-  what: string,
-  timeoutMs: number,
-): Promise<PretalxPage<T>> {
-  let lastErr: unknown;
-  for (let attempt = 0; ; attempt++) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const res = await fetch(url, {
-        signal: controller.signal,
-        headers: {
-          Authorization: `Token ${token}`,
-          Accept: "application/json",
-          "User-Agent": "cndfrance-website-build/1.0",
-        },
-      });
-      if (res.status === 401 || res.status === 403)
-        throw new PretalxAuthError(res.status, what);
-      if (!res.ok) throw new PretalxHttpError(res.status, what, url);
-      return (await res.json()) as PretalxPage<T>;
-    } catch (err) {
-      // Never retry a failure that is about us rather than about Pretalx.
-      if (err instanceof PretalxAuthError) throw err;
-      if (err instanceof PretalxHttpError && !err.retryable) throw err;
-      lastErr = err;
-    } finally {
-      clearTimeout(timer);
+function projectLocalised(value: unknown): Localised {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    const out: Record<string, string> = {};
+    for (const [key, v] of Object.entries(value as Record<string, unknown>)) {
+      if (typeof v === "string") out[key] = v;
     }
-
-    const delay = RETRY_DELAYS_MS[attempt];
-    if (delay === undefined) throw lastErr;
-    console.warn(
-      `[preview] ${what}: ${messageOf(lastErr)} — retrying in ${delay}ms ` +
-        `(${attempt + 1}/${RETRY_DELAYS_MS.length})`,
-    );
-    await new Promise((r) => setTimeout(r, delay));
+    return out;
   }
+  return "";
 }
 
-/**
- * Fetch every page of a paginated endpoint.
- *
- * Mirrors `fetchAllPages` in `pretalx-private.ts`: the `MAX_PAGES` backstop
- * against a non-advancing cursor, and re-anchoring `next` onto the configured
- * origin, because Pretalx emits it as `http://` even over HTTPS — following it
- * verbatim is a cross-origin hop and `fetch` silently drops the Authorization
- * header across it.
- */
-async function fetchAllPages<T>(
-  url: string,
-  token: string,
-  what: string,
-  timeoutMs = 30000,
-): Promise<T[]> {
-  const out: T[] = [];
-  let next: string | null = url;
-  let pages = 0;
-  while (next) {
-    if (++pages > MAX_PAGES) {
-      throw new Error(
-        `[preview] ${what} exceeded ${MAX_PAGES} pages — cursor is not advancing`,
-      );
-    }
-    const body: PretalxPage<T> = await fetchPage<T>(
-      next,
-      token,
-      what,
-      timeoutMs,
-    );
-    out.push(...body.results);
-    next = body.next ? reanchor(body.next) : null;
-  }
-  return out;
+function projectAnswers(value: unknown): PreviewAnswer[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((row) => {
+    const r = (row ?? {}) as Record<string, unknown>;
+    const question = (r.question ?? {}) as Record<string, unknown>;
+    return { question: { id: asNumber(question.id) }, answer: asString(r.answer) };
+  });
+}
+
+function projectSlot(row: unknown): PreviewSlot {
+  const r = (row ?? {}) as Record<string, unknown>;
+  return {
+    submission: asString(r.submission),
+    room: asNumber(r.room),
+    start: asString(r.start),
+    // `!== false`, not `=== true`: the nested slots under /submissions/ report
+    // `is_visible: null`, and a null has always meant visible on this path.
+    is_visible: r.is_visible !== false,
+  };
+}
+
+function projectSubmission(row: unknown): PreviewSubmission {
+  const r = (row ?? {}) as Record<string, unknown>;
+  const track = (r.track ?? null) as Record<string, unknown> | null;
+  const type = (r.submission_type ?? null) as Record<string, unknown> | null;
+  const speakers = Array.isArray(r.speakers) ? r.speakers : [];
+  return {
+    code: asString(r.code),
+    title: asString(r.title),
+    description: typeof r.description === "string" ? r.description : null,
+    abstract: typeof r.abstract === "string" ? r.abstract : null,
+    duration: asNumber(r.duration),
+    content_locale: asString(r.content_locale),
+    tags: Array.isArray(r.tags) ? r.tags.filter((t) => typeof t === "string") : [],
+    track: track
+      ? { name: projectLocalised(track.name), color: asString(track.color) }
+      : null,
+    submission_type: type ? { name: projectLocalised(type.name) } : null,
+    speakers: speakers.map((person) => {
+      const p = (person ?? {}) as Record<string, unknown>;
+      return { code: asString(p.code), name: asString(p.name) };
+    }),
+    answers: projectAnswers(r.answers),
+  };
+}
+
+function projectScheduleVersion(row: unknown): PreviewScheduleVersion {
+  const r = (row ?? {}) as Record<string, unknown>;
+  return {
+    id: asNumber(r.id),
+    published: typeof r.published === "string" ? r.published : null,
+  };
+}
+
+function projectRoom(row: unknown): PreviewRoom {
+  const r = (row ?? {}) as Record<string, unknown>;
+  return { id: asNumber(r.id), name: projectLocalised(r.name) };
 }
 
 /**
@@ -211,11 +192,13 @@ export async function fetchWipScheduleId(
   slug: string,
   token: string,
 ): Promise<number> {
-  const versions = await fetchAllPages<PreviewScheduleVersion>(
-    `${PRETALX_BASE}/api/events/${slug}/schedules/?limit=${PAGE_SIZE}`,
+  const versions = await fetchAllPages<PreviewScheduleVersion>({
+    url: `${PRETALX_BASE}/api/events/${slug}/schedules/?limit=${PAGE_SIZE}`,
     token,
-    `schedules for ${slug}`,
-  );
+    what: `schedules for ${slug}`,
+    project: projectScheduleVersion,
+    logPrefix: LOG_PREFIX,
+  });
   const wip = versions.find((v) => v.published === null);
   if (!wip) {
     throw new Error(
@@ -233,29 +216,41 @@ export async function fetchPreviewSlots(
   scheduleId: number,
   token: string,
 ): Promise<PreviewSlot[]> {
-  return fetchAllPages<PreviewSlot>(
-    `${PRETALX_BASE}/api/events/${slug}/slots/?schedule=${scheduleId}&limit=${PAGE_SIZE}`,
+  return fetchAllPages<PreviewSlot>({
+    url: `${PRETALX_BASE}/api/events/${slug}/slots/?schedule=${scheduleId}&limit=${PAGE_SIZE}`,
     token,
-    `slots for ${slug} (schedule ${scheduleId})`,
-  );
+    what: `slots for ${slug} (schedule ${scheduleId})`,
+    project: projectSlot,
+    logPrefix: LOG_PREFIX,
+  });
 }
 
 /**
- * Every submission for the event — including rejected and pending ones.
+ * Every CONFIRMED submission for the event.
  *
- * `/slots/` is the allowlist, not this: the caller must join against the wip
- * schedule's slots and discard anything without one, per the module docstring.
+ * `?state=confirmed` is the first filter, per spec D-2. Without it the walk
+ * pulls rejected and pending proposals into memory, and a proposal that is
+ * slotted but not yet accepted would render as a real talk — the grid would
+ * announce something the organisers have not decided.
+ *
+ * It is not the only filter: `/slots/` remains the allowlist, and the caller
+ * must still join against the wip schedule's slots and discard anything without
+ * one, per the module docstring. Confirmed-but-unslotted is just as unpublished
+ * as slotted-but-unconfirmed.
  */
 export async function fetchPreviewSubmissions(
   slug: string,
   token: string,
 ): Promise<PreviewSubmission[]> {
-  return fetchAllPages<PreviewSubmission>(
-    `${PRETALX_BASE}/api/events/${slug}/submissions/` +
-      `?expand=track,submission_type,speakers,answers.question&limit=${PAGE_SIZE}`,
+  return fetchAllPages<PreviewSubmission>({
+    url:
+      `${PRETALX_BASE}/api/events/${slug}/submissions/?state=confirmed` +
+      `&expand=track,submission_type,speakers,answers.question&limit=${PAGE_SIZE}`,
     token,
-    `submissions for ${slug}`,
-  );
+    what: `submissions for ${slug}`,
+    project: projectSubmission,
+    logPrefix: LOG_PREFIX,
+  });
 }
 
 /** Room id → localised name, for resolving `PreviewSlot.room`. */
@@ -263,26 +258,39 @@ export async function fetchRoomNames(
   slug: string,
   token: string,
 ): Promise<Map<number, string>> {
-  const rooms = await fetchAllPages<PreviewRoom>(
-    `${PRETALX_BASE}/api/events/${slug}/rooms/?limit=${PAGE_SIZE}`,
+  const rooms = await fetchAllPages<PreviewRoom>({
+    url: `${PRETALX_BASE}/api/events/${slug}/rooms/?limit=${PAGE_SIZE}`,
     token,
-    `rooms for ${slug}`,
-  );
+    what: `rooms for ${slug}`,
+    project: projectRoom,
+    logPrefix: LOG_PREFIX,
+  });
   return new Map(rooms.map((r) => [r.id, localised(r.name)]));
 }
 
 /**
  * One row of `GET /speakers/`, narrowed to the fields the mapper is allowed to
- * read. The live endpoint also returns `email` and `internal_notes` — this
- * type deliberately omits both so nothing downstream can read them, mirroring
- * the PII note in `pretalx-private.ts`.
+ * read. The live endpoint also returns `email` and `internal_notes` — this type
+ * omits both, and `projectSpeaker` enforces the omission rather than merely
+ * declaring it.
  */
 export interface PreviewSpeaker {
   code: string;
   name: string;
   biography: string | null;
   avatar_url: string | null;
-  answers: Array<{ question: { id: number }; answer: string }>;
+  answers: PreviewAnswer[];
+}
+
+function projectSpeaker(row: unknown): PreviewSpeaker {
+  const r = (row ?? {}) as Record<string, unknown>;
+  return {
+    code: asString(r.code),
+    name: asString(r.name),
+    biography: typeof r.biography === "string" ? r.biography : null,
+    avatar_url: typeof r.avatar_url === "string" ? r.avatar_url : null,
+    answers: projectAnswers(r.answers),
+  };
 }
 
 /**
@@ -298,9 +306,11 @@ export async function fetchPreviewSpeakers(
   slug: string,
   token: string,
 ): Promise<PreviewSpeaker[]> {
-  return fetchAllPages<PreviewSpeaker>(
-    `${PRETALX_BASE}/api/events/${slug}/speakers/?expand=answers.question&limit=${PAGE_SIZE}`,
+  return fetchAllPages<PreviewSpeaker>({
+    url: `${PRETALX_BASE}/api/events/${slug}/speakers/?expand=answers.question&limit=${PAGE_SIZE}`,
     token,
-    `speakers for ${slug}`,
-  );
+    what: `speakers for ${slug}`,
+    project: projectSpeaker,
+    logPrefix: LOG_PREFIX,
+  });
 }

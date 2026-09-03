@@ -18,7 +18,13 @@
  *    directly, which (with a token) returns every person who ever submitted.
  *    Visibility matters on both halves: `scheduledPersonCodes` skips an
  *    invisible slot for the same reason `loadSessions` filters out its row.
- * 2. **Nothing is cached to disk.** Fetched at build time and discarded.
+ * 2. **The client never persists a response.** `pretalx-preview-api.ts` writes
+ *    no file, and no snapshot of a preview edition is committed — the repo is
+ *    public, which is why one cannot be. The mapped records this module
+ *    returns do land in Astro's content store under `.astro/`
+ *    (`src/content.config.ts` writes every `SpeakerRecord` there), which is a
+ *    build artefact: staging-only, carrying no PII field, and absent from the
+ *    runtime image nginx serves.
  */
 import type { Edition } from "./editions";
 // Type-only: schedule.ts and speaker-source.ts will import this module at
@@ -231,6 +237,40 @@ export function scheduledPersonCodes(
  * retrying per page.
  */
 const CACHE = new Map<string, Promise<PreviewEdition>>();
+
+/**
+ * `PRETALX_ALLOW_DEGRADED` does NOT apply to this path. A deliberate choice,
+ * not an omission — `pretalx-private.ts` wraps its reads in `degradeOnFailure`
+ * and this module wraps nothing, so a failed preview read is always fatal,
+ * whatever the flag says.
+ *
+ * Four reasons, in the order that decided it:
+ *
+ * 1. **There is nothing to degrade TO.** The private path degrades onto a
+ *    committed snapshot the public half of the build has already loaded: the
+ *    site still renders, minus affiliations and level chips. A preview edition
+ *    has no snapshot beneath it and cannot have one — the repo is public, so
+ *    committing an unreleased programme is the leak the whole design exists to
+ *    prevent. "Degraded" here means the entire programme is missing.
+ * 2. **An empty grid is indistinguishable from a legitimate one.** The spec
+ *    lists "wip schedule has no slots yet → empty session list, build
+ *    succeeds" as a success case. Degrading past an outage would produce a
+ *    byte-identical result from a completely different cause, and the operator
+ *    reviewing staging cannot tell which they are looking at.
+ * 3. **The flag's own error text would become a lie.** It promises a build
+ *    with "no speaker affiliations and no level chips" — a visible but partial
+ *    loss. It has never promised, and must not quietly come to mean, "no
+ *    schedule at all".
+ * 4. **Nothing is unblocked by allowing it.** The override exists so a Pretalx
+ *    outage cannot block a PRODUCTION deploy. Production never fetches a
+ *    preview edition — that is the invariant — so no production deploy is ever
+ *    held up by this code. Only staging is, and a staging build whose one
+ *    purpose is to show the preview programme has nothing worth shipping when
+ *    the programme cannot be read. Rebuild when Pretalx is back.
+ *
+ * `docs/superpowers/specs/2026-09-02-edition-2027-preview-design.md`'s failure
+ * table records the same decision; change both together.
+ */
 
 export async function loadPreviewEdition(
   year: Edition,

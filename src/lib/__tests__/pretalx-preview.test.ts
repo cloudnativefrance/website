@@ -10,29 +10,29 @@ const rooms = new Map([
   [2, "Piaf"],
 ]);
 
+// Both fixtures are exactly the projected shapes `pretalx-preview-api.ts`
+// returns — no `state`, no slot `id`/`end`/`duration`/`schedule`, no
+// `speakers[].biography` — because those fields are dropped at the fetch
+// boundary and nothing downstream may assume they exist.
 const submission = {
   code: "ABC123",
   title: "Scaling etcd",
   description: "How we did it",
+  abstract: null,
   duration: 30,
   content_locale: "fr",
   tags: ["ops"],
-  state: "confirmed",
   track: { name: { fr: "Infrastructure" }, color: "#edbb45" },
   submission_type: { name: { fr: "Talk" } },
-  speakers: [{ code: "S1", name: "Ada Lovelace", biography: "bio" }],
+  speakers: [{ code: "S1", name: "Ada Lovelace" }],
   answers: [{ question: { id: 4 }, answer: "Intermédiaire" }],
 };
 
 const slot = {
-  id: 1,
   submission: "ABC123",
   room: 1,
   start: "2027-06-03T10:30:00+02:00",
-  end: "2027-06-03T11:00:00+02:00",
-  duration: 30,
   is_visible: true,
-  schedule: 12,
 };
 
 const resolve = () => "ada-lovelace";
@@ -240,12 +240,12 @@ describe("toPreviewSpeakers", () => {
  * published its speaker's record and their `/intervenants/<year>/<slug>` page.
  */
 describe("scheduledPersonCodes", () => {
-  const hidden = { ...slot, id: 2, submission: "HID999", is_visible: false };
+  const hidden = { ...slot, submission: "HID999", is_visible: false };
   const hiddenSubmission = {
     ...submission,
     code: "HID999",
     title: "Embargoed keynote",
-    speakers: [{ code: "S9", name: "Grace Hopper", biography: "bio" }],
+    speakers: [{ code: "S9", name: "Grace Hopper" }],
   };
 
   it("collects the speakers of a visible slot", () => {
@@ -282,7 +282,7 @@ describe("scheduledPersonCodes", () => {
   });
 
   it("still collects a person who also has a visible slot", () => {
-    const alsoVisible = { ...hidden, id: 3, is_visible: true };
+    const alsoVisible = { ...hidden, is_visible: true };
     expect(
       scheduledPersonCodes([hidden, alsoVisible], [hiddenSubmission]),
     ).toEqual(new Set(["S9"]));

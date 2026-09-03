@@ -18,13 +18,33 @@
  *    caller passes the set of codes taken from the public released export, and
  *    answers are only ever returned for members of that set.
  *
- * 2. **Nothing here is cached to disk.** The values are fetched at build time and
- *    discarded. A speaker asking to be removed is handled by deleting them in
- *    Pretalx and rebuilding; there is no snapshot or git history to rewrite.
+ * 2. **This client never persists a response.** The values are fetched at build
+ *    time, held in the two memo maps below for the life of the process, and
+ *    discarded with it — nothing here writes a file, and no snapshot of these
+ *    answers is committed. What the build does with the mapped values
+ *    afterwards is a separate question: `loadSpeakerEnrichment`'s output is
+ *    merged into `SpeakerRecord`s that `src/content.config.ts` writes into
+ *    Astro's content store under `.astro/`, a build artefact absent from the
+ *    runtime image. A speaker asking to be removed is still handled by deleting
+ *    them in Pretalx and rebuilding; there is no git history to rewrite.
  */
 import { readFileSync } from "node:fs";
 import type { Edition } from "./editions";
 import { PRETALX_BASE } from "./pretalx";
+import {
+  PAGE_SIZE,
+  PretalxAuthError,
+  PretalxHttpError,
+  TOKEN_HELP,
+  asString,
+  fetchAllPages,
+  messageOf,
+} from "./pretalx-http";
+
+// `reanchor` moved into the shared HTTP layer with the rest of the pagination
+// logic; re-exported so its tests (tests/build/pretalx-levels.test.ts) and any
+// existing importer keep the path they had.
+export { reanchor } from "./pretalx-http";
 
 export type SpeakerField =
   | "company"
@@ -71,11 +91,6 @@ export type SpeakerEnrichment = Map<string, Partial<Record<SpeakerField, string>
 /** Talk level answers, keyed by submission code. */
 export type LevelAnswers = Map<string, string>;
 
-/** What to print for a thrown value. `fetch` rejects with a TypeError; `catch` types it `unknown`. */
-function messageOf(err: unknown): string {
-  return err instanceof Error ? err.message : String(err);
-}
-
 function readToken(): string | undefined {
   const direct = process.env.PRETALX_API_TOKEN?.trim();
   if (direct) return direct;
@@ -91,41 +106,11 @@ function readToken(): string | undefined {
   }
 }
 
-/**
- * How to obtain a token, appended to whichever error surfaces first.
- */
-const TOKEN_HELP =
-  "Set PRETALX_API_TOKEN, or PRETALX_API_TOKEN_FILE to a file containing it. " +
-  `Create one at ${PRETALX_BASE}/orga/me with read access to questions and answers.`;
-
 /** Thrown when there is no token at all, so the policy check has one thing to catch. */
 class MissingTokenError extends Error {
   constructor() {
     super(`No API token. ${TOKEN_HELP}`);
     this.name = "MissingTokenError";
-  }
-}
-
-/**
- * 401/403 — the token is wrong or under-permissioned.
- *
- * Grouped with `MissingTokenError` as a CONFIGURATION failure: it is our
- * mistake, retrying cannot fix it, and it must never be degraded past.
- */
-class PretalxAuthError extends Error {
-  constructor(status: number, what: string) {
-    super(`HTTP ${status} fetching ${what} — token rejected or lacking access. ${TOKEN_HELP}`);
-    this.name = "PretalxAuthError";
-  }
-}
-
-/** Any other non-OK response. 5xx and 429 are worth another attempt; 4xx is not. */
-class PretalxHttpError extends Error {
-  readonly retryable: boolean;
-  constructor(status: number, what: string, url: string) {
-    super(`HTTP ${status} fetching ${what} from ${url}`);
-    this.name = "PretalxHttpError";
-    this.retryable = status >= 500 || status === 429;
   }
 }
 
@@ -169,136 +154,35 @@ export function requireToken(): string {
   return token;
 }
 
-const PAGE_SIZE = 50;
-/** Backstop for a non-advancing cursor; see `fetchAllPages`. */
-const MAX_PAGES = 200;
-
 /**
- * Re-anchor a paginated `next` link onto the configured origin.
+ * One row of `GET /answers/`, narrowed to the three fields this module reads.
  *
- * Pretalx builds absolute `next` URLs from its own notion of the request scheme
- * and emits `http://cfp.cloudnativedays.fr/...` even when serving over HTTPS.
- * Following that verbatim is a cross-origin hop, and fetch drops the
- * `Authorization` header across it — so page 1 returns 200 and page 2 returns
- * 401. Rewriting the scheme and host keeps every page on the authenticated
- * origin while preserving the query string that carries the cursor.
+ * The endpoint returns more than this. `projectAnswer` below builds a fresh
+ * object rather than asserting a type over the raw row, so the rest never
+ * enters memory — see rule 3 in `pretalx-http.ts`. `question` is deliberately
+ * absent: the URL already filters by question id, so nothing here re-reads it.
  */
-export function reanchor(next: string): string {
-  const base = new URL(PRETALX_BASE);
-  const url = new URL(next);
-  // Both setters below are no-ops on opaque-path schemes, so a `data:` or
-  // `file:` link would pass through UNCHANGED rather than being pinned to the
-  // configured origin — the opposite of what this function promises. Reject
-  // those outright instead of returning something that only looks re-anchored.
-  if (url.protocol !== "http:" && url.protocol !== "https:") {
-    throw new Error(`[pretalx] refusing a non-HTTP pagination link (${url.protocol})`);
-  }
-  url.protocol = base.protocol;
-  url.host = base.host;
-  // Credentials in `next` would be sent to the real host and echoed into build
-  // logs by the error path below. Only a compromised Pretalx could plant them,
-  // but dropping them costs nothing.
-  url.username = "";
-  url.password = "";
-  return url.toString();
-}
-
-/**
- * Fetch every page of a paginated endpoint.
- *
- * Pretalx caps page size well below what `limit` requests — asking for 400 returns
- * 50 — so a single request silently truncates. Always follow `next`.
- */
-async function fetchAllPages<T>(
-  url: string,
-  token: string,
-  what: string,
-  timeoutMs = 30000,
-): Promise<T[]> {
-  const out: T[] = [];
-  let next: string | null = url;
-  // A `next` that points back at a page already fetched would loop forever:
-  // the per-request timeout bounds each hop, nothing bounds the walk. The
-  // largest endpoint here is ~310 rows at PAGE_SIZE, so this cap is far above
-  // any real crawl and only trips on a cursor that is not advancing.
-  let pages = 0;
-  while (next) {
-    if (++pages > MAX_PAGES) {
-      throw new Error(`[pretalx] ${what} exceeded ${MAX_PAGES} pages — cursor is not advancing`);
-    }
-    // Annotated because `next` is both the input here and assigned from the
-    // result below; without it the inference is circular and `body` lands as
-    // an implicit `any`, silently dropping the shape check on `results`.
-    const body: PretalxPage<T> = await fetchPage<T>(next, token, what, timeoutMs);
-    out.push(...body.results);
-    next = body.next ? reanchor(body.next) : null;
-  }
-  return out;
-}
-
-/** One page of a paginated Pretalx list endpoint. */
-interface PretalxPage<T> {
-  results: T[];
-  next: string | null;
-}
-
-/** Backoff between attempts. Length is the retry count; short, since this blocks a build. */
-const RETRY_DELAYS_MS = [500, 2000, 5000];
-
-/**
- * Fetch one page, retrying only what a retry can actually fix.
- *
- * A dropped connection, a timeout, a 5xx or a 429 is Pretalx being briefly
- * unavailable, and most real outages are brief. A 401/403 is our token being
- * wrong and any other 4xx is our request being wrong — retrying those just
- * makes the build slower before it fails the same way.
- */
-async function fetchPage<T>(
-  url: string,
-  token: string,
-  what: string,
-  timeoutMs: number,
-): Promise<PretalxPage<T>> {
-  let lastErr: unknown;
-  for (let attempt = 0; ; attempt++) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const res = await fetch(url, {
-        signal: controller.signal,
-        headers: {
-          Authorization: `Token ${token}`,
-          Accept: "application/json",
-          "User-Agent": "cndfrance-website-build/1.0",
-        },
-      });
-      if (res.status === 401 || res.status === 403) throw new PretalxAuthError(res.status, what);
-      if (!res.ok) throw new PretalxHttpError(res.status, what, url);
-      return (await res.json()) as PretalxPage<T>;
-    } catch (err) {
-      // Never retry a failure that is about us rather than about Pretalx.
-      if (err instanceof PretalxAuthError) throw err;
-      if (err instanceof PretalxHttpError && !err.retryable) throw err;
-      lastErr = err;
-    } finally {
-      clearTimeout(timer);
-    }
-
-    const delay = RETRY_DELAYS_MS[attempt];
-    if (delay === undefined) throw lastErr;
-    console.warn(
-      `[pretalx] ${what}: ${messageOf(lastErr)} — retrying in ${delay}ms ` +
-        `(${attempt + 1}/${RETRY_DELAYS_MS.length})`,
-    );
-    await new Promise((r) => setTimeout(r, delay));
-  }
-}
-
 interface PretalxAnswer {
-  question: number;
   answer: string;
   person: string | null;
   submission: string | null;
+}
+
+/**
+ * Narrow one raw `/answers/` row.
+ *
+ * The coercions preserve the previous behaviour exactly: consumers already
+ * wrote `(a.answer || "").trim()` and `if (!a.person)`, so a missing value
+ * arriving as `""`/`null` reads the same as the `undefined` an unchecked
+ * `res.json() as T` used to hand them.
+ */
+function projectAnswer(row: unknown): PretalxAnswer {
+  const r = (row ?? {}) as Record<string, unknown>;
+  return {
+    answer: asString(r.answer),
+    person: typeof r.person === "string" ? r.person : null,
+    submission: typeof r.submission === "string" ? r.submission : null,
+  };
 }
 
 function answersUrl(eventSlug: string, questionId: number): string {
@@ -421,11 +305,12 @@ export async function loadSpeakerEnrichment(
         (Object.entries(questions) as [SpeakerField, number][]).map(
           async ([field, questionId]) => ({
             field,
-            answers: await fetchAllPages<PretalxAnswer>(
-              answersUrl(eventSlug, questionId),
+            answers: await fetchAllPages<PretalxAnswer>({
+              url: answersUrl(eventSlug, questionId),
               token,
-              `speaker field "${field}" (question ${questionId})`,
-            ),
+              what: `speaker field "${field}" (question ${questionId})`,
+              project: projectAnswer,
+            }),
           }),
         ),
       );
@@ -475,11 +360,12 @@ export async function loadLevelAnswers(
         );
       }
 
-      const answers = await fetchAllPages<PretalxAnswer>(
-        answersUrl(eventSlug, questionId),
+      const answers = await fetchAllPages<PretalxAnswer>({
+        url: answersUrl(eventSlug, questionId),
         token,
-        `talk level (question ${questionId})`,
-      );
+        what: `talk level (question ${questionId})`,
+        project: projectAnswer,
+      });
       for (const a of answers) {
         if (!a.submission || !allowedSubmissionCodes.has(a.submission)) continue;
         const value = (a.answer || "").trim();
