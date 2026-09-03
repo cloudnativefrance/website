@@ -93,7 +93,14 @@ export interface PreviewSubmission {
 /** One row of `GET /schedules/` — a version of the schedule, released or not. */
 interface PreviewScheduleVersion {
   id: number;
-  published: string | null;
+  /**
+   * Whether this version has never been released.
+   *
+   * A boolean rather than the raw `published` date, because only the answer is
+   * ever read and the coercion that produces it must happen once. See
+   * `isUnpublished` below for why it is strict.
+   */
+  wip: boolean;
 }
 
 /** One row of `GET /rooms/`. */
@@ -120,6 +127,93 @@ export function localised(v: Localised | null | undefined): string {
 // unexpected shape degrades to an empty/zero value that `localised`, `toLevel`
 // and `toFormat` already handle, rather than failing a build over a field
 // nobody reads.
+//
+// **Two fields are exempt from that, because they grant something.** Degrading
+// to a blank is right for a room name and wrong for a permission: an unexpected
+// shape must never be read as a yes. Both below therefore demand the exact
+// shape they are documented to have and DENY on anything else — see
+// `slotIsVisible` and `isUnpublished`.
+
+/**
+ * Name a value's shape for a log line WITHOUT quoting it.
+ *
+ * `/speakers/` bodies carry `email` and `internal_notes`, and a projection's
+ * warning goes to the same build log the retry warnings do — so these messages
+ * say "string" or "absent", never what the string was. Same rule as
+ * `PretalxParseError`.
+ */
+function shapeOf(value: unknown): string {
+  if (value === null) return "null";
+  if (value === undefined) return "absent";
+  return Array.isArray(value) ? "array" : typeof value;
+}
+
+/**
+ * One warning per field per build, not one per row.
+ *
+ * A renamed field is renamed on every row, and these endpoints return a few
+ * hundred of them. The deny is the safety property; the warning only has to
+ * make it attributable.
+ */
+const warnedFields = new Set<string>();
+
+function warnUnexpectedShape(field: string, value: unknown, consequence: string): void {
+  if (warnedFields.has(field)) return;
+  warnedFields.add(field);
+  console.warn(
+    `${LOG_PREFIX} ${field} arrived as ${shapeOf(value)}, not the documented shape — ` +
+      `${consequence} This is what a renamed or dropped Pretalx field looks like.`,
+  );
+}
+
+/**
+ * Is this slot visible on the wip schedule? Fails CLOSED.
+ *
+ * This decides whether an embargoed talk reaches the site, and — through
+ * `scheduledPersonCodes` — whether its speaker's name, bio, employer and photo
+ * do. It used to be `r.is_visible !== false`, so an absent, renamed or
+ * string-valued field meant VISIBLE: exactly the embargoed-speaker leak the
+ * shared visibility join was written to close, re-opened by a coercion.
+ *
+ * Only a literal `true` grants. Anything else hides the slot, which costs at
+ * worst an incomplete staging grid and can never publish something unannounced.
+ */
+function slotIsVisible(value: unknown): boolean {
+  if (value === true) return true;
+  if (value !== false) {
+    warnUnexpectedShape(
+      "slots[].is_visible",
+      value,
+      "treating the slot as HIDDEN, so the preview grid may be short or empty.",
+    );
+  }
+  return false;
+}
+
+/**
+ * Has this schedule version never been released? Fails CLOSED.
+ *
+ * `null` is Pretalx's "not published"; a string is the publication timestamp.
+ * The old reading — `typeof r.published === "string" ? r.published : null` —
+ * collapsed *absent* into *null*, so a renamed field made every version look
+ * unpublished and `fetchWipScheduleId` returned the first one, typically the
+ * RELEASED one. That is precisely the stale grid its docstring promises it
+ * refuses to serve, delivered silently.
+ *
+ * Only a literal `null` counts as wip. An unrecognised shape counts as
+ * published, so no version qualifies and `fetchWipScheduleId` throws.
+ */
+function isUnpublished(value: unknown): boolean {
+  if (value === null) return true;
+  if (typeof value !== "string") {
+    warnUnexpectedShape(
+      "schedules[].published",
+      value,
+      "treating the version as RELEASED, so no version can qualify as wip.",
+    );
+  }
+  return false;
+}
 
 function projectLocalised(value: unknown): Localised {
   if (typeof value === "string") return value;
@@ -148,9 +242,7 @@ function projectSlot(row: unknown): PreviewSlot {
     submission: asString(r.submission),
     room: asNumber(r.room),
     start: asString(r.start),
-    // `!== false`, not `=== true`: the nested slots under /submissions/ report
-    // `is_visible: null`, and a null has always meant visible on this path.
-    is_visible: r.is_visible !== false,
+    is_visible: slotIsVisible(r.is_visible),
     duration: asNumber(r.duration),
   };
 }
@@ -184,7 +276,7 @@ function projectScheduleVersion(row: unknown): PreviewScheduleVersion {
   const r = asRecord(row);
   return {
     id: asNumber(r.id),
-    published: typeof r.published === "string" ? r.published : null,
+    wip: isUnpublished(r.published),
   };
 }
 
@@ -212,12 +304,15 @@ export async function fetchWipScheduleId(
     project: projectScheduleVersion,
     logPrefix: LOG_PREFIX,
   });
-  const wip = versions.find((v) => v.published === null);
+  const wip = versions.find((v) => v.wip);
   if (!wip) {
     throw new Error(
-      `[preview] event "${slug}" has no unpublished schedule version. A preview ` +
-        `edition renders the wip schedule; refusing to fall back to a released one, ` +
-        `which would silently show an older grid than the organisers are editing.`,
+      `[preview] event "${slug}" has no unpublished schedule version among the ` +
+        `${versions.length} returned. A preview edition renders the wip schedule; ` +
+        `refusing to fall back to a released one, which would silently show an older ` +
+        `grid than the organisers are editing. If the event does have a wip version, ` +
+        `check the warning above: an unrecognised "published" shape is read as ` +
+        `RELEASED rather than guessed at.`,
     );
   }
   return wip.id;

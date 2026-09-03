@@ -97,9 +97,10 @@ export function joinScheduledTalks(
   for (const slot of slots) {
     const submission = byCode.get(slot.submission);
     if (!submission) continue;
-    // `!== false`, not `=== true`: a null is visible on this path, matching
-    // `projectSlot`'s own coercion.
-    talks.push({ slot, submission, visible: slot.is_visible !== false });
+    // No coercion here. `projectSlot` already resolved the field to a strict
+    // boolean that fails CLOSED on an unexpected shape; restating a looser rule
+    // at this second site is how the two halves disagreed in the first place.
+    talks.push({ slot, submission, visible: slot.is_visible });
   }
   return talks;
 }

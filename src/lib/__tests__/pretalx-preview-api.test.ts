@@ -71,6 +71,44 @@ describe("fetchWipScheduleId", () => {
       /unpublished/i,
     );
   });
+
+  /**
+   * The coercion that used to defeat the guarantee above.
+   *
+   * `typeof r.published === "string" ? … : null` read *absent* as *null*, so a
+   * renamed or dropped field made every version look unpublished and the first
+   * — in practice the RELEASED one — was returned as the wip id. The grid would
+   * then render last week's schedule with nothing to observe. Only a literal
+   * null may mean wip; every other shape counts as released, so nothing
+   * qualifies and this throws.
+   */
+  describe("fails CLOSED on an unrecognised `published` shape", () => {
+    it.each([
+      ["the field is absent", { id: 9, version: "v1.0" }],
+      ["the field was renamed", { id: 9, published_at: null }],
+      ["the field is a number", { id: 9, published: 0 }],
+      ["the field is a boolean", { id: 9, published: false }],
+    ])("throws rather than returning a released version when %s", async (_label, row) => {
+      vi.stubGlobal("fetch", () => jsonOnce({ count: 1, next: null, results: [row] }));
+      await expect(fetchWipScheduleId("democon", TOKEN)).rejects.toThrow(
+        /unpublished/i,
+      );
+    });
+
+    it("still resolves the wip id when one version really is unpublished", async () => {
+      vi.stubGlobal("fetch", () =>
+        jsonOnce({
+          count: 2,
+          next: null,
+          results: [
+            { id: 9, published: "2025-06-22T09:57:42+02:00" },
+            { id: 12, published: null },
+          ],
+        }),
+      );
+      await expect(fetchWipScheduleId("democon", TOKEN)).resolves.toBe(12);
+    });
+  });
 });
 
 describe("fetchPreviewSlots", () => {
@@ -81,6 +119,43 @@ describe("fetchPreviewSlots", () => {
     });
     await fetchPreviewSlots("democon", 12, TOKEN);
     expect(calls[0]).toContain("schedule=12");
+  });
+
+  /**
+   * The coercion that re-opened the embargoed-speaker leak.
+   *
+   * `r.is_visible !== false` read an absent, renamed or string-valued field as
+   * VISIBLE, so a slot the organisers had hidden published its talk AND — via
+   * `scheduledPersonCodes` — its speaker's name, bio, employer and photo. Only
+   * a literal `true` may grant visibility; every other shape hides the slot.
+   */
+  describe("fails CLOSED on an unrecognised `is_visible` shape", () => {
+    async function visibilityOf(row: Record<string, unknown>) {
+      vi.stubGlobal("fetch", () =>
+        jsonOnce({
+          count: 1,
+          next: null,
+          results: [{ submission: "AAA", room: 1, start: "s", duration: 30, ...row }],
+        }),
+      );
+      const [slot] = await fetchPreviewSlots("democon", 12, TOKEN);
+      return slot!.is_visible;
+    }
+
+    it.each([
+      ["absent", {}],
+      ["renamed", { visible: true }],
+      ['the string "true"', { is_visible: "true" }],
+      ["a number", { is_visible: 1 }],
+      ["null", { is_visible: null }],
+    ])("hides the slot when is_visible is %s", async (_label, row) => {
+      await expect(visibilityOf(row)).resolves.toBe(false);
+    });
+
+    it("still honours a literal true and a literal false", async () => {
+      await expect(visibilityOf({ is_visible: true })).resolves.toBe(true);
+      await expect(visibilityOf({ is_visible: false })).resolves.toBe(false);
+    });
   });
 
   it("follows pagination, re-anchoring the next link onto the configured origin", async () => {
