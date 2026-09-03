@@ -6,7 +6,8 @@ import tailwindcss from "@tailwindcss/vite";
 
 // Use relative import to resolve @ alias at config load time
 import { generateFlagEnvSchema } from "./src/config/flags-env.ts";
-import { PROD_ORIGIN } from "./src/lib/site-env.ts";
+import { resolveSiteOrigin } from "./src/lib/site-env.ts";
+import { featuredEdition } from "./src/lib/edition-visibility.ts";
 import { loadLocalEnv } from "./scripts/load-local-env.mjs";
 
 // Astro surfaces .env values through import.meta.env, not process.env, and the
@@ -33,6 +34,13 @@ try {
   );
 }
 
+// Which edition the /programme, /speakers and /intervenants redirects should
+// land on: the newest one the site is allowed to show. Production stays on
+// 2026; staging, with the programme flag forced on, resolves to 2027 — so a
+// visitor following one of these short links lands on the live programme,
+// not the archive.
+const featured = featuredEdition();
+
 // https://astro.build/config
 // Build is fully static; bump this file to force a CI rebuild that
 // re-fetches the upstream Google Sheets at compile time.
@@ -44,13 +52,13 @@ export default defineConfig({
   },
   // Driven by PUBLIC_SITE_URL so staging builds advertise their own origin in
   // canonical URLs, hreflang, OG image URLs and the sitemap. Defaults to
-  // production (`||`, not `??`, so an empty string also falls back), so every
-  // existing build path is unchanged.
-  site: process.env.PUBLIC_SITE_URL || PROD_ORIGIN,
+  // production when unset or empty — one definition, shared with the guard in
+  // preview-fixture.ts that decides whether a build may use the fixture.
+  site: resolveSiteOrigin(),
   redirects: {
-    "/programme":    "/programme/2026",
+    "/programme":    `/programme/${featured}`,
     "/sponsors":     "/sponsors/2026",
-    "/speakers":     "/speakers/2026",
+    "/speakers":     `/speakers/${featured}`,
     // The FR slugs need their own entries: nginx rewrites /sponsors ->
     // /partenaires and /speakers -> /intervenants before Astro's redirects
     // above ever run, and with no year in the path that lands on a bare
@@ -58,10 +66,10 @@ export default defineConfig({
     // a 404 on production — /speakers has been a dead link, first behind a
     // wrong port and then behind a missing page.
     "/partenaires":  "/partenaires/2026",
-    "/intervenants": "/intervenants/2026",
-    "/en/programme": "/en/programme/2026",
+    "/intervenants": `/intervenants/${featured}`,
+    "/en/programme": `/en/programme/${featured}`,
     "/en/sponsors":  "/en/sponsors/2026",
-    "/en/speakers":  "/en/speakers/2026",
+    "/en/speakers":  `/en/speakers/${featured}`,
     // Slug renames — keep old URLs alive for SEO + inbound links.
     "/venue":            "/informations-utiles",
     "/en/venue":         "/en/informations-utiles",

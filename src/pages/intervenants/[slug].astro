@@ -1,6 +1,7 @@
 ---
 import { getAllSpeakers, getSlug } from "@/lib/speakers";
 import { EDITIONS, type Edition } from "@/lib/editions";
+import { isEditionLoadable } from "@/lib/edition-visibility";
 
 /**
  * Redirect shim for the former flat `/intervenants/[slug]` URLs.
@@ -10,11 +11,16 @@ import { EDITIONS, type Edition } from "@/lib/editions";
  *
  * Slugs that match an edition year (e.g., "2026") are filtered out to
  * avoid a route collision with `/intervenants/[year]/index.astro`.
+ *
+ * Editions that are not loadable are skipped: this route would otherwise emit
+ * one redirect page per speaker slug, publishing an unannounced edition's
+ * speaker names as URLs.
  */
 export async function getStaticPaths() {
   const editionYears = new Set(EDITIONS.map(String));
   const slugToLatestEdition = new Map<string, Edition>();
   for (const year of EDITIONS) {
+    if (!isEditionLoadable(year)) continue;
     const speakers = await getAllSpeakers(year);
     for (const s of speakers) {
       const slug = getSlug(s.id);

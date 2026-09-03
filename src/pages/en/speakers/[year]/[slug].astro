@@ -9,6 +9,7 @@ import {
 } from "@/lib/speakers";
 import { useTranslations, getLocalePath, getLangFromUrl } from "@/i18n/utils";
 import { EDITIONS, type Edition } from "@/lib/editions";
+import { isEditionLoadable } from "@/lib/edition-visibility";
 
 export async function getStaticPaths() {
   const entries: Array<{
@@ -16,6 +17,7 @@ export async function getStaticPaths() {
     props: { speaker: Awaited<ReturnType<typeof getAllSpeakers>>[number]; year: Edition };
   }> = [];
   for (const year of EDITIONS) {
+    if (!isEditionLoadable(year)) continue;
     const speakers = await getAllSpeakers(year);
     for (const speaker of speakers) {
       entries.push({

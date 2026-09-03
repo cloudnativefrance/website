@@ -15,7 +15,7 @@
  * logic. This is how env vars (FLAG_<NAME>=on|off) force state at build time.
  */
 
-import { FLAGS, type FlagDefinition, type FlagName } from "@/config/flags";
+import { FLAGS, type FlagDefinition, type FlagName } from "../config/flags";
 
 export type FlagState = "pending" | "active" | "ended";
 
@@ -43,6 +43,50 @@ export function isFlagActive(name: FlagName, now: Date = new Date()): boolean {
 }
 
 /**
+ * Parse a `FLAG_OVERRIDES` string into per-flag overrides.
+ *
+ * Format: `name=on,name2=off`. One build-arg carries every override, so adding
+ * a flag needs no Dockerfile or workflow edit.
+ *
+ * Every malformed input throws rather than being skipped. A typo like
+ * `programe=on` that silently did nothing would be indistinguishable from the
+ * feature not working — and on the `programme` flag specifically, the symptom
+ * of a swallowed typo is a staging site that looks correctly empty.
+ */
+export function parseFlagOverrides(raw: string): Map<FlagName, "on" | "off"> {
+  const out = new Map<FlagName, "on" | "off">();
+  for (const token of raw.split(",")) {
+    const entry = token.trim();
+    if (!entry) continue;
+    const eq = entry.indexOf("=");
+    if (eq === -1) {
+      throw new Error(
+        `[flags] FLAG_OVERRIDES entry "${entry}" is malformed — expected <name>=on|off`,
+      );
+    }
+    const name = entry.slice(0, eq).trim();
+    const value = entry.slice(eq + 1).trim();
+    if (!Object.hasOwn(FLAGS, name)) {
+      throw new Error(
+        `[flags] FLAG_OVERRIDES names unknown flag "${name}". Known flags: ${Object.keys(FLAGS).join(", ")}`,
+      );
+    }
+    if (value !== "on" && value !== "off") {
+      throw new Error(
+        `[flags] FLAG_OVERRIDES value for "${name}" is "${value}" — expected on or off`,
+      );
+    }
+    if (out.has(name as FlagName)) {
+      throw new Error(
+        `[flags] FLAG_OVERRIDES sets "${name}" twice — remove the duplicate rather than relying on order`,
+      );
+    }
+    out.set(name as FlagName, value);
+  }
+  return out;
+}
+
+/**
  * Read from node's `process.env` at build time — safe in server contexts,
  * returns undefined in client contexts where `process` is not defined.
  *
@@ -51,11 +95,44 @@ export function isFlagActive(name: FlagName, now: Date = new Date()): boolean {
  * `astro:env/server` module (which requires static per-variable imports).
  * Reading `process.env` directly avoids that constraint and works for any
  * dynamically-derived key such as `FLAG_${name.toUpperCase()}`.
+ *
+ * Two sources, in precedence order:
+ *
+ *   1. `FLAG_<NAME>` — the documented local-development mechanism (`.env.local`).
+ *   2. `FLAG_OVERRIDES` — the image-level build-arg used by CI.
+ *
+ * Individual variables win so that a developer's local override still beats
+ * one inherited from a build configuration.
  */
 export function readEnvOverride(name: FlagName): "on" | "off" | undefined {
-  const key = `FLAG_${name.toUpperCase()}`;
-  const raw = typeof process !== "undefined" ? process.env[key] : undefined;
-  if (raw === "on") return "on";
-  if (raw === "off") return "off";
-  return undefined;
+  if (typeof process === "undefined") return undefined;
+
+  const direct = process.env[`FLAG_${name.toUpperCase()}`];
+  if (direct === "on") return "on";
+  if (direct === "off") return "off";
+
+  const bundle = process.env.FLAG_OVERRIDES;
+  if (!bundle) return undefined;
+  return cachedFlagOverrides(bundle).get(name);
+}
+
+/**
+ * `parseFlagOverrides`, memoised on the raw string.
+ *
+ * `readEnvOverride` runs once per flag per consult, and `Navigation.astro`
+ * consults the `programme` flag on every page a build emits — several
+ * thousand full re-parses and re-validations of one unchanging string.
+ *
+ * Keyed on the raw value rather than parsed once at import: tests mutate
+ * `process.env.FLAG_OVERRIDES` between cases, and a changed value must
+ * re-parse. A malformed value is never cached — `parseFlagOverrides` throws
+ * before the assignment — so it keeps throwing on every call, as before.
+ */
+let overridesCache: { raw: string; parsed: Map<FlagName, "on" | "off"> } | undefined;
+
+function cachedFlagOverrides(raw: string): Map<FlagName, "on" | "off"> {
+  if (overridesCache?.raw !== raw) {
+    overridesCache = { raw, parsed: parseFlagOverrides(raw) };
+  }
+  return overridesCache.parsed;
 }

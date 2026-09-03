@@ -820,7 +820,25 @@ if (root) {
   function icsEscape(s: string): string {
     return String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
   }
+  /**
+   * The edition an agenda export belongs to, read from the sessions being
+   * exported rather than hardcoded — a card's `data-start` already carries
+   * its year. Falls back to the current calendar year only if no bookmarked
+   * card can be found (defensive; the caller already checks the list isn't
+   * empty).
+   */
+  function icsYear(ids: string[]): number {
+    for (const id of ids) {
+      const start = findCard(id)?.getAttribute("data-start");
+      if (start) {
+        const year = new Date(start).getUTCFullYear();
+        if (!Number.isNaN(year)) return year;
+      }
+    }
+    return new Date().getUTCFullYear();
+  }
   function buildIcs(ids: string[]): string {
+    const year = icsYear(ids);
     const events: string[] = [];
     ids.forEach((id) => {
       const card = findCard(id);
@@ -846,7 +864,7 @@ if (root) {
     return [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
-      "PRODID:-//Cloud Native Days France 2027//Schedule//FR",
+      `PRODID:-//Cloud Native Days France ${year}//Schedule//FR`,
       "CALSCALE:GREGORIAN",
       "METHOD:PUBLISH",
       ...events,
@@ -871,6 +889,7 @@ if (root) {
   });
   document.getElementById("schedule-export-agenda")?.addEventListener("click", () => {
     if (bookmarks.size === 0) return;
-    download("cnd-france-2027-agenda.ics", buildIcs([...bookmarks]));
+    const ids = [...bookmarks];
+    download(`cnd-france-${icsYear(ids)}-agenda.ics`, buildIcs(ids));
   });
 }

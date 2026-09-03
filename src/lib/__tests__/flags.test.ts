@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import { getFlagState, type FlagState } from "@/lib/flags";
 import type { FlagDefinition } from "@/config/flags";
 
@@ -66,5 +66,90 @@ describe("getFlagState", () => {
       const active = pageFlag(OPENS, CLOSES);
       expect(getFlagState(active, opensDate, "off")).toBe("ended");
     });
+  });
+});
+
+import { parseFlagOverrides, readEnvOverride } from "@/lib/flags";
+
+describe("parseFlagOverrides", () => {
+  it("returns an empty map for an empty or whitespace string", () => {
+    expect(parseFlagOverrides("").size).toBe(0);
+    expect(parseFlagOverrides("   ").size).toBe(0);
+  });
+
+  it("parses a single override", () => {
+    expect(parseFlagOverrides("programme=on")).toEqual(
+      new Map([["programme", "on"]]),
+    );
+  });
+
+  it("parses several and tolerates whitespace around tokens", () => {
+    expect(parseFlagOverrides(" programme=on , tickets=off ")).toEqual(
+      new Map([
+        ["programme", "on"],
+        ["tickets", "off"],
+      ]),
+    );
+  });
+
+  it("throws on an unknown flag name, naming the value", () => {
+    expect(() => parseFlagOverrides("programe=on")).toThrow(/programe/);
+  });
+
+  it("throws on a value that is not on or off", () => {
+    expect(() => parseFlagOverrides("programme=true")).toThrow(/true/);
+  });
+
+  it("throws on a malformed entry with no '='", () => {
+    expect(() => parseFlagOverrides("programme")).toThrow(/programme/);
+  });
+
+  it("throws on a duplicated flag name rather than picking one", () => {
+    expect(() => parseFlagOverrides("programme=on,programme=off")).toThrow(
+      /programme/,
+    );
+  });
+
+  it.each(["constructor", "toString", "hasOwnProperty", "valueOf", "__proto__"])(
+    "throws on the Object.prototype member %s rather than accepting it",
+    (name) => {
+      expect(() => parseFlagOverrides(`${name}=on`)).toThrow(new RegExp(name));
+    },
+  );
+});
+
+describe("readEnvOverride", () => {
+  const saved = { ...process.env };
+  afterEach(() => {
+    process.env = { ...saved };
+  });
+
+  it("returns undefined when neither source is set", () => {
+    delete process.env.FLAG_PROGRAMME;
+    delete process.env.FLAG_OVERRIDES;
+    expect(readEnvOverride("programme")).toBeUndefined();
+  });
+
+  it("reads the individual FLAG_<NAME> variable", () => {
+    process.env.FLAG_PROGRAMME = "on";
+    expect(readEnvOverride("programme")).toBe("on");
+  });
+
+  it("reads FLAG_OVERRIDES when no individual variable is set", () => {
+    delete process.env.FLAG_PROGRAMME;
+    process.env.FLAG_OVERRIDES = "programme=on";
+    expect(readEnvOverride("programme")).toBe("on");
+  });
+
+  it("lets the individual variable win over FLAG_OVERRIDES", () => {
+    process.env.FLAG_PROGRAMME = "off";
+    process.env.FLAG_OVERRIDES = "programme=on";
+    expect(readEnvOverride("programme")).toBe("off");
+  });
+
+  it("returns undefined for a flag absent from a populated FLAG_OVERRIDES", () => {
+    delete process.env.FLAG_TICKETS;
+    process.env.FLAG_OVERRIDES = "programme=on";
+    expect(readEnvOverride("tickets")).toBeUndefined();
   });
 });

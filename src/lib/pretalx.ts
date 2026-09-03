@@ -9,18 +9,47 @@ import type {
 } from "./schedule";
 import { fetchTextOrFallback } from "./remote-fetch";
 import { SPEAKER_SLUGS } from "@/data/speaker-slugs";
+import { PRETALX_EVENT, type PretalxEventEntry } from "./edition-registry";
 
 export const PRETALX_BASE =
   process.env.PRETALX_BASE_URL || "https://cfp.cloudnativedays.fr";
 
 /**
- * Editions whose Pretalx event is public. 2023 predates the instance; 2027 is
- * added here the day its event goes public — until then the fetch would 404 on
- * every build, so it is deliberately absent rather than mapped and failing.
+ * The event slug /cfp points submitters at: the newest edition flagged `cfpOpen`.
+ *
+ * Deliberately independent of `access`. When the 2027 event opens for proposals it
+ * will be `access: "preview"` (nothing released yet) and `cfpOpen: true` — pointing
+ * the CFP at it must not disturb how the programme is fetched or whether it renders.
  */
-export const PRETALX_EVENT: Partial<Record<Edition, string>> = {
-  2026: "2026",
-};
+export function pickCfpEvent(
+  events: Partial<Record<Edition, PretalxEventEntry>> = PRETALX_EVENT,
+): string {
+  const open = Object.entries(events)
+    .filter(([, e]) => e?.cfpOpen)
+    .sort(([a], [b]) => Number(b) - Number(a));
+  if (open.length === 0) {
+    throw new Error(
+      "[pretalx] no edition in PRETALX_EVENT is flagged cfpOpen — /cfp has nowhere " +
+        "to send submitters. Set cfpOpen on the edition currently accepting proposals.",
+    );
+  }
+  return open[0][1]!.slug;
+}
+
+export function cfpEventUrl(): string {
+  return `${PRETALX_BASE}/${pickCfpEvent()}/`;
+}
+
+/**
+ * The same URL as a display string: no scheme, no trailing slash.
+ *
+ * Both /cfp pages printed this under the submit button and each carried its own
+ * copy of the two `.replace()` calls, so the FR and EN pages could quietly
+ * start rendering the link differently.
+ */
+export function cfpEventLabel(): string {
+  return cfpEventUrl().replace(/^https?:\/\//, "").replace(/\/$/, "");
+}
 
 export function scheduleExportUrl(slug: string): string {
   return `${PRETALX_BASE}/${slug}/schedule/export/schedule.json`;
@@ -206,6 +235,10 @@ export function toSessionRows(
           format: toFormat(talk.type, durationMin),
           startTime: talk.date,
           durationMin,
+          // The released export carries no tags. The preview path used to read
+          // them off /submissions/ and now matches this, so releasing a
+          // schedule — a one-word `access` change — cannot silently empty a
+          // field. Only the frozen 2023 archive has values.
           tags: [],
           feedbackUrl: talk.feedback_url ?? "",
           slidesUrl: pickResource(talk, (r) => SLIDES_LABEL.test(r.title)),

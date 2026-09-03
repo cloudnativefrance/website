@@ -21,14 +21,17 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { Edition } from "./editions";
+import { isEditionLoadable } from "./edition-visibility";
 import { loadFrozenArchive } from "./frozen-archive";
+import { fixtureEvent } from "./preview-fixture";
+import { PRETALX_EVENT } from "./edition-registry";
 import {
-  PRETALX_EVENT,
   allTalks,
   fetchScheduleExport,
   type PretalxPerson,
   type PretalxScheduleExport,
 } from "./pretalx";
+import { loadPreviewEdition } from "./pretalx-preview";
 import { loadSpeakerEnrichment } from "./pretalx-private";
 import { SPEAKER_SLUGS } from "@/data/speaker-slugs";
 import { keynoteRoleFor } from "@/data/keynote-cast";
@@ -90,12 +93,23 @@ function photoFor(slug: string, avatar: string | null | undefined): string {
 }
 
 export async function loadSpeakers(year: Edition): Promise<SpeakerRecord[]> {
-  const eventSlug = PRETALX_EVENT[year];
-  if (!eventSlug) return loadArchivedSpeakers(year);
+  // A fixture only ever stands in for a year with no real PRETALX_EVENT entry
+  // (see preview-fixture.ts) — it never overrides one that already exists.
+  const event = PRETALX_EVENT[year] ?? fixtureEvent(year);
+  // See the matching comment in schedule.ts's loadSessions.
+  if (!event || !isEditionLoadable(year)) return loadArchivedSpeakers(year);
 
-  const doc = await fetchScheduleExport(year, eventSlug);
+  if (event.access === "preview") {
+    // No released schedule yet — read the wip one through the authenticated
+    // reader instead of the anonymous export. buildSpeakerResolver's throw on
+    // an unmapped name already ran inside loadPreviewEdition (toPreviewSpeakers),
+    // so there is nothing left to validate on this branch.
+    return (await loadPreviewEdition(year, event.slug)).speakers;
+  }
+
+  const doc = await fetchScheduleExport(year, event.slug);
   const people = peopleInSchedule(doc);
-  const enrichment = await loadSpeakerEnrichment(year, eventSlug, new Set(people.keys()));
+  const enrichment = await loadSpeakerEnrichment(year, event.slug, new Set(people.keys()));
 
   const records: SpeakerRecord[] = [];
   const unmapped: string[] = [];

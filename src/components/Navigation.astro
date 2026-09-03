@@ -1,7 +1,9 @@
 ---
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { TARGET_DATE } from "@/lib/event";
-import { EDITIONS, CURRENT_EDITION } from "@/lib/editions";
+import { EDITIONS_DESC } from "@/lib/editions";
+import { featuredEdition, archivedEditions } from "@/lib/edition-visibility";
+import { isCurrentPath } from "@/lib/nav-path";
 import LanguageToggle from "@/components/LanguageToggle.astro";
 import ThemeToggle from "@/components/ThemeToggle.astro";
 import NavDropdown from "@/components/NavDropdown.astro";
@@ -41,8 +43,6 @@ const links = navItems.map(({ key, path, dead, postEventOnly }) => {
   };
 });
 
-const editionsDesc = [...EDITIONS].sort((a, b) => b - a);
-
 function sectionDropdown(
   section: "programme" | "sponsors",
   labelKey: "nav.programme.label" | "nav.sponsors.label",
@@ -53,11 +53,10 @@ function sectionDropdown(
     key: labelKey,
     label: t(labelKey),
     active: currentPath.startsWith(localizedBase),
-    items: editionsDesc.map((year) => ({
-      href: getLocalePath(lang, `${basePath}/${year}`),
-      label: `${t(labelKey)} ${year}`,
-      current: currentPath === getLocalePath(lang, `${basePath}/${year}`),
-    })),
+    items: EDITIONS_DESC.map((year) => {
+      const href = getLocalePath(lang, `${basePath}/${year}`);
+      return { href, label: `${t(labelKey)} ${year}`, current: isCurrentPath(currentPath, href) };
+    }),
   };
 }
 
@@ -70,14 +69,40 @@ const programmeDD = (() => {
   const onProgramme   = currentPath.startsWith(programmeBase);
   const onSpeakers    = currentPath.startsWith(speakersBase);
   const onCfp         = currentPath.startsWith(cfpPath);
+  const featured      = featuredEdition();
+  const archives      = archivedEditions();
+  // Every item answers "am I the current page?" the same way — see nav-path.ts
+  // for the two ways this dropdown used to answer it, and what that broke.
+  const item = (href: string, label: string) => ({
+    href,
+    label,
+    current: isCurrentPath(currentPath, href),
+  });
   return {
     key: "nav.programme.label",
     label: t("nav.programme.label"),
     active: onProgramme || onCfp || onSpeakers,
     items: [
-      { href: `${programmeBase}/${CURRENT_EDITION}`, label: t("nav.programme.submenu.programme"),    current: onProgramme },
-      { href: cfpPath,                                label: t("nav.programme.submenu.cfp"),          current: onCfp },
-      { href: `${speakersBase}/${CURRENT_EDITION}`,   label: t("nav.programme.submenu.intervenants"), current: onSpeakers },
+      item(`${programmeBase}/${featured}`, t("nav.programme.submenu.programme")),
+      item(cfpPath,                        t("nav.programme.submenu.cfp")),
+      item(`${speakersBase}/${featured}`,  t("nav.programme.submenu.intervenants")),
+      // Finished editions stay one click away once a newer programme leads —
+      // the schedule AND the speakers. The two entries above both follow
+      // `featured`, so without the speakers line /intervenants/2026, holding
+      // every speaker record of the last edition that happened, would have no
+      // route from the nav at all the moment 2027 takes the lead.
+      // `archivedEditions` already excludes 2023, which has its own dedicated
+      // retrospective linked from the About menu.
+      ...archives.flatMap((y) => [
+        item(
+          `${programmeBase}/${y}`,
+          t("nav.programme.submenu.archive").replace("{year}", String(y)),
+        ),
+        item(
+          `${speakersBase}/${y}`,
+          t("nav.programme.submenu.archive_intervenants").replace("{year}", String(y)),
+        ),
+      ]),
     ],
   };
 })();
