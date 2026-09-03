@@ -13,32 +13,64 @@ import { SPEAKER_SLUGS } from "@/data/speaker-slugs";
 export const PRETALX_BASE =
   process.env.PRETALX_BASE_URL || "https://cfp.cloudnativedays.fr";
 
-/**
- * How an edition's Pretalx event may be read.
- *
- *   "public"  — the event's released schedule is served anonymously at
- *               /<slug>/schedule/export/schedule.json.
- *   "preview" — the event is not public. Its schedule is readable only through
- *               the authenticated REST API, and only in a build where the
- *               `programme` flag is active (see src/lib/edition-visibility.ts).
- *
- * This single word decides the fetch path, whether the edition may be loaded in
- * a production build at all, and which event /cfp links submitters to. Flipping
- * "preview" to "public" moves all three together.
- */
 export type EditionAccess = "public" | "preview";
 
+export interface PretalxEventEntry {
+  slug: string;
+  /**
+   * How the schedule is fetched — and ONLY that.
+   *
+   *   "public"  — a schedule has been RELEASED; the anonymous agenda export at
+   *               /<slug>/schedule/export/schedule.json serves it.
+   *   "preview" — no released schedule; readable only through the authenticated
+   *               REST API, and only in a build where the `programme` flag is active.
+   *
+   * Flips when a schedule is released, NEVER merely when the event becomes
+   * visible to submitters — the export does not exist until a release, so an
+   * early flip would 404 and fall back to a snapshot that does not exist.
+   */
+  access: EditionAccess;
+  /**
+   * Whether submitters may reach this event. Drives the /cfp link and nothing
+   * else, so it can be turned on months before any schedule exists.
+   */
+  cfpOpen?: boolean;
+}
+
 /**
- * Editions with a Pretalx event. 2023 predates the instance and reads a frozen
- * archive. 2027 is added here — as `preview` — once its event exists; until
- * then the fetch would 404 on every build, so it is deliberately absent rather
- * than mapped and failing.
+ * Editions with a Pretalx event. 2023 predates the instance. 2027 is added here
+ * once its event exists; until then the fetch would 404 on every build, so it is
+ * deliberately absent rather than mapped and failing.
  */
-export const PRETALX_EVENT: Partial<
-  Record<Edition, { slug: string; access: EditionAccess }>
-> = {
-  2026: { slug: "2026", access: "public" },
+export const PRETALX_EVENT: Partial<Record<Edition, PretalxEventEntry>> = {
+  2026: { slug: "2026", access: "public", cfpOpen: true },
 };
+
+/**
+ * The event slug /cfp points submitters at: the newest edition flagged `cfpOpen`.
+ *
+ * Deliberately independent of `access`. When the 2027 event opens for proposals it
+ * will be `access: "preview"` (nothing released yet) and `cfpOpen: true` — pointing
+ * the CFP at it must not disturb how the programme is fetched or whether it renders.
+ */
+export function pickCfpEvent(
+  events: Partial<Record<Edition, PretalxEventEntry>> = PRETALX_EVENT,
+): string {
+  const open = Object.entries(events)
+    .filter(([, e]) => e?.cfpOpen)
+    .sort(([a], [b]) => Number(b) - Number(a));
+  if (open.length === 0) {
+    throw new Error(
+      "[pretalx] no edition in PRETALX_EVENT is flagged cfpOpen — /cfp has nowhere " +
+        "to send submitters. Set cfpOpen on the edition currently accepting proposals.",
+    );
+  }
+  return open[0][1]!.slug;
+}
+
+export function cfpEventUrl(): string {
+  return `${PRETALX_BASE}/${pickCfpEvent()}/`;
+}
 
 export function scheduleExportUrl(slug: string): string {
   return `${PRETALX_BASE}/${slug}/schedule/export/schedule.json`;
