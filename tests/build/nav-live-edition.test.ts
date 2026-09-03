@@ -109,6 +109,26 @@ describe("Navigation.astro", () => {
     expect(NAV).toContain("nav.programme.submenu.archive");
   });
 
+  it("offers a SPEAKERS archive entry too, not just a programme one", () => {
+    // The programme and speakers entries above both follow `featured`. Once
+    // 2027 leads, /intervenants/2026 — every speaker record of the last edition
+    // that actually happened — has no route from the nav without this.
+    expect(NAV).toContain("nav.programme.submenu.archive_intervenants");
+    const dd = NAV.slice(NAV.indexOf("const programmeDD"), NAV.indexOf("const aboutDD"));
+    expect(dd).toMatch(/speakersBase\}\/\$\{y\}/);
+  });
+
+  it("decides `current` the same way for every dropdown item", () => {
+    // Featured used startsWith, archives used ===, and Astro serves directory
+    // URLs with a trailing slash — so on /programme/2026/ both entries claimed
+    // current and the archive one could never highlight. See nav-path.ts.
+    expect(NAV).toContain("isCurrentPath");
+    const dd = NAV.slice(NAV.indexOf("const programmeDD"), NAV.indexOf("const aboutDD"));
+    expect(dd).not.toMatch(/current:\s*currentPath ===/);
+    expect(dd).not.toMatch(/current:\s*onProgramme/);
+    expect(dd).not.toMatch(/current:\s*onSpeakers/);
+  });
+
   it("does not re-filter what archivedEditions already decided", () => {
     expect(NAV).not.toMatch(/y\s*>=\s*CURRENT_EDITION/);
   });
