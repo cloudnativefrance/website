@@ -35,6 +35,13 @@ export const DATA_LAYER = [
   "src/lib/schedule.ts",
   "src/lib/speakers.ts",
   "src/lib/speaker-source.ts",
+  // The authenticated preview reader (PR 2): schedule.ts and speaker-source.ts
+  // call into loadPreviewEdition for an access: "preview" edition instead of
+  // calling loadSessions/loadSpeakers on themselves, so neither file matches
+  // LOADER_CALL_RE — they belong here, not in NON_ROUTE_CONSUMERS, whose test
+  // requires every declared entry to match that regex.
+  "src/lib/pretalx-preview.ts",
+  "src/lib/pretalx-preview-api.ts",
 ] as const;
 
 /** Every route that can reach a preview edition's sessions or speakers. */
