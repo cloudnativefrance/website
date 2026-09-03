@@ -16,7 +16,7 @@
  * the point. No island imports it today, which is exactly why the trap would be
  * set silently.
  */
-import { CURRENT_EDITION, EDITIONS, type Edition } from "./editions";
+import { CURRENT_EDITION, EDITIONS_DESC, type Edition } from "./editions";
 import { isFlagActive } from "./flags";
 import { PRETALX_EVENT, type EditionAccess } from "./pretalx";
 
@@ -72,6 +72,38 @@ export function isEditionLoadable(year: Edition, now?: Date): boolean {
 }
 
 /**
+ * Every edition the site is allowed to show, newest first.
+ *
+ * The single derivation `featuredEdition` and `archivedEditions` are both views
+ * of: the first entry leads, the rest are the archive. They used to each redo
+ * this sort-and-filter, and `archivedEditions` also called `featuredEdition`,
+ * so a nav render paid for it three times over.
+ */
+function shownEditions(now?: Date): readonly Edition[] {
+  return EDITIONS_DESC.filter((y) => isEditionLoadable(y, now));
+}
+
+/**
+ * The answer for THIS build, computed once.
+ *
+ * Every input is build-invariant — `EDITIONS` is a literal, the flag state
+ * comes from `process.env` and a clock that only crosses a boundary between
+ * builds — while `Navigation.astro` asks the question on every one of the
+ * several hundred pages a build emits. Same pattern as `pretalx-preview.ts`'s
+ * `CACHE`.
+ *
+ * Only the no-argument case is memoised. An injected `now` is a test asking
+ * about a different moment, and caching across those would make one case's
+ * clock leak into the next.
+ */
+let shownCache: readonly Edition[] | undefined;
+
+function shownEditionsCached(now?: Date): readonly Edition[] {
+  if (now !== undefined) return shownEditions(now);
+  return (shownCache ??= shownEditions());
+}
+
+/**
  * The edition whose programme the site currently leads with.
  *
  * Deliberately NOT `CURRENT_EDITION`, which must stay pinned to the last
@@ -81,20 +113,22 @@ export function isEditionLoadable(year: Edition, now?: Date): boolean {
  * production that is 2026; on staging, where the programme flag is forced on,
  * it is 2027. The staging-only behaviour therefore falls out of the existing
  * flag rather than needing a second switch to keep in step.
+ *
+ * `EDITIONS` always contains at least one past edition (2023), and a past
+ * edition is loadable unconditionally, so `shownEditions` is never empty. There
+ * is deliberately no `?? CURRENT_EDITION` fallback: it was unreachable by that
+ * same argument, and an unreachable fallback only invites the reader to believe
+ * the two answers could differ.
  */
 export function featuredEdition(now?: Date): Edition {
-  // EDITIONS always contains at least one past edition (2023), and a past
-  // edition is loadable unconditionally, so this list is never empty. There is
-  // deliberately no `?? CURRENT_EDITION` fallback: it was unreachable by that
-  // same argument, and an unreachable fallback only invites the reader to
-  // believe the two answers could differ.
-  return [...EDITIONS].sort((a, b) => b - a).filter((y) => isEditionLoadable(y, now))[0];
+  return shownEditionsCached(now)[0];
 }
 
 /**
  * Finished editions that were themselves the headline programme, newest first.
  *
- * Everything shown that is not the current headline, EXCEPT anything older than
+ * Everything shown that is not the current headline — `slice(1)`, since the
+ * headline is by definition the newest shown one — EXCEPT anything older than
  * `CURRENT_EDITION`: 2023 predates the site's programme pages and has its own
  * dedicated /2023 retrospective, which the About menu already links, so listing
  * it again under Programme would be a second, worse route to the same content.
@@ -105,10 +139,9 @@ export function featuredEdition(now?: Date): Edition {
  * this function's own return value something no caller wanted.
  */
 export function archivedEditions(now?: Date): Edition[] {
-  const featured = featuredEdition(now);
-  return [...EDITIONS]
-    .sort((a, b) => b - a)
-    .filter((y) => y !== featured && y >= CURRENT_EDITION && isEditionLoadable(y, now));
+  return shownEditionsCached(now)
+    .slice(1)
+    .filter((y) => y >= CURRENT_EDITION);
 }
 
 /**

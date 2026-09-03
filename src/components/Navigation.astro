@@ -1,7 +1,7 @@
 ---
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { TARGET_DATE } from "@/lib/event";
-import { EDITIONS } from "@/lib/editions";
+import { EDITIONS_DESC } from "@/lib/editions";
 import { featuredEdition, archivedEditions } from "@/lib/edition-visibility";
 import LanguageToggle from "@/components/LanguageToggle.astro";
 import ThemeToggle from "@/components/ThemeToggle.astro";
@@ -42,8 +42,6 @@ const links = navItems.map(({ key, path, dead, postEventOnly }) => {
   };
 });
 
-const editionsDesc = [...EDITIONS].sort((a, b) => b - a);
-
 function sectionDropdown(
   section: "programme" | "sponsors",
   labelKey: "nav.programme.label" | "nav.sponsors.label",
@@ -54,7 +52,7 @@ function sectionDropdown(
     key: labelKey,
     label: t(labelKey),
     active: currentPath.startsWith(localizedBase),
-    items: editionsDesc.map((year) => ({
+    items: EDITIONS_DESC.map((year) => ({
       href: getLocalePath(lang, `${basePath}/${year}`),
       label: `${t(labelKey)} ${year}`,
       current: currentPath === getLocalePath(lang, `${basePath}/${year}`),
