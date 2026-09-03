@@ -11,9 +11,9 @@ const rooms = new Map([
 ]);
 
 // Both fixtures are exactly the projected shapes `pretalx-preview-api.ts`
-// returns — no `state`, no slot `id`/`end`/`duration`/`schedule`, no
-// `speakers[].biography` — because those fields are dropped at the fetch
-// boundary and nothing downstream may assume they exist.
+// returns — no `state`, no slot `id`/`end`, no `speakers[].biography` —
+// because those fields are dropped at the fetch boundary and nothing
+// downstream may assume they exist.
 const submission = {
   code: "ABC123",
   title: "Scaling etcd",
@@ -33,6 +33,7 @@ const slot = {
   room: 1,
   start: "2027-06-03T10:30:00+02:00",
   is_visible: true,
+  duration: 30,
 };
 
 const resolve = () => "ada-lovelace";
@@ -125,6 +126,41 @@ describe("toPreviewSessions", () => {
     // submission.duration is minutes already (30), not "HH:MM" — a value that
     // would throw if it were ever passed to durationToMinutes.
     const [row] = toPreviewSessions([slot], [submission], rooms, resolve, 4);
+    expect(row.durationMin).toBe(30);
+  });
+
+  /**
+   * The 0-minute lightning talk.
+   *
+   * Pretalx returns `duration: null` on a submission whenever the submission
+   * type's default applies — the ordinary case — and the fetch boundary coerces
+   * that null to 0 (asserted directly in pretalx-preview-api.test.ts). Reading
+   * the submission first therefore turned a 45-minute talk into a zero-height
+   * card typed "lightning", and gave it a DTEND equal to its DTSTART in the ICS
+   * feed. The slot carries the scheduled length on every row; it wins.
+   */
+  it("takes duration from the SLOT when the submission has none", () => {
+    const defaulted = { ...submission, duration: 0 };
+    const [row] = toPreviewSessions(
+      [{ ...slot, duration: 45 }],
+      [defaulted],
+      rooms,
+      resolve,
+      4,
+    );
+    expect(row.durationMin).toBe(45);
+    expect(row.format).not.toBe("lightning");
+    expect(row.format).toBe("talk");
+  });
+
+  it("falls back to the submission's duration when the slot has none", () => {
+    const [row] = toPreviewSessions(
+      [{ ...slot, duration: 0 }],
+      [submission],
+      rooms,
+      resolve,
+      4,
+    );
     expect(row.durationMin).toBe(30);
   });
 

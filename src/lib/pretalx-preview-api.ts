@@ -49,6 +49,17 @@ export interface PreviewSlot {
   room: number;
   start: string;
   is_visible: boolean;
+  /**
+   * Minutes, as SCHEDULED — the authoritative length of this talk.
+   *
+   * `submission.duration` is not: Pretalx leaves it null whenever the
+   * submission type's default applies, which is the normal case for a talk
+   * nobody edited the length of. The projection coerces that null to 0, and a
+   * 0 makes `toFormat` return "lightning" (0 <= 15), so a 45-minute talk
+   * rendered as a zero-height "lightning" card and got a DTEND equal to its
+   * DTSTART in the ICS feed. The slot carries a real number on every row.
+   */
+  duration: number;
 }
 
 /** One answer, with `?expand=answers.question` so `question` arrives as an object. */
@@ -140,6 +151,7 @@ function projectSlot(row: unknown): PreviewSlot {
     // `!== false`, not `=== true`: the nested slots under /submissions/ report
     // `is_visible: null`, and a null has always meant visible on this path.
     is_visible: r.is_visible !== false,
+    duration: asNumber(r.duration),
   };
 }
 

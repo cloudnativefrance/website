@@ -191,6 +191,7 @@ describe("the fetch boundary is where PII stops", () => {
       room: 1,
       start: "2027-06-03T10:30:00+02:00",
       is_visible: true,
+      duration: 30,
     });
   });
 
@@ -251,6 +252,35 @@ describe("the fetch boundary is where PII stops", () => {
 });
 
 describe("fetchPreviewSubmissions", () => {
+  /**
+   * Why `toPreviewSessions` reads the SLOT's duration first.
+   *
+   * Pretalx omits a submission's duration whenever the submission type's
+   * default applies, and `asNumber` turns that null into 0 — which `toFormat`
+   * reads as a lightning talk and the ICS feed as a zero-length event. This
+   * pins the coercion that makes the slot the authoritative source.
+   */
+  it("projects a null submission duration as 0, never as a real length", async () => {
+    vi.stubGlobal("fetch", () =>
+      jsonOnce({
+        count: 1,
+        next: null,
+        results: [
+          {
+            code: "AAA",
+            title: "Scaling etcd",
+            duration: null,
+            content_locale: "fr",
+            speakers: [],
+            answers: [],
+          },
+        ],
+      }),
+    );
+    const [submission] = await fetchPreviewSubmissions("democon", TOKEN);
+    expect(submission!.duration).toBe(0);
+  });
+
   it("asks only for confirmed proposals", async () => {
     // Spec D-2. Without it the walk pulls rejected and pending proposals into
     // memory, and a slotted-but-unconfirmed talk would render as a real one.

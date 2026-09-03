@@ -128,7 +128,13 @@ export function toPreviewSessions(
 ): SessionRow[] {
   const rows: SessionRow[] = [];
   for (const { slot, submission, visible } of joinScheduledTalks(slots, submissions)) {
-    const durationMin = submission.duration;
+    // The SLOT's duration wins. `submission.duration` is null whenever the
+    // submission type's default applies — the ordinary case — and the fetch
+    // boundary coerces that null to 0, which `toFormat` reads as a lightning
+    // talk and the ICS feed as a zero-length event. `||`, not `??`: 0 is the
+    // shape a missing value actually takes here, so it must fall through to
+    // the submission's value the same way an absent field does.
+    const durationMin = slot.duration || submission.duration;
     const levelAnswer =
       levelQuestionId === undefined
         ? undefined
