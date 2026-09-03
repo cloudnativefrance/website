@@ -92,13 +92,25 @@ describe("the fixture refuses the pipeline shape a release build actually has", 
     // build-image.yml passes PUBLIC_SITE_URL='' on every non-staging branch,
     // so this — not the literal production URL — is what a production build
     // looks like from inside the code. It must refuse, loudly.
+    //
+    // Targets 2023, not 2027: 2027 now has a REAL PRETALX_EVENT entry (its
+    // Pretalx event exists — see edition-registry.ts), and `PRETALX_EVENT[year]
+    // ?? fixtureEvent(year)` never even calls fixtureEvent once a real entry
+    // exists — "a fixture only ever stands in for a year with no real
+    // PRETALX_EVENT entry" (fixtureEvent's own docstring). So this guard is no
+    // longer reachable through year 2027 at all; 2023, which still has no
+    // PRETALX_EVENT entry, is the one edition left that exercises it. The
+    // production-origin refusal fires before the year is even looked at, so
+    // this is not a gap opening elsewhere — 2027's only gate now is the
+    // `programme` flag, which build-image.yml only forces on for `staging`.
     process.env.PRETALX_PREVIEW_SLUG = "democon";
+    process.env.PRETALX_PREVIEW_EDITION = "2023";
     process.env.PUBLIC_SITE_URL = "";
     process.env.FLAG_OVERRIDES = "programme=on";
 
     const { loadSessions } = await import("@/lib/schedule");
 
-    await expect(loadSessions(2027)).rejects.toThrow(/PRODUCTION build/);
+    await expect(loadSessions(2023)).rejects.toThrow(/PRODUCTION build/);
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 });

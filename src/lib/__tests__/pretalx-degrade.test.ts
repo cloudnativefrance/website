@@ -59,18 +59,34 @@ async function settledWithBackoff(assertion: Promise<void>): Promise<void> {
 }
 
 /** Stub fetch so nothing in this file touches the network. */
-function stubFetch(impl: () => Promise<Response> | Response) {
+function stubFetch(impl: (url: string) => Promise<Response> | Response) {
   vi.stubGlobal("fetch", vi.fn(impl));
 }
 
 const outage = () => Promise.reject(new TypeError("fetch failed"));
 const status = (code: number) => () =>
   new Response("nope", { status: code, statusText: String(code) });
-const ok = () =>
-  new Response(JSON.stringify({ results: [], next: null }), {
+
+/**
+ * `loadLevelAnswers` now makes TWO requests: `GET /questions/`, for the
+ * level-question guard (`assertLevelQuestionText`) to see what
+ * `LEVEL_QUESTION_ID[year]` actually points at, then `GET /answers/` for the
+ * real data. Every case in this file that expects a full, successful read
+ * needs `/questions/` to answer with the real talk-level text for id 4
+ * (`LEVEL_QUESTION_ID[2026]`) — otherwise it would fail the guard instead of
+ * exercising whatever transport behaviour it is actually testing. The guard
+ * itself is exercised on purpose below, in "the level-question guard".
+ */
+const ok = (url: string) => {
+  const body =
+    typeof url === "string" && url.includes("/questions/")
+      ? { results: [{ id: 4, question: { fr: "Niveau de la présentation" } }], next: null }
+      : { results: [], next: null };
+  return new Response(JSON.stringify(body), {
     status: 200,
     headers: { "content-type": "application/json" },
   });
+};
 
 describe("a release build (PRETALX_TOKEN_REQUIRED=1)", () => {
   it("fails on a missing token — configuration, never degraded past", async () => {
@@ -148,12 +164,13 @@ describe("a release build (PRETALX_TOKEN_REQUIRED=1)", () => {
 
   it("treats a missing question-id mapping as configuration, not an outage", async () => {
     // Adding an edition without its question ids is the realistic way to hit
-    // this: 2027 has no SPEAKER_QUESTIONS / LEVEL_QUESTION_ID entry.
+    // this: 2023 predates the Pretalx instance, so it has no entry in either
+    // SPEAKER_QUESTIONS or LEVEL_QUESTION_ID (both 2026 and 2027 do now).
     process.env[REQUIRED] = "1";
     process.env[ALLOW] = "1";
     process.env[TOKEN] = "good-token";
     stubFetch(ok);
-    await expect(loadLevelAnswers(2027, freshSlug(), new Set())).rejects.toThrow(
+    await expect(loadLevelAnswers(2023, freshSlug(), new Set())).rejects.toThrow(
       /No level question id configured/,
     );
   });
@@ -162,14 +179,111 @@ describe("a release build (PRETALX_TOKEN_REQUIRED=1)", () => {
     process.env[REQUIRED] = "1";
     process.env[TOKEN] = "good-token";
     let calls = 0;
-    stubFetch(() => {
+    stubFetch((url) => {
       calls += 1;
-      return calls === 1 ? Promise.reject(new TypeError("fetch failed")) : ok();
+      return calls === 1 ? Promise.reject(new TypeError("fetch failed")) : ok(url);
     });
     vi.useFakeTimers();
     const call = loadLevelAnswers(2026, freshSlug(), new Set());
     await settledWithBackoff(expect(call).resolves.toEqual(new Map()));
-    expect(calls).toBe(2);
+    // 3, not 2: the failed+retried call is now to /questions/ (the guard),
+    // followed by the /answers/ call the guard gates.
+    expect(calls).toBe(3);
+  });
+});
+
+/**
+ * The hardening mechanism itself, exercised where it actually runs:
+ * `loadLevelAnswers`, wrapped in the same `degradeOnFailure` policy as every
+ * other failure in this file. The property under test is narrower than
+ * "the guard throws" (pretalx-levels.test.ts already covers that in
+ * isolation) — it is that THIS specific failure is never one `degradeOnFailure`
+ * waves through, no matter how `PRETALX_ALLOW_DEGRADED` is set. A wrong
+ * question id does not fail the build; it ships every level chip wrong on an
+ * otherwise green one, which is strictly worse than shipping none — so it
+ * must behave like `MissingQuestionIdError`, not like an outage.
+ */
+describe("the level-question guard inside loadLevelAnswers", () => {
+  /** `/questions/` answering with id 4's REAL 2027 text: the speaker's own experience. */
+  const wrongQuestion = (url: string) =>
+    url.includes("/questions/")
+      ? new Response(
+          JSON.stringify({
+            results: [
+              { id: 4, question: { fr: "Quel est votre niveau en tant qu'intervenant(e) ?" } },
+            ],
+            next: null,
+          }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        )
+      : new Response(JSON.stringify({ results: [], next: null }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+
+  /** `/questions/` with no row at all for the configured id — renamed or deleted. */
+  const missingQuestion = () =>
+    new Response(JSON.stringify({ results: [], next: null }), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+
+  it("rejects the speaker-experience question even with ALLOW_DEGRADED=1", async () => {
+    process.env[REQUIRED] = "1";
+    process.env[ALLOW] = "1";
+    process.env[TOKEN] = "good-token";
+    stubFetch(wrongQuestion);
+    await expect(loadLevelAnswers(2026, freshSlug(), new Set())).rejects.toThrow(
+      /does not look like the talk-level question/,
+    );
+  });
+
+  it("rejects a missing/renamed question even with ALLOW_DEGRADED=1", async () => {
+    process.env[REQUIRED] = "1";
+    process.env[ALLOW] = "1";
+    process.env[TOKEN] = "good-token";
+    stubFetch(missingQuestion);
+    await expect(loadLevelAnswers(2026, freshSlug(), new Set())).rejects.toThrow(
+      /does not look like the talk-level question/,
+    );
+  });
+
+  it("still degrades locally (no PRETALX_TOKEN_REQUIRED), same as every other config failure", async () => {
+    // This is NOT a gap: local dev already tolerates a missing/rejected token
+    // the same way ("a local build" describe above) — degradeOnFailure's
+    // non-REQUIRED branch warns and carries on for ANY failure, config or
+    // outage alike, so a developer iterating without Pretalx access is never
+    // blocked. "Fail loudly" is a property of a build that actually SHIPS
+    // (PRETALX_TOKEN_REQUIRED=1, asserted twice above, with and without
+    // ALLOW_DEGRADED) — not of every local invocation.
+    process.env[TOKEN] = "good-token";
+    stubFetch(wrongQuestion);
+    await expect(loadLevelAnswers(2026, freshSlug(), new Set())).resolves.toEqual(new Map());
+  });
+
+  it("passes the real question through to a normal, successful read", async () => {
+    const slug = freshSlug();
+    stubFetch((url) => {
+      if (url.includes("/questions/")) {
+        return new Response(
+          JSON.stringify({
+            results: [{ id: 4, question: { fr: "Niveau de la présentation" } }],
+            next: null,
+          }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        );
+      }
+      return new Response(
+        JSON.stringify({
+          results: [{ answer: "Confirmé", person: null, submission: "TALK1" }],
+          next: null,
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    });
+    process.env[TOKEN] = "good-token";
+    const answers = await loadLevelAnswers(2026, slug, new Set(["TALK1"]));
+    expect(answers.get("TALK1")).toBe("Confirmé");
   });
 });
 

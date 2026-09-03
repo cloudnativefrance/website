@@ -11,8 +11,12 @@ describe("PRETALX_EVENT", () => {
     });
   });
 
-  it("has no 2027 entry — that event does not exist yet", () => {
-    expect(PRETALX_EVENT[2027]).toBeUndefined();
+  it("marks 2027 as a preview edition with no CFP link yet", () => {
+    // The 2027 Pretalx event exists now, but its schedule is not released and
+    // the event itself is non-public — so /cfp keeps pointing at 2026 until
+    // the organiser flips it public (a one-word `cfpOpen` edit here, separate
+    // from when the programme itself releases).
+    expect(PRETALX_EVENT[2027]).toEqual({ slug: "2027", access: "preview" });
   });
 });
 
