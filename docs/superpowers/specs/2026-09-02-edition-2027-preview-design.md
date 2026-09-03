@@ -153,8 +153,28 @@ One memoised call per `(year, slug)` for the process lifetime, matching
 see the same data.
 
 **Which schedule.** The wip schedule — what the organisers are editing right now, with no
-release step. A slot belongs to a schedule version; the reader takes the version whose
-`published` is `null`. Rebuilding staging shows the current state of the grid.
+release step. Rebuilding staging shows the current state of the grid.
+
+> **Correction, 2026-09-03 (measured against `democon`, a non-public event on the live
+> instance).** This needs TWO calls, not one. The section above originally claimed a single
+> `expand=` call yields everything; it does not.
+>
+> - `GET /slots/` **defaults to the released schedule.** On `democon`, `?schedule=1` (the
+>   released `v1.0`) and `?schedule=2` (`wip`) return different slot rows with different
+>   ids. A loader that omits the filter silently renders the *released* schedule — the
+>   precise opposite of a preview that exists to show unreleased edits.
+> - The `slots` nested by `expand=slots.room` under `/submissions/` returns `schedule: null`
+>   and `is_visible: null`, so version selection cannot be done from that payload at all.
+>
+> The reader therefore: (1) `GET /schedules/` and takes the version whose `published` is
+> `null`; (2) `GET /slots/?schedule=<that id>`, which carries `schedule`, `is_visible`,
+> `room`, `start` and `end`; (3) joins to `/submissions/?state=confirmed&expand=…` by
+> submission code for title, track, type, speakers and answers. A slot whose `is_visible`
+> is false maps to `status: "hidden"` and is filtered at `loadSessions`'s single exit point.
+>
+> Cost of getting this wrong is silent and severe — a staging preview that looks correct
+> while showing last week's grid — so the wip schedule id must be resolved explicitly and
+> the loader must fail loudly if no unpublished version exists.
 
 **Mapping.** Reuses `toFormat`, `durationToMinutes`, `toLevel` and `buildSpeakerResolver`
 exported from `pretalx.ts` rather than restating them, so the two ingestion paths cannot
