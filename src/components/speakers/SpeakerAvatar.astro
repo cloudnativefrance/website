@@ -36,7 +36,28 @@ function optimise(url: string, width: number): Promise<string> {
     // ratio without reading the file, and without dimensions it declines to
     // optimise and hands the original URL straight back — silently, which is
     // how this first appeared to "work" while still emitting 65 hotlinks.
-    pending = getImage({ src: url, inferSize: true, width, format: "webp" }).then((r) => r.src);
+    // Both dimensions, explicitly, plus `fit: "cover"`.
+    //
+    // Passing `width` alone looks right — the box is square, so the aspect
+    // ratio should follow — but for a REMOTE source resolved via `inferSize`
+    // it emitted `height` unchanged from the original: a 1024x1058 portrait
+    // came back as 128x1058, squashed 8x horizontally. `object-cover` then
+    // cropped the middle of that sliver, so every Pretalx portrait rendered as
+    // a close-up of a nose or an eye. Measured, not theorised: see the guard in
+    // tests/build/speaker-avatar-aspect.test.ts.
+    //
+    // A square derivative is what this component wants regardless — the box is
+    // `w-16 h-16` / `w-32 h-32` and clipped to a circle — so asking sharp for a
+    // centred square crop moves the decision to build time, where it can be
+    // asserted, instead of leaving it to CSS on an image of unknown shape.
+    pending = getImage({
+      src: url,
+      inferSize: true,
+      width,
+      height: width,
+      fit: "cover",
+      format: "webp",
+    }).then((r) => r.src);
     optimised.set(key, pending);
   }
   return pending;
