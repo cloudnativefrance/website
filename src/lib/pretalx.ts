@@ -72,6 +72,17 @@ export function cfpEventUrl(): string {
   return `${PRETALX_BASE}/${pickCfpEvent()}/`;
 }
 
+/**
+ * The same URL as a display string: no scheme, no trailing slash.
+ *
+ * Both /cfp pages printed this under the submit button and each carried its own
+ * copy of the two `.replace()` calls, so the FR and EN pages could quietly
+ * start rendering the link differently.
+ */
+export function cfpEventLabel(): string {
+  return cfpEventUrl().replace(/^https?:\/\//, "").replace(/\/$/, "");
+}
+
 export function scheduleExportUrl(slug: string): string {
   return `${PRETALX_BASE}/${slug}/schedule/export/schedule.json`;
 }

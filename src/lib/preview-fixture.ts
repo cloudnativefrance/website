@@ -12,8 +12,8 @@
  * like it was validating something it was not.
  *
  * **The origin is resolved the way the rest of the codebase resolves it** —
- * `PUBLIC_SITE_URL || PROD_ORIGIN`, exactly as `astro.config.mjs` derives
- * `site` and `robots.txt.ts` derives its policy. So an unset or empty value
+ * `resolveSiteOrigin`, the same call `astro.config.mjs` derives `site` from and
+ * the same origin `robots.txt.ts` reads its policy off. So an unset or empty value
  * means PRODUCTION and the fixture refuses: fail closed. That is not pedantry.
  * `.github/workflows/build-image.yml` passes `PUBLIC_SITE_URL=''` for every
  * non-staging branch, so a guard that only refused on the literal production
@@ -31,7 +31,7 @@
  * variable in the first place.
  */
 import { isEdition, type Edition } from "./editions";
-import { PROD_ORIGIN, isProductionOrigin } from "./site-env";
+import { PROD_ORIGIN, isProductionOrigin, resolveSiteOrigin } from "./site-env";
 import type { PretalxEventEntry } from "./pretalx";
 
 const DEFAULT_FIXTURE_EDITION = 2027;
@@ -42,10 +42,7 @@ export function resolvePreviewFixture(
   const slug = env.PRETALX_PREVIEW_SLUG?.trim();
   if (!slug) return undefined;
 
-  // `||`, not `??`: an empty PUBLIC_SITE_URL is what CI passes on every
-  // non-staging branch, and it has to mean the same thing here as it does in
-  // astro.config.mjs — production.
-  const origin = env.PUBLIC_SITE_URL?.trim() || PROD_ORIGIN;
+  const origin = resolveSiteOrigin(env);
   if (isProductionOrigin(origin)) {
     throw new Error(
       `[preview] PRETALX_PREVIEW_SLUG=${slug} is set on a PRODUCTION build ` +

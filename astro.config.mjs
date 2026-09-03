@@ -6,7 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 // Use relative import to resolve @ alias at config load time
 import { generateFlagEnvSchema } from "./src/config/flags-env.ts";
-import { PROD_ORIGIN } from "./src/lib/site-env.ts";
+import { resolveSiteOrigin } from "./src/lib/site-env.ts";
 import { featuredEdition } from "./src/lib/edition-visibility.ts";
 import { loadLocalEnv } from "./scripts/load-local-env.mjs";
 
@@ -52,9 +52,9 @@ export default defineConfig({
   },
   // Driven by PUBLIC_SITE_URL so staging builds advertise their own origin in
   // canonical URLs, hreflang, OG image URLs and the sitemap. Defaults to
-  // production (`||`, not `??`, so an empty string also falls back), so every
-  // existing build path is unchanged.
-  site: process.env.PUBLIC_SITE_URL || PROD_ORIGIN,
+  // production when unset or empty — one definition, shared with the guard in
+  // preview-fixture.ts that decides whether a build may use the fixture.
+  site: resolveSiteOrigin(),
   redirects: {
     "/programme":    `/programme/${featured}`,
     "/sponsors":     "/sponsors/2026",

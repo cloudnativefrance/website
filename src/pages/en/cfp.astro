@@ -3,13 +3,14 @@ import Layout from "@/layouts/Layout.astro";
 import { useTranslations } from "@/i18n/utils";
 import { FLAGS } from "@/config/flags";
 import { getFlagState } from "@/lib/flags";
-import { cfpEventUrl } from "@/lib/pretalx";
+import { cfpEventUrl, cfpEventLabel } from "@/lib/pretalx";
 
 const lang = "en";
 const t = useTranslations(lang);
 const cfpState = getFlagState(FLAGS.cfp);
 
 const CFP_URL = cfpEventUrl();
+const CFP_LABEL = cfpEventLabel();
 
 const audiencePills = [
   "Developers",
@@ -303,7 +304,7 @@ const criteria = [
         >
           Submit a talk <span aria-hidden="true">→</span>
         </a>
-        <p class="mt-4 text-xs text-muted-foreground">{CFP_URL.replace(/^https?:\/\//, "").replace(/\/$/, "")}</p>
+        <p class="mt-4 text-xs text-muted-foreground">{CFP_LABEL}</p>
       </div>
     </section>
     </>
