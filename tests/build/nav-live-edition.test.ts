@@ -10,6 +10,25 @@ import { describe, it, expect, afterEach, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { featuredEdition, archivedEditions } from "@/lib/edition-visibility";
+import { stashEnv } from "../support/env-stash";
+
+/**
+ * Every case here injects its own `now` and expects the flag's DATE logic to
+ * decide — but `isFlagActive` consults FLAG_PROGRAMME / FLAG_OVERRIDES first,
+ * and `vitest.config.ts` bridges `.env.local` into `process.env` before any
+ * test runs. A developer following this repo's own documented fixture workflow
+ * therefore failed this suite on a clean checkout, with the injected clock
+ * quietly overridden. The fixture keys go too: `isEditionLoadable` now resolves
+ * `PRETALX_EVENT[year] ?? fixtureEvent(year)`, which reads both of those and
+ * the origin.
+ */
+stashEnv([
+  "FLAG_PROGRAMME",
+  "FLAG_OVERRIDES",
+  "PRETALX_PREVIEW_SLUG",
+  "PRETALX_PREVIEW_EDITION",
+  "PUBLIC_SITE_URL",
+]);
 
 const NAV = readFileSync(
   resolve(import.meta.dirname, "../../src/components/Navigation.astro"),

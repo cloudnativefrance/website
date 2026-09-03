@@ -42,8 +42,12 @@ describe("the preview branch stays gated behind isEditionLoadable", () => {
     // resolvePreviewFixture throw (see preview-fixture.ts). This case is about
     // the FLAG gate, so it supplies the origin a local build would.
     process.env.PUBLIC_SITE_URL = "http://localhost:4321";
-    // FLAG_PROGRAMME / FLAG_OVERRIDES deliberately left unset: `programme`
-    // opens 2027-04-01, so its real, un-overridden state is inactive today.
+    // Pinned, not inferred from the wall clock. `loadSessions` takes no `now`,
+    // so this case used to rely on `programme` still being closed today — and
+    // would have started failing for real on 2027-04-01T09:00, asserting the
+    // opposite of what it is named for. The gate under test is "flag closed →
+    // no fetch"; say so.
+    process.env.FLAG_PROGRAMME = "off";
 
     const { loadSessions } = await import("@/lib/schedule");
 
