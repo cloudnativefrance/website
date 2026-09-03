@@ -15,7 +15,7 @@
  * logic. This is how env vars (FLAG_<NAME>=on|off) force state at build time.
  */
 
-import { FLAGS, type FlagDefinition, type FlagName } from "@/config/flags";
+import { FLAGS, type FlagDefinition, type FlagName } from "../config/flags";
 
 export type FlagState = "pending" | "active" | "ended";
 

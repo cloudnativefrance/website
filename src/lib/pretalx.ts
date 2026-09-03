@@ -8,7 +8,7 @@ import type {
   SessionRow,
 } from "./schedule";
 import { fetchTextOrFallback } from "./remote-fetch";
-import { SPEAKER_SLUGS } from "@/data/speaker-slugs";
+import { SPEAKER_SLUGS } from "../data/speaker-slugs";
 
 export const PRETALX_BASE =
   process.env.PRETALX_BASE_URL || "https://cfp.cloudnativedays.fr";
