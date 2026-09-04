@@ -88,6 +88,10 @@ const defaultView = "grid" as const;
      about 600px. Titles are complete at 235px, but 19 characters a line is a
      narrow ribbon; ~300px reads properly.
 
+     Applied to the heading block as well as the grid: they are one column, and
+     widening only the grid left the title, subtitle and parcours strip 160px
+     short of the schedule's right edge on a 1920px screen.
+
      Only ever wider, never narrower: below 1400px the page cap is already the
      binding constraint and this does nothing. */
   @media (min-width: 1400px) {

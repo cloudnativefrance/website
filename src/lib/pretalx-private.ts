@@ -103,7 +103,8 @@ export type SpeakerEnrichment = Map<string, Partial<Record<SpeakerField, string>
 /** Talk level answers, keyed by submission code. */
 export type LevelAnswers = Map<string, string>;
 
-function readToken(): string | undefined {
+/** Exported so sibling loaders reuse one token resolution, not three copies. */
+export function readToken(): string | undefined {
   const direct = process.env.PRETALX_API_TOKEN?.trim();
   if (direct) return direct;
   const path = process.env.PRETALX_API_TOKEN_FILE?.trim();
