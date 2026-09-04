@@ -205,6 +205,7 @@ export const ui = {
     "schedule.agenda.empty":
       "Aucune session bookmarkee. Cliquez sur l'icone marque-page d'une session pour l'ajouter.",
     "schedule.agenda.remove": "Retirer",
+    "schedule.agenda.clash": "chevauche {title} ({room})",
     "schedule.export_all": "Exporter le programme (.ics)",
     "schedule.export_agenda": "Exporter mon agenda (.ics)",
     "schedule.close": "Fermer",
@@ -608,6 +609,7 @@ export const ui = {
     "schedule.agenda.empty":
       "No sessions bookmarked yet. Click the bookmark icon on a session to add it.",
     "schedule.agenda.remove": "Remove",
+    "schedule.agenda.clash": "overlaps with {title} ({room})",
     "schedule.export_all": "Export full schedule (.ics)",
     "schedule.export_agenda": "Export my agenda (.ics)",
     "schedule.close": "Close",
