@@ -87,10 +87,11 @@ describe("audience lens markup", () => {
     // declaration alone, regardless of call order.
     //
     // `pruneFacetsForLens()` has exactly one call site: inside `setAudience`.
-    // Task 5 needed a second, standalone boot-time call because no lens was
-    // resolved at boot yet; Task 6 makes boot resolve the lens through
-    // `setAudience` too (gated by `hasLens`), so that second call site is
-    // gone — a reader must not find two places claiming to be authoritative.
+    // An earlier version needed a second, standalone boot-time call because
+    // no lens was resolved at boot yet; boot now resolves the initial lens
+    // through `setAudience` too (gated by `hasAudiences`), so that second
+    // call site is gone — a reader must not find two places claiming to be
+    // authoritative.
     const setAudienceStart = src.indexOf("const setAudience = (next: Audience): void => {");
     const setAudienceEnd = src.indexOf("};", setAudienceStart);
     expect(setAudienceStart, "setAudience is declared").toBeGreaterThan(-1);
@@ -217,6 +218,6 @@ describe("audience lens: other editions and the URL", () => {
     const src = read("src/components/schedule/schedule-ui.ts");
     // The boot call must be gated, not ternary'd — a ternary still calls
     // setAudience, which still hides every card of the other audience.
-    expect(src).toMatch(/if\s*\(\s*hasLens\s*\)\s*setAudience/);
+    expect(src).toMatch(/if\s*\(\s*hasAudiences\s*\)\s*setAudience/);
   });
 });
