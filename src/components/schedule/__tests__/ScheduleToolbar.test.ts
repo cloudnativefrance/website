@@ -50,8 +50,6 @@ async function renderToolbar() {
 const CONTRACT_IDS = [
   "schedule-search",
   "schedule-search-clear",
-  "schedule-view-grid",
-  "schedule-view-list",
   "schedule-result-count",
   "schedule-filter-clear",
   "schedule-filter-active-count",
@@ -61,7 +59,7 @@ const CONTRACT_IDS = [
 ];
 
 describe("ScheduleToolbar — id contract with the client island", () => {
-  it("renders all ten ids the island binds to", async () => {
+  it("renders all eight ids the island binds to", async () => {
     const html = await renderToolbar();
     for (const id of CONTRACT_IDS) {
       expect(html).toContain(`id="${id}"`);

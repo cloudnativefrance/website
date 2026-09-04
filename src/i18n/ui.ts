@@ -209,9 +209,6 @@ export const ui = {
     "schedule.export_all": "Exporter le programme (.ics)",
     "schedule.export_agenda": "Exporter mon agenda (.ics)",
     "schedule.close": "Fermer",
-    "schedule.view.grid": "Grille",
-    "schedule.view.list": "Liste",
-    "schedule.view.toggle": "Affichage",
     "schedule.audience.label": "Public",
     "schedule.audience.tech": "Technique",
     // Deliberately NOT translated, in either locale. This is the Pretalx
@@ -619,9 +616,6 @@ export const ui = {
     "schedule.export_all": "Export full schedule (.ics)",
     "schedule.export_agenda": "Export my agenda (.ics)",
     "schedule.close": "Close",
-    "schedule.view.grid": "Grid",
-    "schedule.view.list": "List",
-    "schedule.view.toggle": "View",
     "schedule.audience.label": "Audience",
     "schedule.audience.tech": "Technical",
     // Same literal as the FR bundle, and for the same reason — see there.

@@ -34,15 +34,6 @@ const levels = listLevels(sessions);
       <button type="button" id="schedule-search-clear" aria-label={t("schedule.search.clear")} hidden>×</button>
     </div>
 
-    <div class="toolbar-views" role="group" aria-label={t("schedule.view.toggle")}>
-      <button type="button" id="schedule-view-grid" data-view="grid" aria-pressed={defaultView === "grid"}>
-        {t("schedule.view.grid")}
-      </button>
-      <button type="button" id="schedule-view-list" data-view="list" aria-pressed={defaultView === "list"}>
-        {t("schedule.view.list")}
-      </button>
-    </div>
-
     {hasBothAudiences(sessions) && (
       <div class="audience-switch" data-audience-switch role="group" aria-label={t("schedule.audience.label")}>
         <button type="button" data-audience="tech" aria-pressed="true">{t("schedule.audience.tech")}</button>
@@ -138,24 +129,21 @@ const levels = listLevels(sessions);
      control in the site uses (e.g. ThemeToggle.astro, Navigation.astro). */
   .toolbar-search:has(input:focus-visible) { outline: 2px solid var(--color-ring); outline-offset: 2px; }
 
-  /* .audience-switch is the same segmented control as .toolbar-views — same
-     height, radius and active treatment, sharing these rules rather than
-     restating them for a second control that sits right beside the first. */
-  .toolbar-views, .audience-switch { display: inline-flex; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; }
-  /* Grid view does not exist below md, so offering the choice there is a dead
-     control. The island independently forces the list at this width. The
-     audience switch has no such constraint — it stays available. */
-  @media (max-width: 767px) { .toolbar-views { display: none; } }
-  .toolbar-views button, .audience-switch button {
+  /* The only segmented control in the toolbar. It used to sit beside a
+     grid/list toggle that shared these exact rules, which made the two read as
+     one four-button widget rather than two unrelated choices — the reason the
+     view toggle was removed rather than restyled. */
+  .audience-switch { display: inline-flex; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; }
+  .audience-switch button {
     padding: 0 14px; height: 38px; font-size: 13px; font-weight: 600;
     background: var(--color-card); color: var(--color-foreground); border: 0; cursor: pointer;
   }
-  .toolbar-views button[aria-pressed="true"], .audience-switch button[aria-pressed="true"] { background: var(--color-primary); color: var(--color-primary-foreground); }
+  .audience-switch button[aria-pressed="true"] { background: var(--color-primary); color: var(--color-primary-foreground); }
   /* The container clips overflow to keep only its own rounded corners visible
      (no square corner from a child button poking out), which also clips a
      default outline drawn outside the button's border box. A negative offset
      pulls the ring inside instead, so it survives the clip. */
-  .toolbar-views button:focus-visible, .audience-switch button:focus-visible { outline: 2px solid var(--color-ring); outline-offset: -2px; }
+  .audience-switch button:focus-visible { outline: 2px solid var(--color-ring); outline-offset: -2px; }
 
   .toolbar-actions { display: flex; gap: 8px; }
   .toolbar-btn {
@@ -167,7 +155,6 @@ const levels = listLevels(sessions);
      also animate the colour and border changes these controls need instant. */
   .toolbar-btn,
   .schedule-filter,
-  .toolbar-views button,
   .audience-switch button {
     transition-property: scale;
     transition-duration: 120ms;
@@ -175,11 +162,10 @@ const levels = listLevels(sessions);
   }
   .toolbar-btn:active,
   .schedule-filter:active,
-  .toolbar-views button:active,
   .audience-switch button:active { scale: 0.96; }
   @media (prefers-reduced-motion: reduce) {
-    .toolbar-btn, .schedule-filter, .toolbar-views button, .audience-switch button { transition-duration: 0s; }
-    .toolbar-btn:active, .schedule-filter:active, .toolbar-views button:active, .audience-switch button:active { scale: 1; }
+    .toolbar-btn, .schedule-filter, .audience-switch button { transition-duration: 0s; }
+    .toolbar-btn:active, .schedule-filter:active, .audience-switch button:active { scale: 1; }
   }
   .toolbar-badge {
     background: color-mix(in oklch, var(--color-primary) 20%, transparent);
