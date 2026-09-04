@@ -96,3 +96,26 @@ describe("ScheduleToolbar — id contract with the client island", () => {
     expect(html).toContain('data-filter="track"');
   });
 });
+
+describe("ScheduleToolbar — the audience control", () => {
+  const renderWith = async (list: SessionRow[]) => {
+    const container = await AstroContainer.create();
+    return container.renderToString(ScheduleToolbar, {
+      props: { sessions: list, lang: "fr", defaultView: "grid" },
+    });
+  };
+
+  it("is absent — not disabled — when every session is one audience", async () => {
+    const html = await renderWith([row({ track: "Cloud Native" })]);
+    expect(html).not.toContain("data-audience-switch");
+  });
+
+  it("appears when an edition has sessions in both audiences", async () => {
+    const html = await renderWith([
+      row({ id: "A", track: "Cloud Native" }),
+      row({ id: "B", track: "Strategy & Leadership", room: "Eiffel" }),
+    ]);
+    expect(html).toContain("data-audience-switch");
+    expect(html).toContain('data-audience="leadership"');
+  });
+});

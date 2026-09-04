@@ -3,6 +3,7 @@
 import type { SessionRow } from "@/lib/schedule";
 import { endTime, formatTime } from "@/lib/schedule";
 import { pillColors } from "@/lib/track-pill";
+import { audienceOf } from "@/lib/audience";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 
@@ -34,6 +35,7 @@ const pill = pillColors(session.trackColor);
   data-room={session.room}
   data-format={session.format}
   data-track={session.track}
+  data-audience={audienceOf(session.track)}
   data-level={session.level}
   data-title={session.title}
   data-start={session.startTime}
