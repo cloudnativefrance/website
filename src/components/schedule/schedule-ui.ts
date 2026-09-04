@@ -42,7 +42,6 @@ const root = document.querySelector<HTMLElement>("[data-schedule-root]");
 if (root) {
   const gridView = root.querySelector<HTMLElement>(".grid-view");
   const listView = root.querySelector<HTMLElement>(".list-view");
-  const toolbarViewsEl = root.querySelector<HTMLElement>(".toolbar-views");
   const countEl = document.getElementById("schedule-result-count");
   const searchEl = document.getElementById("schedule-search") as HTMLInputElement | null;
   const clearSearchEl = document.getElementById("schedule-search-clear");
@@ -179,6 +178,10 @@ if (root) {
   // would win — author rules outrank the UA sheet — and both views would render
   // at once with no error anywhere. Disabling preflight breaks this toggle.
   function renderView() {
+    // Two independent reasons a grid cannot be drawn: the viewport is too
+    // narrow for room columns, or the lens has narrowed to a single room. Both
+    // constrain what is RENDERED and neither touches `preferredView`, which is
+    // what `?view=` and the stored choice set.
     const renderedView = narrow.matches || lensForcesList ? "list" : preferredView;
     gridView?.toggleAttribute("hidden", renderedView !== "grid");
     listView?.toggleAttribute("hidden", renderedView !== "list");
@@ -190,13 +193,21 @@ if (root) {
     // Called from inside renderView() (not setAudience) so it tracks every
     // path that can set `lensForcesList`, and is restored the moment the
     // lens widens back past one room.
-    toolbarViewsEl?.toggleAttribute("hidden", lensForcesList);
-    for (const btn of document.querySelectorAll<HTMLElement>("[data-view]")) {
-      const pressed = btn.getAttribute("data-view") === preferredView;
-      btn.setAttribute("aria-pressed", pressed ? "true" : "false");
-    }
+
   }
 
+  /**
+   * Settle the view.
+   *
+   * There is no grid/list control any more — it was removed so the audience
+   * lens is the toolbar's only segmented control, the two having shared one
+   * visual treatment and read as a single four-button widget. What remains is
+   * `?view=` and the stored preference, so `persist` is only ever true for a
+   * caller that means to write them; the boot path passes false.
+   *
+   * The list VIEW is untouched and still rendered: it is what a phone gets
+   * below 767px, and what a one-room lens falls back to.
+   */
   function setView(view: "grid" | "list", persist = true) {
     preferredView = view;
     renderView();
@@ -455,10 +466,6 @@ if (root) {
   // and with it where the grid head must sit.
   if (toolbarEl && "ResizeObserver" in window) {
     new ResizeObserver(syncStickyOffsets).observe(toolbarEl);
-  }
-
-  for (const btn of document.querySelectorAll<HTMLElement>("[data-view]")) {
-    btn.addEventListener("click", () => setView(btn.getAttribute("data-view") as "grid" | "list"));
   }
 
   for (const btn of document.querySelectorAll<HTMLElement>("[data-audience-switch] [data-audience]")) {

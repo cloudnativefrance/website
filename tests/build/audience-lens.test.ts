@@ -79,19 +79,25 @@ describe("audience lens markup", () => {
     expect(read("src/components/schedule/schedule-ui.ts")).toMatch(/roomCount|applyAudience\([^)]*\)\s*===?\s*1|<=\s*1/);
   });
 
-  it("hides the grid/list toggle while a lens forces the list view — a visible control that cannot be honoured", () => {
-    // Important-1 regression: the toggle used to stay visible and clickable
-    // in a one-room lens, report success (aria-pressed="true", a written
-    // localStorage/URL) and do nothing. There is no DOM test environment
-    // here, so this pins the SOURCE MECHANISM the fix relies on: renderView()
-    // itself toggles `.toolbar-views`'s `hidden` attribute off `lensForcesList`
-    // — not some other function, and not a CSS-only fix that this file
-    // can't see. It cannot prove the browser actually hides the element.
+  it("has no grid/list toggle at all — the lens is the toolbar's only segmented control", () => {
+    // Removed deliberately. It shared its every rule with .audience-switch, so
+    // two adjacent controls with identical height, radius and active treatment
+    // read as one four-button widget rather than two unrelated choices — and
+    // the lens is the one that matters. It also could not be honoured in a
+    // one-room lens, where the grid does not exist.
+    //
+    // The list VIEW is untouched: a phone below 767px gets it, and so does a
+    // lens narrowed to a single room. `?view=list` still reaches it.
+    const toolbar = read("src/components/schedule/ScheduleToolbar.astro");
+    expect(toolbar, "no view toggle markup").not.toMatch(/data-view=|toolbar-views/);
+    expect(toolbar, "the audience switch keeps the segmented styling")
+      .toMatch(/\.audience-switch\s*\{[^}]*inline-flex/);
+
     const src = read("src/components/schedule/schedule-ui.ts");
-    const renderView = sliceBalancedBlock(src, "function renderView() {");
-    expect(renderView).toMatch(
-      /toolbarViewsEl\?\.toggleAttribute\(\s*["']hidden["']\s*,\s*lensForcesList\s*\)/,
-    );
+    expect(src, "and no dead wiring is left binding to it").not.toMatch(/\[data-view\]|toolbarViewsEl/);
+    // The list view itself must survive, or a narrow viewport has nothing to show.
+    expect(src, "the list view is still rendered and toggled").toMatch(/listView\?\.toggleAttribute\("hidden"/);
+    expect(src, "and a one-room lens still falls back to it").toMatch(/narrow\.matches \|\| lensForcesList \? "list"/);
   });
 
   it("prunes the lens's dead filter values before re-applying the filters", () => {
