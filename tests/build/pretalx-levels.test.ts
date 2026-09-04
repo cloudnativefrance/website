@@ -21,6 +21,7 @@ import { loadSessions } from "@/lib/schedule";
 import { toLevel } from "@/lib/pretalx";
 import {
   LEVEL_QUESTION_ID,
+  assertLevelQuestionText,
   loadLevelAnswers,
   reanchor,
   SPEAKER_QUESTIONS,
@@ -60,12 +61,30 @@ describe("level question wiring", () => {
     expect(Object.values(SPEAKER_QUESTIONS[2026]!)).not.toContain(LEVEL_QUESTION_ID[2026]);
   });
 
-  it("keys question ids per edition, so a new event cannot silently reuse 2026's", () => {
-    // Pretalx ids belong to the question object, not to a per-event slot. An
-    // edition with no mapping must surface that rather than query ids that do
-    // not exist for it and return an empty, plausible-looking result.
-    expect(SPEAKER_QUESTIONS[2027]).toBeUndefined();
-    expect(LEVEL_QUESTION_ID[2027]).toBeUndefined();
+  it("keys question ids per edition, so 2027 does not silently reuse 2026's", () => {
+    // Pretalx ids belong to the question object, not to a per-event slot —
+    // 2027's own ids (read from its /questions/ list once the event existed)
+    // are a completely different set of numbers from 2026's, and the level id
+    // stays clear of the speaker-question ids on 2027 too.
+    expect(LEVEL_QUESTION_ID[2027]).toBe(22);
+    expect(SPEAKER_QUESTIONS[2027]).toEqual({
+      company: 32,
+      role: 33,
+      linkedin: 34,
+      github: 35,
+      bluesky: 36,
+      website: 37,
+    });
+    expect(Object.values(SPEAKER_QUESTIONS[2027]!)).not.toContain(LEVEL_QUESTION_ID[2027]);
+  });
+
+  it("has no mapping at all for 2023, which predates the Pretalx instance", () => {
+    // The "missing mapping surfaces rather than querying ids that don't
+    // exist" behaviour (see MissingQuestionIdError) still needs an edition
+    // with no entry to exercise it — 2023 is that edition now that both 2026
+    // and 2027 are mapped.
+    expect(SPEAKER_QUESTIONS[2023]).toBeUndefined();
+    expect(LEVEL_QUESTION_ID[2023]).toBeUndefined();
   });
 
   it.skipIf(!hasToken)("returns levels only for talks in the released schedule", async () => {
@@ -91,6 +110,55 @@ describe("level question wiring", () => {
     for (const level of seen) {
       expect(["beginner", "intermediate", "advanced"]).toContain(level);
     }
+  });
+});
+
+/**
+ * The hardening this whole file's docstring warns about: an id alone proves
+ * nothing, because a check that only tests for the word "niveau" passes on
+ * BOTH the talk-level question and its speaker-experience sibling. See
+ * `assertLevelQuestionText`'s own docstring in pretalx-private.ts for the
+ * two-sided rule this pins.
+ */
+describe("assertLevelQuestionText", () => {
+  it("passes the real 2027 talk-level question", () => {
+    expect(() =>
+      assertLevelQuestionText(2027, "2027", 22, "Niveau de la présentation"),
+    ).not.toThrow();
+  });
+
+  it("REJECTS question 23's real text, even though it also contains \"niveau\"", () => {
+    // This is the exact case the design spec's first draft ("contains niveau")
+    // got wrong: both questions contain the word, so that check alone cannot
+    // tell them apart.
+    expect(() =>
+      assertLevelQuestionText(
+        2027,
+        "2027",
+        23,
+        "Quel est votre niveau en tant qu'intervenant(e) ?",
+      ),
+    ).toThrow(/does not look like the talk-level question/);
+  });
+
+  it("rejects a missing or renamed question, rather than reading an empty string as valid", () => {
+    expect(() => assertLevelQuestionText(2027, "2027", 22, undefined)).toThrow(
+      /no question with that id/,
+    );
+  });
+
+  it("names the configured question id and the event in the failure", () => {
+    // Whoever is debugging this at 2am needs to see which id they pointed at
+    // and which event it was fetched from, not just "something is wrong".
+    expect(() => assertLevelQuestionText(2027, "2027", 23, "unrelated text")).toThrow(
+      /LEVEL_QUESTION_ID\[2027\] = 23 on event "2027"/,
+    );
+  });
+
+  it("rejects empty text the same way as a missing question", () => {
+    expect(() => assertLevelQuestionText(2027, "2027", 22, "")).toThrow(
+      /does not look like the talk-level question/,
+    );
   });
 });
 

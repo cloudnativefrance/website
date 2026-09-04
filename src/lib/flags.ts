@@ -15,7 +15,7 @@
  * logic. This is how env vars (FLAG_<NAME>=on|off) force state at build time.
  */
 
-import { FLAGS, type FlagDefinition, type FlagName } from "@/config/flags";
+import { FLAGS, type FlagDefinition, type FlagName } from "../config/flags";
 
 export type FlagState = "pending" | "active" | "ended";
 
@@ -113,5 +113,26 @@ export function readEnvOverride(name: FlagName): "on" | "off" | undefined {
 
   const bundle = process.env.FLAG_OVERRIDES;
   if (!bundle) return undefined;
-  return parseFlagOverrides(bundle).get(name);
+  return cachedFlagOverrides(bundle).get(name);
+}
+
+/**
+ * `parseFlagOverrides`, memoised on the raw string.
+ *
+ * `readEnvOverride` runs once per flag per consult, and `Navigation.astro`
+ * consults the `programme` flag on every page a build emits — several
+ * thousand full re-parses and re-validations of one unchanging string.
+ *
+ * Keyed on the raw value rather than parsed once at import: tests mutate
+ * `process.env.FLAG_OVERRIDES` between cases, and a changed value must
+ * re-parse. A malformed value is never cached — `parseFlagOverrides` throws
+ * before the assignment — so it keeps throwing on every call, as before.
+ */
+let overridesCache: { raw: string; parsed: Map<FlagName, "on" | "off"> } | undefined;
+
+function cachedFlagOverrides(raw: string): Map<FlagName, "on" | "off"> {
+  if (overridesCache?.raw !== raw) {
+    overridesCache = { raw, parsed: parseFlagOverrides(raw) };
+  }
+  return overridesCache.parsed;
 }

@@ -1,12 +1,15 @@
 import { CURRENT_EDITION, type Edition } from "./editions";
+import { isEditionLoadable } from "./edition-visibility";
 import { loadFrozenArchive } from "./frozen-archive";
+import { fixtureEvent } from "./preview-fixture";
+import { PRETALX_EVENT } from "./edition-registry";
 import {
-  PRETALX_EVENT,
   collectTalkCodes,
   fetchScheduleExport,
   buildSpeakerResolver,
   toSessionRows,
 } from "./pretalx";
+import { loadPreviewEdition } from "./pretalx-preview";
 import { loadLevelAnswers } from "./pretalx-private";
 import { ui, type Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
@@ -62,18 +65,30 @@ export interface SessionRow {
 export async function loadSessions(
   year: Edition = CURRENT_EDITION,
 ): Promise<SessionRow[]> {
-  const event = PRETALX_EVENT[year];
+  // A fixture only ever stands in for a year with no real PRETALX_EVENT entry
+  // (see preview-fixture.ts) — it never overrides one that already exists.
+  const event = PRETALX_EVENT[year] ?? fixtureEvent(year);
   let rows: SessionRow[];
-  if (event) {
-    const doc = await fetchScheduleExport(year, event.slug);
-    // Pure lookup against the committed slug map — no I/O, so nothing to await.
-    const resolveSpeaker = buildSpeakerResolver();
-    // The released export is the allowlist: levels are looked up only for talks
-    // it already contains, so an unannounced submission cannot reach the site
-    // through the authenticated answers endpoint.
-    const scheduled = new Set(collectTalkCodes(doc));
-    const levels = await loadLevelAnswers(year, event.slug, scheduled);
-    rows = toSessionRows(doc, resolveSpeaker, levels);
+  // The invariant lives here, not in the routes: src/content.config.ts loads
+  // speakers on every build and is not a route, so a route-only gate cannot
+  // protect it. A non-loadable edition reads its frozen archive and issues no
+  // request at all — there is then nothing in memory for any consumer to leak.
+  if (event && isEditionLoadable(year)) {
+    if (event.access === "preview") {
+      // No released schedule yet — read the wip one through the authenticated
+      // reader instead of the anonymous export.
+      rows = (await loadPreviewEdition(year, event.slug)).sessions;
+    } else {
+      const doc = await fetchScheduleExport(year, event.slug);
+      // Pure lookup against the committed slug map — no I/O, so nothing to await.
+      const resolveSpeaker = buildSpeakerResolver();
+      // The released export is the allowlist: levels are looked up only for talks
+      // it already contains, so an unannounced submission cannot reach the site
+      // through the authenticated answers endpoint.
+      const scheduled = new Set(collectTalkCodes(doc));
+      const levels = await loadLevelAnswers(year, event.slug, scheduled);
+      rows = toSessionRows(doc, resolveSpeaker, levels);
+    }
   } else {
     rows = loadArchivedSessions(year);
   }

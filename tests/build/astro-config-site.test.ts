@@ -7,12 +7,26 @@
  * and must be overridable so staging builds do not advertise production URLs.
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
+import { readFileSync } from "node:fs";
 import { PROD_ORIGIN } from "../../src/lib/site-env.ts";
 
 const STAGING_ORIGIN = "https://staging.cloudnativedays.fr";
 
+/**
+ * The `.env.local` bridge is mocked out, deliberately.
+ *
+ * `astro.config.mjs` calls `loadLocalEnv()` on import, and it never clobbers a
+ * variable the shell already set — but the case below needs PUBLIC_SITE_URL
+ * genuinely UNSET, and an unset variable is exactly the one `loadLocalEnv` is
+ * free to fill from the file. So a developer with `PUBLIC_SITE_URL` in their
+ * `.env.local` watched this suite repopulate the very variable it had just
+ * deleted, and fail. `.env.example` no longer suggests parking it there, and
+ * this isolates the variable under test regardless: the subject here is the
+ * ORIGIN plumbing, and `loadLocalEnv` has its own tests in local-env.test.ts.
+ */
 async function loadConfig() {
   vi.resetModules();
+  vi.doMock("../../scripts/load-local-env.mjs", () => ({ loadLocalEnv: () => [] }));
   return (await import("../../astro.config.mjs")).default;
 }
 
@@ -22,6 +36,16 @@ describe("astro.config.mjs site origin", () => {
   afterEach(() => {
     if (original === undefined) delete process.env.PUBLIC_SITE_URL;
     else process.env.PUBLIC_SITE_URL = original;
+    vi.doUnmock("../../scripts/load-local-env.mjs");
+    vi.resetModules();
+  });
+
+  it("still bridges .env.local into process.env", () => {
+    // loadConfig mocks that call out, which would also hide it going missing —
+    // and losing it means every local build silently ships with no Pretalx
+    // token. Assert the wiring separately from the behaviour that needs it gone.
+    const source = readFileSync("astro.config.mjs", "utf8");
+    expect(source).toMatch(/^loadLocalEnv\(\);$/m);
   });
 
   it("defaults to the production origin when PUBLIC_SITE_URL is unset", async () => {
