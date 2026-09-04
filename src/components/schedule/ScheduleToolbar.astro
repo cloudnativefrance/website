@@ -224,11 +224,17 @@ const levels = listLevels(sessions);
   /* The visible control is one line of 12.5px text — measured 213x18.8px,
      less than half the 40px a pointer target should offer. It cannot simply
      be padded: it sits mid-sentence in the count line and must keep the
-     text's own metrics. A pseudo-element extends the target vertically
-     without touching layout. Inset horizontally to 0 so it never overlaps
-     the count text beside it. */
+     text's own metrics, so a pseudo-element extends the target vertically
+     without touching layout.
+
+     The count line is the last child of the sticky toolbar, directly under
+     the filter disclosure. `.toolbar-count` therefore carries the matching
+     `margin-top` and this band is sized to stay inside it: 8px, not 11px,
+     above — the gap that exists — so the target never reaches the summary
+     above it. Two hit areas must not overlap; a click meant for "Filtres"
+     switching the lens instead would be worse than a small target. */
   :global(.toolbar-cross-lens)::after {
-    content: ""; position: absolute; inset: -11px 0; }
+    content: ""; position: absolute; top: -8px; bottom: -11px; left: 0; right: 0; }
   :global(.toolbar-cross-lens:hover) { text-decoration-thickness: 2px; }
   :global(.toolbar-cross-lens:focus-visible) { outline: 2px solid var(--color-ring); outline-offset: 2px; border-radius: 3px; }
 

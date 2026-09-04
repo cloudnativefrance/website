@@ -41,6 +41,22 @@ function sliceBalancedBlock(src: string, anchor: string): string {
 }
 
 describe("audience lens markup", () => {
+  it("both halves of the lens's hiding rule exist, in the component that renders the elements", () => {
+    // The ENTIRE visual effect of the lens is these two declarations. The
+    // class is applied by JS; if the rule is dropped or fails to match, every
+    // count, the column renumber, the facet prune and the URL all keep
+    // reporting a working lens while both views show every session.
+    //
+    // Each lives with the elements it governs — the card rule in the component
+    // that renders cards, so no view can lose it — which is also why neither
+    // needs a `:global` escape.
+    expect(read("src/components/schedule/SessionCard.astro"))
+      .toMatch(/\.session-card\.is-audience-hidden\s*\{[^}]*display:\s*none/);
+    const grid = read("src/components/schedule/ScheduleGridView.astro");
+    expect(grid).toMatch(/\.grid-view-room\.is-audience-hidden/);
+    expect(grid).toMatch(/\.grid-view-cell\.is-audience-hidden[\s\S]{0,40}\{[^}]*display:\s*none/);
+  });
+
   it("cards carry their audience", () => {
     expect(read("src/components/schedule/SessionCard.astro")).toMatch(/data-audience=/);
   });
