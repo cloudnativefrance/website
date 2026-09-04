@@ -31,4 +31,8 @@ describe("audience lens markup", () => {
     expect(switchAt).toBeGreaterThan(-1);
     expect(switchAt).toBeLessThan(filtersAt);
   });
+
+  it("a lens with one room opens in the list view", () => {
+    expect(read("src/components/schedule/schedule-ui.ts")).toMatch(/roomCount|applyAudience\([^)]*\)\s*===?\s*1|<=\s*1/);
+  });
 });
