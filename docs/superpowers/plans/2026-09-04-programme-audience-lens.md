@@ -825,7 +825,8 @@ MSG
 - Modify: `src/lib/lens.ts`
 - Modify: `src/components/schedule/schedule-ui.ts`
 - Modify: `src/components/schedule/ScheduleGrid.astro` (the three client-side labels)
-- Modify: `src/i18n/ui.ts` (FR + EN)
+- Modify: `src/components/schedule/ScheduleToolbar.astro` (the `.toolbar-cross-lens` rule)
+- Modify: `src/i18n/ui.ts` (FR + EN) — **the four `schedule.audience.*` keys already landed in Task 2; nothing to add unless one is missing**
 - Test: `src/lib/__tests__/lens.test.ts` (extend)
 
 **Interfaces:**
@@ -833,7 +834,7 @@ MSG
 - Produces:
   ```ts
   export function countMatchesOutsideLens(
-    cards: readonly { audience: Audience; search: string }[],
+    cards: readonly { id: string; audience: Audience; format: string; search: string }[],
     audience: Audience,
     query: string,
   ): number;
@@ -852,10 +853,14 @@ Append to `src/lib/__tests__/lens.test.ts` — plain data, no DOM:
 ```ts
 import { countMatchesOutsideLens } from "@/lib/lens";
 
+// Ids and formats are part of the fixture because the function needs both:
+// every session renders TWICE (grid + list), and a keynote shows in both
+// lenses. A fixture without duplicates cannot reveal a double count.
 const haystack = [
-  { audience: "tech" as const,       search: "ebpf réseau" },
-  { audience: "leadership" as const, search: "gouvernance cloud" },
-  { audience: "leadership" as const, search: "gouvernance et budget" },
+  { id: "a", format: "talk",    audience: "tech" as const,       search: "ebpf réseau" },
+  { id: "b", format: "talk",    audience: "leadership" as const, search: "gouvernance cloud" },
+  { id: "c", format: "talk",    audience: "leadership" as const, search: "gouvernance et budget" },
+  { id: "k", format: "keynote", audience: "tech" as const,       search: "gouvernance ouverture" },
 ];
 
 describe("countMatchesOutsideLens", () => {
@@ -874,6 +879,19 @@ describe("countMatchesOutsideLens", () => {
   it("ignores accents and case, like the main search", () => {
     expect(countMatchesOutsideLens(haystack, "tech", "GOUVERNANCE")).toBe(2);
     expect(countMatchesOutsideLens(haystack, "leadership", "RESEAU")).toBe(1);
+  });
+
+  it("counts each session once even though every card renders twice", () => {
+    // The grid copy and the list copy of one session are two cards, one id.
+    // Counting cards would promise "4 more" and deliver two.
+    expect(countMatchesOutsideLens([...haystack, ...haystack], "tech", "gouvernance")).toBe(2);
+  });
+
+  it("never counts a keynote — it is already on screen in this lens", () => {
+    // "k" matches the query and is NOT this lens's audience, but resolveLens
+    // shows it here anyway. Offering to switch lens to reach it would send the
+    // visitor away from a session they can already see.
+    expect(countMatchesOutsideLens(haystack, "leadership", "gouvernance")).toBe(0);
   });
 });
 ```
@@ -897,18 +915,24 @@ Add to `src/lib/lens.ts`, beside `resolveLens`. The DOM wrapper collects
  * misses turn it into a hiding device.
  */
 export function countMatchesOutsideLens(
-  cards: readonly { audience: Audience; search: string }[],
+  cards: readonly { id: string; audience: Audience; format: string; search: string }[],
   audience: Audience,
   query: string,
 ): number {
   const q = normalise(query).trim();
   if (!q) return 0;
-  let n = 0;
+  const ids = new Set<string>();
   for (const c of cards) {
-    if (c.audience === audience) continue;
-    if (normalise(c.search).includes(q)) n += 1;
+    // A keynote is already on screen in BOTH lenses (`resolveLens` exempts it),
+    // so counting one here would offer to switch lens to reach a session the
+    // visitor is looking at.
+    if (c.format === "keynote" || c.audience === audience) continue;
+    if (normalise(c.search).includes(q)) ids.add(c.id);
   }
-  return n;
+  // Session IDS, not cards: every session renders twice (grid + list), so
+  // counting entries reports double and the control promises results that do
+  // not exist. Same reason `apply()` and `lensTotal` count into a Set.
+  return ids.size;
 }
 ```
 
@@ -1017,6 +1041,28 @@ Two things follow from the existing code, not from taste:
   and read them with the same `getAttribute(...) || fallback` shape. Do **not**
   import `useTranslations` into the island: it is a client bundle, and the whole
   i18n table would ship to the browser.
+
+- [ ] **Step 4b: Style the remainder control**
+
+It is a `<button>` sitting inside a `<p class="toolbar-count">`, so with no rule
+of its own it inherits the paragraph's text styling and renders as a bare word
+with a default button look — neither obviously clickable nor obviously part of
+the sentence. Add a rule to `ScheduleToolbar.astro`'s `<style>` block, beside
+`.toolbar-count`:
+
+```css
+  /* Reads as part of the count sentence, not as a separate widget — it
+     continues "12 of 40 sessions · 3 more in …". Underlined rather than boxed
+     for that reason, but a real button: it is the one control that resolves a
+     search whose matches are in the other lens. */
+  .toolbar-cross-lens {
+    background: none; border: 0; padding: 0; cursor: pointer;
+    font: inherit; color: var(--color-primary);
+    text-decoration: underline; text-underline-offset: 2px;
+  }
+  .toolbar-cross-lens:hover { text-decoration-thickness: 2px; }
+  .toolbar-cross-lens:focus-visible { outline: 2px solid var(--color-ring); outline-offset: 2px; border-radius: 3px; }
+```
 
 - [ ] **Step 5: Run tests**
 
