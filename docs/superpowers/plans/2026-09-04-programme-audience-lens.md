@@ -1278,6 +1278,10 @@ git commit -m "feat(schedule): clash detection in the agenda, and lens-aware fil
 - Modify: `src/components/schedule/schedule-ui.ts`
 - Test: `tests/build/audience-lens.test.ts` (extend)
 
+**Interfaces:**
+- Consumes from Task 3, Step 5c: `audience`, `setAudience(next)`, and the `params`
+  object `schedule-ui.ts:233` already builds for `?view=`.
+
 - [ ] **Step 1: Write the failing test**
 
 Append to `tests/build/audience-lens.test.ts`:
@@ -1327,9 +1331,41 @@ Expected: FAIL on the URL and `activeFilterCount` assertions.
 
 - [ ] **Step 3: Implement**
 
-On boot, read `?audience=leadership` from `location.search`; anything else, including its absence and an unknown value, means `"tech"`. When `data-has-audiences` is `"false"`, ignore the parameter entirely — an edition without the track renders its normal programme rather than an empty grid or a 404.
+`schedule-ui.ts` already resolves `?view=` on boot in exactly this shape — a
+`params` object, a narrowing helper that returns `null` for anything it does not
+recognise, and a single settling call (`schedule-ui.ts:232-244`). Follow it,
+reusing the `params` already built there:
 
-Switching the lens updates the URL with `history.replaceState` so the view is shareable without adding history entries a Back button would have to walk.
+```ts
+/** A candidate is only a lens if it names one — anything else falls through. */
+const asAudience = (v: string | null): Audience | null =>
+  v === "tech" || v === "leadership" ? v : null;
+
+// An edition with one audience has no lens to select. Ignoring the parameter
+// rather than 404-ing or rendering an empty grid is what makes a stale link to
+// ?audience=leadership harmless on 2026.
+const hasLens = root.getAttribute("data-has-audiences") === "true";
+setAudience(hasLens ? (asAudience(params.get("audience")) ?? "tech") : "tech");
+```
+
+Place that beside the existing `setView(...)` call, **before** the `apply()`
+that follows it — `setAudience` calls `apply()` itself, and letting the boot
+sequence run it twice would render the page once against the wrong lens.
+
+Then extend `setAudience` at the marked point (Task 3, Step 5c) to write the URL:
+
+```ts
+  const url = new URL(window.location.href);
+  if (hasLens && audience === "leadership") url.searchParams.set("audience", "leadership");
+  else url.searchParams.delete("audience");
+  history.replaceState(null, "", url);
+```
+
+`replaceState`, not `pushState`: the lens is a view of one page, so a visitor
+toggling it four times should not have to press Back four times to leave. The
+technical lens **deletes** the parameter rather than writing `?audience=tech`,
+so the default state has the canonical URL — which is also what spec D-8 asks
+for by keeping the canonical the bare path.
 
 - [ ] **Step 4: Verify against a real build**
 
