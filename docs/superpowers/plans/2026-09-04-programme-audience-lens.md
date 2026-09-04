@@ -471,6 +471,9 @@ MSG
   ```
   plus a thin DOM wrapper `applyAudience(root, audience): number` in
   `src/components/schedule/schedule-ui-audience.ts`.
+- Produces, module-local in `schedule-ui.ts` and called by name in Tasks 4, 5 and 6
+  (defined in Step 5c): `audience`, `lensForcesList`, `otherAudience(a)`,
+  `lensLabel(a)`, `lensCards()`, `setAudience(next)`.
 
 **Why the split.** There is NO DOM test environment in this repo — both vitest
 projects are `environment: "node"`, jsdom and happy-dom are not installed, and no
@@ -697,6 +700,58 @@ is the markup this reasons over):
    not in `FilterState` and cannot reach that function. This is what keeps the
    break bands alive on a lens switch (`schedule-ui.ts:78`).
 
+- [ ] **Step 5c: Define the lens helpers Tasks 4, 5 and 6 consume**
+
+These are module-local to `schedule-ui.ts` — not exports, not part of any public
+interface — but later tasks call them by name, so they are settled here rather
+than invented three times:
+
+```ts
+let audience: Audience = "tech";
+
+const otherAudience = (a: Audience): Audience => (a === "tech" ? "leadership" : "tech");
+
+const lensLabel = (a: Audience) =>
+  a === "leadership"
+    ? root.getAttribute("data-schedule-audience-leadership") || "Strategy & Leadership"
+    : root.getAttribute("data-schedule-audience-tech") || "Technical";
+
+/** Every card's lens-relevant attributes, read once per call. Cards are static
+ *  after render, so there is nothing to cache and nothing to invalidate. */
+function lensCards() {
+  return [...document.querySelectorAll<HTMLElement>(".session-card")].map((el) => ({
+    id: el.getAttribute("data-session-id") ?? "",
+    room: el.getAttribute("data-room") ?? "",
+    format: el.getAttribute("data-format") ?? "",
+    track: el.getAttribute("data-track") ?? "",
+    level: el.getAttribute("data-level") ?? "",
+    search: el.getAttribute("data-search") ?? "",
+    audience: (el.getAttribute("data-audience") as Audience) ?? "tech",
+  }));
+}
+
+/** The single entry point for changing lens. Everything that reacts to a switch
+ *  hangs off this, so a new caller cannot forget half the sequence. */
+function setAudience(next: Audience): void {
+  audience = next;
+  lensForcesList = applyAudience(root, audience) <= 1;
+  // Task 5 adds the facet prune here — BEFORE apply().
+  renderView();
+  apply();
+  for (const btn of document.querySelectorAll<HTMLElement>("[data-audience-switch] [data-audience]")) {
+    btn.setAttribute("aria-pressed", btn.getAttribute("data-audience") === audience ? "true" : "false");
+  }
+  // Task 6 adds the URL write here.
+}
+```
+
+`lensCards()` returns a superset of every shape the pure functions want:
+`LensCard` (Task 3), `{audience, search}` (Task 4) and `FacetCard` (Task 5) are
+all structurally satisfied by it, so TypeScript accepts it at each call site
+without a second traversal or a cast. Later tasks call it as `lensCards()` —
+the names `searchCards()` and `facetCards()` appearing in their code blocks mean
+this same function; use `lensCards()`.
+
 - [ ] **Step 5b: The leadership lens opens in the list view (spec D-7)**
 
 With Eiffel alone the grid would be a single ~1100px column, which is not a grid. When `applyAudience` returns a visible-room count of **1**, render the list view instead.
@@ -868,12 +923,12 @@ a real `<button>`:
 ```ts
 countEl.textContent = visible.size === 0 ? noneLabel : countTemplate…;   // unchanged
 
-const outside = countMatchesOutsideLens(searchCards(), audience, state.query);
+const outside = countMatchesOutsideLens(lensCards(), audience, state.query);
 if (outside > 0) {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "toolbar-cross-lens";
-  btn.textContent = moreResultsLabel
+  btn.textContent = moreResultsLabel   // root.getAttribute("data-schedule-more-results")
     .replace("{n}", String(outside))
     .replace("{lens}", lensLabel(otherAudience(audience)));
   // Switches lens and keeps the query — the whole point of telling them.
@@ -1162,7 +1217,7 @@ export function facetValuesInLens(cards: readonly FacetCard[], audience: Audienc
 Then wire it in `schedule-ui.ts`, inside the lens switch (not inside `apply()` — the reachable values change with the lens, not with the filters):
 
 ```ts
-const reachable = facetValuesInLens(facetCards(), audience);
+const reachable = facetValuesInLens(lensCards(), audience);
 for (const group of document.querySelectorAll<HTMLElement>(".toolbar-facet")) {
   let live = 0;
   for (const btn of group.querySelectorAll<HTMLElement>(".schedule-filter")) {
