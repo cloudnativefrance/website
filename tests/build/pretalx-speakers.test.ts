@@ -12,6 +12,8 @@ import { describe, it, expect } from "vitest";
 import { loadSpeakers } from "@/lib/speaker-source";
 import { SPEAKER_SLUGS, SLUG_TO_NAME } from "@/data/speaker-slugs";
 import { KEYNOTE_CAST, keynoteRoleFor } from "@/data/keynote-cast";
+import { EDITIONS } from "@/lib/editions";
+import { isEditionLoadable } from "@/lib/edition-visibility";
 
 const hasToken = Boolean(
   process.env.PRETALX_API_TOKEN?.trim() || process.env.PRETALX_API_TOKEN_FILE?.trim(),
@@ -118,10 +120,39 @@ describe.skipIf(!hasToken)("speakers from Pretalx", () => {
   });
 
   it("no speaker page that exists today silently disappears", async () => {
-    const rows = await loadSpeakers(2026);
-    const present = new Set(rows.map((r) => r.slug));
-    const known = Object.values(SPEAKER_SLUGS);
-    const gone = known.filter((s) => !present.has(s));
-    expect(gone, `slugs with no Pretalx person: ${gone.join(", ")}`).toEqual([]);
+    // Checks every edition this build can SEE, not just 2026.
+    //
+    // The slug map spans editions, and a preview edition's speakers get their
+    // slugs the moment they are accepted — months before that edition is
+    // public. A production build cannot load a preview edition by design, so a
+    // slug belonging to one is *unverifiable* here, not stale. Asserting
+    // against 2026 alone reported four legitimate 2027 speakers as orphans.
+    //
+    // The hard assertion therefore runs only when every edition is visible
+    // (staging, and any all-public future state) — which is where a genuinely
+    // stale slug would be caught. When something is hidden, the unmatched
+    // slugs are printed and tolerated: the alternative is a guard that fails
+    // on every production build for the whole of a CFP season, which teaches
+    // people to ignore it.
+    const loadable = EDITIONS.filter((y) => isEditionLoadable(y));
+    const rosters = await Promise.all(loadable.map((y) => loadSpeakers(y)));
+    const present = new Set(rosters.flat().map((r) => r.slug));
+    const gone = Object.values(SPEAKER_SLUGS).filter((s) => !present.has(s));
+
+    if (loadable.length === EDITIONS.length) {
+      expect(gone, `slugs with no Pretalx person: ${gone.join(", ")}`).toEqual([]);
+      return;
+    }
+    const hidden = EDITIONS.filter((y) => !loadable.includes(y));
+    if (gone.length > 0) {
+      console.warn(
+        `[speakers] ${gone.length} slug(s) match nobody in the visible ` +
+          `edition(s) ${loadable.join(", ")}: ${gone.join(", ")}. Not asserted — ` +
+          `edition(s) ${hidden.join(", ")} are not loadable in this build, so a ` +
+          `slug belonging to one cannot be distinguished from a stale entry. ` +
+          `The staging build, where every edition is visible, does assert it.`,
+      );
+    }
+    expect(loadable.length).toBeGreaterThan(0);
   });
 });
