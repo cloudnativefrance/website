@@ -149,13 +149,18 @@ describe("Navigation.astro", () => {
     expect(NAV).toContain("nav.programme.submenu.archive");
   });
 
-  it("offers a SPEAKERS archive entry too, not just a programme one", () => {
-    // The programme and speakers entries above both follow `featured`. Once
-    // 2027 leads, /intervenants/2026 — every speaker record of the last edition
-    // that actually happened — has no route from the nav without this.
-    expect(NAV).toContain("nav.programme.submenu.archive_intervenants");
+  it("gives an archived edition ONE entry — its programme, not its speakers", () => {
+    // Deliberate: the menu used to carry a speakers line per finished edition,
+    // on the grounds that /intervenants/<year> would otherwise be unreachable
+    // from the nav. True of the nav, not of the site — every session card on
+    // that programme links its own speakers, so they stay one click from the
+    // page a visitor actually lands on, and the menu keeps one line per
+    // edition instead of two.
     const dd = NAV.slice(NAV.indexOf("const programmeDD"), NAV.indexOf("const aboutDD"));
-    expect(dd).toMatch(/speakersBase\}\/\$\{y\}/);
+    expect(dd, "the archive loop links the programme").toMatch(/programmeBase\}\/\$\{y\}/);
+    expect(dd, "and does not link speakers per archived year").not.toMatch(/speakersBase\}\/\$\{y\}/);
+    // The LIVE edition still gets both — this is about finished editions only.
+    expect(dd, "the live edition keeps its speakers entry").toMatch(/speakersBase\}\/\$\{featured\}/);
   });
 
   it("decides `current` the same way for every dropdown item", () => {

@@ -165,6 +165,15 @@ export const ui = {
     "schedule.rail_label.2026": "Programme \u2014 03 F\u00e9vrier 2026",
     "schedule.subtitle":
       "50+ conf\u00e9rences sur 4 salles en parall\u00e8le. Construisez votre agenda personnel, exportez-le en .ics.",
+    // Per-edition, resolved like `schedule.rail_label.<year>`: 2027 gains a
+    // fifth room and a track that is not about technology, and the subtitle is
+    // where a visitor learns both before scrolling a five-column grid.
+    "schedule.subtitle.2027":
+      "50+ conf\u00e9rences sur 5 salles en parall\u00e8le, dont une track consacr\u00e9e \u00e0 la strat\u00e9gie et aux enjeux d'organisation dans nos entreprises. Construisez votre agenda personnel, exportez-le en .ics.",
+    // Shown under the room name in the grid header. Editorial, not derived: in
+    // an early programme every room looks single-track, so inferring this from
+    // the data would badge all five.
+    "schedule.room_note.2027.Eiffel": "Strat\u00e9gie & Leadership",
     "schedule.empty_state": "Le programme de cette édition sera publié prochainement.",
     "schedule.notice.2027_coming": "Le programme de la prochaine édition sera annoncé en février 2027. En attendant, retrouvez ci-dessous la programmation 2026 ou (re)visionnez les conférences 2026 sur notre chaîne YouTube !",
     "speakers.notice.2027_coming": "Les intervenant(e)s 2027 ne sont pas encore connu(e)s, le programme de la prochaine édition sera annoncé en février 2027. En attendant, retrouvez ci-dessous les intervenant(e)s 2026 ou (re)visionnez les conférences 2026 sur notre chaîne YouTube !",
@@ -209,16 +218,9 @@ export const ui = {
     "schedule.export_all": "Exporter le programme (.ics)",
     "schedule.export_agenda": "Exporter mon agenda (.ics)",
     "schedule.close": "Fermer",
-    "schedule.audience.label": "Public",
-    "schedule.audience.tech": "Technique",
-    // Deliberately NOT translated, in either locale. This is the Pretalx
-    // track's own name — `LEADERSHIP_TRACKS` in src/lib/audience.ts pins the
-    // identical literal, and the lens exists only for sessions carrying it.
-    // Translating the label would leave the control naming something the
-    // programme does not contain. If the track is ever renamed in Pretalx,
-    // both this and LEADERSHIP_TRACKS must change together.
-    "schedule.audience.leadership": "Strategy & Leadership",
-    "schedule.audience.more_results": "{n} de plus dans {lens}",
+    "schedule.view.grid": "Grille",
+    "schedule.view.list": "Liste",
+    "schedule.view.toggle": "Affichage",
     "schedule.search.placeholder": "Rechercher un talk, un orateur, un sujet…",
     "schedule.search.label": "Rechercher dans le programme",
     "schedule.search.clear": "Effacer la recherche",
@@ -576,6 +578,9 @@ export const ui = {
     "schedule.rail_label.2026": "Schedule \u2014 Feb 03, 2026",
     "schedule.subtitle":
       "50+ talks across 4 parallel tracks. Build your personal agenda and export it as .ics.",
+    "schedule.subtitle.2027":
+      "50+ talks across 5 parallel rooms, including one track devoted to strategy and the organisational challenges facing our companies. Build your personal agenda and export it as .ics.",
+    "schedule.room_note.2027.Eiffel": "Strategy & Leadership",
     "schedule.empty_state": "The schedule for this edition will be published soon.",
     "schedule.notice.2027_coming": "The 2027 schedule will be announced in February 2027. In the meantime, browse the 2026 schedule below or (re)watch the 2026 talks on our YouTube channel!",
     "speakers.notice.2027_coming": "The 2027 speakers haven't been announced yet — the next edition's lineup will be unveiled in February 2027. In the meantime, browse the 2026 speakers below or (re)watch the 2026 talks on our YouTube channel!",
@@ -616,11 +621,9 @@ export const ui = {
     "schedule.export_all": "Export full schedule (.ics)",
     "schedule.export_agenda": "Export my agenda (.ics)",
     "schedule.close": "Close",
-    "schedule.audience.label": "Audience",
-    "schedule.audience.tech": "Technical",
-    // Same literal as the FR bundle, and for the same reason — see there.
-    "schedule.audience.leadership": "Strategy & Leadership",
-    "schedule.audience.more_results": "{n} more in {lens}",
+    "schedule.view.grid": "Grid",
+    "schedule.view.list": "List",
+    "schedule.view.toggle": "View",
     "schedule.search.placeholder": "Search a talk, a speaker, a topic…",
     "schedule.search.label": "Search the schedule",
     "schedule.search.clear": "Clear search",

@@ -91,23 +91,20 @@ const programmeDD = (() => {
       item(`${programmeBase}/${featured}`, t("nav.programme.submenu.programme")),
       item(`${speakersBase}/${featured}`,  t("nav.programme.submenu.intervenants")),
       item(cfpPath,                        t("nav.programme.submenu.cfp")),
-      // Finished editions stay one click away once a newer programme leads —
-      // the schedule AND the speakers. The two entries above both follow
-      // `featured`, so without the speakers line /intervenants/2026, holding
-      // every speaker record of the last edition that happened, would have no
-      // route from the nav at all the moment 2027 takes the lead.
+      // A finished edition gets ONE entry: its programme. An earlier version
+      // listed its speakers too, on the grounds that /intervenants/<year> would
+      // otherwise have no route from the nav — true of the nav, but not of the
+      // site. Every session card on that programme links its own speakers, so
+      // they stay one click away from the page a visitor actually lands on,
+      // and the menu keeps one line per edition instead of two.
       // `archivedEditions` already excludes 2023, which has its own dedicated
       // retrospective linked from the About menu.
-      ...archives.flatMap((y) => [
+      ...archives.map((y) =>
         item(
           `${programmeBase}/${y}`,
           t("nav.programme.submenu.archive").replace("{year}", String(y)),
         ),
-        item(
-          `${speakersBase}/${y}`,
-          t("nav.programme.submenu.archive_intervenants").replace("{year}", String(y)),
-        ),
-      ]),
+      ),
     ],
   };
 })();
