@@ -251,6 +251,7 @@ const KNOWN_PROGRAMME_PDFS: Partial<Record<Edition, string>> = {
 
 export interface ProgrammeMetadata {
   railLabel: string;
+  subtitle: string;
   programmePdfUrl: string | undefined;
   programmePdfLabel: string;
 }
@@ -263,6 +264,15 @@ export function getProgrammeMetadata(year: Edition, lang: Locale): ProgrammeMeta
     (ui.fr as Record<string, string>)[yearKey] ??
     t("schedule.rail_label");
 
+  // Same per-edition lookup as the rail label: an edition-specific key wins,
+  // then the French one, then the generic. 2027 needs its own because the room
+  // count changed and one of its tracks is not about technology.
+  const subtitleKey = `schedule.subtitle.${year}`;
+  const subtitle =
+    (ui[lang] as Record<string, string>)[subtitleKey] ??
+    (ui.fr as Record<string, string>)[subtitleKey] ??
+    t("schedule.subtitle");
+
   const envOverride =
     typeof process !== "undefined"
       ? (process.env as Record<string, string | undefined>)[`PROGRAMME_PDF_URL_${year}`]
@@ -270,7 +280,25 @@ export function getProgrammeMetadata(year: Edition, lang: Locale): ProgrammeMeta
 
   return {
     railLabel,
+    subtitle,
     programmePdfUrl: envOverride ?? KNOWN_PROGRAMME_PDFS[year],
     programmePdfLabel: t("schedule.download_pdf").replace("{year}", String(year)),
   };
+}
+
+
+/**
+ * An editorial note shown under a room's name in the grid header.
+ *
+ * Deliberately NOT derived from the sessions. In an early programme every room
+ * holds one track, so inferring "this room is the X track" would badge all of
+ * them; and a room can carry a designation the data does not show — Eiffel is
+ * the strategy room whatever ends up scheduled there. Absent by default: a key
+ * exists only where an organiser wrote one.
+ */
+export function getRoomNote(year: Edition, room: string, lang: Locale): string | undefined {
+  const key = `schedule.room_note.${year}.${room}`;
+  return (
+    (ui[lang] as Record<string, string>)[key] ?? (ui.fr as Record<string, string>)[key] ?? undefined
+  );
 }

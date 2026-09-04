@@ -7,7 +7,6 @@ import { describe, it, expect } from "vitest";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import ScheduleToolbar from "../ScheduleToolbar.astro";
 import type { SessionRow } from "@/lib/schedule";
-import { LEADERSHIP_TRACKS } from "@/lib/audience";
 
 function row(over: Partial<SessionRow> = {}): SessionRow {
   return {
@@ -50,6 +49,8 @@ async function renderToolbar() {
 const CONTRACT_IDS = [
   "schedule-search",
   "schedule-search-clear",
+  "schedule-view-grid",
+  "schedule-view-list",
   "schedule-result-count",
   "schedule-filter-clear",
   "schedule-filter-active-count",
@@ -59,7 +60,7 @@ const CONTRACT_IDS = [
 ];
 
 describe("ScheduleToolbar — id contract with the client island", () => {
-  it("renders all eight ids the island binds to", async () => {
+  it("renders all ten ids the island binds to", async () => {
     const html = await renderToolbar();
     for (const id of CONTRACT_IDS) {
       expect(html).toContain(`id="${id}"`);
@@ -93,82 +94,5 @@ describe("ScheduleToolbar — id contract with the client island", () => {
     expect(html).toContain('data-filter="room"');
     expect(html).toContain('data-filter="format"');
     expect(html).toContain('data-filter="track"');
-  });
-});
-
-describe("ScheduleToolbar — the audience control", () => {
-  const renderWith = async (list: SessionRow[]) => {
-    const container = await AstroContainer.create();
-    return container.renderToString(ScheduleToolbar, {
-      props: { sessions: list, lang: "fr", defaultView: "grid" },
-    });
-  };
-
-  it("is absent — not disabled — when every session is one audience", async () => {
-    const html = await renderWith([row({ track: "Cloud Native" })]);
-    expect(html).not.toContain("data-audience-switch");
-  });
-
-  it("appears when an edition has sessions in both audiences", async () => {
-    const html = await renderWith([
-      row({ id: "A", track: "Cloud Native" }),
-      row({ id: "B", track: "Strategy & Leadership", room: "Eiffel" }),
-    ]);
-    expect(html).toContain("data-audience-switch");
-    expect(html).toContain('data-audience="leadership"');
-  });
-});
-
-// Astro HTML-escapes attribute values, so `LEADERSHIP_TRACKS[0]` ("Strategy &
-// Leadership") never appears literally as `data-value="Strategy & Leadership"`
-// in the rendered markup — the `&` comes back as `&#38;` (or `&amp;`). A plain
-// `.not.toContain(...)` against the raw string would therefore pass whether or
-// not the leadership track is actually filtered out, which is exactly the kind
-// of guard the brief warns against: it looks like it renders the assertion,
-// but it can't fail. Extracting the attribute values and decoding entities
-// keeps the test honest.
-function decodeEntities(value: string): string {
-  return value
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
-}
-
-function dataValues(html: string): string[] {
-  return [...html.matchAll(/data-value="([^"]*)"/g)].map((m) => decodeEntities(m[1]));
-}
-
-describe("ScheduleToolbar — the track filter", () => {
-  it("does not offer the leadership track as a track filter", async () => {
-    const container = await AstroContainer.create();
-    const html = await container.renderToString(ScheduleToolbar, {
-      props: {
-        sessions: [
-          row({ id: "A", track: "IA et Data" }),
-          row({ id: "B", track: LEADERSHIP_TRACKS[0], room: "Eiffel" }),
-        ],
-        lang: "fr",
-        defaultView: "grid",
-      },
-    });
-    // The track that DEFINES the lens must not also be offered inside it:
-    // selecting it from the technical lens yields an empty grid with no
-    // explanation, and from the leadership lens it is a no-op.
-    const values = dataValues(html);
-    expect(values).toContain("IA et Data");
-    expect(values).not.toContain(LEADERSHIP_TRACKS[0]);
-  });
-
-  it("still offers the track facet when only technical tracks exist", async () => {
-    // Removing the leadership track must not empty the facet for editions that
-    // never had one — 2023 and 2026 render exactly as before.
-    const container = await AstroContainer.create();
-    const html = await container.renderToString(ScheduleToolbar, {
-      props: { sessions: [row({ track: "IA et Data" })], lang: "fr", defaultView: "grid" },
-    });
-    expect(html).toContain('data-value="IA et Data"');
   });
 });

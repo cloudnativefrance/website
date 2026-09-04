@@ -37,7 +37,8 @@ for (const s of speakerEntries) {
   speakerInfo.set(s.data.name, info);
 }
 
-const { railLabel, programmePdfUrl, programmePdfLabel } = getProgrammeMetadata(year, lang);
+const { railLabel, subtitle, programmePdfUrl, programmePdfLabel } =
+  getProgrammeMetadata(year, lang);
 
 ---
 
@@ -77,7 +78,7 @@ const { railLabel, programmePdfUrl, programmePdfLabel } = getProgrammeMetadata(y
               {`${t("schedule.heading")} ${year}`}
             </h1>
             <p class="mt-3 text-base md:text-lg text-muted-foreground max-w-2xl">
-              {t("schedule.subtitle")}
+              {subtitle}
             </p>
             {programmePdfUrl && (
               <a
@@ -91,8 +92,8 @@ const { railLabel, programmePdfUrl, programmePdfLabel } = getProgrammeMetadata(y
               </a>
             )}
           </section>
-          <section class="max-w-7xl mx-auto pb-20">
-            <ScheduleGrid sessions={sessions} lang={lang} speakerInfo={speakerInfo} />
+          <section class="schedule-section max-w-7xl mx-auto pb-20">
+            <ScheduleGrid sessions={sessions} lang={lang} speakerInfo={speakerInfo} year={year} />
           </section>
         </>
       )}
