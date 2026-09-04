@@ -205,6 +205,8 @@ MSG
 - Modify: `src/components/schedule/ScheduleToolbar.astro`
 - Modify: `src/components/schedule/ScheduleGridView.astro`
 - Modify: `src/i18n/ui.ts` (FR + EN)
+- Modify: `src/components/schedule/__tests__/ScheduleGridView.test.ts` (its cell regex — see Step 4)
+- Test: `src/components/schedule/__tests__/ScheduleToolbar.test.ts` (extend)
 - Test: `tests/build/audience-lens.test.ts` (create)
 
 **Interfaces:**
@@ -257,18 +259,46 @@ describe("audience lens markup", () => {
     expect(head).toMatch(/data-room=/);
   });
 
-  it("the control is rendered only when an edition has both audiences", () => {
-    const src = read("src/components/schedule/ScheduleToolbar.astro");
-    expect(src).toContain("hasBothAudiences");
-    expect(src).toContain("data-audience-switch");
-  });
-
   it("the control sits with the view toggle, not among the filters", () => {
     const src = read("src/components/schedule/ScheduleToolbar.astro");
     const switchAt = src.indexOf("data-audience-switch");
     const filtersAt = src.indexOf("schedule-filter-clear");
     expect(switchAt).toBeGreaterThan(-1);
     expect(switchAt).toBeLessThan(filtersAt);
+  });
+});
+```
+
+**And the control's presence is pinned by RENDERING, not by grepping.** Spec D-9
+says the control is *absent, not disabled* for an edition with one audience —
+a property of the output, which a regex for `hasBothAudiences` in the source
+cannot tell apart from the call being there but not gating anything. This repo
+already renders `.astro` components in tests through Astro's container API
+(the `astro-components` vitest project, `src/components/**/__tests__/*.test.ts`).
+Extend `src/components/schedule/__tests__/ScheduleToolbar.test.ts`, reusing its
+existing `row()` helper and `AstroContainer` setup:
+
+```ts
+describe("ScheduleToolbar — the audience control", () => {
+  const renderWith = async (list: SessionRow[]) => {
+    const container = await AstroContainer.create();
+    return container.renderToString(ScheduleToolbar, {
+      props: { sessions: list, lang: "fr", defaultView: "grid" },
+    });
+  };
+
+  it("is absent — not disabled — when every session is one audience", async () => {
+    const html = await renderWith([row({ track: "Cloud Native" })]);
+    expect(html).not.toContain("data-audience-switch");
+  });
+
+  it("appears when an edition has sessions in both audiences", async () => {
+    const html = await renderWith([
+      row({ id: "A", track: "Cloud Native" }),
+      row({ id: "B", track: "Strategy & Leadership", room: "Eiffel" }),
+    ]);
+    expect(html).toContain("data-audience-switch");
+    expect(html).toContain('data-audience="leadership"');
   });
 });
 ```
@@ -308,13 +338,39 @@ Leave the server-rendered `grid-column` exactly as it is — it is the correct
 value for the unfiltered page, which is what a visitor with JavaScript disabled
 gets.
 
-Add the same assertion to the Task 2 test:
+**This markup change breaks an existing test — fix it in the same commit.**
+`src/components/schedule/__tests__/ScheduleGridView.test.ts` slices the rendered
+row with a regex that requires `class` and `style` to be *adjacent*:
 
 ```ts
-  it("grid body cells carry their room, so a column can be renumbered", () => {
-    const src = read("src/components/schedule/ScheduleGridView.astro");
-    const body = src.slice(src.indexOf("grid-view-body"));
-    expect(body).toMatch(/class="grid-view-cell"[\s\S]{0,120}data-room=/);
+/<div class="grid-view-cell" style="grid-column:(\d+); grid-row:(\d+) \/ (\d+);"[^>]*>/g
+```
+
+Astro emits attributes in source order, so inserting `data-room` between them
+makes that regex match nothing and `cellsByColumn` returns an empty map — the
+suite fails with a confusing "expected Map(0)". Relax the regex to tolerate any
+attribute order rather than quietly placing `data-room` last and depending on
+source order:
+
+```ts
+/<div class="grid-view-cell"[^>]*style="grid-column:(\d+); grid-row:(\d+) \/ (\d+);"[^>]*>/g
+```
+
+That test pins the *server-rendered* columns, which this task does not change —
+it must still pass, unchanged in intent. If any of its assertions fail on
+values rather than on parsing, stop and report: it means the markup edit changed
+placement, which it must not.
+
+Then extend it with the new attribute, using its own `renderGrid` helper:
+
+```ts
+  it("labels each room cell with its room, so the lens can renumber columns", async () => {
+    const html = await renderGrid([
+      row({ id: "A", room: "Monet" }),
+      row({ id: "B", room: "Piaf" }),
+    ]);
+    expect(html).toContain('data-room="Monet"');
+    expect(html).toContain('data-room="Piaf"');
   });
 ```
 
@@ -362,14 +418,30 @@ The lens name stays untranslated in both — it is the track's name in Pretalx a
 
 - [ ] **Step 8: Run tests and build**
 
-Run: `pnpm test audience-lens && pnpm build`
+Run: `pnpm test && pnpm build`  — the whole suite, because this task edits an
+existing container test; a filtered run would hide a regression in it.
 Expected: PASS; 374 pages. The control renders nowhere yet — 2027 has no leadership sessions, so `hasBothAudiences` is false everywhere. That is correct and is what Task 6's guard pins.
 
 - [ ] **Step 9: Commit**
 
 ```bash
 git add src/components/schedule/ src/i18n/ui.ts tests/build/audience-lens.test.ts
-git commit -m "feat(schedule): render the audience control and make columns addressable"
+git commit -F - <<'MSG'
+feat(schedule): render the audience control and make columns addressable
+
+Cards get `data-audience`, header cells and body cells get `data-room`, and the
+root says whether a lens exists at all. Nothing switches yet — this is the
+surface the client script will act on.
+
+The body cells matter more than they look: the grid head auto-places and
+reflows on its own, but the body pins every cell to an explicit `grid-column`
+computed server-side. Hiding a room therefore has to renumber the survivors,
+and it can only do that if each cell says which room it is.
+
+ScheduleGridView.test.ts parsed cells by requiring `class` and `style` to be
+adjacent attributes; its regex is relaxed to tolerate the new one. The columns
+it pins are unchanged.
+MSG
 ```
 
 ---
