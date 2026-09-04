@@ -101,3 +101,74 @@ export function lensTotal(
   }
   return ids.size;
 }
+
+export interface AgendaItem { id: string; start: string; duration: number }
+
+/**
+ * Bookmarked sessions that overlap in time.
+ *
+ * The grid can only show parallelism within one lens; a clash between a
+ * leadership session and a technical one is invisible there by construction.
+ * The agenda holds both, so it is the only place the conflict can surface — and
+ * it surfaces at the moment someone is planning their day rather than in the
+ * corridor.
+ *
+ * Touching is not overlapping: a 10:00-10:30 and a 10:30-11:00 are a plan, not
+ * a clash.
+ */
+export function findClashes(items: readonly AgendaItem[]): Map<string, string[]> {
+  const out = new Map<string, string[]>();
+  const add = (id: string, other: string) => {
+    const list = out.get(id);
+    if (list) list.push(other);
+    else out.set(id, [other]);
+  };
+  const at = items.map((i) => {
+    const start = new Date(i.start).getTime();
+    return { id: i.id, start, end: start + i.duration * 60_000 };
+  });
+  for (let a = 0; a < at.length; a++) {
+    for (let b = a + 1; b < at.length; b++) {
+      // Strict `<` on both sides: touching is not overlapping.
+      if (at[a].start < at[b].end && at[b].start < at[a].end) {
+        add(at[a].id, at[b].id);
+        add(at[b].id, at[a].id);
+      }
+    }
+  }
+  return out;
+}
+
+export interface FacetCard {
+  audience: Audience;
+  room: string;
+  format: string;
+  track: string;
+  level: string;
+}
+
+export type FacetValues = Record<"room" | "format" | "track" | "level", Set<string>>;
+
+/**
+ * The facet values still reachable inside one lens.
+ *
+ * A filter offering a value that yields nothing is worse than no filter: it
+ * reads as a broken page rather than an empty result. In the leadership lens
+ * the room facet would otherwise still list all five rooms.
+ *
+ * Keynotes belong to both lenses and are exempt from the room filter, exactly
+ * as `matchesSession` has them — so a keynote contributes its format, track and
+ * level, but never its room.
+ */
+export function facetValuesInLens(cards: readonly FacetCard[], audience: Audience): FacetValues {
+  const out: FacetValues = { room: new Set(), format: new Set(), track: new Set(), level: new Set() };
+  for (const card of cards) {
+    const isKeynote = card.format === "keynote";
+    if (!isKeynote && card.audience !== audience) continue;
+    if (!isKeynote && card.room) out.room.add(card.room);
+    if (card.format) out.format.add(card.format);
+    if (card.track) out.track.add(card.track);
+    if (card.level) out.level.add(card.level);
+  }
+  return out;
+}

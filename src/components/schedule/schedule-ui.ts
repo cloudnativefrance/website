@@ -16,7 +16,13 @@ import {
   type FilterState,
 } from "@/lib/schedule-filter";
 import type { Audience } from "@/lib/audience";
-import { countMatchesOutsideLens, lensTotal } from "@/lib/lens";
+import {
+  countMatchesOutsideLens,
+  facetValuesInLens,
+  findClashes,
+  lensTotal,
+  type FacetValues,
+} from "@/lib/lens";
 import { applyAudience } from "./schedule-ui-audience";
 
 const VIEW_KEY = "cnd-schedule-view";
@@ -224,6 +230,50 @@ if (root) {
     }));
   }
 
+  /**
+   * Hides the filter chips (and whole facet groups) the current lens has
+   * emptied, and drops any selection in `state` the lens can no longer
+   * honour. Runs once per LENS — the initial render and every switch — never
+   * inside apply(), since the reachable values change with the lens, not
+   * with the filters.
+   *
+   * Called both from `setAudience` and once at initial load: `applyAudience`
+   * is also invoked directly at load (below) to resolve the server-rendered
+   * default lens, so without this the first paint would offer chips for
+   * values only the other lens can reach until the visitor's first switch.
+   *
+   * A no-op for a single-audience edition: `hasAudiences` is false there, no
+   * `[data-audience-switch]` is even rendered, and a facet with only one
+   * value across the WHOLE edition is not this task's concern — hiding it
+   * would be a new, unrelated behaviour change for 2023/2026.
+   */
+  function pruneFacetsForLens(): void {
+    if (!hasAudiences) return;
+    const reachable = facetValuesInLens(lensCards(), audience);
+    for (const group of document.querySelectorAll<HTMLElement>(".toolbar-facet")) {
+      let live = 0;
+      for (const btn of group.querySelectorAll<HTMLElement>(".schedule-filter")) {
+        const facet = btn.getAttribute("data-filter") as keyof FacetValues | null;
+        const value = btn.getAttribute("data-value") ?? "";
+        const on = !!facet && reachable[facet]?.has(value);
+        btn.toggleAttribute("hidden", !on);
+        if (on) live += 1;
+      }
+      // Fewer than two options is a control that cannot change anything (spec D-4).
+      group.toggleAttribute("hidden", live < 2);
+    }
+    // Any selection the current lens cannot honour must leave `state` before
+    // the next apply(), or a room filter for a room this lens has hidden
+    // produces zero results with no visible cause — the chip that would
+    // explain it was just hidden above. Level and format normally survive:
+    // filtering for `beginner` keeps that filter across a lens switch.
+    for (const facet of ["room", "format", "track", "level"] as const) {
+      for (const value of [...state[facet]]) {
+        if (!reachable[facet].has(value)) state[facet].delete(value);
+      }
+    }
+  }
+
   // A `const` arrow, not a `function` declaration: TypeScript only carries the
   // `if (root)` null-narrowing into a nested closure defined directly in this
   // block (an arrow assigned here), not into a hoisted function declaration —
@@ -234,7 +284,7 @@ if (root) {
   const setAudience = (next: Audience): void => {
     audience = next;
     lensForcesList = applyAudience(root, audience) <= 1;
-    // Task 5 adds the facet prune here — BEFORE apply().
+    pruneFacetsForLens();
     renderView();
     apply();
     for (const btn of document.querySelectorAll<HTMLElement>("[data-audience-switch] [data-audience]")) {
@@ -342,6 +392,11 @@ if (root) {
   // correct `lensForcesList`, and before the trailing `apply()` so the
   // initial result count and row-emptiness already reflect the default lens.
   lensForcesList = applyAudience(root, audience) <= 1;
+  // The initial lens is resolved above by calling `applyAudience` directly
+  // rather than through `setAudience`, so the facet prune needs its own call
+  // here too — otherwise the first paint offers filter chips for values only
+  // reachable in the OTHER lens, until the visitor's first manual switch.
+  pruneFacetsForLens();
   setView(asView(fromUrl) ?? asView(stored) ?? serverDefaultView, false);
   apply();
 
@@ -836,6 +891,7 @@ if (root) {
   const drawer = document.getElementById("schedule-agenda-drawer");
   const agendaList = document.getElementById("schedule-agenda-list");
   const emptyLabel = root.getAttribute("data-schedule-empty") || "";
+  const clashLabel = root.getAttribute("data-schedule-agenda-clash") || "overlaps with {title} ({room})";
 
   function openDrawer(): void {
     if (!drawer) return;
@@ -878,6 +934,20 @@ if (root) {
       if (card) picked.push(card);
     });
     picked.sort((a, b) => (a.getAttribute("data-start") || "").localeCompare(b.getAttribute("data-start") || ""));
+
+    // The grid can only show parallelism within one lens; a clash between a
+    // leadership session and a technical one is invisible there by
+    // construction. The agenda holds both bookmarks regardless of lens, so
+    // it is the only surface that can name the conflict.
+    const clashes = findClashes(
+      picked.map((c) => ({
+        id: c.getAttribute("data-session-id") ?? "",
+        start: c.getAttribute("data-start") ?? "",
+        duration: Number(c.getAttribute("data-duration") ?? "0"),
+      })),
+    );
+    const byId = new Map(picked.map((c) => [c.getAttribute("data-session-id") ?? "", c]));
+
     picked.forEach((card) => {
       const id = card.getAttribute("data-session-id");
       const title = card.getAttribute("data-title") || "";
@@ -886,10 +956,21 @@ if (root) {
       const room = card.getAttribute("data-room") || "";
       const item = document.createElement("div");
       item.className = "flex items-start justify-between gap-3 rounded-md border border-border bg-background/40 p-3";
+      const clashHtml = (clashes.get(id ?? "") ?? [])
+        .map((otherId) => byId.get(otherId))
+        .filter((other): other is HTMLElement => !!other)
+        .map((other) => {
+          const label = clashLabel
+            .replace("{title}", other.getAttribute("data-title") || "")
+            .replace("{room}", other.getAttribute("data-room") || "");
+          return `<div class="text-xs text-destructive-strong">${escHtml(label)}</div>`;
+        })
+        .join("");
       item.innerHTML = `
         <div class="min-w-0">
           <div class="text-xs text-muted-foreground">${escHtml(timeLabel)} · ${escHtml(room)}</div>
           <div class="text-sm font-semibold text-foreground truncate">${escHtml(title)}</div>
+          ${clashHtml}
         </div>
         <button type="button" class="agenda-remove shrink-0 text-muted-foreground hover:text-foreground" aria-label="${escHtml(agendaRemoveLabel)}">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>

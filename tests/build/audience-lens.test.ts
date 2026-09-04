@@ -35,4 +35,12 @@ describe("audience lens markup", () => {
   it("a lens with one room opens in the list view", () => {
     expect(read("src/components/schedule/schedule-ui.ts")).toMatch(/roomCount|applyAudience\([^)]*\)\s*===?\s*1|<=\s*1/);
   });
+
+  it("prunes the lens's dead filter values before re-applying the filters", () => {
+    const src = read("src/components/schedule/schedule-ui.ts");
+    const prune = src.indexOf("facetValuesInLens");
+    expect(prune).toBeGreaterThan(-1);
+    // The first apply() after the prune is what renders the corrected state.
+    expect(src.indexOf("apply()", prune)).toBeGreaterThan(prune);
+  });
 });

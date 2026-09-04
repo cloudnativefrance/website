@@ -2,7 +2,7 @@
 // src/components/schedule/ScheduleToolbar.astro
 import type { SessionRow } from "@/lib/schedule";
 import { listFormats, listLevels, listRooms, listTracks } from "@/lib/schedule";
-import { hasBothAudiences } from "@/lib/audience";
+import { audienceOf, hasBothAudiences } from "@/lib/audience";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 
@@ -12,7 +12,11 @@ const t = useTranslations(lang);
 
 const rooms = listRooms(sessions);
 const formats = listFormats(sessions);
-const tracks = listTracks(sessions);
+// The leadership track is what DEFINES the leadership lens, so offering it a
+// second time as a track filter is a trap: selecting it from the technical
+// lens yields an empty grid with no explanation, and from the leadership lens
+// it is a no-op (spec D-4).
+const tracks = listTracks(sessions).filter((track) => audienceOf(track) !== "leadership");
 const levels = listLevels(sessions);
 ---
 

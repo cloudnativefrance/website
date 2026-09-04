@@ -107,3 +107,74 @@ describe("lensTotal", () => {
     expect(lensTotal(cards, "tech")).toBe(2);         // K + A
   });
 });
+
+import { findClashes } from "@/lib/lens";
+
+const s = (id: string, start: string, duration: number) => ({ id, start, duration });
+
+describe("findClashes", () => {
+  it("finds an overlap across lenses", () => {
+    const c = findClashes([
+      s("A", "2027-06-03T10:00:00+02:00", 45),
+      s("B", "2027-06-03T10:30:00+02:00", 30),
+    ]);
+    expect(c.get("A")).toEqual(["B"]);
+    expect(c.get("B")).toEqual(["A"]);
+  });
+
+  it("does not flag back-to-back sessions — touching is not overlapping", () => {
+    const c = findClashes([
+      s("A", "2027-06-03T10:00:00+02:00", 30),
+      s("B", "2027-06-03T10:30:00+02:00", 30),
+    ]);
+    expect(c.size).toBe(0);
+  });
+
+  it("handles three-way overlaps", () => {
+    const c = findClashes([
+      s("A", "2027-06-03T10:00:00+02:00", 60),
+      s("B", "2027-06-03T10:15:00+02:00", 15),
+      s("C", "2027-06-03T10:30:00+02:00", 15),
+    ]);
+    expect(c.get("A")!.sort()).toEqual(["B", "C"]);
+  });
+
+  it("is empty for a single session", () => {
+    expect(findClashes([s("A", "2027-06-03T10:00:00+02:00", 30)]).size).toBe(0);
+  });
+});
+
+import { facetValuesInLens, type FacetCard } from "@/lib/lens";
+
+const mixed: FacetCard[] = [
+  { audience: "tech",       room: "Monet",  format: "talk",    track: "IA et Data",           level: "intermediate" },
+  { audience: "tech",       room: "Piaf",   format: "workshop", track: "Developer Experience", level: "" },
+  { audience: "leadership", room: "Eiffel", format: "talk",    track: "Strategy & Leadership", level: "" },
+  { audience: "tech",       room: "Monet",  format: "keynote", track: "",                     level: "" },
+];
+
+describe("facetValuesInLens", () => {
+  it("keeps only the values the lens can still reach", () => {
+    const v = facetValuesInLens(mixed, "leadership");
+    expect([...v.room]).toEqual(["Eiffel"]);
+    expect([...v.track]).toEqual(["Strategy & Leadership"]);
+  });
+
+  it("counts a keynote in every lens, since it is shown in both", () => {
+    // The keynote is `audience: "tech"` by its (empty) track, but it spans the
+    // whole audience — so "keynote" must stay offered in the leadership lens.
+    expect(facetValuesInLens(mixed, "leadership").format.has("keynote")).toBe(true);
+  });
+
+  it("does not let a keynote's room into the room facet", () => {
+    // The room filter already exempts keynotes (`schedule-filter.ts:52`), so
+    // offering Monet in a lens whose only Monet session is the keynote would be
+    // a control that changes nothing.
+    expect(facetValuesInLens(mixed, "leadership").room.has("Monet")).toBe(false);
+  });
+
+  it("drops empty values — an unset level is not a level", () => {
+    expect(facetValuesInLens(mixed, "tech").level.has("")).toBe(false);
+    expect([...facetValuesInLens(mixed, "tech").level]).toEqual(["intermediate"]);
+  });
+});
