@@ -1,3 +1,5 @@
+import { normalise } from "./schedule-filter";
+
 /**
  * Which audience a session belongs to.
  *
@@ -22,14 +24,12 @@ export type Audience = "tech" | "leadership";
  */
 export const LEADERSHIP_TRACKS: readonly string[] = ["Strategy & Leadership"];
 
-function fold(s: string): string {
-  return s.normalize("NFD").replace(/\p{Diacritic}/gu, "").trim().toLowerCase();
-}
+const foldTrack = (track: string) => normalise(track.trim());
 
-const LEADERSHIP_FOLDED = new Set(LEADERSHIP_TRACKS.map(fold));
+const LEADERSHIP_FOLDED = new Set(LEADERSHIP_TRACKS.map(foldTrack));
 
 export function audienceOf(track: string): Audience {
-  return LEADERSHIP_FOLDED.has(fold(track)) ? "leadership" : "tech";
+  return LEADERSHIP_FOLDED.has(foldTrack(track)) ? "leadership" : "tech";
 }
 
 /**
