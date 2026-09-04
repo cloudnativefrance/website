@@ -1,4 +1,5 @@
 import type { Audience } from "./audience";
+import { normalise } from "./schedule-filter";
 
 export interface LensCard { id: string; room: string; format: string; audience: Audience }
 export interface LensResult {
@@ -50,4 +51,46 @@ export function resolveLens(
     if (roomsInLens.has(room)) columnOf.set(room, columnOf.size + 1);
   }
   return { hiddenIds, hiddenRooms, columnOf, roomCount: Math.max(columnOf.size, 1) };
+}
+
+/**
+ * How many sessions in the OTHER lens match the query.
+ *
+ * Without this a CTO searching "gouvernance" from the technical lens is told
+ * "no results" — true, and useless. A lens is meant to focus; unannounced
+ * misses turn it into a hiding device.
+ */
+export function countMatchesOutsideLens(
+  cards: readonly { audience: Audience; search: string }[],
+  audience: Audience,
+  query: string,
+): number {
+  const q = normalise(query).trim();
+  if (!q) return 0;
+  let n = 0;
+  for (const c of cards) {
+    if (c.audience === audience) continue;
+    if (normalise(c.search).includes(q)) n += 1;
+  }
+  return n;
+}
+
+/**
+ * How many distinct sessions belong to a lens: its own audience, plus every
+ * keynote (which spans both).
+ *
+ * Every session renders twice — once in the grid, once in the list — so
+ * `cards` here is a superset of session ids. Counting into a Set, not
+ * counting entries, is what makes that safe: a card rendered once (a
+ * keynote, say) would silently break a divide-by-two.
+ */
+export function lensTotal(
+  cards: readonly { id: string; audience: Audience; format: string }[],
+  audience: Audience,
+): number {
+  const ids = new Set<string>();
+  for (const c of cards) {
+    if (c.format === "keynote" || c.audience === audience) ids.add(c.id);
+  }
+  return ids.size;
 }
