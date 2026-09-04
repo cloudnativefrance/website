@@ -98,15 +98,24 @@ describe("audience lens markup", () => {
     expect(setAudienceEnd, "setAudience body closes").toBeGreaterThan(setAudienceStart);
 
     const setAudienceBody = src.slice(setAudienceStart, setAudienceEnd);
-    const setAudiencePrune = setAudienceBody.indexOf("pruneFacetsForLens();");
+    // `pruneFacetsForLens(` with its opening paren, not the whole `();`: the
+    // call now threads the already-read card array through
+    // (`pruneFacetsForLens(cards)`), so a literal `();` match would silently
+    // stop finding it — as it did the moment that argument was added. The
+    // declaration cannot be matched by accident here: this slice is the body
+    // of `setAudience`, which does not contain it.
+    const setAudiencePrune = setAudienceBody.indexOf("pruneFacetsForLens(");
     const setAudienceApply = setAudienceBody.indexOf("apply();", setAudiencePrune);
     expect(setAudiencePrune, "setAudience calls the prune").toBeGreaterThan(-1);
     expect(setAudienceApply, "setAudience: prune precedes apply()").toBeGreaterThan(setAudiencePrune);
 
     // No second call site anywhere else in the file — in particular not a
     // standalone one reinstated at boot.
-    const callSites = src.split("pruneFacetsForLens();").length - 1;
-    expect(callSites, "pruneFacetsForLens() has exactly one call site").toBe(1);
+    // One CALL, plus the one declaration. Counting `pruneFacetsForLens(`
+    // catches both, so the expected total is 2 — anything higher means a
+    // second call site was reinstated.
+    const mentions = src.split("pruneFacetsForLens(").length - 1;
+    expect(mentions, "pruneFacetsForLens has one declaration and one call site").toBe(2);
   });
 
   it("moves focus off the cross-lens button after it switches lens, before apply() destroys the node it sits in", () => {
@@ -148,7 +157,7 @@ describe("audience lens markup", () => {
 describe("audience lens: other editions and the URL", () => {
   it("2023 and 2026 render no control — absent, not disabled", () => {
     for (const page of ["dist/programme/2023/index.html", "dist/programme/2026/index.html"]) {
-      const html = readFileSync(resolve(import.meta.dirname, "../../", page), "utf-8");
+      const html = read(page);
       expect(html, page).not.toContain("data-audience-switch");
       expect(html, page).toContain('data-has-audiences="false"');
     }

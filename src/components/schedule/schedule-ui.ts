@@ -102,7 +102,10 @@ if (root) {
     }
 
     if (countEl) {
-      const cards = lensCards();
+      // Only built when a lens exists. On a single-audience edition both
+      // consumers below fall back to their non-`cards` branch, so scraping
+      // ~100 cards on every keystroke would be pure waste.
+      const cards = hasAudiences ? lensCards() : [];
       // The server's `data-total` counts the whole edition — right for a page
       // with one lens, wrong for a page with two, where it must count only
       // this lens's own sessions (its cards plus every keynote).
@@ -121,14 +124,17 @@ if (root) {
       // this would offer a lens switch to a control that was never rendered.
       const outside = hasAudiences ? countMatchesOutsideLens(cards, audience, state.query) : 0;
       if (outside > 0) {
+        // One landing lens, named once: the label the visitor reads and the
+        // lens the click delivers must be the same value, not two calls that
+        // happen to agree.
+        const landing = otherAudience(audience);
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "toolbar-cross-lens";
         btn.textContent = moreResultsLabel
           .replace("{n}", String(outside))
-          .replace("{lens}", lensLabel(otherAudience(audience)));
+          .replace("{lens}", lensLabel(landing));
         btn.addEventListener("click", () => {
-          const landing = otherAudience(audience);
           setAudience(landing);
           // This button lives inside #schedule-result-count, and apply()'s
           // first act is `countEl.textContent = …`, which destroys the node
@@ -237,6 +243,17 @@ if (root) {
   // and so switching it cannot trigger the break-band hiding `apply()` does
   // when a filter is active.
   // -----------------------------------------------------------------------
+  /** The shape `lensCards()` produces; see its docstring. */
+  interface LensRelevantCard {
+    id: string;
+    room: string;
+    format: string;
+    track: string;
+    level: string;
+    search: string;
+    audience: Audience;
+  }
+
   let audience: Audience = "tech";
 
   const otherAudience = (a: Audience): Audience => (a === "tech" ? "leadership" : "tech");
@@ -246,9 +263,16 @@ if (root) {
       ? root.getAttribute("data-schedule-audience-leadership") || "Strategy & Leadership"
       : root.getAttribute("data-schedule-audience-tech") || "Technical";
 
-  /** Every card's lens-relevant attributes, read once per call. Cards are static
-   *  after render, so there is nothing to cache and nothing to invalidate. */
-  function lensCards() {
+  /**
+   * Every card's lens-relevant attributes. A superset of `LensCard`,
+   * `FacetCard` and the shapes `lensTotal`/`countMatchesOutsideLens` want, so
+   * one read satisfies every consumer without a cast.
+   *
+   * Cards are static after render, so there is nothing to cache and nothing to
+   * invalidate — but callers should still read once per interaction and pass
+   * the array on, rather than each calling this for itself.
+   */
+  function lensCards(): LensRelevantCard[] {
     return [...document.querySelectorAll<HTMLElement>(".session-card")].map((el) => ({
       id: el.getAttribute("data-session-id") ?? "",
       room: el.getAttribute("data-room") ?? "",
@@ -276,9 +300,9 @@ if (root) {
    * value across the WHOLE edition is not this task's concern — hiding it
    * would be a new, unrelated behaviour change for 2023/2026.
    */
-  function pruneFacetsForLens(): void {
+  function pruneFacetsForLens(cards: readonly LensRelevantCard[]): void {
     if (!hasAudiences) return;
-    const reachable = facetValuesInLens(lensCards(), audience);
+    const reachable = facetValuesInLens(cards, audience);
     for (const group of document.querySelectorAll<HTMLElement>(".toolbar-facet")) {
       let live = 0;
       for (const btn of group.querySelectorAll<HTMLElement>(".schedule-filter")) {
@@ -312,8 +336,13 @@ if (root) {
    *  hangs off this, so a new caller cannot forget half the sequence. */
   const setAudience = (next: Audience): void => {
     audience = next;
-    lensForcesList = applyAudience(root, audience) <= 1;
-    pruneFacetsForLens();
+    // Read the cards ONCE for the whole switch. applyAudience, the facet
+    // prune and the result count all want the same attributes off the same
+    // elements; three independent scrapes is both wasted work on the hottest
+    // path this feature has and three places to forget a new attribute.
+    const cards = lensCards();
+    lensForcesList = applyAudience(root, cards, audience) <= 1;
+    pruneFacetsForLens(cards);
     renderView();
     apply();
     for (const btn of document.querySelectorAll<HTMLElement>("[data-audience-switch] [data-audience]")) {
