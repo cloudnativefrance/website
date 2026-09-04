@@ -188,7 +188,28 @@ export function findClashes(items: readonly AgendaItem[]): Map<string, string[]>
  * wrong. A function replacement disables that handling.
  */
 export function substituteClashLabel(template: string, title: string, room: string): string {
-  return template.replace(/\{(title|room)\}/g, (_match, key: string) => (key === "title" ? title : room));
+  return substituteTokens(template, { title, room });
+}
+
+/**
+ * Fill `{name}` placeholders in one pass, from untrusted values.
+ *
+ * Two sequential `template.replace("{a}", x).replace("{b}", y)` calls are wrong
+ * twice over, and both ways bite with real Pretalx data:
+ *
+ * - the STRING form of `replace` treats `$&`, `$$`, `` $` ``, `$'` and
+ *   `$<name>` in the REPLACEMENT as patterns, so a value containing `$&` is
+ *   silently rewritten;
+ * - the second call scans text the first one just inserted, so a value
+ *   containing another placeholder gets substituted into.
+ *
+ * One global regex with a function replacement avoids both: the scan is over
+ * the original template only, and function replacements disable `$` handling.
+ */
+export function substituteTokens(template: string, values: Record<string, string>): string {
+  return template.replace(/\{(\w+)\}/g, (match, key: string) =>
+    Object.hasOwn(values, key) ? values[key] : match,
+  );
 }
 
 export interface FacetCard {

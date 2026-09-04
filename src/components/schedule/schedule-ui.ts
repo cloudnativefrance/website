@@ -22,6 +22,7 @@ import {
   findClashes,
   lensTotal,
   substituteClashLabel,
+  substituteTokens,
   type FacetValues,
 } from "@/lib/lens";
 import { applyAudience } from "./schedule-ui-audience";
@@ -131,9 +132,15 @@ if (root) {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "toolbar-cross-lens";
-        btn.textContent = moreResultsLabel
-          .replace("{n}", String(outside))
-          .replace("{lens}", lensLabel(landing));
+        // Single pass, for the same two reasons substituteClashLabel exists:
+        // a lens label containing `$&` would be rewritten by the string form
+        // of replace, and a second sequential call would scan text the first
+        // one inserted. The label comes off a data- attribute, so it is not
+        // ours to trust.
+        btn.textContent = substituteTokens(moreResultsLabel, {
+          n: String(outside),
+          lens: lensLabel(landing),
+        });
         btn.addEventListener("click", () => {
           setAudience(landing);
           // This button lives inside #schedule-result-count, and apply()'s
@@ -243,6 +250,19 @@ if (root) {
   // and so switching it cannot trigger the break-band hiding `apply()` does
   // when a filter is active.
   // -----------------------------------------------------------------------
+  /**
+   * A candidate is only a lens if it names one — anything else falls through.
+   *
+   * Declared HERE, above every consumer, not beside the URL parsing that was
+   * its first caller: it now also validates the switch buttons' attribute and
+   * each card's `data-audience`, both of which are read before the boot
+   * sequence reaches the URL. A `const` arrow declared after them would sit in
+   * the temporal dead zone at that point.
+   */
+  function asAudience(v: string | null): Audience | null {
+    return v === "tech" || v === "leadership" ? v : null;
+  }
+
   /** The shape `lensCards()` produces; see its docstring. */
   interface LensRelevantCard {
     id: string;
@@ -280,7 +300,10 @@ if (root) {
       track: el.getAttribute("data-track") ?? "",
       level: el.getAttribute("data-level") ?? "",
       search: el.getAttribute("data-search") ?? "",
-      audience: (el.getAttribute("data-audience") as Audience) ?? "tech",
+      // `?? "tech"` alone would not catch `data-audience=""` — getAttribute
+      // returns "" there, not null, and "" belongs to neither lens, so the
+      // card would be hidden in BOTH while still counting toward the total.
+      audience: asAudience(el.getAttribute("data-audience")) ?? "tech",
     }));
   }
 
@@ -393,8 +416,17 @@ if (root) {
 
   for (const btn of document.querySelectorAll<HTMLElement>("[data-audience-switch] [data-audience]")) {
     btn.addEventListener("click", () => {
-      const next = btn.getAttribute("data-audience") as Audience | null;
-      if (next) setAudience(next);
+      // Validated with the same narrowing the URL uses, not cast: a markup
+      // typo or a future third value would otherwise reach resolveLens, match
+      // no card and no keynote, and hide every session in both views.
+      //
+      // Gated on `hasAudiences` too. The control and the root attribute are
+      // derived by two independent `hasBothAudiences` calls in two components;
+      // if they ever disagree, a rendered switch over a "false" root would
+      // half-apply a lens — cards hidden while the count and the URL take
+      // their non-lens branch.
+      const next = asAudience(btn.getAttribute("data-audience"));
+      if (next && hasAudiences) setAudience(next);
     });
   }
 
@@ -453,10 +485,6 @@ if (root) {
   function asView(value: string | null): "grid" | "list" | null {
     return value === "grid" || value === "list" ? value : null;
   }
-  /** A candidate is only a lens if it names one — anything else falls through. */
-  const asAudience = (v: string | null): Audience | null =>
-    v === "tech" || v === "leadership" ? v : null;
-
   // An edition with one audience has no lens to select — `hasAudiences`
   // (declared above, from `data-has-audiences`) says so. Ignoring the
   // parameter rather than 404-ing or rendering an empty grid is what makes a
@@ -1024,7 +1052,11 @@ if (root) {
       picked.map((c) => ({
         id: c.getAttribute("data-session-id") ?? "",
         start: c.getAttribute("data-start") ?? "",
-        duration: Number(c.getAttribute("data-duration") ?? "0"),
+        // NaN, not 0, when the attribute is absent: `Number(null ?? "0")` is
+        // 0, which makes end === start and every overlap test false — the
+        // agenda would report "no conflicts" forever rather than fail
+        // visibly. findClashes documents NaN as the degrade it expects.
+        duration: Number(c.getAttribute("data-duration") ?? NaN),
       })),
     );
     const byId = new Map(picked.map((c) => [c.getAttribute("data-session-id") ?? "", c]));
