@@ -97,20 +97,23 @@ describe("audience lens: other editions and the URL", () => {
     // Scoped to the FilterState interface and the activeFilterCount function
     // bodies specifically, not the whole file: schedule-filter.ts also has an
     // unrelated comment about a keynote's "entire audience", which would trip
-    // a whole-file `not.toContain("audience")` regardless of whether the lens
-    // actually leaked into FilterState.
+    // a whole-file, case-insensitive `audience` match regardless of whether
+    // the lens actually leaked into FilterState. Case-insensitive within the
+    // narrowed window, not `toContain`, for the same reason as the
+    // Clear-filters guard below: a capitalised `Audience` reference (the
+    // imported type, or a field typo) would slip past a lowercase-only check.
     const filter = read("src/lib/schedule-filter.ts");
     expect(filter).toContain("function activeFilterCount");
 
     const interfaceStart = filter.indexOf("export interface FilterState");
     const interfaceEnd = filter.indexOf("}", interfaceStart);
     expect(interfaceStart, "FilterState is declared").toBeGreaterThan(-1);
-    expect(filter.slice(interfaceStart, interfaceEnd)).not.toContain("audience");
+    expect(filter.slice(interfaceStart, interfaceEnd)).not.toMatch(/audience/i);
 
     const fnStart = filter.indexOf("export function activeFilterCount");
     const fnEnd = filter.indexOf("}", fnStart);
     expect(fnStart, "activeFilterCount is declared").toBeGreaterThan(-1);
-    expect(filter.slice(fnStart, fnEnd)).not.toContain("audience");
+    expect(filter.slice(fnStart, fnEnd)).not.toMatch(/audience/i);
 
     const ui = read("src/components/schedule/schedule-ui.ts");
     expect(ui).not.toMatch(/state\.audience|audience:\s*(new Set|")/);
@@ -119,7 +122,12 @@ describe("audience lens: other editions and the URL", () => {
   it("Clear filters does not reset the lens", () => {
     const src = read("src/components/schedule/schedule-ui.ts");
     const clear = src.slice(src.indexOf("schedule-filter-clear"));
-    expect(clear.slice(0, 400)).not.toContain("audience");
+    // Case-insensitive, and not just a literal-assignment check: the file's
+    // own documented entry point for changing lens is `setAudience(...)` —
+    // capital A — so a maintainer wiring a lens reset into this handler would
+    // call that, not assign `audience` directly. A case-sensitive
+    // `toContain("audience")` lets `setAudience("tech");` straight through.
+    expect(clear.slice(0, 400)).not.toMatch(/audience/i);
   });
 
   it("an edition with one audience never applies a lens", () => {

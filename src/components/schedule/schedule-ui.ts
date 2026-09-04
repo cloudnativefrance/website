@@ -414,6 +414,11 @@ if (root) {
   // one below first would render the page once against the wrong lens.
   if (hasLens) setAudience(asAudience(params.get("audience")) ?? "tech");
   setView(asView(fromUrl) ?? asView(stored) ?? serverDefaultView, false);
+  // Redundant with the `apply()` inside `setAudience` when `hasLens` is true
+  // (harmless: synchronous, no paint between, idempotent) but load-bearing
+  // when it is false — that branch never calls `setAudience`, so this is the
+  // ONLY apply() a single-audience edition gets. Do not remove it as a
+  // de-duplication.
   apply();
 
   // -----------------------------------------------------------------------
