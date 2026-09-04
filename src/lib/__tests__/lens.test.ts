@@ -142,6 +142,20 @@ describe("findClashes", () => {
   it("is empty for a single session", () => {
     expect(findClashes([s("A", "2027-06-03T10:00:00+02:00", 30)]).size).toBe(0);
   });
+
+  it("dedupes by id — a session rendered twice (grid + list) does not clash with its own twin", () => {
+    const a = s("A", "2027-06-03T10:00:00+02:00", 45);
+    const c = findClashes([a, { ...a }]);
+    expect(c.size).toBe(0);
+  });
+
+  it("degrades safely for a missing or unparseable start — it participates in no clashes", () => {
+    const c = findClashes([
+      s("A", "", 45),
+      s("B", "2027-06-03T10:00:00+02:00", 45),
+    ]);
+    expect(c.size).toBe(0);
+  });
 });
 
 import { facetValuesInLens, type FacetCard } from "@/lib/lens";

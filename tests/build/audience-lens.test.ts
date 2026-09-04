@@ -38,9 +38,33 @@ describe("audience lens markup", () => {
 
   it("prunes the lens's dead filter values before re-applying the filters", () => {
     const src = read("src/components/schedule/schedule-ui.ts");
-    const prune = src.indexOf("facetValuesInLens");
-    expect(prune).toBeGreaterThan(-1);
-    // The first apply() after the prune is what renders the corrected state.
-    expect(src.indexOf("apply()", prune)).toBeGreaterThan(prune);
+    // Match the CALL — `pruneFacetsForLens();` / `apply();`, semicolon and
+    // all — never a declaration: `function pruneFacetsForLens(): void {` and
+    // `function apply() {` both contain the bare `name()` substring with no
+    // trailing semicolon, so a semicolon-less match would pass on the
+    // declaration alone, regardless of call order.
+    //
+    // Two call sites need this guarantee: the lens switch (setAudience) and
+    // the boot sequence that resolves the server-rendered default lens.
+    // Getting either backwards is silent — apply() would run once against
+    // selections the new lens cannot honour, and the result count would lag
+    // one switch behind.
+    const setAudienceStart = src.indexOf("const setAudience = (next: Audience): void => {");
+    const setAudienceEnd = src.indexOf("};", setAudienceStart);
+    expect(setAudienceStart, "setAudience is declared").toBeGreaterThan(-1);
+    expect(setAudienceEnd, "setAudience body closes").toBeGreaterThan(setAudienceStart);
+
+    const setAudienceBody = src.slice(setAudienceStart, setAudienceEnd);
+    const setAudiencePrune = setAudienceBody.indexOf("pruneFacetsForLens();");
+    const setAudienceApply = setAudienceBody.indexOf("apply();", setAudiencePrune);
+    expect(setAudiencePrune, "setAudience calls the prune").toBeGreaterThan(-1);
+    expect(setAudienceApply, "setAudience: prune precedes apply()").toBeGreaterThan(setAudiencePrune);
+
+    // The boot sequence's own prune/apply pair, searched forward from where
+    // setAudience ends so this cannot re-match setAudience's own calls.
+    const bootPrune = src.indexOf("pruneFacetsForLens();", setAudienceEnd);
+    const bootApply = src.indexOf("apply();", bootPrune);
+    expect(bootPrune, "boot calls the prune").toBeGreaterThan(setAudienceEnd);
+    expect(bootApply, "boot: prune precedes apply()").toBeGreaterThan(bootPrune);
   });
 });
