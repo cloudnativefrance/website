@@ -192,6 +192,10 @@ function spanOf(list: SessionRow[]): { start: number; end: number } {
      "Pause déjeuner" separators above an empty result set. */
   .grid-view-break.is-hidden { display: none; }
 
+  /* A second axis, composed with the filters' own `.is-hidden` — see
+     schedule-ui-audience.ts for why they cannot share one class. */
+  :global(.is-audience-hidden) { display: none !important; }
+
   /* Below md the room columns are unusable, and the list view takes over. */
   @media (max-width: 767px) { .grid-view { display: none; } }
 </style>

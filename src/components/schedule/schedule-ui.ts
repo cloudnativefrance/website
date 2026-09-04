@@ -15,6 +15,8 @@ import {
   normalise,
   type FilterState,
 } from "@/lib/schedule-filter";
+import type { Audience } from "@/lib/audience";
+import { applyAudience } from "./schedule-ui-audience";
 
 const VIEW_KEY = "cnd-schedule-view";
 /**
@@ -57,13 +59,20 @@ if (root) {
       const searchOk = !query || normalise(card.getAttribute("data-search") ?? "").includes(query);
       const show = facetOk && searchOk;
       card.classList.toggle("is-hidden", !show);
-      if (show) visible.add(card.getAttribute("data-session-id") ?? "");
+      // The lens is a second, independent axis (`is-audience-hidden`, applied
+      // by schedule-ui-audience.ts) — a card counts as visible only when it
+      // also passes the filters, so switching the lens can never clear a
+      // filter and clearing filters can never touch the lens.
+      const inLens = !card.classList.contains("is-audience-hidden");
+      if (show && inLens) visible.add(card.getAttribute("data-session-id") ?? "");
     }
 
     // Hide a slot or group whose cards are all filtered out, so the page does
-    // not fill with empty time headings.
+    // not fill with empty time headings. Checked against both axes: a row
+    // whose only survivor is lens-hidden must not render as a labelled empty
+    // band either.
     for (const container of document.querySelectorAll<HTMLElement>(".grid-view-row, .list-view-group")) {
-      const any = container.querySelector(".session-card:not(.is-hidden)");
+      const any = container.querySelector(".session-card:not(.is-hidden):not(.is-audience-hidden)");
       container.classList.toggle("is-hidden", !any);
     }
     // A non-empty query already counts as one active filter, so this single
@@ -120,13 +129,17 @@ if (root) {
   // `setView(initial, false)` call there is what actually settles it.
   let preferredView: "grid" | "list" = serverDefaultView;
 
+  /** A lens showing one room has no grid to draw. Like `narrow`, this
+   *  constrains what is RENDERED without touching what the visitor chose. */
+  let lensForcesList = false;
+
   // Hiding relies on Tailwind v4's preflight, which declares
   // `[hidden] { display: none !important }`. Without that `!important` the
   // views' own `.grid-view { display: grid }` / `.list-view { display: flex }`
   // would win — author rules outrank the UA sheet — and both views would render
   // at once with no error anywhere. Disabling preflight breaks this toggle.
   function renderView() {
-    const renderedView = narrow.matches ? "list" : preferredView;
+    const renderedView = narrow.matches || lensForcesList ? "list" : preferredView;
     gridView?.toggleAttribute("hidden", renderedView !== "grid");
     listView?.toggleAttribute("hidden", renderedView !== "list");
     for (const btn of document.querySelectorAll<HTMLElement>("[data-view]")) {
@@ -153,6 +166,54 @@ if (root) {
   // Rotating a phone or dragging a desktop window across the breakpoint has to
   // re-evaluate, or the same blank page appears after the fact.
   narrow.addEventListener("change", renderView);
+
+  // -----------------------------------------------------------------------
+  // Audience lens — a VIEW over the shared agenda, not a filter. Held outside
+  // `FilterState` so it cannot reach `activeFilterCount` or "Clear filters",
+  // and so switching it cannot trigger the break-band hiding `apply()` does
+  // when a filter is active.
+  // -----------------------------------------------------------------------
+  let audience: Audience = "tech";
+
+  const otherAudience = (a: Audience): Audience => (a === "tech" ? "leadership" : "tech");
+
+  const lensLabel = (a: Audience) =>
+    a === "leadership"
+      ? root.getAttribute("data-schedule-audience-leadership") || "Strategy & Leadership"
+      : root.getAttribute("data-schedule-audience-tech") || "Technical";
+
+  /** Every card's lens-relevant attributes, read once per call. Cards are static
+   *  after render, so there is nothing to cache and nothing to invalidate. */
+  function lensCards() {
+    return [...document.querySelectorAll<HTMLElement>(".session-card")].map((el) => ({
+      id: el.getAttribute("data-session-id") ?? "",
+      room: el.getAttribute("data-room") ?? "",
+      format: el.getAttribute("data-format") ?? "",
+      track: el.getAttribute("data-track") ?? "",
+      level: el.getAttribute("data-level") ?? "",
+      search: el.getAttribute("data-search") ?? "",
+      audience: (el.getAttribute("data-audience") as Audience) ?? "tech",
+    }));
+  }
+
+  // A `const` arrow, not a `function` declaration: TypeScript only carries the
+  // `if (root)` null-narrowing into a nested closure defined directly in this
+  // block (an arrow assigned here), not into a hoisted function declaration —
+  // the same reason `rootStyle` was captured out of `root.style` above for
+  // `syncStickyOffsets`. This one reads `root` directly instead.
+  /** The single entry point for changing lens. Everything that reacts to a switch
+   *  hangs off this, so a new caller cannot forget half the sequence. */
+  const setAudience = (next: Audience): void => {
+    audience = next;
+    lensForcesList = applyAudience(root, audience) <= 1;
+    // Task 5 adds the facet prune here — BEFORE apply().
+    renderView();
+    apply();
+    for (const btn of document.querySelectorAll<HTMLElement>("[data-audience-switch] [data-audience]")) {
+      btn.setAttribute("aria-pressed", btn.getAttribute("data-audience") === audience ? "true" : "false");
+    }
+    // Task 6 adds the URL write here.
+  };
 
   // Both sticky offsets were hardcoded to `top: 64px`. The site header is
   // sticky and its logo is `h-10 md:h-14`, so it measures 85px on a phone but
@@ -185,6 +246,13 @@ if (root) {
 
   for (const btn of document.querySelectorAll<HTMLElement>("[data-view]")) {
     btn.addEventListener("click", () => setView(btn.getAttribute("data-view") as "grid" | "list"));
+  }
+
+  for (const btn of document.querySelectorAll<HTMLElement>("[data-audience-switch] [data-audience]")) {
+    btn.addEventListener("click", () => {
+      const next = btn.getAttribute("data-audience") as Audience | null;
+      if (next) setAudience(next);
+    });
   }
 
   for (const btn of document.querySelectorAll<HTMLElement>(".schedule-filter")) {
@@ -242,6 +310,10 @@ if (root) {
   function asView(value: string | null): "grid" | "list" | null {
     return value === "grid" || value === "list" ? value : null;
   }
+  // Applied before `setView` so its `renderView()` call already sees a
+  // correct `lensForcesList`, and before the trailing `apply()` so the
+  // initial result count and row-emptiness already reflect the default lens.
+  lensForcesList = applyAudience(root, audience) <= 1;
   setView(asView(fromUrl) ?? asView(stored) ?? serverDefaultView, false);
   apply();
 
