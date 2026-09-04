@@ -1405,17 +1405,34 @@ for (const facet of ["room", "format", "track", "level"] as const) {
 
 Level and format normally survive, which is the point: someone filtering for `beginner` keeps that filter across a lens switch.
 
-Guard the ordering in `tests/build/audience-lens.test.ts`, because getting it backwards is silent — `apply()` would run once against stale state and the count would flicker:
+Guard the ordering in `tests/build/audience-lens.test.ts`, because getting it
+backwards is silent — `apply()` would run once against stale state and the count
+would lag a switch behind.
+
+**Scope the comparison to each call site's own body, and match the CALL.** A
+naive version of this guard is unfalsifiable, and shipped in an earlier draft of
+this plan: `src.indexOf("facetValuesInLens")` lands on the *import statement* and
+`src.indexOf("apply()", …)` lands on the `function apply() {` *declaration* —
+both unconditional, neither related to call order, so swapping the two calls
+leaves it green. Match `pruneFacetsForLens();` and `apply();` with their
+semicolons, inside the slice of source belonging to one call site, and assert per
+site:
 
 ```ts
   it("prunes the lens's dead filter values before re-applying the filters", () => {
     const src = read("src/components/schedule/schedule-ui.ts");
-    const prune = src.indexOf("facetValuesInLens");
-    expect(prune).toBeGreaterThan(-1);
-    // The first apply() after the prune is what renders the corrected state.
-    expect(src.indexOf("apply()", prune)).toBeGreaterThan(prune);
+    for (const [label, body] of callSites(src)) {   // setAudience, and the boot sequence
+      const prune = body.indexOf("pruneFacetsForLens();");
+      expect(prune, label).toBeGreaterThan(-1);
+      expect(body.indexOf("apply();", prune), label).toBeGreaterThan(prune);
+    }
   });
 ```
+
+**Prove it fails before you trust it.** Swap the two calls inside `setAudience`,
+watch the test go red, restore, watch it go green, and put both outputs in your
+report. Three guards in this plan's history looked correct and could not fail;
+the only thing that distinguishes a real guard from those is having seen it red.
 
 - [ ] **Step 7: Run tests**
 
