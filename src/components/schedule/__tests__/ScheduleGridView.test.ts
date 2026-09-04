@@ -56,7 +56,7 @@ interface Cell {
 function cellsByColumn(html: string): Map<number, Cell> {
   const starts = [
     ...html.matchAll(
-      /<div class="grid-view-cell" style="grid-column:(\d+); grid-row:(\d+) \/ (\d+);"[^>]*>/g,
+      /<div class="grid-view-cell"[^>]*style="grid-column:(\d+); grid-row:(\d+) \/ (\d+);"[^>]*>/g,
     ),
   ];
   const cells = new Map<number, Cell>();
@@ -143,5 +143,14 @@ describe("ScheduleGridView — room cell placement", () => {
     // ...and end on strictly increasing ones. Equal spans is the old bug.
     expect(span(2)).toBeLessThan(span(3));
     expect(span(3)).toBeLessThan(span(4));
+  });
+
+  it("labels each room cell with its room, so the lens can renumber columns", async () => {
+    const html = await renderGrid([
+      row({ id: "A", room: "Monet" }),
+      row({ id: "B", room: "Piaf" }),
+    ]);
+    expect(html).toContain('data-room="Monet"');
+    expect(html).toContain('data-room="Piaf"');
   });
 });

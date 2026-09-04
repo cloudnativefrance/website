@@ -53,7 +53,7 @@ function spanOf(list: SessionRow[]): { start: number; end: number } {
 <div class="grid-view" style={`--room-count:${rooms.length};`}>
   <div class="grid-view-head">
     <div class="grid-view-gutter"></div>
-    {rooms.map((room) => <div class="grid-view-room">{room}</div>)}
+    {rooms.map((room) => <div class="grid-view-room" data-room={room}>{room}</div>)}
   </div>
 
   <div class="grid-view-body" style={`--row-count:${grid.rowCount};`}>
@@ -93,6 +93,7 @@ function spanOf(list: SessionRow[]): { start: number; end: number } {
             return (
               <div
                 class="grid-view-cell"
+                data-room={room}
                 style={`grid-column:${i + 2}; grid-row:${start} / ${end};`}
               >
                 {inRoom.map((s) => (
