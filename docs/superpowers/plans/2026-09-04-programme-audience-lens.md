@@ -769,6 +769,7 @@ MSG
 **Files:**
 - Modify: `src/lib/lens.ts`
 - Modify: `src/components/schedule/schedule-ui.ts`
+- Modify: `src/components/schedule/ScheduleGrid.astro` (the three client-side labels)
 - Modify: `src/i18n/ui.ts` (FR + EN)
 - Test: `src/lib/__tests__/lens.test.ts` (extend)
 
@@ -859,7 +860,48 @@ differently would report matches the visitor cannot reproduce by switching lens.
 
 - [ ] **Step 4: Surface it in the result line**
 
-In `schedule-ui.ts`'s `apply()`, after the existing count is written, append the remainder when non-zero, using `schedule.audience.more_results` with `{n}` and `{lens}` substituted. Render it as a **button** that switches lens and keeps the query — not plain text. A count the reader cannot act on is worse than no count.
+`#schedule-result-count` is written with `textContent` today, so the count is
+plain text. The remainder must be a **control**, not a sentence: a count the
+reader cannot act on is worse than no count. Keep the number as text and append
+a real `<button>`:
+
+```ts
+countEl.textContent = visible.size === 0 ? noneLabel : countTemplate…;   // unchanged
+
+const outside = countMatchesOutsideLens(searchCards(), audience, state.query);
+if (outside > 0) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "toolbar-cross-lens";
+  btn.textContent = moreResultsLabel
+    .replace("{n}", String(outside))
+    .replace("{lens}", lensLabel(otherAudience(audience)));
+  // Switches lens and keeps the query — the whole point of telling them.
+  btn.addEventListener("click", () => setAudience(otherAudience(audience)));
+  countEl.append(" · ", btn);
+}
+```
+
+Two things follow from the existing code, not from taste:
+
+- **`textContent =` wipes the element**, so the button must be appended *after*
+  the count is written, and re-created on every `apply()`. Build it with
+  `createElement`/`textContent`, never by assembling an HTML string — the
+  substituted values are fine here, but the file's own convention is to escape
+  anything interpolated (`escHtml`), and `createElement` makes the question moot.
+- **The labels reach the island through the root element**, like every other
+  client-side string in this file (`schedule-ui.ts:495-500`). Add them in
+  `ScheduleGrid.astro` beside `data-schedule-agenda-remove`:
+
+  ```astro
+  data-schedule-more-results={t("schedule.audience.more_results")}
+  data-schedule-audience-tech={t("schedule.audience.tech")}
+  data-schedule-audience-leadership={t("schedule.audience.leadership")}
+  ```
+
+  and read them with the same `getAttribute(...) || fallback` shape. Do **not**
+  import `useTranslations` into the island: it is a client bundle, and the whole
+  i18n table would ship to the browser.
 
 - [ ] **Step 5: Run tests**
 
