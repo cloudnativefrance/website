@@ -1528,12 +1528,37 @@ Expected: `0` — 2027 has no leadership sessions yet, so no control. Record it.
 
 - [ ] **Step 2: Prove it with a throwaway**
 
-Temporarily add an existing 2027 track name to `LEADERSHIP_TRACKS` — e.g. `"Réseau et sécurité"`, which the eBPF demo talk carries — and rebuild with the same command. Confirm:
+Temporarily add an existing 2027 track name to `LEADERSHIP_TRACKS` and rebuild
+with the same command.
+
+**Use `"Réseau et sécurité"` exactly.** Verified against the live event: 2027
+holds three confirmed demo talks, and their tracks are
+
+| Code | Title | Track |
+|---|---|---|
+| `3ZAQS9` | eBPF pour les gens pressés | Réseau et sécurité |
+| `7XVPFE` | Piloter 300 clusters sans réveiller personne | Infrastructure et opérations |
+| `BUD7GH` | FinOps sans tableur : instrumenter la dépense | IA et Data |
+
+so that one track splits the edition 1 / 2 — `hasBothAudiences` becomes true and
+the control renders. It also puts the leadership lens down to a **single room**,
+which exercises the `lensForcesList` fallback for free. Any of the other four
+track names would leave `hasBothAudiences` false and prove nothing.
+
+Confirm:
 
 - the control renders;
-- the technical lens shows the remaining rooms with `--room-count` reduced;
-- the leadership lens shows only the eBPF session;
-- the break bands are present in both;
+- the technical lens shows the two remaining rooms with `--room-count` reduced
+  to 2, and each surviving `.grid-view-cell` renumbered to a column that exists;
+- the leadership lens shows only the eBPF session, and — being one room — opens
+  in the **list** view rather than as a single ~1100px grid column;
+- switching back to the technical lens restores the grid, and the visitor's
+  grid/list preference is unchanged (this is what P9 protects: the fallback must
+  not have written `localStorage` or `?view=`);
+- the break bands are present in both lenses;
+- the result count reads `n of N` where **N is the lens's own session count**,
+  not 3 (this is what P14 fixes — in the leadership lens it must read "1 of 1",
+  never "1 of 3");
 - `/programme/2026` still has no control.
 
 Record what you saw, then **revert the throwaway** and confirm `git diff` is empty.
