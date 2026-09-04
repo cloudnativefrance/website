@@ -113,7 +113,7 @@ function loadArchivedSessions(year: Edition): SessionRow[] {
  * Preferred room order in the schedule grid. Rooms encountered in the data
  * but not listed here are appended alphabetically after the priority set.
  */
-const ROOM_ORDER = ["Monet", "Piaf", "Debussy", "Dumas"];
+const ROOM_ORDER = ["Monet", "Piaf", "Debussy", "Dumas", "Eiffel"];
 
 /** Unique room list ordered per the physical floor layout (falls back to alpha). */
 export function listRooms(sessions: SessionRow[]): string[] {
