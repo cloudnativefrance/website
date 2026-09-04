@@ -1,6 +1,6 @@
 ---
 import type { SessionRow } from "@/lib/schedule";
-import { hasBothAudiences } from "@/lib/audience";
+import type { Edition } from "@/lib/editions";
 import ScheduleToolbar from "./ScheduleToolbar.astro";
 import ScheduleGridView from "./ScheduleGridView.astro";
 import ScheduleListView from "./ScheduleListView.astro";
@@ -26,9 +26,10 @@ interface Props {
    * not make that guarantee.
    */
   speakerInfo: Map<string, SpeakerInfo>;
+  year: Edition;
 }
 
-const { sessions, lang, speakerInfo } = Astro.props;
+const { sessions, lang, speakerInfo, year } = Astro.props;
 const t = useTranslations(lang);
 
 /**
@@ -52,7 +53,6 @@ const defaultView = "grid" as const;
 <div
   data-schedule-root
   data-default-view={defaultView}
-  data-has-audiences={hasBothAudiences(sessions) ? "true" : "false"}
   data-count-template={t("schedule.results.count")}
   data-none-label={t("schedule.results.none")}
   data-schedule-format-keynote={t("schedule.format.keynote")}
@@ -65,13 +65,10 @@ const defaultView = "grid" as const;
   data-schedule-agenda-remove={t("schedule.agenda.remove")}
   data-schedule-agenda-clash={t("schedule.agenda.clash")}
   data-schedule-empty={t("schedule.agenda.empty")}
-  data-schedule-more-results={t("schedule.audience.more_results")}
-  data-schedule-audience-tech={t("schedule.audience.tech")}
-  data-schedule-audience-leadership={t("schedule.audience.leadership")}
 >
   <ScheduleToolbar sessions={sessions} lang={lang} defaultView={defaultView} />
   <div class="schedule-views">
-    <ScheduleGridView sessions={sessions} lang={lang} speakerInfo={speakerInfo} />
+    <ScheduleGridView sessions={sessions} lang={lang} speakerInfo={speakerInfo} year={year} />
     <ScheduleListView sessions={sessions} lang={lang} speakerInfo={speakerInfo} />
   </div>
 </div>
@@ -84,5 +81,18 @@ const defaultView = "grid" as const;
 </script>
 
 <style>
+  /* The programme is the one section on the site that gets wider than the page.
+     Every other block is prose or cards, where max-w-7xl is a readability
+     ceiling; this is a five-column timetable, where the same ceiling pins a
+     column at 235px however large the screen — a 1920px display was wasting
+     about 600px. Titles are complete at 235px, but 19 characters a line is a
+     narrow ribbon; ~300px reads properly.
+
+     Only ever wider, never narrower: below 1400px the page cap is already the
+     binding constraint and this does nothing. */
+  @media (min-width: 1400px) {
+    :global(.schedule-section) { max-width: min(1600px, calc(100vw - 96px)); }
+  }
+
   .schedule-views { margin-top: 18px; }
 </style>
