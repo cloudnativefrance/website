@@ -1,0 +1,269 @@
+import { describe, it, expect } from "vitest";
+import {
+  resolveLens,
+  countMatchesAfterSwitch,
+  lensTotal,
+  type LensCard,
+  type FacetSelection,
+} from "@/lib/lens";
+
+const ROOMS = ["Monet", "Piaf", "Eiffel"];
+const cards: LensCard[] = [
+  { id: "A", room: "Monet",  format: "talk",    audience: "tech" },
+  { id: "B", room: "Eiffel", format: "talk",    audience: "leadership" },
+  { id: "K", room: "",       format: "keynote", audience: "tech" },
+];
+
+describe("resolveLens", () => {
+  it("hides cards outside the lens", () => {
+    const r = resolveLens(cards, ROOMS, "tech");
+    expect(r.hiddenIds.has("B")).toBe(true);
+    expect(r.hiddenIds.has("A")).toBe(false);
+  });
+
+  it("keeps an all-room keynote visible in BOTH lenses", () => {
+    for (const lens of ["tech", "leadership"] as const) {
+      expect(resolveLens(cards, ROOMS, lens).hiddenIds.has("K")).toBe(false);
+    }
+  });
+
+  it("hides a room with nothing in the lens", () => {
+    const r = resolveLens(cards, ROOMS, "tech");
+    expect(r.hiddenRooms.has("Eiffel")).toBe(true);
+    expect(r.hiddenRooms.has("Piaf")).toBe(true);   // empty in every lens
+    expect(r.hiddenRooms.has("Monet")).toBe(false);
+  });
+
+  it("counts the rooms that remain, which is what widens the columns", () => {
+    expect(resolveLens(cards, ROOMS, "tech").roomCount).toBe(1);
+    expect(resolveLens(cards, ROOMS, "leadership").roomCount).toBe(1);
+  });
+
+  it("renumbers the surviving rooms from 1, keeping their original order", () => {
+    const wide: LensCard[] = [
+      { id: "a", room: "Monet",  format: "talk", audience: "tech" },
+      { id: "b", room: "Eiffel", format: "talk", audience: "tech" },
+    ];
+    // Piaf sits BETWEEN them in ROOMS and drops out, so Eiffel must move from
+    // column 3 to column 2. Without this the grid pins it to a track that no
+    // longer exists.
+    const r = resolveLens(wide, ROOMS, "tech");
+    expect(r.columnOf.get("Monet")).toBe(1);
+    expect(r.columnOf.get("Eiffel")).toBe(2);
+    expect(r.columnOf.has("Piaf")).toBe(false);
+  });
+
+  it("never reports zero rooms — a grid with no columns has no layout", () => {
+    expect(resolveLens([], ROOMS, "tech").roomCount).toBe(1);
+  });
+
+  it("says nothing about break bands — they belong to both lenses", () => {
+    const r = resolveLens(cards, ROOMS, "leadership");
+    expect(r.hiddenIds.has("K")).toBe(false);
+    // Kept in sync with LensResult's actual shape (see the "Produces"
+    // interface and the DOM wrapper, both of which need `columnOf`) rather
+    // than the brief's Step 1 literal, which omits it and would fail against
+    // any implementation the DOM wrapper can consume.
+    expect(Object.keys(r)).toEqual(["hiddenIds", "hiddenRooms", "columnOf", "roomCount"]);
+  });
+});
+
+const haystack = [
+  { id: "a", format: "talk",    audience: "tech" as const,       room: "Monet",  track: "IA et Data",           level: "advanced",     search: "ebpf réseau" },
+  { id: "b", format: "talk",    audience: "leadership" as const, room: "Eiffel", track: "Strategy & Leadership", level: "advanced",     search: "gouvernance cloud" },
+  { id: "c", format: "talk",    audience: "leadership" as const, room: "Eiffel", track: "Strategy & Leadership", level: "intermediate", search: "gouvernance et budget" },
+  { id: "k", format: "keynote", audience: "tech" as const,       room: "Monet",  track: "",                      level: "",             search: "gouvernance ouverture" },
+];
+
+/** No facet selected — the plain "just a search" case. */
+const nothingSelected: FacetSelection = {
+  room: new Set(), format: new Set(), track: new Set(), level: new Set(),
+};
+const select = (facet: keyof FacetSelection, ...values: string[]): FacetSelection => ({
+  ...nothingSelected,
+  [facet]: new Set(values),
+});
+
+describe("countMatchesAfterSwitch", () => {
+  it("counts what the other lens would show", () => {
+    expect(countMatchesAfterSwitch(haystack, "tech", "leadership", nothingSelected, "gouvernance")).toBe(2);
+  });
+
+  it("is zero when the other lens has nothing matching", () => {
+    expect(countMatchesAfterSwitch(haystack, "tech", "leadership", nothingSelected, "ebpf")).toBe(0);
+  });
+
+  it("is zero for an empty query — an empty search is not a search", () => {
+    expect(countMatchesAfterSwitch(haystack, "tech", "leadership", nothingSelected, "   ")).toBe(0);
+  });
+
+  it("ignores accents and case, like the main search", () => {
+    expect(countMatchesAfterSwitch(haystack, "tech", "leadership", nothingSelected, "GOUVERNANCE")).toBe(2);
+    expect(countMatchesAfterSwitch(haystack, "leadership", "tech", nothingSelected, "RESEAU")).toBe(1);
+  });
+
+  it("counts each session once even though every card renders twice", () => {
+    expect(countMatchesAfterSwitch([...haystack, ...haystack], "tech", "leadership", nothingSelected, "gouvernance")).toBe(2);
+  });
+
+  it("never counts a keynote — it is already on screen in this lens", () => {
+    // "k" matches the query and is a tech-track keynote, but a keynote shows
+    // in BOTH lenses, so from the leadership lens it is not "more" anywhere.
+    expect(countMatchesAfterSwitch(haystack, "leadership", "tech", nothingSelected, "gouvernance")).toBe(0);
+  });
+
+  it("respects a filter the target lens can honour — the promise must match the delivery", () => {
+    // level=advanced is reachable in the leadership lens (b has it), so the
+    // switch will keep it and only b will show. Counting the query alone would
+    // promise 2 and deliver 1.
+    expect(countMatchesAfterSwitch(haystack, "tech", "leadership", select("level", "advanced"), "gouvernance")).toBe(1);
+  });
+
+  it("ignores a filter the target lens cannot honour, exactly as the switch will drop it", () => {
+    // No leadership session is in Monet, so the room filter is unreachable
+    // there and pruned on arrival. Counting it as a filter would report 0
+    // while the click actually shows 2.
+    expect(countMatchesAfterSwitch(haystack, "tech", "leadership", select("room", "Monet"), "gouvernance")).toBe(2);
+  });
+
+  it("cannot be reached by a keynote at all — it is in every lens, so never 'more'", () => {
+    // Recorded as a property, not an omission: this is why honouredInLens has
+    // no keynote room-exemption, unlike its siblings. Whichever lens you are
+    // in, a keynote is on screen, so it is excluded before facets are read.
+    const keynoteOnly = [haystack[3]];
+    for (const [from, to] of [["tech", "leadership"], ["leadership", "tech"]] as const) {
+      expect(countMatchesAfterSwitch(keynoteOnly, from, to, select("room", "Monet"), "gouvernance")).toBe(0);
+    }
+  });
+});
+
+describe("lensTotal", () => {
+  it("counts each session once even though every card renders twice", () => {
+    const twice = [...cards, ...cards];   // grid copy + list copy
+    expect(lensTotal(twice, "tech")).toBe(lensTotal(cards, "tech"));
+  });
+
+  it("counts a keynote in both lenses", () => {
+    expect(lensTotal(cards, "leadership")).toBe(2);   // K + B
+    expect(lensTotal(cards, "tech")).toBe(2);         // K + A
+  });
+});
+
+import { findClashes } from "@/lib/lens";
+
+const s = (id: string, start: string, duration: number) => ({ id, start, duration });
+
+describe("findClashes", () => {
+  it("finds an overlap across lenses", () => {
+    const c = findClashes([
+      s("A", "2027-06-03T10:00:00+02:00", 45),
+      s("B", "2027-06-03T10:30:00+02:00", 30),
+    ]);
+    expect(c.get("A")).toEqual(["B"]);
+    expect(c.get("B")).toEqual(["A"]);
+  });
+
+  it("does not flag back-to-back sessions — touching is not overlapping", () => {
+    const c = findClashes([
+      s("A", "2027-06-03T10:00:00+02:00", 30),
+      s("B", "2027-06-03T10:30:00+02:00", 30),
+    ]);
+    expect(c.size).toBe(0);
+  });
+
+  it("handles three-way overlaps", () => {
+    const c = findClashes([
+      s("A", "2027-06-03T10:00:00+02:00", 60),
+      s("B", "2027-06-03T10:15:00+02:00", 15),
+      s("C", "2027-06-03T10:30:00+02:00", 15),
+    ]);
+    expect(c.get("A")!.sort()).toEqual(["B", "C"]);
+  });
+
+  it("is empty for a single session", () => {
+    expect(findClashes([s("A", "2027-06-03T10:00:00+02:00", 30)]).size).toBe(0);
+  });
+
+  it("dedupes by id — a session rendered twice (grid + list) does not clash with its own twin", () => {
+    const a = s("A", "2027-06-03T10:00:00+02:00", 45);
+    const c = findClashes([a, { ...a }]);
+    expect(c.size).toBe(0);
+  });
+
+  it("degrades safely for a missing or unparseable start — it participates in no clashes", () => {
+    const c = findClashes([
+      s("A", "", 45),
+      s("B", "2027-06-03T10:00:00+02:00", 45),
+    ]);
+    expect(c.size).toBe(0);
+  });
+});
+
+import { substituteClashLabel } from "@/lib/lens";
+
+describe("substituteClashLabel", () => {
+  it("substitutes both tokens", () => {
+    expect(substituteClashLabel("overlaps with {title} ({room})", "Scaling eBPF", "Piaf")).toBe(
+      "overlaps with Scaling eBPF (Piaf)",
+    );
+  });
+
+  it("does not let a title containing the literal {room} token bleed into the room substitution", () => {
+    // A naive `.replace("{title}", …).replace("{room}", …)` would land the
+    // room name INSIDE the just-substituted title here, and leave the
+    // template's own {room} token showing raw.
+    const label = substituteClashLabel(
+      "chevauche {title} ({room})",
+      "Scheduling {room} at scale",
+      "Piaf",
+    );
+    expect(label).toBe("chevauche Scheduling {room} at scale (Piaf)");
+  });
+
+  it("does not treat $& in a title as a special replacement pattern", () => {
+    const label = substituteClashLabel("overlaps with {title} ({room})", "Rust & $& Friends", "Eiffel");
+    expect(label).toBe("overlaps with Rust & $& Friends (Eiffel)");
+  });
+
+  it("leaves a token untouched when the template does not name it", () => {
+    expect(substituteClashLabel("overlaps with {title}", "Scaling eBPF", "Piaf")).toBe(
+      "overlaps with Scaling eBPF",
+    );
+    expect(substituteClashLabel("busy right now", "Scaling eBPF", "Piaf")).toBe("busy right now");
+  });
+});
+
+import { facetValuesInLens, type FacetCard } from "@/lib/lens";
+
+const mixed: FacetCard[] = [
+  { audience: "tech",       room: "Monet",  format: "talk",    track: "IA et Data",           level: "intermediate" },
+  { audience: "tech",       room: "Piaf",   format: "workshop", track: "Developer Experience", level: "" },
+  { audience: "leadership", room: "Eiffel", format: "talk",    track: "Strategy & Leadership", level: "" },
+  { audience: "tech",       room: "Monet",  format: "keynote", track: "",                     level: "" },
+];
+
+describe("facetValuesInLens", () => {
+  it("keeps only the values the lens can still reach", () => {
+    const v = facetValuesInLens(mixed, "leadership");
+    expect([...v.room]).toEqual(["Eiffel"]);
+    expect([...v.track]).toEqual(["Strategy & Leadership"]);
+  });
+
+  it("counts a keynote in every lens, since it is shown in both", () => {
+    // The keynote is `audience: "tech"` by its (empty) track, but it spans the
+    // whole audience — so "keynote" must stay offered in the leadership lens.
+    expect(facetValuesInLens(mixed, "leadership").format.has("keynote")).toBe(true);
+  });
+
+  it("does not let a keynote's room into the room facet", () => {
+    // The room filter already exempts keynotes (`schedule-filter.ts:52`), so
+    // offering Monet in a lens whose only Monet session is the keynote would be
+    // a control that changes nothing.
+    expect(facetValuesInLens(mixed, "leadership").room.has("Monet")).toBe(false);
+  });
+
+  it("drops empty values — an unset level is not a level", () => {
+    expect(facetValuesInLens(mixed, "tech").level.has("")).toBe(false);
+    expect([...facetValuesInLens(mixed, "tech").level]).toEqual(["intermediate"]);
+  });
+});

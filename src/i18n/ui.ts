@@ -205,12 +205,20 @@ export const ui = {
     "schedule.agenda.empty":
       "Aucune session bookmarkee. Cliquez sur l'icone marque-page d'une session pour l'ajouter.",
     "schedule.agenda.remove": "Retirer",
+    "schedule.agenda.clash": "chevauche {title} ({room})",
     "schedule.export_all": "Exporter le programme (.ics)",
     "schedule.export_agenda": "Exporter mon agenda (.ics)",
     "schedule.close": "Fermer",
-    "schedule.view.grid": "Grille",
-    "schedule.view.list": "Liste",
-    "schedule.view.toggle": "Affichage",
+    "schedule.audience.label": "Public",
+    "schedule.audience.tech": "Technique",
+    // Deliberately NOT translated, in either locale. This is the Pretalx
+    // track's own name — `LEADERSHIP_TRACKS` in src/lib/audience.ts pins the
+    // identical literal, and the lens exists only for sessions carrying it.
+    // Translating the label would leave the control naming something the
+    // programme does not contain. If the track is ever renamed in Pretalx,
+    // both this and LEADERSHIP_TRACKS must change together.
+    "schedule.audience.leadership": "Strategy & Leadership",
+    "schedule.audience.more_results": "{n} de plus dans {lens}",
     "schedule.search.placeholder": "Rechercher un talk, un orateur, un sujet…",
     "schedule.search.label": "Rechercher dans le programme",
     "schedule.search.clear": "Effacer la recherche",
@@ -604,12 +612,15 @@ export const ui = {
     "schedule.agenda.empty":
       "No sessions bookmarked yet. Click the bookmark icon on a session to add it.",
     "schedule.agenda.remove": "Remove",
+    "schedule.agenda.clash": "overlaps with {title} ({room})",
     "schedule.export_all": "Export full schedule (.ics)",
     "schedule.export_agenda": "Export my agenda (.ics)",
     "schedule.close": "Close",
-    "schedule.view.grid": "Grid",
-    "schedule.view.list": "List",
-    "schedule.view.toggle": "View",
+    "schedule.audience.label": "Audience",
+    "schedule.audience.tech": "Technical",
+    // Same literal as the FR bundle, and for the same reason — see there.
+    "schedule.audience.leadership": "Strategy & Leadership",
+    "schedule.audience.more_results": "{n} more in {lens}",
     "schedule.search.placeholder": "Search a talk, a speaker, a topic…",
     "schedule.search.label": "Search the schedule",
     "schedule.search.clear": "Clear search",

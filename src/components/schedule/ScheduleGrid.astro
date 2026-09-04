@@ -1,5 +1,6 @@
 ---
 import type { SessionRow } from "@/lib/schedule";
+import { hasBothAudiences } from "@/lib/audience";
 import ScheduleToolbar from "./ScheduleToolbar.astro";
 import ScheduleGridView from "./ScheduleGridView.astro";
 import ScheduleListView from "./ScheduleListView.astro";
@@ -51,6 +52,7 @@ const defaultView = "grid" as const;
 <div
   data-schedule-root
   data-default-view={defaultView}
+  data-has-audiences={hasBothAudiences(sessions) ? "true" : "false"}
   data-count-template={t("schedule.results.count")}
   data-none-label={t("schedule.results.none")}
   data-schedule-format-keynote={t("schedule.format.keynote")}
@@ -61,7 +63,11 @@ const defaultView = "grid" as const;
   data-schedule-level-intermediate={t("schedule.level.intermediate")}
   data-schedule-level-advanced={t("schedule.level.advanced")}
   data-schedule-agenda-remove={t("schedule.agenda.remove")}
+  data-schedule-agenda-clash={t("schedule.agenda.clash")}
   data-schedule-empty={t("schedule.agenda.empty")}
+  data-schedule-more-results={t("schedule.audience.more_results")}
+  data-schedule-audience-tech={t("schedule.audience.tech")}
+  data-schedule-audience-leadership={t("schedule.audience.leadership")}
 >
   <ScheduleToolbar sessions={sessions} lang={lang} defaultView={defaultView} />
   <div class="schedule-views">

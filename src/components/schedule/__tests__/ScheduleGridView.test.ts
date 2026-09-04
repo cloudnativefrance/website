@@ -46,9 +46,18 @@ function row(over: Partial<SessionRow> = {}): SessionRow {
  * "does this session id appear in this cell's region" without a full DOM
  * parser (none is a project dependency, and this project's other build
  * tests already assert on raw HTML/source strings the same way).
+ *
+ * `room` is read out of the matched opening tag itself, not the sliced
+ * `html` region: `data-room` sits *inside* that tag (Astro renders
+ * `class`, `data-room`, then `style` in source order), so slicing from the
+ * end of the tag — which is what isolates a cell's children — excludes it.
+ * Extracted with its own regex against the full match rather than assumed
+ * to sit at a fixed offset from `style`, so this keeps working if the
+ * attribute order in the component ever changes.
  */
 interface Cell {
   html: string;
+  room: string | undefined;
   rowStart: number;
   rowEnd: number;
 }
@@ -56,7 +65,7 @@ interface Cell {
 function cellsByColumn(html: string): Map<number, Cell> {
   const starts = [
     ...html.matchAll(
-      /<div class="grid-view-cell" style="grid-column:(\d+); grid-row:(\d+) \/ (\d+);"[^>]*>/g,
+      /<div class="grid-view-cell"[^>]*style="grid-column:(\d+); grid-row:(\d+) \/ (\d+);"[^>]*>/g,
     ),
   ];
   const cells = new Map<number, Cell>();
@@ -65,6 +74,7 @@ function cellsByColumn(html: string): Map<number, Cell> {
     const to = i + 1 < starts.length ? starts[i + 1].index! : html.length;
     cells.set(Number(starts[i][1]), {
       html: html.slice(from, to),
+      room: starts[i][0].match(/data-room="([^"]*)"/)?.[1],
       rowStart: Number(starts[i][2]),
       rowEnd: Number(starts[i][3]),
     });
@@ -143,5 +153,20 @@ describe("ScheduleGridView — room cell placement", () => {
     // ...and end on strictly increasing ones. Equal spans is the old bug.
     expect(span(2)).toBeLessThan(span(3));
     expect(span(3)).toBeLessThan(span(4));
+  });
+
+  it("labels each room cell with its room, so the lens can renumber columns", async () => {
+    // Asserted through cellsByColumn, not a bare html.toContain: the header
+    // row emits a `data-room` per room too (ScheduleGridView.astro's
+    // `.grid-view-room`), so a plain substring check on the whole document
+    // would pass on the header alone and never touch the body cell this
+    // guard exists for.
+    const html = await renderGrid([
+      row({ id: "A", room: "Monet" }),
+      row({ id: "B", room: "Piaf" }),
+    ]);
+    const cells = cellsByColumn(html);
+    expect(cells.get(2)!.room).toBe("Monet");
+    expect(cells.get(3)!.room).toBe("Piaf");
   });
 });

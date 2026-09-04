@@ -53,7 +53,7 @@ function spanOf(list: SessionRow[]): { start: number; end: number } {
 <div class="grid-view" style={`--room-count:${rooms.length};`}>
   <div class="grid-view-head">
     <div class="grid-view-gutter"></div>
-    {rooms.map((room) => <div class="grid-view-room">{room}</div>)}
+    {rooms.map((room) => <div class="grid-view-room" data-room={room}>{room}</div>)}
   </div>
 
   <div class="grid-view-body" style={`--row-count:${grid.rowCount};`}>
@@ -93,6 +93,7 @@ function spanOf(list: SessionRow[]): { start: number; end: number } {
             return (
               <div
                 class="grid-view-cell"
+                data-room={room}
                 style={`grid-column:${i + 2}; grid-row:${start} / ${end};`}
               >
                 {inRoom.map((s) => (
@@ -190,6 +191,14 @@ function spanOf(list: SessionRow[]): { start: number; end: number } {
      search is active; without this rule they stayed on screen, leaving orphan
      "Pause déjeuner" separators above an empty result set. */
   .grid-view-break.is-hidden { display: none; }
+
+  /* The lens hides whole room columns as well as cards. Only the grid's own
+     elements are named here; the card rule lives in SessionCard.astro beside
+     its `.is-hidden` sibling, so the list view keeps working no matter what
+     happens to this component. Scoped, not `:global` — these are this
+     component's elements. */
+  .grid-view-room.is-audience-hidden,
+  .grid-view-cell.is-audience-hidden { display: none !important; }
 
   /* Below md the room columns are unusable, and the list view takes over. */
   @media (max-width: 767px) { .grid-view { display: none; } }

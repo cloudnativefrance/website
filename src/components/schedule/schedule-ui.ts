@@ -15,6 +15,17 @@ import {
   normalise,
   type FilterState,
 } from "@/lib/schedule-filter";
+import type { Audience } from "@/lib/audience";
+import {
+  countMatchesAfterSwitch,
+  facetValuesInLens,
+  findClashes,
+  lensTotal,
+  substituteClashLabel,
+  substituteTokens,
+  type FacetValues,
+} from "@/lib/lens";
+import { applyAudience } from "./schedule-ui-audience";
 
 const VIEW_KEY = "cnd-schedule-view";
 /**
@@ -34,9 +45,16 @@ if (root) {
   const countEl = document.getElementById("schedule-result-count");
   const searchEl = document.getElementById("schedule-search") as HTMLInputElement | null;
   const clearSearchEl = document.getElementById("schedule-search-clear");
-  const total = Number(countEl?.getAttribute("data-total") ?? "0");
+  /** The <p> wrapping the live region; the cross-lens button is its child. */
+  const countLineEl = root.querySelector<HTMLElement>(".toolbar-count");
+  const total = Number(countLineEl?.getAttribute("data-total") ?? "0");
   const countTemplate = root.getAttribute("data-count-template") ?? "{n}/{total}";
   const noneLabel = root.getAttribute("data-none-label") ?? "";
+  // Server-rendered: true only for an edition with both audiences, i.e. one
+  // that actually shows the lens switch. `total` (the whole edition) stays
+  // the right denominator for every other edition.
+  const hasAudiences = root.getAttribute("data-has-audiences") === "true";
+  const moreResultsLabel = root.getAttribute("data-schedule-more-results") || "{n} more in {lens}";
 
   function apply() {
     const query = normalise(state.query.trim());
@@ -57,13 +75,20 @@ if (root) {
       const searchOk = !query || normalise(card.getAttribute("data-search") ?? "").includes(query);
       const show = facetOk && searchOk;
       card.classList.toggle("is-hidden", !show);
-      if (show) visible.add(card.getAttribute("data-session-id") ?? "");
+      // The lens is a second, independent axis (`is-audience-hidden`, applied
+      // by schedule-ui-audience.ts) — a card counts as visible only when it
+      // also passes the filters, so switching the lens can never clear a
+      // filter and clearing filters can never touch the lens.
+      const inLens = !card.classList.contains("is-audience-hidden");
+      if (show && inLens) visible.add(card.getAttribute("data-session-id") ?? "");
     }
 
     // Hide a slot or group whose cards are all filtered out, so the page does
-    // not fill with empty time headings.
+    // not fill with empty time headings. Checked against both axes: a row
+    // whose only survivor is lens-hidden must not render as a labelled empty
+    // band either.
     for (const container of document.querySelectorAll<HTMLElement>(".grid-view-row, .list-view-group")) {
-      const any = container.querySelector(".session-card:not(.is-hidden)");
+      const any = container.querySelector(".session-card:not(.is-hidden):not(.is-audience-hidden)");
       container.classList.toggle("is-hidden", !any);
     }
     // A non-empty query already counts as one active filter, so this single
@@ -79,10 +104,33 @@ if (root) {
     }
 
     if (countEl) {
+      // Only built when a lens exists. On a single-audience edition both
+      // consumers below fall back to their non-`cards` branch, so scraping
+      // ~100 cards on every keystroke would be pure waste.
+      const cards = hasAudiences ? lensCards() : [];
+      // The server's `data-total` counts the whole edition — right for a page
+      // with one lens, wrong for a page with two, where it must count only
+      // this lens's own sessions (its cards plus every keynote).
+      const scopedTotal = hasAudiences ? lensTotal(cards, audience) : total;
       countEl.textContent =
         visible.size === 0
           ? noneLabel
-          : countTemplate.replace("{n}", String(visible.size)).replace("{total}", String(total));
+          : countTemplate.replace("{n}", String(visible.size)).replace("{total}", String(scopedTotal));
+
+      // A search can match sessions the lens is hiding. Silently reporting
+      // "no results" would be true and useless, so name the remainder and
+      // offer the one click that resolves it: switch lens, keep the query.
+      //
+      // Counted as "what the click will actually deliver", not "what matches
+      // the query": see countMatchesAfterSwitch. Gated on `hasAudiences` for
+      // the same reason as `scopedTotal` above — on a single-audience edition
+      // `audience` never changes, so every non-keynote card would count as
+      // outside and this would offer a switch to a control never rendered.
+      const landing = otherAudience(audience);
+      const outside = hasAudiences
+        ? countMatchesAfterSwitch(cards, audience, landing, intended, state.query)
+        : 0;
+      renderCrossLens(outside, landing);
     }
 
     for (const btn of document.querySelectorAll<HTMLElement>(".schedule-filter")) {
@@ -120,21 +168,46 @@ if (root) {
   // `setView(initial, false)` call there is what actually settles it.
   let preferredView: "grid" | "list" = serverDefaultView;
 
+  /** A lens showing one room has no grid to draw. Like `narrow`, this
+   *  constrains what is RENDERED without touching what the visitor chose. */
+  let lensForcesList = false;
+
   // Hiding relies on Tailwind v4's preflight, which declares
   // `[hidden] { display: none !important }`. Without that `!important` the
   // views' own `.grid-view { display: grid }` / `.list-view { display: flex }`
   // would win — author rules outrank the UA sheet — and both views would render
   // at once with no error anywhere. Disabling preflight breaks this toggle.
   function renderView() {
-    const renderedView = narrow.matches ? "list" : preferredView;
+    // Two independent reasons a grid cannot be drawn: the viewport is too
+    // narrow for room columns, or the lens has narrowed to a single room. Both
+    // constrain what is RENDERED and neither touches `preferredView`, which is
+    // what `?view=` and the stored choice set.
+    const renderedView = narrow.matches || lensForcesList ? "list" : preferredView;
     gridView?.toggleAttribute("hidden", renderedView !== "grid");
     listView?.toggleAttribute("hidden", renderedView !== "list");
-    for (const btn of document.querySelectorAll<HTMLElement>("[data-view]")) {
-      const pressed = btn.getAttribute("data-view") === preferredView;
-      btn.setAttribute("aria-pressed", pressed ? "true" : "false");
-    }
+    // A lens with one room has no grid to draw, so the grid/list toggle has
+    // nothing left to choose between — the same reasoning the `max-width:
+    // 767px` case above applies via CSS. Without this, the buttons stayed
+    // visible and clickable: "Grille" turned primary-coloured, reported
+    // `aria-pressed="true"`, and the page stayed in list view regardless.
+    // Called from inside renderView() (not setAudience) so it tracks every
+    // path that can set `lensForcesList`, and is restored the moment the
+    // lens widens back past one room.
+
   }
 
+  /**
+   * Settle the view.
+   *
+   * There is no grid/list control any more — it was removed so the audience
+   * lens is the toolbar's only segmented control, the two having shared one
+   * visual treatment and read as a single four-button widget. What remains is
+   * `?view=` and the stored preference, so `persist` is only ever true for a
+   * caller that means to write them; the boot path passes false.
+   *
+   * The list VIEW is untouched and still rendered: it is what a phone gets
+   * below 767px, and what a one-room lens falls back to.
+   */
   function setView(view: "grid" | "list", persist = true) {
     preferredView = view;
     renderView();
@@ -153,6 +226,218 @@ if (root) {
   // Rotating a phone or dragging a desktop window across the breakpoint has to
   // re-evaluate, or the same blank page appears after the fact.
   narrow.addEventListener("change", renderView);
+
+  // -----------------------------------------------------------------------
+  // Audience lens — a VIEW over the shared agenda, not a filter. Held outside
+  // `FilterState` so it cannot reach `activeFilterCount` or "Clear filters",
+  // and so switching it cannot trigger the break-band hiding `apply()` does
+  // when a filter is active.
+  // -----------------------------------------------------------------------
+  /**
+   * A candidate is only a lens if it names one — anything else falls through.
+   *
+   * Declared HERE, above every consumer, not beside the URL parsing that was
+   * its first caller: it now also validates the switch buttons' attribute and
+   * each card's `data-audience`, both of which are read before the boot
+   * sequence reaches the URL. A `const` arrow declared after them would sit in
+   * the temporal dead zone at that point.
+   */
+  function asAudience(v: string | null): Audience | null {
+    return v === "tech" || v === "leadership" ? v : null;
+  }
+
+  /**
+   * What the visitor has ASKED for, as distinct from what is applied.
+   *
+   * A lens switch drops selections the new lens cannot honour — spec D-4 wants
+   * that, since a room filter for a room this lens does not have would
+   * otherwise produce zero results with no visible cause. But dropping them
+   * from the only copy meant they never came back: peek at the other lens,
+   * return, and your filters were silently gone. `intended` survives the round
+   * trip; `state` is always `intended` narrowed to what the current lens can
+   * actually reach, and remains the thing `apply()` and `activeFilterCount`
+   * read, so the badge keeps reporting what is really in force.
+   */
+  const intended: FilterState = emptyFilterState();
+
+  /**
+   * Re-derive `state` from `intended` for the current lens.
+   *
+   * Called on every lens switch and every filter click, so the two can never
+   * disagree. A no-op narrowing for a single-audience edition, where every
+   * value is reachable.
+   */
+  function syncStateToLens(cards: readonly LensRelevantCard[]): void {
+    const reachable = hasAudiences ? facetValuesInLens(cards, audience) : null;
+    for (const facet of ["room", "format", "track", "level"] as const) {
+      const set = state[facet];
+      set.clear();
+      for (const value of intended[facet]) {
+        if (!reachable || reachable[facet].has(value)) set.add(value);
+      }
+    }
+  }
+
+  /**
+   * The cross-lens remainder control.
+   *
+   * Created once and updated, never rebuilt: it used to live inside the
+   * aria-live region and be destroyed by `countEl.textContent = …` on every
+   * apply(), which re-announced a whole sentence plus a button on each
+   * keystroke and dropped keyboard focus for anyone standing on it. It is now
+   * a sibling of the live region, so the announcement covers the count alone.
+   */
+  let crossLensBtn: HTMLButtonElement | null = null;
+  /** The lens the button currently promises; read by its one listener. */
+  let crossLensLanding: Audience = "leadership";
+
+  function renderCrossLens(outside: number, landing: Audience): void {
+    crossLensLanding = landing;
+    if (outside <= 0) {
+      crossLensBtn?.toggleAttribute("hidden", true);
+      return;
+    }
+    if (!crossLensBtn) {
+      crossLensBtn = document.createElement("button");
+      crossLensBtn.type = "button";
+      crossLensBtn.className = "toolbar-cross-lens";
+      // One listener for the element's whole life, reading the current landing
+      // lens rather than closing over the one it was created with.
+      crossLensBtn.addEventListener("click", () => {
+        const target = crossLensLanding;
+        setAudience(target);
+        // The button survives apply() now, so focus is not destroyed under a
+        // keyboard user — but after a switch the natural place to be is the
+        // lens control that now reads as pressed.
+        document
+          .querySelector<HTMLElement>(`[data-audience-switch] [data-audience="${target}"]`)
+          ?.focus();
+      });
+      countLineEl?.append(" · ", crossLensBtn);
+    }
+    crossLensBtn.hidden = false;
+    // Single pass, for the same two reasons substituteClashLabel exists: a
+    // label containing `$&` would be rewritten by the string form of replace,
+    // and a second sequential call would scan text the first one inserted.
+    crossLensBtn.textContent = substituteTokens(moreResultsLabel, {
+      n: String(outside),
+      lens: lensLabel(landing),
+    });
+  }
+
+  /** The shape `lensCards()` produces; see its docstring. */
+  interface LensRelevantCard {
+    id: string;
+    room: string;
+    format: string;
+    track: string;
+    level: string;
+    search: string;
+    audience: Audience;
+  }
+
+  let audience: Audience = "tech";
+
+  const otherAudience = (a: Audience): Audience => (a === "tech" ? "leadership" : "tech");
+
+  const lensLabel = (a: Audience) =>
+    a === "leadership"
+      ? root.getAttribute("data-schedule-audience-leadership") || "Strategy & Leadership"
+      : root.getAttribute("data-schedule-audience-tech") || "Technical";
+
+  /**
+   * Every card's lens-relevant attributes. A superset of `LensCard`,
+   * `FacetCard` and the shapes `lensTotal`/`countMatchesAfterSwitch` want, so
+   * one read satisfies every consumer without a cast.
+   *
+   * Cards are static after render, so there is nothing to cache and nothing to
+   * invalidate — but callers should still read once per interaction and pass
+   * the array on, rather than each calling this for itself.
+   */
+  function lensCards(): LensRelevantCard[] {
+    return [...document.querySelectorAll<HTMLElement>(".session-card")].map((el) => ({
+      id: el.getAttribute("data-session-id") ?? "",
+      room: el.getAttribute("data-room") ?? "",
+      format: el.getAttribute("data-format") ?? "",
+      track: el.getAttribute("data-track") ?? "",
+      level: el.getAttribute("data-level") ?? "",
+      search: el.getAttribute("data-search") ?? "",
+      // `?? "tech"` alone would not catch `data-audience=""` — getAttribute
+      // returns "" there, not null, and "" belongs to neither lens, so the
+      // card would be hidden in BOTH while still counting toward the total.
+      audience: asAudience(el.getAttribute("data-audience")) ?? "tech",
+    }));
+  }
+
+  /**
+   * Hides the filter chips (and whole facet groups) the current lens has
+   * emptied, and drops any selection in `state` the lens can no longer
+   * honour. Runs once per LENS — the initial render and every switch — never
+   * inside apply(), since the reachable values change with the lens, not
+   * with the filters.
+   *
+   * Its only call site is inside `setAudience` — the boot sequence resolves
+   * the initial lens through `setAudience` too, so there is no separate
+   * boot-time call left to keep in sync with this one.
+   *
+   * A no-op for a single-audience edition: `hasAudiences` is false there, no
+   * `[data-audience-switch]` is even rendered, and a facet with only one
+   * value across the WHOLE edition is not this task's concern — hiding it
+   * would be a new, unrelated behaviour change for 2023/2026.
+   */
+  function pruneFacetsForLens(cards: readonly LensRelevantCard[]): void {
+    if (!hasAudiences) return;
+    const reachable = facetValuesInLens(cards, audience);
+    for (const group of document.querySelectorAll<HTMLElement>(".toolbar-facet")) {
+      let live = 0;
+      for (const btn of group.querySelectorAll<HTMLElement>(".schedule-filter")) {
+        const facet = btn.getAttribute("data-filter") as keyof FacetValues | null;
+        const value = btn.getAttribute("data-value") ?? "";
+        const on = !!facet && reachable[facet]?.has(value);
+        btn.toggleAttribute("hidden", !on);
+        if (on) live += 1;
+      }
+      // Fewer than two options is a control that cannot change anything (spec D-4).
+      group.toggleAttribute("hidden", live < 2);
+    }
+    // Re-derive what this lens can honour from the visitor's intent. A
+    // selection the lens cannot reach is not applied — a room filter for a
+    // room this lens lacks would otherwise produce zero results with no
+    // visible cause, since the chip explaining it was just hidden above — but
+    // it is NOT forgotten: switching back restores it.
+    syncStateToLens(cards);
+  }
+
+  // A `const` arrow, not a `function` declaration: TypeScript only carries the
+  // `if (root)` null-narrowing into a nested closure defined directly in this
+  // block (an arrow assigned here), not into a hoisted function declaration —
+  // the same reason `rootStyle` was captured out of `root.style` above for
+  // `syncStickyOffsets`. This one reads `root` directly instead.
+  /** The single entry point for changing lens. Everything that reacts to a switch
+   *  hangs off this, so a new caller cannot forget half the sequence. */
+  const setAudience = (next: Audience): void => {
+    audience = next;
+    // Read the cards ONCE for the whole switch. applyAudience, the facet
+    // prune and the result count all want the same attributes off the same
+    // elements; three independent scrapes is both wasted work on the hottest
+    // path this feature has and three places to forget a new attribute.
+    const cards = lensCards();
+    lensForcesList = applyAudience(root, cards, audience) <= 1;
+    pruneFacetsForLens(cards);
+    renderView();
+    apply();
+    for (const btn of document.querySelectorAll<HTMLElement>("[data-audience-switch] [data-audience]")) {
+      btn.setAttribute("aria-pressed", btn.getAttribute("data-audience") === audience ? "true" : "false");
+    }
+    // `replaceState`, not `pushState`: the lens is a view of one page, so
+    // toggling it four times must not cost four Back presses. The technical
+    // lens deletes the parameter rather than writing `?audience=tech`, so the
+    // default state keeps the canonical bare path (spec D-8).
+    const url = new URL(window.location.href);
+    if (hasAudiences && audience === "leadership") url.searchParams.set("audience", "leadership");
+    else url.searchParams.delete("audience");
+    history.replaceState(null, "", url);
+  };
 
   // Both sticky offsets were hardcoded to `top: 64px`. The site header is
   // sticky and its logo is `h-10 md:h-14`, so it measures 85px on a phone but
@@ -183,8 +468,20 @@ if (root) {
     new ResizeObserver(syncStickyOffsets).observe(toolbarEl);
   }
 
-  for (const btn of document.querySelectorAll<HTMLElement>("[data-view]")) {
-    btn.addEventListener("click", () => setView(btn.getAttribute("data-view") as "grid" | "list"));
+  for (const btn of document.querySelectorAll<HTMLElement>("[data-audience-switch] [data-audience]")) {
+    btn.addEventListener("click", () => {
+      // Validated with the same narrowing the URL uses, not cast: a markup
+      // typo or a future third value would otherwise reach resolveLens, match
+      // no card and no keynote, and hide every session in both views.
+      //
+      // Gated on `hasAudiences` too. The control and the root attribute are
+      // derived by two independent `hasBothAudiences` calls in two components;
+      // if they ever disagree, a rendered switch over a "false" root would
+      // half-apply a lens — cards hidden while the count and the URL take
+      // their non-lens branch.
+      const next = asAudience(btn.getAttribute("data-audience"));
+      if (next && hasAudiences) setAudience(next);
+    });
   }
 
   for (const btn of document.querySelectorAll<HTMLElement>(".schedule-filter")) {
@@ -192,18 +489,24 @@ if (root) {
       const f = btn.getAttribute("data-filter") as Exclude<keyof FilterState, "query"> | null;
       const v = btn.getAttribute("data-value");
       if (!f || !v) return;
-      const set = state[f] as Set<string>;
-      if (set.has(v)) set.delete(v);
-      else set.add(v);
+      // Toggle the INTENT. `state` is then re-derived from it for the current
+      // lens, so a value this lens cannot reach is not applied but is still
+      // remembered for the lens that can.
+      const wanted = intended[f] as Set<string>;
+      if (wanted.has(v)) wanted.delete(v);
+      else wanted.add(v);
+      syncStateToLens(hasAudiences ? lensCards() : []);
       apply();
     });
   }
 
   document.getElementById("schedule-filter-clear")?.addEventListener("click", () => {
-    state.room.clear();
-    state.format.clear();
-    state.track.clear();
-    state.level.clear();
+    // Both copies: clearing only `state` would let the next lens switch
+    // re-derive the old selections straight back out of `intended`.
+    for (const facet of ["room", "format", "track", "level"] as const) {
+      state[facet].clear();
+      intended[facet].clear();
+    }
     // The search query counts towards the active-filter badge, so leaving it
     // set meant "clear all" left the badge showing 1 and the results still
     // narrowed, with nothing in this panel able to explain why.
@@ -242,7 +545,28 @@ if (root) {
   function asView(value: string | null): "grid" | "list" | null {
     return value === "grid" || value === "list" ? value : null;
   }
+  // An edition with one audience has no lens to select — `hasAudiences`
+  // (declared above, from `data-has-audiences`) says so. Ignoring the
+  // parameter rather than 404-ing or rendering an empty grid is what makes a
+  // stale link to ?audience=leadership harmless on 2026.
+  //
+  // The `if` is load-bearing, not a ternary: `setAudience` hides every card
+  // whose audience is not the current one, and a single-audience edition
+  // renders no control to switch back with. Applying no lens is what leaves
+  // every card visible there and lets `apply()` alone decide what shows.
+  //
+  // Placed before `setView` so its `renderView()` call already sees a
+  // correct `lensForcesList`, and before the trailing `apply()` below so the
+  // initial result count and row-emptiness already reflect the resolved
+  // lens — `setAudience` runs its own `apply()` internally, so running the
+  // one below first would render the page once against the wrong lens.
+  if (hasAudiences) setAudience(asAudience(params.get("audience")) ?? "tech");
   setView(asView(fromUrl) ?? asView(stored) ?? serverDefaultView, false);
+  // Redundant with the `apply()` inside `setAudience` when `hasAudiences` is
+  // true (harmless: synchronous, no paint between, idempotent) but load-bearing
+  // when it is false — that branch never calls `setAudience`, so this is the
+  // ONLY apply() a single-audience edition gets. Do not remove it as a
+  // de-duplication.
   apply();
 
   // -----------------------------------------------------------------------
@@ -736,6 +1060,7 @@ if (root) {
   const drawer = document.getElementById("schedule-agenda-drawer");
   const agendaList = document.getElementById("schedule-agenda-list");
   const emptyLabel = root.getAttribute("data-schedule-empty") || "";
+  const clashLabel = root.getAttribute("data-schedule-agenda-clash") || "overlaps with {title} ({room})";
 
   function openDrawer(): void {
     if (!drawer) return;
@@ -778,6 +1103,24 @@ if (root) {
       if (card) picked.push(card);
     });
     picked.sort((a, b) => (a.getAttribute("data-start") || "").localeCompare(b.getAttribute("data-start") || ""));
+
+    // The grid can only show parallelism within one lens; a clash between a
+    // leadership session and a technical one is invisible there by
+    // construction. The agenda holds both bookmarks regardless of lens, so
+    // it is the only surface that can name the conflict.
+    const clashes = findClashes(
+      picked.map((c) => ({
+        id: c.getAttribute("data-session-id") ?? "",
+        start: c.getAttribute("data-start") ?? "",
+        // NaN, not 0, when the attribute is absent: `Number(null ?? "0")` is
+        // 0, which makes end === start and every overlap test false — the
+        // agenda would report "no conflicts" forever rather than fail
+        // visibly. findClashes documents NaN as the degrade it expects.
+        duration: Number(c.getAttribute("data-duration") ?? NaN),
+      })),
+    );
+    const byId = new Map(picked.map((c) => [c.getAttribute("data-session-id") ?? "", c]));
+
     picked.forEach((card) => {
       const id = card.getAttribute("data-session-id");
       const title = card.getAttribute("data-title") || "";
@@ -786,10 +1129,27 @@ if (root) {
       const room = card.getAttribute("data-room") || "";
       const item = document.createElement("div");
       item.className = "flex items-start justify-between gap-3 rounded-md border border-border bg-background/40 p-3";
+      const clashHtml = (clashes.get(id ?? "") ?? [])
+        .map((otherId) => byId.get(otherId))
+        .filter((other): other is HTMLElement => !!other)
+        .map((other) => {
+          // substituteClashLabel does both tokens in a single pass — see its
+          // docstring for why two sequential `.replace()` calls are unsafe
+          // here. escHtml still runs on the result, so this is a correctness
+          // fix, not a security one.
+          const label = substituteClashLabel(
+            clashLabel,
+            other.getAttribute("data-title") || "",
+            other.getAttribute("data-room") || "",
+          );
+          return `<div class="text-xs text-destructive-strong">${escHtml(label)}</div>`;
+        })
+        .join("");
       item.innerHTML = `
         <div class="min-w-0">
           <div class="text-xs text-muted-foreground">${escHtml(timeLabel)} · ${escHtml(room)}</div>
           <div class="text-sm font-semibold text-foreground truncate">${escHtml(title)}</div>
+          ${clashHtml}
         </div>
         <button type="button" class="agenda-remove shrink-0 text-muted-foreground hover:text-foreground" aria-label="${escHtml(agendaRemoveLabel)}">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
