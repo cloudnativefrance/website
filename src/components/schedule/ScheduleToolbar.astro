@@ -219,7 +219,16 @@ const levels = listLevels(sessions);
     background: none; border: 0; padding: 0; cursor: pointer;
     font: inherit; color: var(--color-primary);
     text-decoration: underline; text-underline-offset: 2px;
+    position: relative;
   }
+  /* The visible control is one line of 12.5px text — measured 213x18.8px,
+     less than half the 40px a pointer target should offer. It cannot simply
+     be padded: it sits mid-sentence in the count line and must keep the
+     text's own metrics. A pseudo-element extends the target vertically
+     without touching layout. Inset horizontally to 0 so it never overlaps
+     the count text beside it. */
+  :global(.toolbar-cross-lens)::after {
+    content: ""; position: absolute; inset: -11px 0; }
   :global(.toolbar-cross-lens:hover) { text-decoration-thickness: 2px; }
   :global(.toolbar-cross-lens:focus-visible) { outline: 2px solid var(--color-ring); outline-offset: 2px; border-radius: 3px; }
 

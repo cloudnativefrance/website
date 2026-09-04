@@ -191,4 +191,11 @@ const pill = pillColors(session.trackColor);
     font-size: 12px; font-weight: 600; color: var(--color-primary);
   }
   .session-card.is-hidden { display: none; }
+  /* The lens's axis, composed with the filter's `.is-hidden` above rather than
+     sharing it: the two must be independent, or whichever ran last would clear
+     the other and a lens switch would silently drop an active filter.
+     Declared HERE, beside its sibling, because this component renders the card
+     — every view that uses a session card gets the rule, and neither the grid
+     nor the list can drop it by being extracted or conditionally rendered. */
+  .session-card.is-audience-hidden { display: none !important; }
 </style>

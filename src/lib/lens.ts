@@ -2,6 +2,24 @@ import type { Audience } from "./audience";
 import { normalise } from "./schedule-filter";
 
 export interface LensCard { id: string; room: string; format: string; audience: Audience }
+
+/**
+ * Whether a card belongs to a lens.
+ *
+ * A keynote spans every room and belongs to everyone — the same exemption the
+ * room filter already makes in `matchesSession`. Stated ONCE because four
+ * functions here depend on it (`resolveLens`, `countMatchesOutsideLens`,
+ * `lensTotal`, `facetValuesInLens`) and a change to what "spans every lens"
+ * means — a second keynote-like format, say — must not require finding four
+ * hand-written booleans, two of them negated. Missing one would not error: it
+ * would quietly mis-count, or offer a filter chip that yields nothing.
+ */
+export function belongsToLens(
+  card: { format: string; audience: Audience },
+  audience: Audience,
+): boolean {
+  return card.format === "keynote" || card.audience === audience;
+}
 export interface LensResult {
   hiddenIds: Set<string>;
   hiddenRooms: Set<string>;
@@ -33,11 +51,10 @@ export function resolveLens(
   const roomsInLens = new Set<string>();
 
   for (const card of cards) {
-    // A keynote spans every room and belongs to everyone — the same reasoning
-    // the room filter already applies in schedule-ui.ts.
     const isKeynote = card.format === "keynote";
-    const show = isKeynote || card.audience === audience;
-    if (!show) hiddenIds.add(card.id);
+    if (!belongsToLens(card, audience)) hiddenIds.add(card.id);
+    // A keynote occupies every column, so it never puts a room in the lens —
+    // a room whose only session is the keynote has nothing of its own to show.
     else if (card.room && !isKeynote) roomsInLens.add(card.room);
   }
 
@@ -76,7 +93,7 @@ export function countMatchesOutsideLens(
   if (!q) return 0;
   const ids = new Set<string>();
   for (const c of cards) {
-    if (c.format === "keynote" || c.audience === audience) continue;
+    if (belongsToLens(c, audience)) continue;
     if (normalise(c.search).includes(q)) ids.add(c.id);
   }
   return ids.size;
@@ -97,7 +114,7 @@ export function lensTotal(
 ): number {
   const ids = new Set<string>();
   for (const c of cards) {
-    if (c.format === "keynote" || c.audience === audience) ids.add(c.id);
+    if (belongsToLens(c, audience)) ids.add(c.id);
   }
   return ids.size;
 }
@@ -198,8 +215,10 @@ export type FacetValues = Record<"room" | "format" | "track" | "level", Set<stri
 export function facetValuesInLens(cards: readonly FacetCard[], audience: Audience): FacetValues {
   const out: FacetValues = { room: new Set(), format: new Set(), track: new Set(), level: new Set() };
   for (const card of cards) {
+    if (!belongsToLens(card, audience)) continue;
+    // Keynotes are exempt from the room filter (`matchesSession` has them the
+    // same way), so a keynote contributes format/track/level but never a room.
     const isKeynote = card.format === "keynote";
-    if (!isKeynote && card.audience !== audience) continue;
     if (!isKeynote && card.room) out.room.add(card.room);
     if (card.format) out.format.add(card.format);
     if (card.track) out.track.add(card.track);

@@ -192,15 +192,13 @@ function spanOf(list: SessionRow[]): { start: number; end: number } {
      "Pause déjeuner" separators above an empty result set. */
   .grid-view-break.is-hidden { display: none; }
 
-  /* A second axis, composed with the filters' own `.is-hidden` — see
-     schedule-ui-audience.ts for why they cannot share one class. This rule
-     lives here only because the grid component happened to render first;
-     `applyAudience` in schedule-ui-audience.ts applies the class to every
-     `.session-card` under the root regardless of which view it is in, so
-     `:global` is what makes this one declaration also govern the list
-     view's cards. Extracting or conditionally rendering the grid must not
-     drop this rule, or list-view lens-hiding silently stops working. */
-  :global(.is-audience-hidden) { display: none !important; }
+  /* The lens hides whole room columns as well as cards. Only the grid's own
+     elements are named here; the card rule lives in SessionCard.astro beside
+     its `.is-hidden` sibling, so the list view keeps working no matter what
+     happens to this component. Scoped, not `:global` — these are this
+     component's elements. */
+  .grid-view-room.is-audience-hidden,
+  .grid-view-cell.is-audience-hidden { display: none !important; }
 
   /* Below md the room columns are unusable, and the list view takes over. */
   @media (max-width: 767px) { .grid-view { display: none; } }
