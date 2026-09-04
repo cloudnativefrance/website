@@ -134,39 +134,85 @@ describe("audience lens markup", () => {
     expect(mentions, "pruneFacetsForLens has one declaration and one call site").toBe(2);
   });
 
-  it("moves focus off the cross-lens button after it switches lens, before apply() destroys the node it sits in", () => {
-    // Important-2 regression: this button lives inside #schedule-result-count,
-    // and apply()'s first line is `countEl.textContent = …`, which removes the
-    // button a keyboard user is standing on. There is no DOM test environment
-    // here, so this pins the SOURCE MECHANISM: within the cross-lens button's
-    // own click handler, a call to setAudience(...) precedes a `.focus()` call
-    // that targets the now-pressed button in the lens switch. It cannot prove
-    // the browser actually keeps focus visible or reachable.
-    const src = read("src/components/schedule/schedule-ui.ts");
-    const start = src.indexOf("toolbar-cross-lens");
-    const end = src.indexOf("countEl.append(", start);
-    expect(start, "the cross-lens button is built").toBeGreaterThan(-1);
-    expect(end, "the button's wiring ends where it is appended").toBeGreaterThan(start);
+  it("keeps the cross-lens control out of the live region, and alive across apply()", () => {
+    // The button used to be created inside #schedule-result-count and
+    // destroyed by `countEl.textContent = …` on every apply(): a screen reader
+    // re-announced the whole sentence plus a control on each keystroke, and a
+    // keyboard user standing on it lost focus to <body> on any apply() other
+    // than its own click.
+    //
+    // It is now a sibling of the live region, created once and updated. No DOM
+    // test environment here, so this pins the two source facts that make that
+    // true; it cannot prove what a screen reader announces.
+    const toolbar = read("src/components/schedule/ScheduleToolbar.astro");
+    // aria-live wraps the count SPAN only — the button is appended to the <p>.
+    expect(toolbar).toMatch(/<span id="schedule-result-count"[^>]*aria-live="polite"/);
+    expect(toolbar.slice(toolbar.indexOf('class="toolbar-count"')))
+      .not.toMatch(/aria-live[^>]*>\s*<[^>]*toolbar-cross-lens/);
 
-    const block = src.slice(start, end);
+    const src = read("src/components/schedule/schedule-ui.ts");
+    // Created once, behind a null check, and appended to the line — not to the
+    // live region — then reused.
+    expect(src, "the button is created only when it does not exist yet")
+      .toMatch(/if \(!crossLensBtn\)/);
+    expect(src, "and appended to the count line, outside the live region")
+      .toMatch(/countLineEl\?\.append\(/);
+    expect(src, "apply() writes only the live region's text")
+      .toMatch(/countEl\.textContent =/);
+  });
+
+  it("moves focus to the lens control after the cross-lens button switches lens", () => {
+    // The button survives apply() now, so focus is no longer destroyed under a
+    // keyboard user — but after a switch the place to be is the lens control
+    // that now reads as pressed.
+    const src = read("src/components/schedule/schedule-ui.ts");
+    const start = src.indexOf("crossLensBtn.addEventListener");
+    expect(start, "the button has a click handler").toBeGreaterThan(-1);
+    const block = src.slice(start, src.indexOf("countLineEl?.append(", start));
     const setAudienceAt = block.indexOf("setAudience(");
     const focusAt = block.indexOf(".focus()");
-    expect(setAudienceAt, "the click handler switches the lens").toBeGreaterThan(-1);
-    expect(focusAt, "focus is moved only after the lens has switched").toBeGreaterThan(setAudienceAt);
-    expect(
-      block,
-      "focus lands on the lens switch button, not wherever the destroyed button used to be",
-    ).toMatch(/\[data-audience-switch\]\s*\[data-audience=/);
+    expect(setAudienceAt, "the handler switches the lens").toBeGreaterThan(-1);
+    expect(focusAt, "focus moves only after the lens has switched").toBeGreaterThan(setAudienceAt);
+    expect(block, "focus lands on the lens switch button")
+      .toMatch(/\[data-audience-switch\]\s*\[data-audience=/);
   });
 
   it("the cross-lens remainder is gated on hasAudiences, like scopedTotal two lines above it", () => {
-    // Minor-4: on a single-audience edition `audience` never leaves "tech",
-    // so every non-keynote card would count as "outside" the lens and offer a
-    // switch to a control ScheduleToolbar.astro never rendered.
+    // On a single-audience edition `audience` never leaves "tech", so every
+    // non-keynote card would count as outside the lens and offer a switch to a
+    // control ScheduleToolbar.astro never rendered.
     const src = read("src/components/schedule/schedule-ui.ts");
     expect(src).toMatch(
-      /const outside = hasAudiences \? countMatchesOutsideLens\([^)]*\) : 0;/,
+      /const outside = hasAudiences\s*\?\s*countMatchesAfterSwitch\([\s\S]*?\)\s*:\s*0;/,
     );
+  });
+
+  it("remembers filter selections a lens cannot honour, instead of deleting them", () => {
+    // A lens switch drops selections the new lens cannot reach (spec D-4 wants
+    // that — a room filter for a room this lens lacks would otherwise yield
+    // zero results with no visible cause). Dropping them from the ONLY copy
+    // meant a round trip through the other lens silently cleared your filters.
+    const src = read("src/components/schedule/schedule-ui.ts");
+    expect(src, "the visitor's intent is held separately from what is applied")
+      .toMatch(/const intended: FilterState = emptyFilterState\(\);/);
+    expect(src, "and state is re-derived from it rather than mutated in place")
+      .toMatch(/function syncStateToLens\(/);
+    // A filter click must record the intent, not write `state` directly, or
+    // the two diverge on the very next switch.
+    const clickBlock = src.slice(src.indexOf('btn.getAttribute("data-filter") as Exclude'));
+    expect(clickBlock.slice(0, 600), "the chip handler toggles the intent")
+      .toMatch(/intended\[f\]/);
+    // Clear filters must clear both, or the next switch resurrects them.
+    const clearBlock = sliceBalancedBlock(src, 'getElementById("schedule-filter-clear")');
+    expect(clearBlock, "clear empties the intent too").toMatch(/intended\[facet\]\.clear\(\)/);
+  });
+
+  it("counts the remainder from the visitor's intent, so the promise matches the delivery", () => {
+    // The count must be what the CLICK will show, not what the query alone
+    // matches: filter level=advanced, search a term the other lens has, and a
+    // query-only count promised results the switch then filtered away.
+    const src = read("src/components/schedule/schedule-ui.ts");
+    expect(src).toMatch(/countMatchesAfterSwitch\(cards, audience, landing, intended, state\.query\)/);
   });
 });
 

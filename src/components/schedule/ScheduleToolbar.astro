@@ -101,7 +101,14 @@ const levels = listLevels(sessions);
     </div>
   </details>
 
-  <p id="schedule-result-count" class="toolbar-count" aria-live="polite" data-total={sessions.length}></p>
+  {/* The live region wraps ONLY the count sentence. The cross-lens button is a
+      sibling, not a child: a control inside aria-live is re-announced in full
+      on every keystroke, and it is destroyed and rebuilt with it — which drops
+      keyboard focus for anyone standing on it. Kept outside, the button is
+      created once and updated in place. */}
+  <p class="toolbar-count" data-total={sessions.length}>
+    <span id="schedule-result-count" aria-live="polite"></span>
+  </p>
 </div>
 
 <style>

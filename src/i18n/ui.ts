@@ -214,6 +214,12 @@ export const ui = {
     "schedule.view.toggle": "Affichage",
     "schedule.audience.label": "Public",
     "schedule.audience.tech": "Technique",
+    // Deliberately NOT translated, in either locale. This is the Pretalx
+    // track's own name — `LEADERSHIP_TRACKS` in src/lib/audience.ts pins the
+    // identical literal, and the lens exists only for sessions carrying it.
+    // Translating the label would leave the control naming something the
+    // programme does not contain. If the track is ever renamed in Pretalx,
+    // both this and LEADERSHIP_TRACKS must change together.
     "schedule.audience.leadership": "Strategy & Leadership",
     "schedule.audience.more_results": "{n} de plus dans {lens}",
     "schedule.search.placeholder": "Rechercher un talk, un orateur, un sujet…",
@@ -618,6 +624,7 @@ export const ui = {
     "schedule.view.toggle": "View",
     "schedule.audience.label": "Audience",
     "schedule.audience.tech": "Technical",
+    // Same literal as the FR bundle, and for the same reason — see there.
     "schedule.audience.leadership": "Strategy & Leadership",
     "schedule.audience.more_results": "{n} more in {lens}",
     "schedule.search.placeholder": "Search a talk, a speaker, a topic…",

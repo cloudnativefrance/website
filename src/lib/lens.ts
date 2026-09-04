@@ -8,7 +8,7 @@ export interface LensCard { id: string; room: string; format: string; audience: 
  *
  * A keynote spans every room and belongs to everyone — the same exemption the
  * room filter already makes in `matchesSession`. Stated ONCE because four
- * functions here depend on it (`resolveLens`, `countMatchesOutsideLens`,
+ * functions here depend on it (`resolveLens`, `countMatchesAfterSwitch`,
  * `lensTotal`, `facetValuesInLens`) and a change to what "spans every lens"
  * means — a second keynote-like format, say — must not require finding four
  * hand-written booleans, two of them negated. Missing one would not error: it
@@ -71,35 +71,6 @@ export function resolveLens(
 }
 
 /**
- * How many sessions in the OTHER lens match the query.
- *
- * Without this a CTO searching "gouvernance" from the technical lens is told
- * "no results" — true, and useless. A lens is meant to focus; unannounced
- * misses turn it into a hiding device.
- *
- * Needs `id` and `format`, not just `audience`/`search`, for the same two
- * reasons `lensTotal` does: every session renders twice (grid + list), so
- * counting entries rather than distinct ids doubles the number; and a
- * keynote is already on screen in BOTH lenses (`resolveLens` exempts it),
- * so counting one here would offer to switch lens to reach a session the
- * visitor is already looking at.
- */
-export function countMatchesOutsideLens(
-  cards: readonly { id: string; audience: Audience; format: string; search: string }[],
-  audience: Audience,
-  query: string,
-): number {
-  const q = normalise(query).trim();
-  if (!q) return 0;
-  const ids = new Set<string>();
-  for (const c of cards) {
-    if (belongsToLens(c, audience)) continue;
-    if (normalise(c.search).includes(q)) ids.add(c.id);
-  }
-  return ids.size;
-}
-
-/**
  * How many distinct sessions belong to a lens: its own audience, plus every
  * keynote (which spans both).
  *
@@ -119,6 +90,85 @@ export function lensTotal(
   return ids.size;
 }
 
+/**
+ * How many sessions the OTHER lens would actually show, given the filters and
+ * query in force right now.
+ *
+ * Not "how many match the query" — that was the earlier, weaker question, and
+ * it let the control lie. Filter `level=advanced`, search "gouvernance", and a
+ * query-only count promised two more in the other lens; the click kept
+ * `level=advanced` (the target lens can reach that value, so the prune leaves
+ * it) and rendered "no sessions". The one affordance whose purpose is to
+ * rescue a fruitless search delivered an empty page.
+ *
+ * So this answers the question the visitor is really asking: *if I click, what
+ * do I get?* A selection the target lens cannot honour is dropped here exactly
+ * as `pruneFacetsForLens` will drop it on arrival, so the promise and the
+ * delivery are computed the same way.
+ */
+export function countMatchesAfterSwitch(
+  cards: readonly SearchableCard[],
+  current: Audience,
+  target: Audience,
+  selected: FacetSelection,
+  query: string,
+): number {
+  const q = normalise(query).trim();
+  // An empty search is not a search. This control exists to rescue a query
+  // that found nothing here (spec D-3); without the guard it would sit on the
+  // page permanently announcing that the other lens also has sessions, which
+  // is noise rather than information.
+  if (!q) return 0;
+  const reachable = facetValuesInLens(cards, target);
+  const ids = new Set<string>();
+  for (const c of cards) {
+    // Anything already on screen here is not "more" — and that includes every
+    // keynote, which belongs to both lenses. Offering to switch lens to reach
+    // a session the visitor is looking at is the defect this exclusion exists
+    // for; only cards the current lens hides can be a remainder.
+    if (belongsToLens(c, current)) continue;
+    if (!normalise(c.search).includes(q)) continue;
+    if (!honouredInLens(c, selected, reachable)) continue;
+    // Ids, not entries: every session renders twice (grid + list).
+    ids.add(c.id);
+  }
+  return ids.size;
+}
+
+/** The facet values a visitor has asked for; a superset of what any one lens can honour. */
+export type FacetSelection = Record<"room" | "format" | "track" | "level", ReadonlySet<string>>;
+
+export interface SearchableCard extends FacetCard {
+  id: string;
+  search: string;
+}
+
+/**
+ * Whether a card survives the selections a lens can actually honour.
+ *
+ * A selected value the target lens cannot reach is treated as not selected —
+ * the same rule `pruneFacetsForLens` applies when it drops that value from
+ * state on arrival. Without it, a room filter for a room the target lens does
+ * not have would count every card out and report zero.
+ *
+ * No keynote exemption here, unlike `matchesSession` and `facetValuesInLens`:
+ * a keynote belongs to every lens, so `countMatchesAfterSwitch` has already
+ * excluded it before this is reached. A room-filter carve-out would be a
+ * branch nothing can execute.
+ */
+function honouredInLens(
+  card: FacetCard,
+  selected: FacetSelection,
+  reachable: FacetValues,
+): boolean {
+  for (const facet of ["room", "format", "track", "level"] as const) {
+    const wanted = [...selected[facet]].filter((v) => reachable[facet].has(v));
+    if (wanted.length === 0) continue;
+    if (!wanted.includes(card[facet])) return false;
+  }
+  return true;
+}
+
 export interface AgendaItem { id: string; start: string; duration: number }
 
 /**
@@ -130,7 +180,7 @@ export interface AgendaItem { id: string; start: string; duration: number }
  * it surfaces at the moment someone is planning their day rather than in the
  * corridor.
  *
- * Deduped by `id` on entry, like `lensTotal` and `countMatchesOutsideLens` —
+ * Deduped by `id` on entry, like `lensTotal` and `countMatchesAfterSwitch` —
  * every session renders twice (grid + list), so a caller that ever passes
  * `querySelectorAll(".session-card")` results directly, instead of one
  * resolved card per bookmark, must not make every session clash with its own

@@ -17,7 +17,7 @@ import {
 } from "@/lib/schedule-filter";
 import type { Audience } from "@/lib/audience";
 import {
-  countMatchesOutsideLens,
+  countMatchesAfterSwitch,
   facetValuesInLens,
   findClashes,
   lensTotal,
@@ -46,7 +46,9 @@ if (root) {
   const countEl = document.getElementById("schedule-result-count");
   const searchEl = document.getElementById("schedule-search") as HTMLInputElement | null;
   const clearSearchEl = document.getElementById("schedule-search-clear");
-  const total = Number(countEl?.getAttribute("data-total") ?? "0");
+  /** The <p> wrapping the live region; the cross-lens button is its child. */
+  const countLineEl = root.querySelector<HTMLElement>(".toolbar-count");
+  const total = Number(countLineEl?.getAttribute("data-total") ?? "0");
   const countTemplate = root.getAttribute("data-count-template") ?? "{n}/{total}";
   const noneLabel = root.getAttribute("data-none-label") ?? "";
   // Server-rendered: true only for an edition with both audiences, i.e. one
@@ -119,47 +121,17 @@ if (root) {
       // A search can match sessions the lens is hiding. Silently reporting
       // "no results" would be true and useless, so name the remainder and
       // offer the one click that resolves it: switch lens, keep the query.
-      // Gated on `hasAudiences`, same as `scopedTotal` above: on a
-      // single-audience edition `audience` stays "tech" with nothing ever
-      // switching it, so every non-keynote card would count as "outside" and
-      // this would offer a lens switch to a control that was never rendered.
-      const outside = hasAudiences ? countMatchesOutsideLens(cards, audience, state.query) : 0;
-      if (outside > 0) {
-        // One landing lens, named once: the label the visitor reads and the
-        // lens the click delivers must be the same value, not two calls that
-        // happen to agree.
-        const landing = otherAudience(audience);
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "toolbar-cross-lens";
-        // Single pass, for the same two reasons substituteClashLabel exists:
-        // a lens label containing `$&` would be rewritten by the string form
-        // of replace, and a second sequential call would scan text the first
-        // one inserted. The label comes off a data- attribute, so it is not
-        // ours to trust.
-        btn.textContent = substituteTokens(moreResultsLabel, {
-          n: String(outside),
-          lens: lensLabel(landing),
-        });
-        btn.addEventListener("click", () => {
-          setAudience(landing);
-          // This button lives inside #schedule-result-count, and apply()'s
-          // first act is `countEl.textContent = …`, which destroys the node
-          // the keyboard focus is standing on — the click already happened,
-          // but a keyboard activation (Enter/Space) needs focus to land
-          // somewhere, or it resets to <body> and the next Tab restarts from
-          // the site header. The newly-pressed lens button reads best: that
-          // is where the visitor now conceptually is. Guarded for its
-          // absence, though it always exists here — this button only renders
-          // when `hasAudiences` is true, which is exactly when the switch is.
-          document
-            .querySelector<HTMLElement>(`[data-audience-switch] [data-audience="${landing}"]`)
-            ?.focus();
-        });
-        // `textContent =` above wiped any previous button, so it is rebuilt
-        // fresh on every apply() rather than toggled.
-        countEl.append(" · ", btn);
-      }
+      //
+      // Counted as "what the click will actually deliver", not "what matches
+      // the query": see countMatchesAfterSwitch. Gated on `hasAudiences` for
+      // the same reason as `scopedTotal` above — on a single-audience edition
+      // `audience` never changes, so every non-keynote card would count as
+      // outside and this would offer a switch to a control never rendered.
+      const landing = otherAudience(audience);
+      const outside = hasAudiences
+        ? countMatchesAfterSwitch(cards, audience, landing, intended, state.query)
+        : 0;
+      renderCrossLens(outside, landing);
     }
 
     for (const btn of document.querySelectorAll<HTMLElement>(".schedule-filter")) {
@@ -263,6 +235,85 @@ if (root) {
     return v === "tech" || v === "leadership" ? v : null;
   }
 
+  /**
+   * What the visitor has ASKED for, as distinct from what is applied.
+   *
+   * A lens switch drops selections the new lens cannot honour — spec D-4 wants
+   * that, since a room filter for a room this lens does not have would
+   * otherwise produce zero results with no visible cause. But dropping them
+   * from the only copy meant they never came back: peek at the other lens,
+   * return, and your filters were silently gone. `intended` survives the round
+   * trip; `state` is always `intended` narrowed to what the current lens can
+   * actually reach, and remains the thing `apply()` and `activeFilterCount`
+   * read, so the badge keeps reporting what is really in force.
+   */
+  const intended: FilterState = emptyFilterState();
+
+  /**
+   * Re-derive `state` from `intended` for the current lens.
+   *
+   * Called on every lens switch and every filter click, so the two can never
+   * disagree. A no-op narrowing for a single-audience edition, where every
+   * value is reachable.
+   */
+  function syncStateToLens(cards: readonly LensRelevantCard[]): void {
+    const reachable = hasAudiences ? facetValuesInLens(cards, audience) : null;
+    for (const facet of ["room", "format", "track", "level"] as const) {
+      const set = state[facet];
+      set.clear();
+      for (const value of intended[facet]) {
+        if (!reachable || reachable[facet].has(value)) set.add(value);
+      }
+    }
+  }
+
+  /**
+   * The cross-lens remainder control.
+   *
+   * Created once and updated, never rebuilt: it used to live inside the
+   * aria-live region and be destroyed by `countEl.textContent = …` on every
+   * apply(), which re-announced a whole sentence plus a button on each
+   * keystroke and dropped keyboard focus for anyone standing on it. It is now
+   * a sibling of the live region, so the announcement covers the count alone.
+   */
+  let crossLensBtn: HTMLButtonElement | null = null;
+  /** The lens the button currently promises; read by its one listener. */
+  let crossLensLanding: Audience = "leadership";
+
+  function renderCrossLens(outside: number, landing: Audience): void {
+    crossLensLanding = landing;
+    if (outside <= 0) {
+      crossLensBtn?.toggleAttribute("hidden", true);
+      return;
+    }
+    if (!crossLensBtn) {
+      crossLensBtn = document.createElement("button");
+      crossLensBtn.type = "button";
+      crossLensBtn.className = "toolbar-cross-lens";
+      // One listener for the element's whole life, reading the current landing
+      // lens rather than closing over the one it was created with.
+      crossLensBtn.addEventListener("click", () => {
+        const target = crossLensLanding;
+        setAudience(target);
+        // The button survives apply() now, so focus is not destroyed under a
+        // keyboard user — but after a switch the natural place to be is the
+        // lens control that now reads as pressed.
+        document
+          .querySelector<HTMLElement>(`[data-audience-switch] [data-audience="${target}"]`)
+          ?.focus();
+      });
+      countLineEl?.append(" · ", crossLensBtn);
+    }
+    crossLensBtn.hidden = false;
+    // Single pass, for the same two reasons substituteClashLabel exists: a
+    // label containing `$&` would be rewritten by the string form of replace,
+    // and a second sequential call would scan text the first one inserted.
+    crossLensBtn.textContent = substituteTokens(moreResultsLabel, {
+      n: String(outside),
+      lens: lensLabel(landing),
+    });
+  }
+
   /** The shape `lensCards()` produces; see its docstring. */
   interface LensRelevantCard {
     id: string;
@@ -285,7 +336,7 @@ if (root) {
 
   /**
    * Every card's lens-relevant attributes. A superset of `LensCard`,
-   * `FacetCard` and the shapes `lensTotal`/`countMatchesOutsideLens` want, so
+   * `FacetCard` and the shapes `lensTotal`/`countMatchesAfterSwitch` want, so
    * one read satisfies every consumer without a cast.
    *
    * Cards are static after render, so there is nothing to cache and nothing to
@@ -338,16 +389,12 @@ if (root) {
       // Fewer than two options is a control that cannot change anything (spec D-4).
       group.toggleAttribute("hidden", live < 2);
     }
-    // Any selection the current lens cannot honour must leave `state` before
-    // the next apply(), or a room filter for a room this lens has hidden
-    // produces zero results with no visible cause — the chip that would
-    // explain it was just hidden above. Level and format normally survive:
-    // filtering for `beginner` keeps that filter across a lens switch.
-    for (const facet of ["room", "format", "track", "level"] as const) {
-      for (const value of [...state[facet]]) {
-        if (!reachable[facet].has(value)) state[facet].delete(value);
-      }
-    }
+    // Re-derive what this lens can honour from the visitor's intent. A
+    // selection the lens cannot reach is not applied — a room filter for a
+    // room this lens lacks would otherwise produce zero results with no
+    // visible cause, since the chip explaining it was just hidden above — but
+    // it is NOT forgotten: switching back restores it.
+    syncStateToLens(cards);
   }
 
   // A `const` arrow, not a `function` declaration: TypeScript only carries the
@@ -435,18 +482,24 @@ if (root) {
       const f = btn.getAttribute("data-filter") as Exclude<keyof FilterState, "query"> | null;
       const v = btn.getAttribute("data-value");
       if (!f || !v) return;
-      const set = state[f] as Set<string>;
-      if (set.has(v)) set.delete(v);
-      else set.add(v);
+      // Toggle the INTENT. `state` is then re-derived from it for the current
+      // lens, so a value this lens cannot reach is not applied but is still
+      // remembered for the lens that can.
+      const wanted = intended[f] as Set<string>;
+      if (wanted.has(v)) wanted.delete(v);
+      else wanted.add(v);
+      syncStateToLens(hasAudiences ? lensCards() : []);
       apply();
     });
   }
 
   document.getElementById("schedule-filter-clear")?.addEventListener("click", () => {
-    state.room.clear();
-    state.format.clear();
-    state.track.clear();
-    state.level.clear();
+    // Both copies: clearing only `state` would let the next lens switch
+    // re-derive the old selections straight back out of `intended`.
+    for (const facet of ["room", "format", "track", "level"] as const) {
+      state[facet].clear();
+      intended[facet].clear();
+    }
     // The search query counts towards the active-filter badge, so leaving it
     // set meant "clear all" left the badge showing 1 and the results still
     // narrowed, with nothing in this panel able to explain why.

@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { resolveLens, countMatchesOutsideLens, lensTotal, type LensCard } from "@/lib/lens";
+import {
+  resolveLens,
+  countMatchesAfterSwitch,
+  lensTotal,
+  type LensCard,
+  type FacetSelection,
+} from "@/lib/lens";
 
 const ROOMS = ["Monet", "Piaf", "Eiffel"];
 const cards: LensCard[] = [
@@ -63,36 +69,71 @@ describe("resolveLens", () => {
 });
 
 const haystack = [
-  { id: "a", format: "talk",    audience: "tech" as const,       search: "ebpf réseau" },
-  { id: "b", format: "talk",    audience: "leadership" as const, search: "gouvernance cloud" },
-  { id: "c", format: "talk",    audience: "leadership" as const, search: "gouvernance et budget" },
-  { id: "k", format: "keynote", audience: "tech" as const,       search: "gouvernance ouverture" },
+  { id: "a", format: "talk",    audience: "tech" as const,       room: "Monet",  track: "IA et Data",           level: "advanced",     search: "ebpf réseau" },
+  { id: "b", format: "talk",    audience: "leadership" as const, room: "Eiffel", track: "Strategy & Leadership", level: "advanced",     search: "gouvernance cloud" },
+  { id: "c", format: "talk",    audience: "leadership" as const, room: "Eiffel", track: "Strategy & Leadership", level: "intermediate", search: "gouvernance et budget" },
+  { id: "k", format: "keynote", audience: "tech" as const,       room: "Monet",  track: "",                      level: "",             search: "gouvernance ouverture" },
 ];
 
-describe("countMatchesOutsideLens", () => {
-  it("counts matches in the other lens", () => {
-    expect(countMatchesOutsideLens(haystack, "tech", "gouvernance")).toBe(2);
+/** No facet selected — the plain "just a search" case. */
+const nothingSelected: FacetSelection = {
+  room: new Set(), format: new Set(), track: new Set(), level: new Set(),
+};
+const select = (facet: keyof FacetSelection, ...values: string[]): FacetSelection => ({
+  ...nothingSelected,
+  [facet]: new Set(values),
+});
+
+describe("countMatchesAfterSwitch", () => {
+  it("counts what the other lens would show", () => {
+    expect(countMatchesAfterSwitch(haystack, "tech", "leadership", nothingSelected, "gouvernance")).toBe(2);
   });
 
-  it("is zero when the other lens has nothing", () => {
-    expect(countMatchesOutsideLens(haystack, "tech", "ebpf")).toBe(0);
+  it("is zero when the other lens has nothing matching", () => {
+    expect(countMatchesAfterSwitch(haystack, "tech", "leadership", nothingSelected, "ebpf")).toBe(0);
   });
 
   it("is zero for an empty query — an empty search is not a search", () => {
-    expect(countMatchesOutsideLens(haystack, "tech", "   ")).toBe(0);
+    expect(countMatchesAfterSwitch(haystack, "tech", "leadership", nothingSelected, "   ")).toBe(0);
   });
 
   it("ignores accents and case, like the main search", () => {
-    expect(countMatchesOutsideLens(haystack, "tech", "GOUVERNANCE")).toBe(2);
-    expect(countMatchesOutsideLens(haystack, "leadership", "RESEAU")).toBe(1);
+    expect(countMatchesAfterSwitch(haystack, "tech", "leadership", nothingSelected, "GOUVERNANCE")).toBe(2);
+    expect(countMatchesAfterSwitch(haystack, "leadership", "tech", nothingSelected, "RESEAU")).toBe(1);
   });
 
   it("counts each session once even though every card renders twice", () => {
-    expect(countMatchesOutsideLens([...haystack, ...haystack], "tech", "gouvernance")).toBe(2);
+    expect(countMatchesAfterSwitch([...haystack, ...haystack], "tech", "leadership", nothingSelected, "gouvernance")).toBe(2);
   });
 
   it("never counts a keynote — it is already on screen in this lens", () => {
-    expect(countMatchesOutsideLens(haystack, "leadership", "gouvernance")).toBe(0);
+    // "k" matches the query and is a tech-track keynote, but a keynote shows
+    // in BOTH lenses, so from the leadership lens it is not "more" anywhere.
+    expect(countMatchesAfterSwitch(haystack, "leadership", "tech", nothingSelected, "gouvernance")).toBe(0);
+  });
+
+  it("respects a filter the target lens can honour — the promise must match the delivery", () => {
+    // level=advanced is reachable in the leadership lens (b has it), so the
+    // switch will keep it and only b will show. Counting the query alone would
+    // promise 2 and deliver 1.
+    expect(countMatchesAfterSwitch(haystack, "tech", "leadership", select("level", "advanced"), "gouvernance")).toBe(1);
+  });
+
+  it("ignores a filter the target lens cannot honour, exactly as the switch will drop it", () => {
+    // No leadership session is in Monet, so the room filter is unreachable
+    // there and pruned on arrival. Counting it as a filter would report 0
+    // while the click actually shows 2.
+    expect(countMatchesAfterSwitch(haystack, "tech", "leadership", select("room", "Monet"), "gouvernance")).toBe(2);
+  });
+
+  it("cannot be reached by a keynote at all — it is in every lens, so never 'more'", () => {
+    // Recorded as a property, not an omission: this is why honouredInLens has
+    // no keynote room-exemption, unlike its siblings. Whichever lens you are
+    // in, a keynote is on screen, so it is excluded before facets are read.
+    const keynoteOnly = [haystack[3]];
+    for (const [from, to] of [["tech", "leadership"], ["leadership", "tech"]] as const) {
+      expect(countMatchesAfterSwitch(keynoteOnly, from, to, select("room", "Monet"), "gouvernance")).toBe(0);
+    }
   });
 });
 
