@@ -40,6 +40,28 @@ const slot = {
 
 const resolve = () => "ada-lovelace";
 
+describe("joinScheduledTalks — unscheduled slots", () => {
+  // Pretalx creates a TalkSlot when a proposal is CONFIRMED, with room and
+  // start null, and only fills them when it is placed on the grid. Measured
+  // against the live 2027 event: 3 confirmed talks, 3 slots, all start: null.
+  // Rendering those produced cards with a blank time and a blank room.
+  const unscheduled = { ...slot, start: "", room: 0 };
+
+  it("drops a confirmed-but-unplaced talk", () => {
+    expect(toPreviewSessions([unscheduled], [submission], rooms, resolve, 4)).toEqual([]);
+  });
+
+  it("still keeps a talk that has been placed", () => {
+    const rows = toPreviewSessions([slot], [submission], rooms, resolve, 4);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].startTime).toBe(slot.start);
+  });
+
+  it("does not collect the speaker of an unplaced talk", () => {
+    expect(scheduledPersonCodes([unscheduled], [submission])).not.toContain("S1");
+  });
+});
+
 describe("toPreviewSessions", () => {
   it("joins a slot to its submission", () => {
     const [row] = toPreviewSessions([slot], [submission], rooms, resolve, 4);

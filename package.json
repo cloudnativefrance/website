@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "optimize:photos": "tsx scripts/optimize-photos.ts",
-    "sync:pretalx": "tsx scripts/sync-pretalx.ts"
+    "sync:pretalx": "tsx scripts/sync-pretalx.ts",
+    "sync:speaker-slugs": "tsx scripts/sync-speaker-slugs.ts"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.3",
