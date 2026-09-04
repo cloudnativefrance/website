@@ -27,9 +27,12 @@
 
 | Symbol | Location |
 |---|---|
-| `apply()`, `state`, `facetMatches`, `activeFilterCount`, `normalise` | `src/components/schedule/schedule-ui.ts` |
+| `apply()`, `state` (the DOM plumbing) | `src/components/schedule/schedule-ui.ts` |
+| `FilterState`, `facetMatches`, `activeFilterCount`, `normalise` (the pure semantics, shared with the server render) | `src/lib/schedule-filter.ts` |
 | `is-hidden` per card; container hidden when it has no visible card | `schedule-ui.ts:59,66` |
 | `--room-count` set server-side from `rooms.length` | `ScheduleGridView.astro:53` |
+| Grid **body** cells placed explicitly: `grid-column:${i + 2}` | `ScheduleGridView.astro:95` |
+| Grid **head** cells auto-placed, one per room | `ScheduleGridView.astro:56` |
 | `listRooms`, `listTracks`, `ROOM_ORDER` | `src/lib/schedule.ts` |
 | Card attributes: `data-session-id`, `data-room`, `data-format`, `data-track`, `data-level`, `data-start`, `data-duration`, `data-search` | `SessionCard.astro` |
 
@@ -197,6 +200,7 @@ MSG
 ### Task 2: Render the control, and make columns addressable
 
 **Files:**
+- Modify: `src/components/schedule/SessionCard.astro`
 - Modify: `src/components/schedule/ScheduleGrid.astro`
 - Modify: `src/components/schedule/ScheduleToolbar.astro`
 - Modify: `src/components/schedule/ScheduleGridView.astro`
@@ -205,9 +209,22 @@ MSG
 
 **Interfaces:**
 - Consumes: `hasBothAudiences`, `audienceOf` from Task 1.
-- Produces: `data-audience="tech|leadership"` on every `.session-card`; `data-room="<name>"` on every `.grid-view-room` header cell; a control with `data-audience-switch` and buttons carrying `data-audience`; `data-has-audiences` on `[data-schedule-root]`.
+- Produces: `data-audience="tech|leadership"` on every `.session-card`; `data-room="<name>"` on every `.grid-view-room` header cell **and every `.grid-view-cell`**; a control with `data-audience-switch` and buttons carrying `data-audience`; `data-has-audiences` on `[data-schedule-root]`.
 
-The header cells must become addressable: the client hides a column by hiding *both* its header cell and its cards, and today the header cells carry no room identity.
+**Why both, and why the cells matter.** The two halves of the grid are placed
+differently, and this is the trap the lens has to clear:
+
+| | Placement | Effect of hiding a room |
+|---|---|---|
+| `.grid-view-head` | auto — one `<div>` per room, in order | survivors reflow into columns 2…n by themselves |
+| `.grid-view-body` | **explicit** — `grid-column:${i + 2}` computed server-side (`ScheduleGridView.astro:95`) | survivors keep column numbers that may no longer exist |
+
+So hiding cards alone is not enough twice over: the `.grid-view-cell` wrapper
+keeps occupying its track even when every card inside it is hidden, and once
+`--room-count` shrinks, a cell pinned to `grid-column:6` in a four-column grid
+lands in an implicit track. The client must therefore hide the *cells* and
+**renumber** the survivors — which it can only do if each cell says which room
+it is. Task 3 owns the renumbering; this task makes it addressable.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -269,12 +286,36 @@ In `src/components/schedule/SessionCard.astro`, import `audienceOf` and add the 
 data-audience={audienceOf(session.track)}
 ```
 
-- [ ] **Step 4: Make header cells addressable**
+- [ ] **Step 4: Make columns addressable, head and body**
 
-In `ScheduleGridView.astro`, the `.grid-view-room` header cells render one per room. Add the room name so the client can hide a column:
+In `ScheduleGridView.astro`, add the room name in both places. The header cell:
 
 ```astro
 <div class="grid-view-room" data-room={room}>{room}</div>
+```
+
+and the body cell, whose explicit `grid-column` the client will have to rewrite:
+
+```astro
+<div
+  class="grid-view-cell"
+  data-room={room}
+  style={`grid-column:${i + 2}; grid-row:${start} / ${end};`}
+>
+```
+
+Leave the server-rendered `grid-column` exactly as it is — it is the correct
+value for the unfiltered page, which is what a visitor with JavaScript disabled
+gets.
+
+Add the same assertion to the Task 2 test:
+
+```ts
+  it("grid body cells carry their room, so a column can be renumbered", () => {
+    const src = read("src/components/schedule/ScheduleGridView.astro");
+    const body = src.slice(src.indexOf("grid-view-body"));
+    expect(body).toMatch(/class="grid-view-cell"[\s\S]{0,120}data-room=/);
+  });
 ```
 
 - [ ] **Step 5: Render the control**
@@ -347,7 +388,13 @@ git commit -m "feat(schedule): render the audience control and make columns addr
 - Produces, in `src/lib/lens.ts` (pure, node-testable):
   ```ts
   export interface LensCard { id: string; room: string; format: string; audience: Audience }
-  export interface LensResult { hiddenIds: Set<string>; hiddenRooms: Set<string>; roomCount: number }
+  export interface LensResult {
+    hiddenIds: Set<string>;
+    hiddenRooms: Set<string>;
+    /** Room name -> its 1-based position among the rooms still visible. */
+    columnOf: Map<string, number>;
+    roomCount: number;
+  }
   export function resolveLens(cards: readonly LensCard[], rooms: readonly string[], audience: Audience): LensResult;
   ```
   plus a thin DOM wrapper `applyAudience(root, audience): number` in
@@ -399,6 +446,20 @@ describe("resolveLens", () => {
   it("counts the rooms that remain, which is what widens the columns", () => {
     expect(resolveLens(cards, ROOMS, "tech").roomCount).toBe(1);
     expect(resolveLens(cards, ROOMS, "leadership").roomCount).toBe(1);
+  });
+
+  it("renumbers the surviving rooms from 1, keeping their original order", () => {
+    const wide: LensCard[] = [
+      { id: "a", room: "Monet",  format: "talk", audience: "tech" },
+      { id: "b", room: "Eiffel", format: "talk", audience: "tech" },
+    ];
+    // Piaf sits BETWEEN them in ROOMS and drops out, so Eiffel must move from
+    // column 3 to column 2. Without this the grid pins it to a track that no
+    // longer exists.
+    const r = resolveLens(wide, ROOMS, "tech");
+    expect(r.columnOf.get("Monet")).toBe(1);
+    expect(r.columnOf.get("Eiffel")).toBe(2);
+    expect(r.columnOf.has("Piaf")).toBe(false);
   });
 
   it("never reports zero rooms — a grid with no columns has no layout", () => {
@@ -464,7 +525,15 @@ export function resolveLens(
   }
 
   const hiddenRooms = new Set(rooms.filter((r) => !roomsInLens.has(r)));
-  return { hiddenIds, hiddenRooms, roomCount: Math.max(roomsInLens.size, 1) };
+  // Positions are recomputed, not merely reduced: the grid body places cells
+  // with an explicit `grid-column`, so a room that survives while an earlier
+  // one drops out must MOVE LEFT. Shrinking `--room-count` alone would pin it
+  // to a track the grid no longer has.
+  const columnOf = new Map<string, number>();
+  for (const room of rooms) {
+    if (roomsInLens.has(room)) columnOf.set(room, columnOf.size + 1);
+  }
+  return { hiddenIds, hiddenRooms, columnOf, roomCount: Math.max(columnOf.size, 1) };
 }
 ```
 
@@ -488,13 +557,24 @@ export function applyAudience(root: HTMLElement, audience: Audience): number {
   const heads = [...root.querySelectorAll<HTMLElement>(".grid-view-room")];
   const rooms = heads.map((h) => h.getAttribute("data-room") ?? "");
 
-  const { hiddenIds, hiddenRooms, roomCount } = resolveLens(cards, rooms, audience);
+  const { hiddenIds, hiddenRooms, columnOf, roomCount } = resolveLens(cards, rooms, audience);
 
   // A SECOND hidden-class, not the filters' `is-hidden`: the two axes must
   // compose. Sharing one class would let whichever ran last clobber the other,
   // so switching lens would silently clear an active filter.
   els.forEach((el, i) => el.classList.toggle("is-audience-hidden", hiddenIds.has(cards[i].id)));
   heads.forEach((h, i) => h.classList.toggle("is-audience-hidden", hiddenRooms.has(rooms[i])));
+
+  // The head auto-places and reflows on its own; the body does not. Hide the
+  // out-of-lens cells (an empty cell still occupies its track) and move the
+  // survivors to their new column.
+  for (const cell of root.querySelectorAll<HTMLElement>(".grid-view-cell")) {
+    const room = cell.getAttribute("data-room") ?? "";
+    const column = columnOf.get(room);
+    cell.classList.toggle("is-audience-hidden", column === undefined);
+    // +1 for the 56px time gutter, which is column 1.
+    if (column !== undefined) cell.style.gridColumn = String(column + 1);
+  }
 
   root.querySelector<HTMLElement>(".grid-view")
     ?.style.setProperty("--room-count", String(roomCount));
@@ -512,9 +592,38 @@ In `ScheduleGridView.astro`'s `<style>`, beside the existing `.is-hidden` rules:
   :global(.is-audience-hidden) { display: none !important; }
 ```
 
-- [ ] **Step 5: Wire it into the toolbar**
+- [ ] **Step 5: Wire it into the toolbar, and scope `apply()` to the lens**
 
-In `schedule-ui.ts`: add `audience` to the state, default `"tech"`, call `applyAudience` before the existing `apply()`, and bind the control's buttons. **`activeFilterCount` must not change** — the lens is not a filter.
+In `schedule-ui.ts`: hold the current lens in a module-level `let audience: Audience = "tech"` — **NOT** in `FilterState`, which `activeFilterCount` and `Clear filters` both read wholesale. Call `applyAudience(root, audience)` before `apply()`, and bind the control's buttons to set the lens, re-run both, and update `aria-pressed`.
+
+Three edits inside `apply()` are load-bearing, because the lens uses a second
+class the existing code knows nothing about (`ScheduleGridView.astro:53-56,89-101`
+is the markup this reasons over):
+
+1. **The result count is lens-scoped** (spec D-4). A card only joins `visible`
+   when it passes the filters *and* is in the lens:
+
+   ```ts
+   const inLens = !card.classList.contains("is-audience-hidden");
+   const show = facetOk && searchOk;
+   card.classList.toggle("is-hidden", !show);   // the filter axis, unchanged
+   if (show && inLens) visible.add(card.getAttribute("data-session-id") ?? "");
+   ```
+
+   `is-hidden` still tracks the filters alone, so the two axes stay independent
+   and a lens switch cannot clear a filter.
+
+2. **The emptiness check must see both axes.** The existing selector is
+   `.session-card:not(.is-hidden)`; a row whose only survivor is lens-hidden
+   would stay open as a labelled empty band. It becomes:
+
+   ```ts
+   const any = container.querySelector(".session-card:not(.is-hidden):not(.is-audience-hidden)");
+   ```
+
+3. **`activeFilterCount` must not change** — the lens is not a filter, so it is
+   not in `FilterState` and cannot reach that function. This is what keeps the
+   break bands alive on a lens switch (`schedule-ui.ts:78`).
 
 - [ ] **Step 5b: The leadership lens opens in the list view (spec D-7)**
 
@@ -837,9 +946,17 @@ describe("audience lens: other editions and the URL", () => {
   });
 
   it("the lens is NOT counted as an active filter", () => {
-    const src = read("src/components/schedule/schedule-ui.ts");
-    const fn = src.slice(src.indexOf("function activeFilterCount"));
-    expect(fn.slice(0, fn.indexOf("}"))).not.toContain("audience");
+    // `activeFilterCount` reads FilterState wholesale, so the guard is that the
+    // lens never enters FilterState — assert on the file that DEFINES both.
+    // (Slicing schedule-ui.ts for "function activeFilterCount" finds nothing
+    //  there: it is imported, so indexOf returns -1, slice(-1) yields one
+    //  character, and the assertion passes without testing anything.)
+    const filter = read("src/lib/schedule-filter.ts");
+    expect(filter).toContain("function activeFilterCount");
+    expect(filter).not.toContain("audience");
+
+    const ui = read("src/components/schedule/schedule-ui.ts");
+    expect(ui).not.toMatch(/state\.audience|audience:\s*(new Set|")/);
   });
 
   it("Clear filters does not reset the lens", () => {
