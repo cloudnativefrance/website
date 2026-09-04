@@ -886,7 +886,11 @@ git commit -m "feat(schedule): search across both lenses and offer the remainder
 - Test: `src/lib/__tests__/lens.test.ts` (extend)
 
 **Interfaces:**
-- Produces: `findClashes(items): Map<string, string[]>` — session id → ids it overlaps.
+- Produces, in `src/lib/lens.ts`:
+  ```ts
+  export function findClashes(items: readonly AgendaItem[]): Map<string, string[]>;
+  export function facetValuesInLens(cards: readonly FacetCard[], audience: Audience): FacetValues;
+  ```
 
 The agenda is the one surface where the two lenses reunite, so it is the only place a cross-audience clash can be shown.
 
@@ -1034,13 +1038,128 @@ Guard it in `tests/build/audience-lens.test.ts`:
   });
 ```
 
-- [ ] **Step 5: Prune single-option filters**
+- [ ] **Step 5: Prune the filter options the lens has emptied**
 
-In `apply()`, after the lens is applied: for each filter group, count distinct values among cards not hidden by the lens; hide the whole group when fewer than two remain. In the leadership lens the room filter offers only Eiffel — a control that cannot change anything. This also improves the 2023 archive, which has fewer rooms.
+The pure half goes in `src/lib/lens.ts`. Write the test first, appending to `src/lib/__tests__/lens.test.ts`:
 
-- [ ] **Step 6: Drop inapplicable filter values on switch**
+```ts
+import { facetValuesInLens, type FacetCard } from "@/lib/lens";
 
-When switching lens, remove from `state` any selected facet value that no longer exists in the new lens — a room filter for Piaf carried into a lens without Piaf produces zero results and no explanation. Level and format carry across.
+const mixed: FacetCard[] = [
+  { audience: "tech",       room: "Monet",  format: "talk",    track: "IA et Data",           level: "intermediate" },
+  { audience: "tech",       room: "Piaf",   format: "workshop", track: "Developer Experience", level: "" },
+  { audience: "leadership", room: "Eiffel", format: "talk",    track: "Strategy & Leadership", level: "" },
+  { audience: "tech",       room: "Monet",  format: "keynote", track: "",                     level: "" },
+];
+
+describe("facetValuesInLens", () => {
+  it("keeps only the values the lens can still reach", () => {
+    const v = facetValuesInLens(mixed, "leadership");
+    expect([...v.room]).toEqual(["Eiffel"]);
+    expect([...v.track]).toEqual(["Strategy & Leadership"]);
+  });
+
+  it("counts a keynote in every lens, since it is shown in both", () => {
+    // The keynote is `audience: "tech"` by its (empty) track, but it spans the
+    // whole audience — so "keynote" must stay offered in the leadership lens.
+    expect(facetValuesInLens(mixed, "leadership").format.has("keynote")).toBe(true);
+  });
+
+  it("does not let a keynote's room into the room facet", () => {
+    // The room filter already exempts keynotes (`schedule-filter.ts:52`), so
+    // offering Monet in a lens whose only Monet session is the keynote would be
+    // a control that changes nothing.
+    expect(facetValuesInLens(mixed, "leadership").room.has("Monet")).toBe(false);
+  });
+
+  it("drops empty values — an unset level is not a level", () => {
+    expect(facetValuesInLens(mixed, "tech").level.has("")).toBe(false);
+    expect([...facetValuesInLens(mixed, "tech").level]).toEqual(["intermediate"]);
+  });
+});
+```
+
+Then implement:
+
+```ts
+export interface FacetCard {
+  audience: Audience;
+  room: string;
+  format: string;
+  track: string;
+  level: string;
+}
+
+export type FacetValues = Record<"room" | "format" | "track" | "level", Set<string>>;
+
+/**
+ * The facet values still reachable inside one lens.
+ *
+ * A filter offering a value that yields nothing is worse than no filter: it
+ * reads as a broken page rather than an empty result. In the leadership lens
+ * the room facet would otherwise still list all five rooms.
+ *
+ * Keynotes belong to both lenses and are exempt from the room filter, exactly
+ * as `matchesSession` has them — so a keynote contributes its format, track and
+ * level, but never its room.
+ */
+export function facetValuesInLens(cards: readonly FacetCard[], audience: Audience): FacetValues {
+  const out: FacetValues = { room: new Set(), format: new Set(), track: new Set(), level: new Set() };
+  for (const card of cards) {
+    const isKeynote = card.format === "keynote";
+    if (!isKeynote && card.audience !== audience) continue;
+    if (!isKeynote && card.room) out.room.add(card.room);
+    if (card.format) out.format.add(card.format);
+    if (card.track) out.track.add(card.track);
+    if (card.level) out.level.add(card.level);
+  }
+  return out;
+}
+```
+
+Then wire it in `schedule-ui.ts`, inside the lens switch (not inside `apply()` — the reachable values change with the lens, not with the filters):
+
+```ts
+const reachable = facetValuesInLens(facetCards(), audience);
+for (const group of document.querySelectorAll<HTMLElement>(".toolbar-facet")) {
+  let live = 0;
+  for (const btn of group.querySelectorAll<HTMLElement>(".schedule-filter")) {
+    const facet = btn.getAttribute("data-filter") as keyof FacetValues | null;
+    const value = btn.getAttribute("data-value") ?? "";
+    const on = !!facet && reachable[facet]?.has(value);
+    btn.toggleAttribute("hidden", !on);
+    if (on) live += 1;
+  }
+  // Fewer than two options is a control that cannot change anything (spec D-4).
+  group.toggleAttribute("hidden", live < 2);
+}
+```
+
+- [ ] **Step 6: Drop the selections the new lens cannot honour**
+
+Still inside the lens switch, and **before** calling `apply()`: any selected facet value that is no longer reachable must leave `state`, or a room filter for Piaf carried into a lens without Piaf produces zero results with no visible cause — the chip that explains it has just been hidden by Step 5.
+
+```ts
+for (const facet of ["room", "format", "track", "level"] as const) {
+  for (const value of [...state[facet]]) {
+    if (!reachable[facet].has(value)) state[facet].delete(value);
+  }
+}
+```
+
+Level and format normally survive, which is the point: someone filtering for `beginner` keeps that filter across a lens switch.
+
+Guard the ordering in `tests/build/audience-lens.test.ts`, because getting it backwards is silent — `apply()` would run once against stale state and the count would flicker:
+
+```ts
+  it("prunes the lens's dead filter values before re-applying the filters", () => {
+    const src = read("src/components/schedule/schedule-ui.ts");
+    const prune = src.indexOf("facetValuesInLens");
+    expect(prune).toBeGreaterThan(-1);
+    // The first apply() after the prune is what renders the corrected state.
+    expect(src.indexOf("apply()", prune)).toBeGreaterThan(prune);
+  });
+```
 
 - [ ] **Step 7: Run tests**
 
