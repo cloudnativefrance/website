@@ -1263,8 +1263,14 @@ that would have passed against a deleted feature. Extend the container tests in
     // The track that DEFINES the lens must not also be offered inside it:
     // selecting it from the technical lens yields an empty grid with no
     // explanation, and from the leadership lens it is a no-op.
-    expect(html).toContain('data-value="IA et Data"');
-    expect(html).not.toContain(`data-value="${LEADERSHIP_TRACKS[0]}"`);
+    // Astro HTML-escapes attribute values, so LEADERSHIP_TRACKS[0]
+    // ("Strategy & Leadership") NEVER appears literally — the `&` comes back
+    // as `&#38;`. A plain `.not.toContain(raw)` would therefore pass whether or
+    // not the track is filtered out: an assertion that cannot fail. Extract the
+    // attribute values and decode entities before comparing.
+    const values = dataValues(html);
+    expect(values).toContain("IA et Data");
+    expect(values).not.toContain(LEADERSHIP_TRACKS[0]);
   });
 
   it("still offers the track facet when only technical tracks exist", async () => {
@@ -1278,7 +1284,11 @@ that would have passed against a deleted feature. Extend the container tests in
   });
 ```
 
-Import `LEADERSHIP_TRACKS` from `@/lib/audience` in that test file. Note the
+Both cases need a `dataValues(html)` helper that pulls every `data-value="…"`
+out of the markup and decodes HTML entities (`&#38;`, `&amp;`, `&lt;`, `&gt;`,
+`&quot;`, `&#39;`) before comparison — without it the negative assertion is
+unfalsifiable, as above. Import `LEADERSHIP_TRACKS` from `@/lib/audience` in
+that test file. Note the
 second case: the server already drops a facet whose value list is empty
 (`ScheduleToolbar.astro`'s `.filter((facet) => facet.values.length > 0)`), so
 removing the leadership track must not accidentally remove the whole track
@@ -1496,6 +1506,12 @@ const asAudience = (v: string | null): Audience | null =>
 const hasLens = root.getAttribute("data-has-audiences") === "true";
 if (hasLens) setAudience(asAudience(params.get("audience")) ?? "tech");
 ```
+
+**Remove Task 5's standalone boot-time `pruneFacetsForLens()` call when you add
+this.** Task 5 had to call it directly at load because no lens was resolved at
+boot yet. `setAudience` already prunes, so once this boot call exists the
+standalone one runs the same work a second time and leaves a reader unsure which
+is authoritative. Delete it and its comment; keep the one inside `setAudience`.
 
 **The `if` is load-bearing — do not flatten it to `setAudience(hasLens ? … : "tech")`.**
 `setAudience` calls `applyAudience`, which hides every card whose audience is not
