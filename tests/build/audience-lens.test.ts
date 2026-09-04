@@ -63,6 +63,21 @@ describe("audience lens markup", () => {
     expect(read("src/components/schedule/schedule-ui.ts")).toMatch(/roomCount|applyAudience\([^)]*\)\s*===?\s*1|<=\s*1/);
   });
 
+  it("hides the grid/list toggle while a lens forces the list view — a visible control that cannot be honoured", () => {
+    // Important-1 regression: the toggle used to stay visible and clickable
+    // in a one-room lens, report success (aria-pressed="true", a written
+    // localStorage/URL) and do nothing. There is no DOM test environment
+    // here, so this pins the SOURCE MECHANISM the fix relies on: renderView()
+    // itself toggles `.toolbar-views`'s `hidden` attribute off `lensForcesList`
+    // — not some other function, and not a CSS-only fix that this file
+    // can't see. It cannot prove the browser actually hides the element.
+    const src = read("src/components/schedule/schedule-ui.ts");
+    const renderView = sliceBalancedBlock(src, "function renderView() {");
+    expect(renderView).toMatch(
+      /toolbarViewsEl\?\.toggleAttribute\(\s*["']hidden["']\s*,\s*lensForcesList\s*\)/,
+    );
+  });
+
   it("prunes the lens's dead filter values before re-applying the filters", () => {
     const src = read("src/components/schedule/schedule-ui.ts");
     // Match the CALL — `pruneFacetsForLens();` / `apply();`, semicolon and
@@ -91,6 +106,41 @@ describe("audience lens markup", () => {
     // standalone one reinstated at boot.
     const callSites = src.split("pruneFacetsForLens();").length - 1;
     expect(callSites, "pruneFacetsForLens() has exactly one call site").toBe(1);
+  });
+
+  it("moves focus off the cross-lens button after it switches lens, before apply() destroys the node it sits in", () => {
+    // Important-2 regression: this button lives inside #schedule-result-count,
+    // and apply()'s first line is `countEl.textContent = …`, which removes the
+    // button a keyboard user is standing on. There is no DOM test environment
+    // here, so this pins the SOURCE MECHANISM: within the cross-lens button's
+    // own click handler, a call to setAudience(...) precedes a `.focus()` call
+    // that targets the now-pressed button in the lens switch. It cannot prove
+    // the browser actually keeps focus visible or reachable.
+    const src = read("src/components/schedule/schedule-ui.ts");
+    const start = src.indexOf("toolbar-cross-lens");
+    const end = src.indexOf("countEl.append(", start);
+    expect(start, "the cross-lens button is built").toBeGreaterThan(-1);
+    expect(end, "the button's wiring ends where it is appended").toBeGreaterThan(start);
+
+    const block = src.slice(start, end);
+    const setAudienceAt = block.indexOf("setAudience(");
+    const focusAt = block.indexOf(".focus()");
+    expect(setAudienceAt, "the click handler switches the lens").toBeGreaterThan(-1);
+    expect(focusAt, "focus is moved only after the lens has switched").toBeGreaterThan(setAudienceAt);
+    expect(
+      block,
+      "focus lands on the lens switch button, not wherever the destroyed button used to be",
+    ).toMatch(/\[data-audience-switch\]\s*\[data-audience=/);
+  });
+
+  it("the cross-lens remainder is gated on hasAudiences, like scopedTotal two lines above it", () => {
+    // Minor-4: on a single-audience edition `audience` never leaves "tech",
+    // so every non-keynote card would count as "outside" the lens and offer a
+    // switch to a control ScheduleToolbar.astro never rendered.
+    const src = read("src/components/schedule/schedule-ui.ts");
+    expect(src).toMatch(
+      /const outside = hasAudiences \? countMatchesOutsideLens\([^)]*\) : 0;/,
+    );
   });
 });
 

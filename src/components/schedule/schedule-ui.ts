@@ -40,6 +40,7 @@ const root = document.querySelector<HTMLElement>("[data-schedule-root]");
 if (root) {
   const gridView = root.querySelector<HTMLElement>(".grid-view");
   const listView = root.querySelector<HTMLElement>(".list-view");
+  const toolbarViewsEl = root.querySelector<HTMLElement>(".toolbar-views");
   const countEl = document.getElementById("schedule-result-count");
   const searchEl = document.getElementById("schedule-search") as HTMLInputElement | null;
   const clearSearchEl = document.getElementById("schedule-search-clear");
@@ -113,7 +114,11 @@ if (root) {
       // A search can match sessions the lens is hiding. Silently reporting
       // "no results" would be true and useless, so name the remainder and
       // offer the one click that resolves it: switch lens, keep the query.
-      const outside = countMatchesOutsideLens(cards, audience, state.query);
+      // Gated on `hasAudiences`, same as `scopedTotal` above: on a
+      // single-audience edition `audience` stays "tech" with nothing ever
+      // switching it, so every non-keynote card would count as "outside" and
+      // this would offer a lens switch to a control that was never rendered.
+      const outside = hasAudiences ? countMatchesOutsideLens(cards, audience, state.query) : 0;
       if (outside > 0) {
         const btn = document.createElement("button");
         btn.type = "button";
@@ -121,7 +126,22 @@ if (root) {
         btn.textContent = moreResultsLabel
           .replace("{n}", String(outside))
           .replace("{lens}", lensLabel(otherAudience(audience)));
-        btn.addEventListener("click", () => setAudience(otherAudience(audience)));
+        btn.addEventListener("click", () => {
+          const landing = otherAudience(audience);
+          setAudience(landing);
+          // This button lives inside #schedule-result-count, and apply()'s
+          // first act is `countEl.textContent = …`, which destroys the node
+          // the keyboard focus is standing on — the click already happened,
+          // but a keyboard activation (Enter/Space) needs focus to land
+          // somewhere, or it resets to <body> and the next Tab restarts from
+          // the site header. The newly-pressed lens button reads best: that
+          // is where the visitor now conceptually is. Guarded for its
+          // absence, though it always exists here — this button only renders
+          // when `hasAudiences` is true, which is exactly when the switch is.
+          document
+            .querySelector<HTMLElement>(`[data-audience-switch] [data-audience="${landing}"]`)
+            ?.focus();
+        });
         // `textContent =` above wiped any previous button, so it is rebuilt
         // fresh on every apply() rather than toggled.
         countEl.append(" · ", btn);
@@ -176,6 +196,15 @@ if (root) {
     const renderedView = narrow.matches || lensForcesList ? "list" : preferredView;
     gridView?.toggleAttribute("hidden", renderedView !== "grid");
     listView?.toggleAttribute("hidden", renderedView !== "list");
+    // A lens with one room has no grid to draw, so the grid/list toggle has
+    // nothing left to choose between — the same reasoning the `max-width:
+    // 767px` case above applies via CSS. Without this, the buttons stayed
+    // visible and clickable: "Grille" turned primary-coloured, reported
+    // `aria-pressed="true"`, and the page stayed in list view regardless.
+    // Called from inside renderView() (not setAudience) so it tracks every
+    // path that can set `lensForcesList`, and is restored the moment the
+    // lens widens back past one room.
+    toolbarViewsEl?.toggleAttribute("hidden", lensForcesList);
     for (const btn of document.querySelectorAll<HTMLElement>("[data-view]")) {
       const pressed = btn.getAttribute("data-view") === preferredView;
       btn.setAttribute("aria-pressed", pressed ? "true" : "false");
