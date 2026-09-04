@@ -699,9 +699,34 @@ is the markup this reasons over):
 
 - [ ] **Step 5b: The leadership lens opens in the list view (spec D-7)**
 
-With Eiffel alone the grid would be a single ~1100px column, which is not a grid. When `applyAudience` returns a visible-room count of **1**, switch to the list view — the same code path the existing grid/list toggle uses, so the toggle's state stays truthful and the visitor can switch back.
+With Eiffel alone the grid would be a single ~1100px column, which is not a grid. When `applyAudience` returns a visible-room count of **1**, render the list view instead.
 
 Derived from the count, not hardcoded to the leadership lens: a technical lens that ever narrows to one room gets the same treatment, and a leadership programme that grows to two rooms gets a grid without anyone remembering to change this.
+
+**Do NOT call `setView("list")`.** That function is the visitor's *choice*: it writes `preferredView`, `localStorage` and `?view=` in the URL. An automatic fallback is not a choice, and calling it would overwrite the grid preference a visitor set, permanently — switching back to the technical lens would then leave them in the list view they never asked for. `setView("list", false)` is no better: it still mutates `preferredView`, so the preference is gone either way.
+
+`schedule-ui.ts` already draws exactly this distinction and names it (see the comment at `schedule-ui.ts:110-121`): `preferredView` is what the visitor chose and what persists; `renderedView` is what the viewport can actually display. A one-room lens is a second reason the viewport cannot display a grid — the same shape as the `max-width: 767px` case — so add it the same way:
+
+```ts
+/** A lens showing one room has no grid to draw. Like `narrow`, this constrains
+ *  what is RENDERED without touching what the visitor chose. */
+let lensForcesList = false;
+
+function renderView() {
+  const renderedView = narrow.matches || lensForcesList ? "list" : preferredView;
+  // …unchanged…
+}
+```
+
+and on every lens switch:
+
+```ts
+lensForcesList = applyAudience(root, audience) <= 1;
+renderView();
+apply();
+```
+
+The grid/list buttons keep reflecting `preferredView`, which is what they already do on a phone.
 
 `resolveLens` already reports this; the Task 3 test
 `"counts the rooms that remain, which is what widens the columns"` pins it.
