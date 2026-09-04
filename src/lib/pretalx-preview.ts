@@ -98,9 +98,20 @@ export function joinScheduledTalks(
   for (const slot of slots) {
     const submission = byCode.get(slot.submission);
     if (!submission) continue;
-    // No coercion here. `projectSlot` already resolved the field to a strict
-    // boolean that fails CLOSED on an unexpected shape; restating a looser rule
-    // at this second site is how the two halves disagreed in the first place.
+    // A slot without a start time is not scheduled.
+    //
+    // Pretalx creates a TalkSlot the moment a proposal is CONFIRMED, with
+    // `room` and `start` null, and only fills them when someone places the talk
+    // on the grid. Every accepted talk therefore has a slot months before the
+    // schedule exists. Without this guard the programme renders the entire
+    // accepted list as cards with a blank time and a blank room — plausible
+    // enough to look like a styling bug and wrong enough to mislead, which is
+    // the failure mode this whole path exists to avoid. Measured against the
+    // 2027 event: three confirmed talks, three slots, all `start: null`.
+    if (!slot.start) continue;
+    // No coercion on visibility. `projectSlot` already resolved the field to a
+    // strict boolean that fails CLOSED on an unexpected shape; restating a
+    // looser rule at this second site is how the two halves disagreed before.
     talks.push({ slot, submission, visible: slot.is_visible });
   }
   return talks;
