@@ -63,9 +63,10 @@ describe("resolveLens", () => {
 });
 
 const haystack = [
-  { audience: "tech" as const,       search: "ebpf réseau" },
-  { audience: "leadership" as const, search: "gouvernance cloud" },
-  { audience: "leadership" as const, search: "gouvernance et budget" },
+  { id: "a", format: "talk",    audience: "tech" as const,       search: "ebpf réseau" },
+  { id: "b", format: "talk",    audience: "leadership" as const, search: "gouvernance cloud" },
+  { id: "c", format: "talk",    audience: "leadership" as const, search: "gouvernance et budget" },
+  { id: "k", format: "keynote", audience: "tech" as const,       search: "gouvernance ouverture" },
 ];
 
 describe("countMatchesOutsideLens", () => {
@@ -84,6 +85,14 @@ describe("countMatchesOutsideLens", () => {
   it("ignores accents and case, like the main search", () => {
     expect(countMatchesOutsideLens(haystack, "tech", "GOUVERNANCE")).toBe(2);
     expect(countMatchesOutsideLens(haystack, "leadership", "RESEAU")).toBe(1);
+  });
+
+  it("counts each session once even though every card renders twice", () => {
+    expect(countMatchesOutsideLens([...haystack, ...haystack], "tech", "gouvernance")).toBe(2);
+  });
+
+  it("never counts a keynote — it is already on screen in this lens", () => {
+    expect(countMatchesOutsideLens(haystack, "leadership", "gouvernance")).toBe(0);
   });
 });
 
