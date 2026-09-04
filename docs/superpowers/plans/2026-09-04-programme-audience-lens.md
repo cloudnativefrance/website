@@ -18,6 +18,7 @@
 - **One card per session in the DOM.** Two copies would give one session two bookmark buttons whose state must be synchronised.
 - Editions with no leadership sessions render exactly as today, with **no control at all** — absent, not disabled.
 - Bilingual: every string comes from `src/i18n/ui.ts` with FR **and** EN entries; `i18n-parity.test.ts` enforces it.
+- **There is NO DOM test environment.** Both vitest projects are `environment: "node"`; jsdom and happy-dom are not installed and must not be added. Anything worth testing therefore lives as a pure function over plain data in `src/lib/`, with a thin DOM wrapper that only reads attributes and toggles classes — the idiom already used by `resolveEditionLoadable`/`isEditionLoadable` and `getFlagState`/`isFlagActive`. Guard the wrapper by source shape in `tests/build/` if it needs guarding at all.
 - Conventional commits, English. Never co-author; no attribution lines.
 - No `git commit --amend`, no `git reset --hard`.
 - Baseline: `pnpm test` 57 files / 695 tests green; `pnpm exec astro check` 0 errors / 0 warnings; `pnpm build` 374 pages. Two build-artifact tests read `dist/`, so run `pnpm build` before judging them.
@@ -335,136 +336,169 @@ git commit -m "feat(schedule): render the audience control and make columns addr
 ### Task 3: Apply the lens client-side
 
 **Files:**
+- Create: `src/lib/lens.ts`
+- Create: `src/components/schedule/schedule-ui-audience.ts`
 - Modify: `src/components/schedule/schedule-ui.ts`
-- Test: `src/components/schedule/__tests__/audience-apply.test.ts` (create)
+- Modify: `src/components/schedule/ScheduleGridView.astro` (the `.is-audience-hidden` rule)
+- Test: `src/lib/__tests__/lens.test.ts` (create)
 
 **Interfaces:**
 - Consumes: `data-audience` on cards, `data-room` on header cells, `data-has-audiences` on the root.
-- Produces: `state.audience: Audience`; `applyAudience(root, audience): number` returning the count of visible room columns.
+- Produces, in `src/lib/lens.ts` (pure, node-testable):
+  ```ts
+  export interface LensCard { id: string; room: string; format: string; audience: Audience }
+  export interface LensResult { hiddenIds: Set<string>; hiddenRooms: Set<string>; roomCount: number }
+  export function resolveLens(cards: readonly LensCard[], rooms: readonly string[], audience: Audience): LensResult;
+  ```
+  plus a thin DOM wrapper `applyAudience(root, audience): number` in
+  `src/components/schedule/schedule-ui-audience.ts`.
+
+**Why the split.** There is NO DOM test environment in this repo — both vitest
+projects are `environment: "node"`, jsdom and happy-dom are not installed, and no
+existing test touches `document`. Rather than add one, the policy lives in a pure
+function over plain data and the wrapper is a loop that reads attributes and
+toggles classes. That is this codebase's established idiom (`resolveEditionLoadable`
+and `isEditionLoadable`; `getFlagState` and `isFlagActive`) — the decision is
+tested, the DOM plumbing is guarded by source shape.
 
 - [ ] **Step 1: Write the failing test**
 
-Create `src/components/schedule/__tests__/audience-apply.test.ts`. Build a minimal DOM, then assert the three properties that matter:
+Create `src/lib/__tests__/lens.test.ts` — plain data, no DOM:
 
 ```ts
-import { describe, it, expect, beforeEach } from "vitest";
-import { applyAudience } from "../schedule-ui-audience";
+import { describe, it, expect } from "vitest";
+import { resolveLens, type LensCard } from "@/lib/lens";
 
-function build(): HTMLElement {
-  document.body.innerHTML = `
-    <div data-schedule-root data-has-audiences="true">
-      <div class="grid-view" style="--room-count:5">
-        <div class="grid-view-head">
-          <div class="grid-view-room" data-room="Monet">Monet</div>
-          <div class="grid-view-room" data-room="Eiffel">Eiffel</div>
-        </div>
-        <div class="grid-view-body">
-          <div class="grid-view-row">
-            <article class="session-card" data-session-id="A" data-room="Monet" data-audience="tech"></article>
-            <article class="session-card" data-session-id="B" data-room="Eiffel" data-audience="leadership"></article>
-            <article class="session-card" data-session-id="K" data-room="" data-format="keynote" data-audience="tech"></article>
-          </div>
-          <div class="grid-view-break">Déjeuner</div>
-        </div>
-      </div>
-    </div>`;
-  return document.querySelector<HTMLElement>("[data-schedule-root]")!;
-}
+const ROOMS = ["Monet", "Piaf", "Eiffel"];
+const cards: LensCard[] = [
+  { id: "A", room: "Monet",  format: "talk",    audience: "tech" },
+  { id: "B", room: "Eiffel", format: "talk",    audience: "leadership" },
+  { id: "K", room: "",       format: "keynote", audience: "tech" },
+];
 
-beforeEach(build);
-
-describe("applyAudience", () => {
+describe("resolveLens", () => {
   it("hides cards outside the lens", () => {
-    applyAudience(document.querySelector("[data-schedule-root]")!, "tech");
-    const hidden = (id: string) =>
-      document.querySelector(`[data-session-id="${id}"]`)!.classList.contains("is-audience-hidden");
-    expect(hidden("A")).toBe(false);
-    expect(hidden("B")).toBe(true);
+    const r = resolveLens(cards, ROOMS, "tech");
+    expect(r.hiddenIds.has("B")).toBe(true);
+    expect(r.hiddenIds.has("A")).toBe(false);
   });
 
   it("keeps an all-room keynote visible in BOTH lenses", () => {
     for (const lens of ["tech", "leadership"] as const) {
-      applyAudience(document.querySelector("[data-schedule-root]")!, lens);
-      expect(
-        document.querySelector('[data-session-id="K"]')!.classList.contains("is-audience-hidden"),
-      ).toBe(false);
+      expect(resolveLens(cards, ROOMS, lens).hiddenIds.has("K")).toBe(false);
     }
   });
 
-  it("NEVER hides a break band — that is the difference from a filter", () => {
-    applyAudience(document.querySelector("[data-schedule-root]")!, "leadership");
-    expect(
-      document.querySelector(".grid-view-break")!.classList.contains("is-hidden"),
-    ).toBe(false);
+  it("hides a room with nothing in the lens", () => {
+    const r = resolveLens(cards, ROOMS, "tech");
+    expect(r.hiddenRooms.has("Eiffel")).toBe(true);
+    expect(r.hiddenRooms.has("Piaf")).toBe(true);   // empty in every lens
+    expect(r.hiddenRooms.has("Monet")).toBe(false);
   });
 
-  it("hides the column header of a room with nothing in the lens", () => {
-    applyAudience(document.querySelector("[data-schedule-root]")!, "tech");
-    const head = (r: string) =>
-      document.querySelector<HTMLElement>(`.grid-view-room[data-room="${r}"]`)!;
-    expect(head("Monet").classList.contains("is-audience-hidden")).toBe(false);
-    expect(head("Eiffel").classList.contains("is-audience-hidden")).toBe(true);
+  it("counts the rooms that remain, which is what widens the columns", () => {
+    expect(resolveLens(cards, ROOMS, "tech").roomCount).toBe(1);
+    expect(resolveLens(cards, ROOMS, "leadership").roomCount).toBe(1);
   });
 
-  it("recomputes --room-count so the remaining columns expand", () => {
-    const root = document.querySelector<HTMLElement>("[data-schedule-root]")!;
-    expect(applyAudience(root, "tech")).toBe(1);
-    expect(
-      root.querySelector<HTMLElement>(".grid-view")!.style.getPropertyValue("--room-count"),
-    ).toBe("1");
+  it("never reports zero rooms — a grid with no columns has no layout", () => {
+    expect(resolveLens([], ROOMS, "tech").roomCount).toBe(1);
+  });
+
+  it("says nothing about break bands — they belong to both lenses", () => {
+    const r = resolveLens(cards, ROOMS, "leadership");
+    expect(r.hiddenIds.has("K")).toBe(false);
+    expect(Object.keys(r)).toEqual(["hiddenIds", "hiddenRooms", "roomCount"]);
   });
 });
 ```
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `pnpm test audience-apply`
-Expected: FAIL — cannot resolve `../schedule-ui-audience`.
+Run: `pnpm test lens`
+Expected: FAIL — cannot resolve `@/lib/lens`.
 
-- [ ] **Step 3: Implement**
+- [ ] **Step 3: Implement the pure part**
 
-Create `src/components/schedule/schedule-ui-audience.ts` as a separate module so it is unit-testable without the whole toolbar bootstrap (`schedule-ui.ts` runs its setup at import time against a live document):
+Create `src/lib/lens.ts`:
+
+```ts
+import type { Audience } from "./audience";
+
+export interface LensCard { id: string; room: string; format: string; audience: Audience }
+export interface LensResult {
+  hiddenIds: Set<string>;
+  hiddenRooms: Set<string>;
+  /** Never below 1: a grid with no columns has no layout. */
+  roomCount: number;
+}
+
+/**
+ * Which cards and room columns a lens hides.
+ *
+ * Pure, over plain data, because this repo has no DOM test environment — both
+ * vitest projects are `environment: "node"`. The decision is tested here; the
+ * DOM plumbing that applies it is a loop guarded by source shape. Same split as
+ * `resolveEditionLoadable` / `isEditionLoadable` and `getFlagState` /
+ * `isFlagActive`.
+ *
+ * Says nothing about break bands, deliberately. They describe the unfiltered
+ * day and belong to both lenses — the filter code hides them because narrowing
+ * a day makes them meaningless, which scoping it does not.
+ */
+export function resolveLens(
+  cards: readonly LensCard[],
+  rooms: readonly string[],
+  audience: Audience,
+): LensResult {
+  const hiddenIds = new Set<string>();
+  const roomsInLens = new Set<string>();
+
+  for (const card of cards) {
+    // A keynote spans every room and belongs to everyone — the same reasoning
+    // the room filter already applies in schedule-ui.ts.
+    const isKeynote = card.format === "keynote";
+    const show = isKeynote || card.audience === audience;
+    if (!show) hiddenIds.add(card.id);
+    else if (card.room && !isKeynote) roomsInLens.add(card.room);
+  }
+
+  const hiddenRooms = new Set(rooms.filter((r) => !roomsInLens.has(r)));
+  return { hiddenIds, hiddenRooms, roomCount: Math.max(roomsInLens.size, 1) };
+}
+```
+
+- [ ] **Step 3b: Implement the thin DOM wrapper**
+
+Create `src/components/schedule/schedule-ui-audience.ts`. It reads attributes,
+calls `resolveLens`, and applies the result — no policy of its own:
 
 ```ts
 import type { Audience } from "@/lib/audience";
+import { resolveLens, type LensCard } from "@/lib/lens";
 
-/**
- * Scope the schedule to one audience.
- *
- * Deliberately a SECOND hidden-class, `is-audience-hidden`, rather than reusing
- * the filters' `is-hidden`. The two must compose: a card is shown only when the
- * lens allows it AND the filters do. Sharing one class would make whichever ran
- * last clobber the other, so switching lens would silently clear an active
- * filter.
- *
- * Break bands are untouched. They describe the unfiltered day and belong to
- * both lenses; the filter code hides them because narrowing a day makes them
- * meaningless, which a lens does not.
- *
- * Returns the number of room columns still visible, so the caller can size the
- * grid.
- */
 export function applyAudience(root: HTMLElement, audience: Audience): number {
-  const roomsInLens = new Set<string>();
+  const els = [...root.querySelectorAll<HTMLElement>(".session-card")];
+  const cards: LensCard[] = els.map((el) => ({
+    id: el.getAttribute("data-session-id") ?? "",
+    room: el.getAttribute("data-room") ?? "",
+    format: el.getAttribute("data-format") ?? "",
+    audience: (el.getAttribute("data-audience") as Audience) ?? "tech",
+  }));
+  const heads = [...root.querySelectorAll<HTMLElement>(".grid-view-room")];
+  const rooms = heads.map((h) => h.getAttribute("data-room") ?? "");
 
-  for (const card of root.querySelectorAll<HTMLElement>(".session-card")) {
-    // A keynote spans every room and belongs to everyone — the same reasoning
-    // the room filter already applies in schedule-ui.ts.
-    const isKeynote = card.getAttribute("data-format") === "keynote";
-    const show = isKeynote || card.getAttribute("data-audience") === audience;
-    card.classList.toggle("is-audience-hidden", !show);
-    const room = card.getAttribute("data-room") ?? "";
-    if (show && room && !isKeynote) roomsInLens.add(room);
-  }
+  const { hiddenIds, hiddenRooms, roomCount } = resolveLens(cards, rooms, audience);
 
-  for (const head of root.querySelectorAll<HTMLElement>(".grid-view-room")) {
-    const room = head.getAttribute("data-room") ?? "";
-    head.classList.toggle("is-audience-hidden", !roomsInLens.has(room));
-  }
+  // A SECOND hidden-class, not the filters' `is-hidden`: the two axes must
+  // compose. Sharing one class would let whichever ran last clobber the other,
+  // so switching lens would silently clear an active filter.
+  els.forEach((el, i) => el.classList.toggle("is-audience-hidden", hiddenIds.has(cards[i].id)));
+  heads.forEach((h, i) => h.classList.toggle("is-audience-hidden", hiddenRooms.has(rooms[i])));
 
-  const grid = root.querySelector<HTMLElement>(".grid-view");
-  if (grid) grid.style.setProperty("--room-count", String(Math.max(roomsInLens.size, 1)));
-  return roomsInLens.size;
+  root.querySelector<HTMLElement>(".grid-view")
+    ?.style.setProperty("--room-count", String(roomCount));
+  return roomCount;
 }
 ```
 
@@ -488,24 +522,26 @@ With Eiffel alone the grid would be a single ~1100px column, which is not a grid
 
 Derived from the count, not hardcoded to the leadership lens: a technical lens that ever narrows to one room gets the same treatment, and a leadership programme that grows to two rooms gets a grid without anyone remembering to change this.
 
-Add a case to the Task 3 test file:
+`resolveLens` already reports this; the Task 3 test
+`"counts the rooms that remain, which is what widens the columns"` pins it.
+Add a source-shape guard in `tests/build/audience-lens.test.ts` that the
+wrapper acts on it:
 
 ```ts
-  it("reports a single visible room, which is what selects the list view", () => {
-    const root = document.querySelector<HTMLElement>("[data-schedule-root]")!;
-    expect(applyAudience(root, "leadership")).toBe(1);
+  it("a lens with one room opens in the list view", () => {
+    expect(read("src/components/schedule/schedule-ui.ts")).toMatch(/roomCount|applyAudience\([^)]*\)\s*===?\s*1|<=\s*1/);
   });
 ```
 
 - [ ] **Step 6: Run tests**
 
-Run: `pnpm test audience && pnpm exec astro check`
+Run: `pnpm test lens audience && pnpm exec astro check`
 Expected: PASS, 0 type errors.
 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add src/components/schedule/
+git add src/lib/lens.ts src/lib/__tests__/lens.test.ts src/components/schedule/ tests/build/
 git commit -F - <<'MSG'
 feat(schedule): apply the audience lens and resize the grid
 
@@ -525,77 +561,95 @@ MSG
 ### Task 4: Search across both lenses
 
 **Files:**
+- Modify: `src/lib/lens.ts`
 - Modify: `src/components/schedule/schedule-ui.ts`
-- Test: `src/components/schedule/__tests__/cross-lens-search.test.ts` (create)
+- Modify: `src/i18n/ui.ts` (FR + EN)
+- Test: `src/lib/__tests__/lens.test.ts` (extend)
 
 **Interfaces:**
-- Produces: `countMatchesOutsideLens(root, audience, query): number`.
+- Consumes: `normalise` from `@/lib/schedule-filter`.
+- Produces:
+  ```ts
+  export function countMatchesOutsideLens(
+    cards: readonly { audience: Audience; search: string }[],
+    audience: Audience,
+    query: string,
+  ): number;
+  ```
 
 Without this a CTO searching "gouvernance" from the technical lens is told *no results* — true and useless. The lens becomes a hiding device instead of a focusing one.
 
 - [ ] **Step 1: Write the failing test**
 
+Append to `src/lib/__tests__/lens.test.ts` — plain data, no DOM:
+
 ```ts
-import { describe, it, expect, beforeEach } from "vitest";
-import { countMatchesOutsideLens } from "../schedule-ui-audience";
+import { countMatchesOutsideLens } from "@/lib/lens";
 
-beforeEach(() => {
-  document.body.innerHTML = `
-    <div data-schedule-root>
-      <article class="session-card" data-audience="tech"        data-search="ebpf réseau"></article>
-      <article class="session-card" data-audience="leadership"  data-search="gouvernance cloud"></article>
-      <article class="session-card" data-audience="leadership"  data-search="gouvernance et budget"></article>
-    </div>`;
-});
-
-const root = () => document.querySelector<HTMLElement>("[data-schedule-root]")!;
+const haystack = [
+  { audience: "tech" as const,       search: "ebpf réseau" },
+  { audience: "leadership" as const, search: "gouvernance cloud" },
+  { audience: "leadership" as const, search: "gouvernance et budget" },
+];
 
 describe("countMatchesOutsideLens", () => {
   it("counts matches in the other lens", () => {
-    expect(countMatchesOutsideLens(root(), "tech", "gouvernance")).toBe(2);
+    expect(countMatchesOutsideLens(haystack, "tech", "gouvernance")).toBe(2);
   });
 
   it("is zero when the other lens has nothing", () => {
-    expect(countMatchesOutsideLens(root(), "tech", "ebpf")).toBe(0);
+    expect(countMatchesOutsideLens(haystack, "tech", "ebpf")).toBe(0);
   });
 
   it("is zero for an empty query — an empty search is not a search", () => {
-    expect(countMatchesOutsideLens(root(), "tech", "")).toBe(0);
+    expect(countMatchesOutsideLens(haystack, "tech", "   ")).toBe(0);
   });
 
   it("ignores accents and case, like the main search", () => {
-    expect(countMatchesOutsideLens(root(), "tech", "GOUVERNANCE")).toBe(2);
+    expect(countMatchesOutsideLens(haystack, "tech", "GOUVERNANCE")).toBe(2);
+    expect(countMatchesOutsideLens(haystack, "leadership", "RESEAU")).toBe(1);
   });
 });
 ```
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `pnpm test cross-lens-search`
-Expected: FAIL — `countMatchesOutsideLens` is not exported.
+Run: `pnpm test lens`
+Expected: FAIL — `countMatchesOutsideLens` is not exported from `@/lib/lens`.
 
 - [ ] **Step 3: Implement**
 
-Add to `schedule-ui-audience.ts`. Reuse the same folding the main search uses, exported from `schedule-ui.ts` if it already is; otherwise duplicate the two-line `normalise` and note why:
+Add to `src/lib/lens.ts`, beside `resolveLens`. The DOM wrapper collects
+`{audience, search}` from the cards and calls this:
 
 ```ts
+/**
+ * How many sessions in the OTHER lens match the query.
+ *
+ * Without this a CTO searching "gouvernance" from the technical lens is told
+ * "no results" — true, and useless. A lens is meant to focus; unannounced
+ * misses turn it into a hiding device.
+ */
 export function countMatchesOutsideLens(
-  root: HTMLElement,
+  cards: readonly { audience: Audience; search: string }[],
   audience: Audience,
   query: string,
 ): number {
-  const q = query.normalize("NFD").replace(/\p{Diacritic}/gu, "").trim().toLowerCase();
+  const q = normalise(query).trim();
   if (!q) return 0;
   let n = 0;
-  for (const card of root.querySelectorAll<HTMLElement>(".session-card")) {
-    if (card.getAttribute("data-audience") === audience) continue;
-    const hay = (card.getAttribute("data-search") ?? "")
-      .normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
-    if (hay.includes(q)) n += 1;
+  for (const c of cards) {
+    if (c.audience === audience) continue;
+    if (normalise(c.search).includes(q)) n += 1;
   }
   return n;
 }
 ```
+
+`normalise` is the existing accent- and case-folding helper — import it from
+`./schedule-filter` (`src/lib/schedule-filter.ts:34`), do NOT write a second
+copy. The main search already folds with it; a remainder count that folded
+differently would report matches the visitor cannot reproduce by switching lens.
 
 - [ ] **Step 4: Surface it in the result line**
 
@@ -603,13 +657,13 @@ In `schedule-ui.ts`'s `apply()`, after the existing count is written, append the
 
 - [ ] **Step 5: Run tests**
 
-Run: `pnpm test schedule && pnpm exec astro check`
+Run: `pnpm test && pnpm exec astro check`
 Expected: PASS.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add src/components/schedule/
+git add src/lib/ src/components/schedule/ src/i18n/ui.ts
 git commit -m "feat(schedule): search across both lenses and offer the remainder"
 ```
 
@@ -618,9 +672,11 @@ git commit -m "feat(schedule): search across both lenses and offer the remainder
 ### Task 5: Prune filters, and detect clashes in the agenda
 
 **Files:**
+- Modify: `src/lib/lens.ts`
 - Modify: `src/components/schedule/schedule-ui.ts`
+- Modify: `src/components/schedule/ScheduleToolbar.astro`
 - Modify: `src/components/schedule/AgendaDrawer.astro`
-- Test: `src/components/schedule/__tests__/agenda-clash.test.ts` (create)
+- Test: `src/lib/__tests__/lens.test.ts` (extend)
 
 **Interfaces:**
 - Produces: `findClashes(items): Map<string, string[]>` — session id → ids it overlaps.
@@ -629,9 +685,10 @@ The agenda is the one surface where the two lenses reunite, so it is the only pl
 
 - [ ] **Step 1: Write the failing test**
 
+Append to `src/lib/__tests__/lens.test.ts`:
+
 ```ts
-import { describe, it, expect } from "vitest";
-import { findClashes } from "../schedule-ui-audience";
+import { findClashes } from "@/lib/lens";
 
 const s = (id: string, start: string, duration: number) => ({ id, start, duration });
 
@@ -670,7 +727,7 @@ describe("findClashes", () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `pnpm test agenda-clash`
+Run: `pnpm test lens`
 Expected: FAIL — `findClashes` is not exported.
 
 - [ ] **Step 3: Implement**
@@ -692,15 +749,21 @@ export interface AgendaItem { id: string; start: string; duration: number }
  */
 export function findClashes(items: readonly AgendaItem[]): Map<string, string[]> {
   const out = new Map<string, string[]>();
+  const add = (id: string, other: string) => {
+    const list = out.get(id);
+    if (list) list.push(other);
+    else out.set(id, [other]);
+  };
   const at = items.map((i) => {
     const start = new Date(i.start).getTime();
     return { id: i.id, start, end: start + i.duration * 60_000 };
   });
   for (let a = 0; a < at.length; a++) {
     for (let b = a + 1; b < at.length; b++) {
+      // Strict `<` on both sides: touching is not overlapping.
       if (at[a].start < at[b].end && at[b].start < at[a].end) {
-        (out.get(at[a].id) ?? out.set(at[a].id, []).get(at[a].id)!).push(at[b].id);
-        (out.get(at[b].id) ?? out.set(at[b].id, []).get(at[b].id)!).push(at[a].id);
+        add(at[a].id, at[b].id);
+        add(at[b].id, at[a].id);
       }
     }
   }
@@ -741,7 +804,7 @@ Expected: PASS.
 - [ ] **Step 8: Commit**
 
 ```bash
-git add src/components/schedule/ src/i18n/ui.ts
+git add src/lib/ src/components/schedule/ src/i18n/ui.ts tests/build/
 git commit -m "feat(schedule): clash detection in the agenda, and lens-aware filters"
 ```
 
