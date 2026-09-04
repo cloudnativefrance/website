@@ -106,7 +106,18 @@ levels or speaker enrichment.
 
 > **PII note.** `/api/events/{slug}/speakers/` returns `email` and `internal_notes`. The
 > mapper reads `code`, `name`, `biography`, `avatar_url` and `answers` and nothing else.
-> Like `pretalx-private.ts`, nothing from this path is ever written to disk.
+>
+> *Amended 2026-09-03.* "Reads nothing else" is not enough on its own, twice over. Each row
+> is **projected** into that shape at the fetch boundary (`pretalx-http.ts`), so the two
+> fields stop existing in memory rather than merely going unread — a `res.json() as T` is a
+> type assertion, not a filter. And a `res.json()` that *rejects* throws a V8 `SyntaxError`
+> whose message quotes the surrounding body text; that error is re-thrown body-free, because
+> the retry path prints it into the build log.
+>
+> Like `pretalx-private.ts`, this **client** never persists a response and no snapshot of a
+> preview edition is committed. The mapped records do reach Astro's content store under
+> `.astro/` via `src/content.config.ts` — a staging-only build artefact, carrying no PII
+> field, absent from the runtime image.
 
 ---
 
@@ -123,16 +134,51 @@ export const PRETALX_EVENT: Partial<Record<Edition, { slug: string; access: Edit
 };
 ```
 
-One word is the single source of truth for three otherwise-scattered decisions:
+> **Correction, 2026-09-03.** This section originally claimed one word was the single
+> source of truth for three decisions — fetch path, loadability, and the `/cfp` target —
+> "moved together in a one-word PR". They do not move together, and the coupling is unsafe.
+>
+> *Is the event public?* must become true around 2026-09 so the CFP can accept 2027
+> proposals. *Is a schedule released?* must stay false until the 2027-04-01 announcement,
+> or the programme is public at `cfp.cloudnativedays.fr/2027/schedule/` no matter what this
+> site renders. The anonymous agenda export only exists once a schedule is **released**, so
+> flipping `access` to `"public"` on the day the event opens for submissions would ask for
+> an export that does not exist, 404, and fall back to a `pretalx-2027.json` snapshot that
+> also does not exist — the unguarded `readFileSync` crash in `remote-fetch.ts:66`.
+>
+> This is the same defect as D-2's: one marker asserted to mean several things that move on
+> different days.
 
-- which fetch path is used (anonymous agenda export vs authenticated REST);
-- whether the edition's data may be loaded in a production build at all;
-- which event `/cfp` links submitters to.
+`access` therefore means exactly one thing — **how the schedule is fetched**:
 
-Flipping `preview` → `public` on the day the Pretalx event goes public moves all three
-together, in a one-word PR. That is deliberately *not* the same switch as the `programme`
-flag: the CFP must target the 2027 event from the moment it opens (2026-09-01), months
-before the programme is announced (2027-04-01). Two facts, two switches.
+```ts
+export type EditionAccess = "public" | "preview";
+
+export const PRETALX_EVENT: Partial<Record<Edition, {
+  slug: string;
+  /** "preview" = authenticated REST against the wip schedule; "public" = anonymous
+   *  agenda export. Flips only when a schedule is actually RELEASED, never merely
+   *  when the event becomes visible to submitters. */
+  access: EditionAccess;
+  /** Whether the event accepts submissions publicly — drives the /cfp target only.
+   *  Independent of `access`, and safe to turn on months earlier. */
+  cfpOpen?: boolean;
+}>> = {
+  2026: { slug: "2026", access: "public" },
+  2027: { slug: "2027", access: "preview" },   // added when the event exists
+};
+```
+
+Two independent switches, each individually safe:
+
+| Switch | Means | Flips when | Affects |
+|---|---|---|---|
+| `cfpOpen` | submitters may reach this event | the 2027 event opens for proposals | `/cfp` link only |
+| `access` | a schedule is released | the announcement | fetch path only |
+
+Neither is the `programme` flag, which governs whether the pages render at all. Three
+facts, three switches — and the operator can perform each without reasoning about the
+others.
 
 ### D-2 — `src/lib/pretalx-preview.ts`, the authenticated reader
 
@@ -411,7 +457,8 @@ twenty speakers is one command plus one review, not twenty edits.
 | Token rejected (401/403) | **Build fails**, not degradable | `isConfigurationFailure` — ours to fix, never an outage |
 | `SPEAKER_QUESTIONS[2027]` missing | **Build fails** naming the edition | `MissingQuestionIdError`, existing behaviour |
 | `LEVEL_QUESTION_ID[2027]` points at the wrong question | **Build fails** naming both questions | New assertion, D-2 |
-| Pretalx unreachable, staging | Retry, then fail under `PRETALX_TOKEN_REQUIRED` unless `PRETALX_ALLOW_DEGRADED=1` | Matches the existing deliberate override |
+| Pretalx unreachable, staging — *speaker enrichment / levels* (`pretalx-private.ts`) | Retry, then fail under `PRETALX_TOKEN_REQUIRED` unless `PRETALX_ALLOW_DEGRADED=1` | Matches the existing deliberate override |
+| Pretalx unreachable, staging — *preview reader* (`pretalx-preview.ts`) | Retry, then **fail. `PRETALX_ALLOW_DEGRADED` does not apply to this path** | Amended 2026-09-03. The override degrades onto a committed snapshot the public half of the build already loaded; a preview edition has none and cannot have one (public repo), so "degraded" means the whole programme is missing. That result is byte-identical to the legitimate "wip schedule has no slots yet" row below, so allowing it would make an outage indistinguishable from an empty grid. The flag's own message promises "no affiliations and no level chips", never "no schedule". And nothing is unblocked by allowing it: production never fetches a preview edition, so no release is ever held up by this path — only staging, which has nothing worth shipping without the programme. Rationale in full on `loadPreviewEdition` |
 | Pretalx unreachable, production | **Unaffected** — 2027 is never fetched | D-3 |
 | 2027 event exists but wip schedule has no slots yet | Empty session list on staging, build succeeds | Genuinely empty ≠ broken. Distinguished from a failed fetch, which throws |
 | `PRETALX_EVENT[2027]` set before the event exists | **Build fails** with a named 404 | Non-retryable HTTP is a configuration failure. Note: with the *anonymous* path this crashes on an unguarded `readFileSync` of a non-existent `pretalx-2027.json` (`remote-fetch.ts:66`) — the preview path must not inherit that, and reports the 404 instead |

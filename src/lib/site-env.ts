@@ -14,6 +14,24 @@
 
 export const PROD_ORIGIN = "https://cloudnativedays.fr";
 
+/**
+ * The origin THIS build is for.
+ *
+ * `||`, not `??`: `.github/workflows/build-image.yml` passes an empty
+ * `PUBLIC_SITE_URL` on every non-staging branch, and that has to mean the same
+ * thing everywhere — production. Trimmed, so a value with a stray space is not
+ * a third, un-recognised origin.
+ *
+ * `astro.config.mjs` derives `site` from this and `preview-fixture.ts` decides
+ * whether to refuse from it; they used to each spell it out, and had already
+ * drifted apart on the trim.
+ */
+export function resolveSiteOrigin(
+  env: Record<string, string | undefined> = process.env,
+): string {
+  return env.PUBLIC_SITE_URL?.trim() || PROD_ORIGIN;
+}
+
 export function isProductionOrigin(origin: string | undefined): boolean {
   return origin === PROD_ORIGIN;
 }
