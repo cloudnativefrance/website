@@ -6,6 +6,8 @@ import { loadSessions, type SessionRow } from "@/lib/schedule";
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { EDITIONS, isEdition, CURRENT_EDITION, type Edition } from "@/lib/editions";
 import ComingNotice from "@/components/ComingNotice.astro";
+import ComingSoonLayout from "@/components/flags/ComingSoonLayout.astro";
+import { isEditionLoadable } from "@/lib/edition-visibility";
 
 export async function getStaticPaths() {
   return EDITIONS.map((year) => ({ params: { year: String(year) } }));
@@ -21,8 +23,9 @@ const year: Edition = yearNum;
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-const speakers = await getSpeakersByLocale(lang, year);
-const sessions = await loadSessions(year);
+const speakersReady = isEditionLoadable(year);
+const speakers = speakersReady ? await getSpeakersByLocale(lang, year) : [];
+const sessions: SessionRow[] = speakersReady ? await loadSessions(year) : [];
 const primaryTalkBySlug = new Map<string, SessionRow>();
 for (const speaker of speakers) {
   const primary = getPrimaryTalk(getSlug(speaker.id), sessions);
@@ -45,6 +48,7 @@ const regular = speakers
   .sort(sortByName);
 ---
 
+{speakersReady ? (
 <Layout title={`${t("speakers.heading")} ${year} | ${t("site.title")}`}>
   <main class="px-4 md:px-6 lg:px-8">
     {year === CURRENT_EDITION && <ComingNotice class="mx-auto max-w-6xl mt-8" i18nKey="speakers.notice.2027_coming" />}
@@ -214,3 +218,6 @@ const regular = speakers
     )}
   </main>
 </Layout>
+) : (
+  <ComingSoonLayout flag="programme" lang={lang} />
+)}
