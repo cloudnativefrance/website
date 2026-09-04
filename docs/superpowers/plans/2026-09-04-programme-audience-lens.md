@@ -856,7 +856,8 @@ git commit -m "feat(schedule): search across both lenses and offer the remainder
 - Modify: `src/lib/lens.ts`
 - Modify: `src/components/schedule/schedule-ui.ts`
 - Modify: `src/components/schedule/ScheduleToolbar.astro`
-- Modify: `src/components/schedule/AgendaDrawer.astro`
+- Modify: `src/components/schedule/ScheduleGrid.astro` (the clash label on `[data-schedule-root]`)
+- Modify: `src/i18n/ui.ts` (FR + EN)
 - Test: `src/lib/__tests__/lens.test.ts` (extend)
 
 **Interfaces:**
@@ -954,7 +955,46 @@ export function findClashes(items: readonly AgendaItem[]): Map<string, string[]>
 
 - [ ] **Step 4: Show clashes in the drawer**
 
-In `AgendaDrawer.astro`'s rendering code, mark a clashing entry with the other session's title and room. Add FR + EN keys, e.g. `"schedule.agenda.clash": "chevauche {title} ({room})"` / `"overlaps with {title} ({room})"`.
+**The drawer's entries are built in JavaScript, not in the component.**
+`AgendaDrawer.astro` renders only the shell — heading, empty-state paragraph,
+export button. The list is populated by `refreshAgenda()` in `schedule-ui.ts`
+(~line 765), which reads each bookmarked card out of the DOM and writes an item
+with `innerHTML`. That is where the clash marker goes; `AgendaDrawer.astro`
+needs no change at all.
+
+`refreshAgenda` already collects the cards it renders and reads
+`data-session-id`, `data-start`, `data-room` and `data-title` off each one.
+`data-duration` is on the card too, so build the `AgendaItem[]` from the same
+`picked` array, call `findClashes` once before the render loop, and append a
+line to the entry when its id has clashes:
+
+```ts
+const clashes = findClashes(
+  picked.map((c) => ({
+    id: c.getAttribute("data-session-id") ?? "",
+    start: c.getAttribute("data-start") ?? "",
+    duration: Number(c.getAttribute("data-duration") ?? "0"),
+  })),
+);
+```
+
+Render the marker inside the existing `<div class="min-w-0">`, naming the other
+session — `clashLabel.replace("{title}", …).replace("{room}", …)` with the
+titles read from the clashing cards. **Escape it with the existing `escHtml`**,
+as every other interpolation in that template does: a talk title comes from
+Pretalx and can contain `&` or `<`.
+
+The label comes from `root.getAttribute(...)` like the drawer's other client-side
+strings (`agendaRemoveLabel`, `emptyLabel` — see `schedule-ui.ts:500`), which
+means adding it to the `[data-schedule-root]` element in `ScheduleGrid.astro`
+as well as to `src/i18n/ui.ts`:
+
+```ts
+// fr
+"schedule.agenda.clash": "chevauche {title} ({room})",
+// en
+"schedule.agenda.clash": "overlaps with {title} ({room})",
+```
 
 - [ ] **Step 4b: Remove the leadership tracks from the track filter (spec D-4)**
 
