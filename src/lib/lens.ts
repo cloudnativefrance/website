@@ -113,8 +113,18 @@ export interface AgendaItem { id: string; start: string; duration: number }
  * it surfaces at the moment someone is planning their day rather than in the
  * corridor.
  *
+ * Deduped by `id` on entry, like `lensTotal` and `countMatchesOutsideLens` —
+ * every session renders twice (grid + list), so a caller that ever passes
+ * `querySelectorAll(".session-card")` results directly, instead of one
+ * resolved card per bookmark, must not make every session clash with its own
+ * on-screen twin.
+ *
  * Touching is not overlapping: a 10:00-10:30 and a 10:30-11:00 are a plan, not
  * a clash.
+ *
+ * An item with a missing or unparseable `start` degrades safely rather than
+ * throwing: `new Date("").getTime()` is `NaN`, and every comparison against
+ * `NaN` is `false`, so that item simply participates in no clashes.
  */
 export function findClashes(items: readonly AgendaItem[]): Map<string, string[]> {
   const out = new Map<string, string[]>();
@@ -123,13 +133,16 @@ export function findClashes(items: readonly AgendaItem[]): Map<string, string[]>
     if (list) list.push(other);
     else out.set(id, [other]);
   };
-  const at = items.map((i) => {
+  const deduped = [...new Map(items.map((i) => [i.id, i])).values()];
+  const at = deduped.map((i) => {
     const start = new Date(i.start).getTime();
     return { id: i.id, start, end: start + i.duration * 60_000 };
   });
   for (let a = 0; a < at.length; a++) {
     for (let b = a + 1; b < at.length; b++) {
-      // Strict `<` on both sides: touching is not overlapping.
+      // Strict `<` on both sides: touching is not overlapping. NaN on either
+      // side (an unparseable start) makes both sides false, so the item never
+      // clashes rather than throwing.
       if (at[a].start < at[b].end && at[b].start < at[a].end) {
         add(at[a].id, at[b].id);
         add(at[b].id, at[a].id);

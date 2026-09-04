@@ -960,9 +960,15 @@ if (root) {
         .map((otherId) => byId.get(otherId))
         .filter((other): other is HTMLElement => !!other)
         .map((other) => {
+          // A function replacement, not a string one: `String.prototype.replace`
+          // treats `$&`, `$$`, `` $` ``, `$'` and `$<name>` as special patterns in
+          // a STRING replacement argument, so a Pretalx title containing `$&`
+          // would render as the literal `{title}` token instead of the title
+          // itself. A function replacement disables that handling. escHtml still
+          // runs on the result, so this is a correctness fix, not a security one.
           const label = clashLabel
-            .replace("{title}", other.getAttribute("data-title") || "")
-            .replace("{room}", other.getAttribute("data-room") || "");
+            .replace("{title}", () => other.getAttribute("data-title") || "")
+            .replace("{room}", () => other.getAttribute("data-room") || "");
           return `<div class="text-xs text-destructive-strong">${escHtml(label)}</div>`;
         })
         .join("");
