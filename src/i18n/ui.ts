@@ -161,15 +161,19 @@ export const ui = {
     "venue.access.note":
       "Le site CENTQUATRE-PARIS est certifié accessible aux personnes à mobilité réduite. Contactez l'équipe de l'événement pour des besoins spécifiques.",
     "schedule.heading": "Programme",
+    "schedule.parcours.heading": "Les parcours",
+    "schedule.parcours.hint": "Survolez un parcours pour en lire la description.",
     "schedule.rail_label": "Programme \u2014 3 juin 2027",
     "schedule.rail_label.2026": "Programme \u2014 03 F\u00e9vrier 2026",
     "schedule.subtitle":
       "50+ conf\u00e9rences sur 4 salles en parall\u00e8le. Construisez votre agenda personnel, exportez-le en .ics.",
     // Per-edition, resolved like `schedule.rail_label.<year>`: 2027 gains a
-    // fifth room and a track that is not about technology, and the subtitle is
-    // where a visitor learns both before scrolling a five-column grid.
+    // fifth room, and that room — not a track — is what carries the strategic
+    // orientation. Talks in it sit in the ordinary parcours; the room is the
+    // signal. The subtitle is where a visitor learns this before meeting a
+    // five-column grid.
     "schedule.subtitle.2027":
-      "50+ conf\u00e9rences sur 5 salles en parall\u00e8le, dont une track consacr\u00e9e \u00e0 la strat\u00e9gie et aux enjeux d'organisation dans nos entreprises. Construisez votre agenda personnel, exportez-le en .ics.",
+      "50+ conf\u00e9rences sur 5 salles en parall\u00e8le, dont une consacr\u00e9e \u00e0 la strat\u00e9gie et aux enjeux d'organisation dans nos entreprises. Construisez votre agenda personnel, exportez-le en .ics.",
     // Shown under the room name in the grid header. Editorial, not derived: in
     // an early programme every room looks single-track, so inferring this from
     // the data would badge all five.
@@ -574,12 +578,14 @@ export const ui = {
     "venue.access.note":
       "CENTQUATRE-PARIS is certified accessible to people with reduced mobility. Contact the event team for specific needs.",
     "schedule.heading": "Schedule",
+    "schedule.parcours.heading": "Tracks",
+    "schedule.parcours.hint": "Hover a track to read what it covers.",
     "schedule.rail_label": "Schedule \u2014 June 3, 2027",
     "schedule.rail_label.2026": "Schedule \u2014 Feb 03, 2026",
     "schedule.subtitle":
       "50+ talks across 4 parallel tracks. Build your personal agenda and export it as .ics.",
     "schedule.subtitle.2027":
-      "50+ talks across 5 parallel rooms, including one track devoted to strategy and the organisational challenges facing our companies. Build your personal agenda and export it as .ics.",
+      "50+ talks across 5 parallel rooms, one of them devoted to strategy and the organisational challenges facing our companies. Build your personal agenda and export it as .ics.",
     "schedule.room_note.2027.Eiffel": "Strategy & Leadership",
     "schedule.empty_state": "The schedule for this edition will be published soon.",
     "schedule.notice.2027_coming": "The 2027 schedule will be announced in February 2027. In the meantime, browse the 2026 schedule below or (re)watch the 2026 talks on our YouTube channel!",
