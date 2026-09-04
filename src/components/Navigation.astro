@@ -83,9 +83,14 @@ const programmeDD = (() => {
     label: t("nav.programme.label"),
     active: onProgramme || onCfp || onSpeakers,
     items: [
+      // Order: the live edition's programme, then its speakers, then the CFP.
+      // Programme and Intervenant(e)s are two views of the same edition and
+      // belong side by side; the CFP is a different kind of thing — a call to
+      // act, not a page about the content — so it reads better after them, and
+      // ahead of the finished editions below.
       item(`${programmeBase}/${featured}`, t("nav.programme.submenu.programme")),
-      item(cfpPath,                        t("nav.programme.submenu.cfp")),
       item(`${speakersBase}/${featured}`,  t("nav.programme.submenu.intervenants")),
+      item(cfpPath,                        t("nav.programme.submenu.cfp")),
       // Finished editions stay one click away once a newer programme leads —
       // the schedule AND the speakers. The two entries above both follow
       // `featured`, so without the speakers line /intervenants/2026, holding
