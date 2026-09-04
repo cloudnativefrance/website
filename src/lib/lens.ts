@@ -152,6 +152,28 @@ export function findClashes(items: readonly AgendaItem[]): Map<string, string[]>
   return out;
 }
 
+/**
+ * Fill a clash-label template's `{title}` and `{room}` tokens in one pass.
+ *
+ * Two sequential `.replace()` calls cannot do this safely: a Pretalx title
+ * can itself contain the literal text `{room}`, and the second `.replace()`
+ * would then match that occurrence INSIDE the just-substituted title rather
+ * than the template's own `{room}` token — e.g. a title "Scheduling {room} at
+ * scale" turns `"chevauche {title} ({room})"` into
+ * `"chevauche Scheduling Piaf at scale ({room})"`: the room name lands inside
+ * the title, and the real `{room}` token is left showing on screen. Matching
+ * both tokens in a single regex pass cannot re-enter text it already
+ * substituted.
+ *
+ * Function-replacement form, not string-replacement: `String.prototype.replace`
+ * treats `$&`, `$$`, `` $` ``, `$'` and `$<name>` as special patterns in a
+ * STRING replacement argument, so a title containing `$&` would render
+ * wrong. A function replacement disables that handling.
+ */
+export function substituteClashLabel(template: string, title: string, room: string): string {
+  return template.replace(/\{(title|room)\}/g, (_match, key: string) => (key === "title" ? title : room));
+}
+
 export interface FacetCard {
   audience: Audience;
   room: string;

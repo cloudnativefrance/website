@@ -158,6 +158,40 @@ describe("findClashes", () => {
   });
 });
 
+import { substituteClashLabel } from "@/lib/lens";
+
+describe("substituteClashLabel", () => {
+  it("substitutes both tokens", () => {
+    expect(substituteClashLabel("overlaps with {title} ({room})", "Scaling eBPF", "Piaf")).toBe(
+      "overlaps with Scaling eBPF (Piaf)",
+    );
+  });
+
+  it("does not let a title containing the literal {room} token bleed into the room substitution", () => {
+    // A naive `.replace("{title}", …).replace("{room}", …)` would land the
+    // room name INSIDE the just-substituted title here, and leave the
+    // template's own {room} token showing raw.
+    const label = substituteClashLabel(
+      "chevauche {title} ({room})",
+      "Scheduling {room} at scale",
+      "Piaf",
+    );
+    expect(label).toBe("chevauche Scheduling {room} at scale (Piaf)");
+  });
+
+  it("does not treat $& in a title as a special replacement pattern", () => {
+    const label = substituteClashLabel("overlaps with {title} ({room})", "Rust & $& Friends", "Eiffel");
+    expect(label).toBe("overlaps with Rust & $& Friends (Eiffel)");
+  });
+
+  it("leaves a token untouched when the template does not name it", () => {
+    expect(substituteClashLabel("overlaps with {title}", "Scaling eBPF", "Piaf")).toBe(
+      "overlaps with Scaling eBPF",
+    );
+    expect(substituteClashLabel("busy right now", "Scaling eBPF", "Piaf")).toBe("busy right now");
+  });
+});
+
 import { facetValuesInLens, type FacetCard } from "@/lib/lens";
 
 const mixed: FacetCard[] = [
