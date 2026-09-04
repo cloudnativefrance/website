@@ -8,6 +8,8 @@ import type { Edition } from "./editions";
 /** One parcours as the organisers wrote it in Pretalx. */
 export interface EventTrack {
   name: string;
+  /** Pretalx's own ordering. Absent on a track nobody has ranked. */
+  position?: number;
   /** Empty when nobody has written one; the caller decides whether to render. */
   description: string;
   color?: string;
@@ -48,14 +50,27 @@ export async function loadEventTracks(year: Edition): Promise<EventTrack[]> {
 
     return rows
       .map((row) => {
-        const r = row as { name?: unknown; description?: unknown; color?: unknown };
+        const r = row as {
+          name?: unknown; description?: unknown; color?: unknown; position?: unknown;
+        };
         return {
           name: localised(r.name as never),
           description: localised(r.description as never),
           color: typeof r.color === "string" ? r.color : undefined,
+          position: typeof r.position === "number" ? r.position : undefined,
         };
       })
-      .filter((t) => t.name);
+      .filter((t) => t.name)
+      // Ordered by the organisers, in Pretalx, not by the id the API happens to
+      // return them in — creation order put the two newest parcours last, which
+      // is the opposite of their priority. Anything unranked sorts to the end
+      // rather than jumping the queue, and ties fall back to the name so the
+      // build output is stable.
+      .sort((a, b) => {
+        const pa = a.position ?? Number.MAX_SAFE_INTEGER;
+        const pb = b.position ?? Number.MAX_SAFE_INTEGER;
+        return pa - pb || a.name.localeCompare(b.name, "fr");
+      });
   } catch (err) {
     console.warn(`[tracks] ${slug}: ${messageOf(err)} — the parcours strip will not render.`);
     return [];
