@@ -13,6 +13,33 @@ import { resolve } from "node:path";
 const read = (rel: string) =>
   readFileSync(resolve(import.meta.dirname, "../../", rel), "utf-8");
 
+/**
+ * Slice from `anchor` through the balanced closing `}` of the block that
+ * follows it (its own opening `{`, matched by brace depth) — never a magic
+ * character count, and never a naive `indexOf("}", start)`. Both of those
+ * silently under-cover the moment the block grows: a fixed-length window
+ * stops covering a handler that gets longer (the `Clear filters` guard
+ * below used to slice a fixed 400 characters, three lines short of the
+ * handler's actual end), and `indexOf("}", start)` matches the first `{...}`
+ * to close — a nested `if`/loop/object literal, not necessarily the block's
+ * own end.
+ */
+function sliceBalancedBlock(src: string, anchor: string): string {
+  const start = src.indexOf(anchor);
+  if (start === -1) throw new Error(`sliceBalancedBlock: anchor not found: ${anchor}`);
+  const bodyOpen = src.indexOf("{", start);
+  if (bodyOpen === -1) throw new Error(`sliceBalancedBlock: no "{" after anchor: ${anchor}`);
+  let depth = 0;
+  for (let i = bodyOpen; i < src.length; i++) {
+    if (src[i] === "{") depth++;
+    else if (src[i] === "}") {
+      depth--;
+      if (depth === 0) return src.slice(start, i + 1);
+    }
+  }
+  throw new Error(`sliceBalancedBlock: unbalanced braces from anchor: ${anchor}`);
+}
+
 describe("audience lens markup", () => {
   it("cards carry their audience", () => {
     expect(read("src/components/schedule/SessionCard.astro")).toMatch(/data-audience=/);
@@ -105,15 +132,15 @@ describe("audience lens: other editions and the URL", () => {
     const filter = read("src/lib/schedule-filter.ts");
     expect(filter).toContain("function activeFilterCount");
 
-    const interfaceStart = filter.indexOf("export interface FilterState");
-    const interfaceEnd = filter.indexOf("}", interfaceStart);
-    expect(interfaceStart, "FilterState is declared").toBeGreaterThan(-1);
-    expect(filter.slice(interfaceStart, interfaceEnd)).not.toMatch(/audience/i);
-
-    const fnStart = filter.indexOf("export function activeFilterCount");
-    const fnEnd = filter.indexOf("}", fnStart);
-    expect(fnStart, "activeFilterCount is declared").toBeGreaterThan(-1);
-    expect(filter.slice(fnStart, fnEnd)).not.toMatch(/audience/i);
+    // Balanced-brace bound, not `indexOf("}", start)`: neither body has a
+    // nested `{...}` today, so the naive bound happens to land correctly —
+    // but that is an assumption about today's code, not a guarantee. The
+    // moment either grows an `if`/loop/object literal before its own close,
+    // `indexOf("}", start)` would match that nested brace and silently stop
+    // covering the rest of the body. sliceBalancedBlock cannot make that
+    // mistake: it tracks depth, so it always finds the block's OWN close.
+    expect(sliceBalancedBlock(filter, "export interface FilterState")).not.toMatch(/audience/i);
+    expect(sliceBalancedBlock(filter, "export function activeFilterCount")).not.toMatch(/audience/i);
 
     const ui = read("src/components/schedule/schedule-ui.ts");
     expect(ui).not.toMatch(/state\.audience|audience:\s*(new Set|")/);
@@ -121,13 +148,19 @@ describe("audience lens: other editions and the URL", () => {
 
   it("Clear filters does not reset the lens", () => {
     const src = read("src/components/schedule/schedule-ui.ts");
-    const clear = src.slice(src.indexOf("schedule-filter-clear"));
+    // Balanced-brace bound, not a fixed character count: a fixed `slice(0,
+    // 400)` stopped covering the handler's own last three lines — including
+    // its trailing `apply();`, the single most natural place to insert
+    // "reset the lens, then apply" — the moment the handler grew past 400
+    // characters. sliceBalancedBlock always runs to the handler's own
+    // closing `}`, however long the handler is.
+    //
     // Case-insensitive, and not just a literal-assignment check: the file's
     // own documented entry point for changing lens is `setAudience(...)` —
     // capital A — so a maintainer wiring a lens reset into this handler would
     // call that, not assign `audience` directly. A case-sensitive
     // `toContain("audience")` lets `setAudience("tech");` straight through.
-    expect(clear.slice(0, 400)).not.toMatch(/audience/i);
+    expect(sliceBalancedBlock(src, "schedule-filter-clear")).not.toMatch(/audience/i);
   });
 
   it("an edition with one audience never applies a lens", () => {
