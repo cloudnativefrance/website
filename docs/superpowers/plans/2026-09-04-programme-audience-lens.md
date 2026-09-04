@@ -1039,6 +1039,7 @@ git commit -m "feat(schedule): search across both lenses and offer the remainder
 - Modify: `src/components/schedule/schedule-ui.ts`
 - Modify: `src/components/schedule/ScheduleToolbar.astro`
 - Modify: `src/components/schedule/ScheduleGrid.astro` (the clash label on `[data-schedule-root]`)
+- Test: `src/components/schedule/__tests__/ScheduleToolbar.test.ts` (extend)
 - Modify: `src/i18n/ui.ts` (FR + EN)
 - Test: `src/lib/__tests__/lens.test.ts` (extend)
 
@@ -1186,14 +1187,49 @@ as well as to `src/i18n/ui.ts`:
 
 `ScheduleToolbar.astro` builds the track filter from `listTracks(sessions)`. Once a track defines the lens, offering it again in the dropdown is a trap: selecting it from the technical lens yields an empty grid with no explanation, and from the leadership lens it is a no-op. Filter the leadership track names out of that list.
 
-Guard it in `tests/build/audience-lens.test.ts`:
+Guard it by **rendering**, not by grepping the source. A regex looking for
+`LEADERSHIP_TRACKS` near `listTracks` passes whether or not the value is
+actually removed from the list — and this run has already shipped two guards
+that would have passed against a deleted feature. Extend the container tests in
+`src/components/schedule/__tests__/ScheduleToolbar.test.ts`, which already has
+`AstroContainer` and a `row()` helper:
 
 ```ts
-  it("the leadership track is not offered as a track filter", () => {
-    const src = read("src/components/schedule/ScheduleToolbar.astro");
-    expect(src).toMatch(/listTracks\([^)]*\)[\s\S]{0,200}(LEADERSHIP_TRACKS|audienceOf)/);
+  it("does not offer the leadership track as a track filter", async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ScheduleToolbar, {
+      props: {
+        sessions: [
+          row({ id: "A", track: "IA et Data" }),
+          row({ id: "B", track: LEADERSHIP_TRACKS[0], room: "Eiffel" }),
+        ],
+        lang: "fr",
+        defaultView: "grid",
+      },
+    });
+    // The track that DEFINES the lens must not also be offered inside it:
+    // selecting it from the technical lens yields an empty grid with no
+    // explanation, and from the leadership lens it is a no-op.
+    expect(html).toContain('data-value="IA et Data"');
+    expect(html).not.toContain(`data-value="${LEADERSHIP_TRACKS[0]}"`);
+  });
+
+  it("still offers the track facet when only technical tracks exist", async () => {
+    // Removing the leadership track must not empty the facet for editions that
+    // never had one — 2023 and 2026 render exactly as before.
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ScheduleToolbar, {
+      props: { sessions: [row({ track: "IA et Data" })], lang: "fr", defaultView: "grid" },
+    });
+    expect(html).toContain('data-value="IA et Data"');
   });
 ```
+
+Import `LEADERSHIP_TRACKS` from `@/lib/audience` in that test file. Note the
+second case: the server already drops a facet whose value list is empty
+(`ScheduleToolbar.astro`'s `.filter((facet) => facet.values.length > 0)`), so
+removing the leadership track must not accidentally remove the whole track
+facet from an edition that has no leadership track at all.
 
 - [ ] **Step 5: Prune the filter options the lens has emptied**
 
