@@ -837,6 +837,10 @@ MSG
     audience: Audience,
     query: string,
   ): number;
+  export function lensTotal(
+    cards: readonly { id: string; audience: Audience; format: string }[],
+    audience: Audience,
+  ): number;
   ```
 
 Without this a CTO searching "gouvernance" from the technical lens is told *no results* — true and useless. The lens becomes a hiding device instead of a focusing one.
@@ -912,6 +916,62 @@ export function countMatchesOutsideLens(
 `./schedule-filter` (`src/lib/schedule-filter.ts:34`), do NOT write a second
 copy. The main search already folds with it; a remainder count that folded
 differently would report matches the visitor cannot reproduce by switching lens.
+
+- [ ] **Step 3b: Lens-scope the DENOMINATOR too (spec D-4)**
+
+`apply()` writes `"{n} of {total} sessions"`, and `{total}` is
+`data-total={sessions.length}` — a static, server-rendered count of the whole
+day (`ScheduleToolbar.astro:100`, read at `schedule-ui.ts:39`). Task 3 scoped
+the numerator to the lens but the denominator still counts every session in the
+edition.
+
+The result: open the leadership lens with **no filter active** and the line
+reads *"6 of 51 sessions"*, which tells the visitor 45 sessions are hidden by
+their filters. Nothing is filtered. Spec D-4 says the result count is
+lens-scoped and matches what is on screen; half of it does not.
+
+Count the lens's own cards instead, falling back to the server total when the
+page has no lens:
+
+```ts
+// The server's `data-total` counts the whole edition, which is right for a
+// page with one lens and wrong for a page with two.
+const lensTotal = document.querySelectorAll(
+  ".session-card:not(.is-audience-hidden)",
+).length / cardCopiesPerSession;
+```
+
+**Mind the double count.** Every session renders twice — once in the grid, once
+in the list (`ScheduleGridView.astro` and `ScheduleListView.astro` both emit a
+`.session-card`), which is why `apply()` counts *ids* into a `Set` rather than
+counting elements. Do the same here: build a `Set` of `data-session-id` over the
+non-lens-hidden cards and take its `size`. Do not divide by two — a keynote or
+any card rendered once would break that arithmetic silently.
+
+Guard it in `src/lib/__tests__/lens.test.ts` by making it a pure function beside
+the others, so the arithmetic is tested rather than trusted:
+
+```ts
+export function lensTotal(cards: readonly { id: string; audience: Audience; format: string }[], audience: Audience): number {
+  const ids = new Set<string>();
+  for (const c of cards) if (c.format === "keynote" || c.audience === audience) ids.add(c.id);
+  return ids.size;
+}
+```
+
+```ts
+describe("lensTotal", () => {
+  it("counts each session once even though every card renders twice", () => {
+    const twice = [...cards, ...cards];   // grid copy + list copy
+    expect(lensTotal(twice, "tech")).toBe(lensTotal(cards, "tech"));
+  });
+
+  it("counts a keynote in both lenses", () => {
+    expect(lensTotal(cards, "leadership")).toBe(2);   // K + B
+    expect(lensTotal(cards, "tech")).toBe(2);         // K + A
+  });
+});
+```
 
 - [ ] **Step 4: Surface it in the result line**
 
@@ -1345,7 +1405,30 @@ const asAudience = (v: string | null): Audience | null =>
 // rather than 404-ing or rendering an empty grid is what makes a stale link to
 // ?audience=leadership harmless on 2026.
 const hasLens = root.getAttribute("data-has-audiences") === "true";
-setAudience(hasLens ? (asAudience(params.get("audience")) ?? "tech") : "tech");
+if (hasLens) setAudience(asAudience(params.get("audience")) ?? "tech");
+```
+
+**The `if` is load-bearing — do not flatten it to `setAudience(hasLens ? … : "tech")`.**
+`setAudience` calls `applyAudience`, which hides every card whose audience is not
+the current one. On an edition where `hasBothAudiences` is false, no control
+renders, so there is nothing to switch back with — and if that edition happened
+to be entirely *leadership*, booting into `"tech"` would hide every session on
+the page and leave a blank programme with no way out.
+
+Not reachable from today's data, and it is precisely the shape of bug that
+becomes reachable the year someone runs a leadership-only track day. An edition
+with one audience has no lens, so the honest thing is to apply none: leave every
+card visible and let `apply()` alone decide what shows.
+
+Guard it, since the failure is silent:
+
+```ts
+  it("an edition with one audience never applies a lens", () => {
+    const src = read("src/components/schedule/schedule-ui.ts");
+    // The boot call must be gated, not ternary'd — a ternary still calls
+    // setAudience, which still hides every card of the other audience.
+    expect(src).toMatch(/if\s*\(\s*hasLens\s*\)\s*setAudience/);
+  });
 ```
 
 Place that beside the existing `setView(...)` call, **before** the `apply()`
