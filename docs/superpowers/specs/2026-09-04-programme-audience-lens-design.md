@@ -191,7 +191,28 @@ session is scheduled there. One line to change if the floor says otherwise.
 The leadership track does not yet exist in Pretalx: the 2027 event has five tracks
 (Infrastructure et opérations, Developer Experience, IA et Data, Réseau et sécurité,
 Autres sujets et crazy stuff). An organiser must create the leadership track and assign
-the relevant proposals to it. Room Eiffel must also exist and be scheduled into.
+the relevant proposals to it. **Room Eiffel already exists** in the 2027 event — verified
+against the live API — so only the track is outstanding.
+
+### The track's name must match exactly, and in French
+
+`LEADERSHIP_TRACKS` in `src/lib/audience.ts` holds the literal string
+
+> `Strategy & Leadership`
+
+and the track's **French** name must equal it. 2027 is a preview-access edition, so its
+sessions come through `src/lib/pretalx-preview.ts`, which resolves
+`track: localised(submission.track?.name)`, and `localised` (`pretalx-preview-api.ts`)
+returns the `fr` field first. So it is the French name that reaches `SessionRow.track`.
+
+`audienceOf` folds case and accents, so `STRATEGY & LEADERSHIP` or a stray accent still
+matches. A *different name* does not: "Stratégie & Leadership", "Leadership", or
+"Strategy and Leadership" would all leave `hasBothAudiences` false.
+
+**This is the feature's most likely operational failure, and it is silent.** A mismatched
+name renders no control, ignores `?audience=leadership`, and reports no error anywhere —
+the page simply looks like an edition with one audience, which is a legitimate state. If
+the lens does not appear once the track exists, check this string first.
 
 Until both exist, the code is inert: no edition has leadership sessions, so no control
 renders. The implementation can therefore land before the content does.
