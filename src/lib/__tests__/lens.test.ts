@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { resolveLens, type LensCard } from "@/lib/lens";
+import { resolveLens, countMatchesOutsideLens, lensTotal, type LensCard } from "@/lib/lens";
 
 const ROOMS = ["Monet", "Piaf", "Eiffel"];
 const cards: LensCard[] = [
@@ -59,5 +59,42 @@ describe("resolveLens", () => {
     // than the brief's Step 1 literal, which omits it and would fail against
     // any implementation the DOM wrapper can consume.
     expect(Object.keys(r)).toEqual(["hiddenIds", "hiddenRooms", "columnOf", "roomCount"]);
+  });
+});
+
+const haystack = [
+  { audience: "tech" as const,       search: "ebpf réseau" },
+  { audience: "leadership" as const, search: "gouvernance cloud" },
+  { audience: "leadership" as const, search: "gouvernance et budget" },
+];
+
+describe("countMatchesOutsideLens", () => {
+  it("counts matches in the other lens", () => {
+    expect(countMatchesOutsideLens(haystack, "tech", "gouvernance")).toBe(2);
+  });
+
+  it("is zero when the other lens has nothing", () => {
+    expect(countMatchesOutsideLens(haystack, "tech", "ebpf")).toBe(0);
+  });
+
+  it("is zero for an empty query — an empty search is not a search", () => {
+    expect(countMatchesOutsideLens(haystack, "tech", "   ")).toBe(0);
+  });
+
+  it("ignores accents and case, like the main search", () => {
+    expect(countMatchesOutsideLens(haystack, "tech", "GOUVERNANCE")).toBe(2);
+    expect(countMatchesOutsideLens(haystack, "leadership", "RESEAU")).toBe(1);
+  });
+});
+
+describe("lensTotal", () => {
+  it("counts each session once even though every card renders twice", () => {
+    const twice = [...cards, ...cards];   // grid copy + list copy
+    expect(lensTotal(twice, "tech")).toBe(lensTotal(cards, "tech"));
+  });
+
+  it("counts a keynote in both lenses", () => {
+    expect(lensTotal(cards, "leadership")).toBe(2);   // K + B
+    expect(lensTotal(cards, "tech")).toBe(2);         // K + A
   });
 });

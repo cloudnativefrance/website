@@ -16,6 +16,7 @@ import {
   type FilterState,
 } from "@/lib/schedule-filter";
 import type { Audience } from "@/lib/audience";
+import { countMatchesOutsideLens, lensTotal } from "@/lib/lens";
 import { applyAudience } from "./schedule-ui-audience";
 
 const VIEW_KEY = "cnd-schedule-view";
@@ -39,6 +40,11 @@ if (root) {
   const total = Number(countEl?.getAttribute("data-total") ?? "0");
   const countTemplate = root.getAttribute("data-count-template") ?? "{n}/{total}";
   const noneLabel = root.getAttribute("data-none-label") ?? "";
+  // Server-rendered: true only for an edition with both audiences, i.e. one
+  // that actually shows the lens switch. `total` (the whole edition) stays
+  // the right denominator for every other edition.
+  const hasAudiences = root.getAttribute("data-has-audiences") === "true";
+  const moreResultsLabel = root.getAttribute("data-schedule-more-results") || "{n} more in {lens}";
 
   function apply() {
     const query = normalise(state.query.trim());
@@ -88,10 +94,32 @@ if (root) {
     }
 
     if (countEl) {
+      const cards = lensCards();
+      // The server's `data-total` counts the whole edition — right for a page
+      // with one lens, wrong for a page with two, where it must count only
+      // this lens's own sessions (its cards plus every keynote).
+      const scopedTotal = hasAudiences ? lensTotal(cards, audience) : total;
       countEl.textContent =
         visible.size === 0
           ? noneLabel
-          : countTemplate.replace("{n}", String(visible.size)).replace("{total}", String(total));
+          : countTemplate.replace("{n}", String(visible.size)).replace("{total}", String(scopedTotal));
+
+      // A search can match sessions the lens is hiding. Silently reporting
+      // "no results" would be true and useless, so name the remainder and
+      // offer the one click that resolves it: switch lens, keep the query.
+      const outside = countMatchesOutsideLens(cards, audience, state.query);
+      if (outside > 0) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "toolbar-cross-lens";
+        btn.textContent = moreResultsLabel
+          .replace("{n}", String(outside))
+          .replace("{lens}", lensLabel(otherAudience(audience)));
+        btn.addEventListener("click", () => setAudience(otherAudience(audience)));
+        // `textContent =` above wiped any previous button, so it is rebuilt
+        // fresh on every apply() rather than toggled.
+        countEl.append(" · ", btn);
+      }
     }
 
     for (const btn of document.querySelectorAll<HTMLElement>(".schedule-filter")) {
