@@ -173,8 +173,13 @@ function spanOf(list: SessionRow[]): { start: number; end: number } {
      rather than two competing lines. */
   .grid-view-room { display: flex; flex-direction: column; gap: 1px; }
   .grid-view-room-note {
-    font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em;
-    color: var(--color-primary); text-transform: none;
+    /* `--color-primary-strong`, not `--color-primary`: measured on the light
+       page, primary as TEXT at this size came to 3.37:1, under the 4.5 AA
+       wants. The strong variant exists for exactly this — painted as text
+       rather than as a fill — and carries its own dark-mode value, so the
+       note stays legible in both. 11px for the same reason. */
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+    color: var(--color-primary-strong); text-transform: none;
   }
   .grid-view-gutter { min-width: 0; }
   .grid-view-time {
