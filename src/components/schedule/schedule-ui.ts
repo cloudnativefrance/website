@@ -237,10 +237,9 @@ if (root) {
    * inside apply(), since the reachable values change with the lens, not
    * with the filters.
    *
-   * Called both from `setAudience` and once at initial load: `applyAudience`
-   * is also invoked directly at load (below) to resolve the server-rendered
-   * default lens, so without this the first paint would offer chips for
-   * values only the other lens can reach until the visitor's first switch.
+   * Its only call site is inside `setAudience` — the boot sequence resolves
+   * the initial lens through `setAudience` too (Task 6), so there is no
+   * separate boot-time call left to keep in sync with this one.
    *
    * A no-op for a single-audience edition: `hasAudiences` is false there, no
    * `[data-audience-switch]` is even rendered, and a facet with only one
@@ -290,7 +289,14 @@ if (root) {
     for (const btn of document.querySelectorAll<HTMLElement>("[data-audience-switch] [data-audience]")) {
       btn.setAttribute("aria-pressed", btn.getAttribute("data-audience") === audience ? "true" : "false");
     }
-    // Task 6 adds the URL write here.
+    // `replaceState`, not `pushState`: the lens is a view of one page, so
+    // toggling it four times must not cost four Back presses. The technical
+    // lens deletes the parameter rather than writing `?audience=tech`, so the
+    // default state keeps the canonical bare path (spec D-8).
+    const url = new URL(window.location.href);
+    if (hasLens && audience === "leadership") url.searchParams.set("audience", "leadership");
+    else url.searchParams.delete("audience");
+    history.replaceState(null, "", url);
   };
 
   // Both sticky offsets were hardcoded to `top: 64px`. The site header is
@@ -388,15 +394,25 @@ if (root) {
   function asView(value: string | null): "grid" | "list" | null {
     return value === "grid" || value === "list" ? value : null;
   }
-  // Applied before `setView` so its `renderView()` call already sees a
-  // correct `lensForcesList`, and before the trailing `apply()` so the
-  // initial result count and row-emptiness already reflect the default lens.
-  lensForcesList = applyAudience(root, audience) <= 1;
-  // The initial lens is resolved above by calling `applyAudience` directly
-  // rather than through `setAudience`, so the facet prune needs its own call
-  // here too — otherwise the first paint offers filter chips for values only
-  // reachable in the OTHER lens, until the visitor's first manual switch.
-  pruneFacetsForLens();
+  /** A candidate is only a lens if it names one — anything else falls through. */
+  const asAudience = (v: string | null): Audience | null =>
+    v === "tech" || v === "leadership" ? v : null;
+
+  // An edition with one audience has no lens to select. Ignoring the
+  // parameter rather than 404-ing or rendering an empty grid is what makes a
+  // stale link to ?audience=leadership harmless on 2026.
+  const hasLens = hasAudiences;
+  // The `if` is load-bearing, not a ternary: `setAudience` hides every card
+  // whose audience is not the current one, and a single-audience edition
+  // renders no control to switch back with. Applying no lens is what leaves
+  // every card visible there and lets `apply()` alone decide what shows.
+  //
+  // Placed before `setView` so its `renderView()` call already sees a
+  // correct `lensForcesList`, and before the trailing `apply()` below so the
+  // initial result count and row-emptiness already reflect the resolved
+  // lens — `setAudience` runs its own `apply()` internally, so running the
+  // one below first would render the page once against the wrong lens.
+  if (hasLens) setAudience(asAudience(params.get("audience")) ?? "tech");
   setView(asView(fromUrl) ?? asView(stored) ?? serverDefaultView, false);
   apply();
 

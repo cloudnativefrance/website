@@ -44,11 +44,11 @@ describe("audience lens markup", () => {
     // trailing semicolon, so a semicolon-less match would pass on the
     // declaration alone, regardless of call order.
     //
-    // Two call sites need this guarantee: the lens switch (setAudience) and
-    // the boot sequence that resolves the server-rendered default lens.
-    // Getting either backwards is silent — apply() would run once against
-    // selections the new lens cannot honour, and the result count would lag
-    // one switch behind.
+    // `pruneFacetsForLens()` has exactly one call site: inside `setAudience`.
+    // Task 5 needed a second, standalone boot-time call because no lens was
+    // resolved at boot yet; Task 6 makes boot resolve the lens through
+    // `setAudience` too (gated by `hasLens`), so that second call site is
+    // gone — a reader must not find two places claiming to be authoritative.
     const setAudienceStart = src.indexOf("const setAudience = (next: Audience): void => {");
     const setAudienceEnd = src.indexOf("};", setAudienceStart);
     expect(setAudienceStart, "setAudience is declared").toBeGreaterThan(-1);
@@ -60,11 +60,72 @@ describe("audience lens markup", () => {
     expect(setAudiencePrune, "setAudience calls the prune").toBeGreaterThan(-1);
     expect(setAudienceApply, "setAudience: prune precedes apply()").toBeGreaterThan(setAudiencePrune);
 
-    // The boot sequence's own prune/apply pair, searched forward from where
-    // setAudience ends so this cannot re-match setAudience's own calls.
-    const bootPrune = src.indexOf("pruneFacetsForLens();", setAudienceEnd);
-    const bootApply = src.indexOf("apply();", bootPrune);
-    expect(bootPrune, "boot calls the prune").toBeGreaterThan(setAudienceEnd);
-    expect(bootApply, "boot: prune precedes apply()").toBeGreaterThan(bootPrune);
+    // No second call site anywhere else in the file — in particular not a
+    // standalone one reinstated at boot.
+    const callSites = src.split("pruneFacetsForLens();").length - 1;
+    expect(callSites, "pruneFacetsForLens() has exactly one call site").toBe(1);
+  });
+});
+
+describe("audience lens: other editions and the URL", () => {
+  it("2023 and 2026 render no control — absent, not disabled", () => {
+    for (const page of ["dist/programme/2023/index.html", "dist/programme/2026/index.html"]) {
+      const html = readFileSync(resolve(import.meta.dirname, "../../", page), "utf-8");
+      expect(html, page).not.toContain("data-audience-switch");
+      expect(html, page).toContain('data-has-audiences="false"');
+    }
+  });
+
+  it("the lens is read from the URL and defaults to tech", () => {
+    const src = read("src/components/schedule/schedule-ui.ts");
+    expect(src).toContain("audience");
+    expect(src).toMatch(/searchParams/);
+    // The two assertions above are already satisfied by unrelated code (the
+    // `Audience` type is used throughout the file; `?view=` already reads
+    // `searchParams`), so on their own they would pass even without this
+    // feature. Pin the actual behaviour: the URL is read for `audience`.
+    expect(src).toMatch(/params\.get\(\s*["']audience["']\s*\)/);
+  });
+
+  it("the lens is NOT counted as an active filter", () => {
+    // `activeFilterCount` reads FilterState wholesale, so the guard is that the
+    // lens never enters FilterState — assert on the file that DEFINES both.
+    // (Slicing schedule-ui.ts for "function activeFilterCount" finds nothing
+    //  there: it is imported, so indexOf returns -1, slice(-1) yields one
+    //  character, and the assertion passes without testing anything.)
+    //
+    // Scoped to the FilterState interface and the activeFilterCount function
+    // bodies specifically, not the whole file: schedule-filter.ts also has an
+    // unrelated comment about a keynote's "entire audience", which would trip
+    // a whole-file `not.toContain("audience")` regardless of whether the lens
+    // actually leaked into FilterState.
+    const filter = read("src/lib/schedule-filter.ts");
+    expect(filter).toContain("function activeFilterCount");
+
+    const interfaceStart = filter.indexOf("export interface FilterState");
+    const interfaceEnd = filter.indexOf("}", interfaceStart);
+    expect(interfaceStart, "FilterState is declared").toBeGreaterThan(-1);
+    expect(filter.slice(interfaceStart, interfaceEnd)).not.toContain("audience");
+
+    const fnStart = filter.indexOf("export function activeFilterCount");
+    const fnEnd = filter.indexOf("}", fnStart);
+    expect(fnStart, "activeFilterCount is declared").toBeGreaterThan(-1);
+    expect(filter.slice(fnStart, fnEnd)).not.toContain("audience");
+
+    const ui = read("src/components/schedule/schedule-ui.ts");
+    expect(ui).not.toMatch(/state\.audience|audience:\s*(new Set|")/);
+  });
+
+  it("Clear filters does not reset the lens", () => {
+    const src = read("src/components/schedule/schedule-ui.ts");
+    const clear = src.slice(src.indexOf("schedule-filter-clear"));
+    expect(clear.slice(0, 400)).not.toContain("audience");
+  });
+
+  it("an edition with one audience never applies a lens", () => {
+    const src = read("src/components/schedule/schedule-ui.ts");
+    // The boot call must be gated, not ternary'd — a ternary still calls
+    // setAudience, which still hides every card of the other audience.
+    expect(src).toMatch(/if\s*\(\s*hasLens\s*\)\s*setAudience/);
   });
 });
