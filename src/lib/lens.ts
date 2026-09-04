@@ -59,20 +59,27 @@ export function resolveLens(
  * Without this a CTO searching "gouvernance" from the technical lens is told
  * "no results" — true, and useless. A lens is meant to focus; unannounced
  * misses turn it into a hiding device.
+ *
+ * Needs `id` and `format`, not just `audience`/`search`, for the same two
+ * reasons `lensTotal` does: every session renders twice (grid + list), so
+ * counting entries rather than distinct ids doubles the number; and a
+ * keynote is already on screen in BOTH lenses (`resolveLens` exempts it),
+ * so counting one here would offer to switch lens to reach a session the
+ * visitor is already looking at.
  */
 export function countMatchesOutsideLens(
-  cards: readonly { audience: Audience; search: string }[],
+  cards: readonly { id: string; audience: Audience; format: string; search: string }[],
   audience: Audience,
   query: string,
 ): number {
   const q = normalise(query).trim();
   if (!q) return 0;
-  let n = 0;
+  const ids = new Set<string>();
   for (const c of cards) {
-    if (c.audience === audience) continue;
-    if (normalise(c.search).includes(q)) n += 1;
+    if (c.format === "keynote" || c.audience === audience) continue;
+    if (normalise(c.search).includes(q)) ids.add(c.id);
   }
-  return n;
+  return ids.size;
 }
 
 /**

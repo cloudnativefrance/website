@@ -202,6 +202,22 @@ const levels = listLevels(sessions);
     /* "51 sessions sur 51" rewrites on every keystroke in the search box. */
     font-variant-numeric: tabular-nums;
   }
+  /* Reads as part of the count sentence, not as a separate widget — it
+     continues "12 of 40 sessions · 3 more in …". Underlined rather than boxed
+     for that reason, but a real button: it is the one control that resolves a
+     search whose matches are in the other lens.
+     `:global()` is required, not stylistic: this button is built with
+     `document.createElement` in schedule-ui.ts, so it never passes through
+     Astro's SSR and never receives this component's `data-astro-cid-*`
+     scoping attribute — a scoped selector would compile clean and match
+     nothing. Same reason ScheduleGridView.astro globals `.is-audience-hidden`. */
+  :global(.toolbar-cross-lens) {
+    background: none; border: 0; padding: 0; cursor: pointer;
+    font: inherit; color: var(--color-primary);
+    text-decoration: underline; text-underline-offset: 2px;
+  }
+  :global(.toolbar-cross-lens:hover) { text-decoration-thickness: 2px; }
+  :global(.toolbar-cross-lens:focus-visible) { outline: 2px solid var(--color-ring); outline-offset: 2px; border-radius: 3px; }
 
   /* On mobile the facets collapse behind the summary — the old bar cost eight
      stacked rows, roughly 1100px, before the first talk. */
