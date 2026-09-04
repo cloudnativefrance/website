@@ -268,8 +268,8 @@ if (root) {
    * with the filters.
    *
    * Its only call site is inside `setAudience` — the boot sequence resolves
-   * the initial lens through `setAudience` too (Task 6), so there is no
-   * separate boot-time call left to keep in sync with this one.
+   * the initial lens through `setAudience` too, so there is no separate
+   * boot-time call left to keep in sync with this one.
    *
    * A no-op for a single-audience edition: `hasAudiences` is false there, no
    * `[data-audience-switch]` is even rendered, and a facet with only one
@@ -324,7 +324,7 @@ if (root) {
     // lens deletes the parameter rather than writing `?audience=tech`, so the
     // default state keeps the canonical bare path (spec D-8).
     const url = new URL(window.location.href);
-    if (hasLens && audience === "leadership") url.searchParams.set("audience", "leadership");
+    if (hasAudiences && audience === "leadership") url.searchParams.set("audience", "leadership");
     else url.searchParams.delete("audience");
     history.replaceState(null, "", url);
   };
@@ -428,10 +428,11 @@ if (root) {
   const asAudience = (v: string | null): Audience | null =>
     v === "tech" || v === "leadership" ? v : null;
 
-  // An edition with one audience has no lens to select. Ignoring the
+  // An edition with one audience has no lens to select — `hasAudiences`
+  // (declared above, from `data-has-audiences`) says so. Ignoring the
   // parameter rather than 404-ing or rendering an empty grid is what makes a
   // stale link to ?audience=leadership harmless on 2026.
-  const hasLens = hasAudiences;
+  //
   // The `if` is load-bearing, not a ternary: `setAudience` hides every card
   // whose audience is not the current one, and a single-audience edition
   // renders no control to switch back with. Applying no lens is what leaves
@@ -442,10 +443,10 @@ if (root) {
   // initial result count and row-emptiness already reflect the resolved
   // lens — `setAudience` runs its own `apply()` internally, so running the
   // one below first would render the page once against the wrong lens.
-  if (hasLens) setAudience(asAudience(params.get("audience")) ?? "tech");
+  if (hasAudiences) setAudience(asAudience(params.get("audience")) ?? "tech");
   setView(asView(fromUrl) ?? asView(stored) ?? serverDefaultView, false);
-  // Redundant with the `apply()` inside `setAudience` when `hasLens` is true
-  // (harmless: synchronous, no paint between, idempotent) but load-bearing
+  // Redundant with the `apply()` inside `setAudience` when `hasAudiences` is
+  // true (harmless: synchronous, no paint between, idempotent) but load-bearing
   // when it is false — that branch never calls `setAudience`, so this is the
   // ONLY apply() a single-audience edition gets. Do not remove it as a
   // de-duplication.
