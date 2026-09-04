@@ -1050,18 +1050,25 @@ with a default button look — neither obviously clickable nor obviously part of
 the sentence. Add a rule to `ScheduleToolbar.astro`'s `<style>` block, beside
 `.toolbar-count`:
 
+**`:global()` is required, not stylistic.** Astro scopes a component's styles by
+stamping a `data-astro-cid-*` attribute on the elements it renders — and this
+button is created at runtime by `document.createElement`, so it never receives
+that attribute. A plain `.toolbar-cross-lens` rule would compile to
+`.toolbar-cross-lens[data-astro-cid-…]` and match nothing, silently.
+`ScheduleGridView.astro` globals `.is-audience-hidden` for the same reason.
+
 ```css
   /* Reads as part of the count sentence, not as a separate widget — it
      continues "12 of 40 sessions · 3 more in …". Underlined rather than boxed
      for that reason, but a real button: it is the one control that resolves a
      search whose matches are in the other lens. */
-  .toolbar-cross-lens {
+  :global(.toolbar-cross-lens) {
     background: none; border: 0; padding: 0; cursor: pointer;
     font: inherit; color: var(--color-primary);
     text-decoration: underline; text-underline-offset: 2px;
   }
-  .toolbar-cross-lens:hover { text-decoration-thickness: 2px; }
-  .toolbar-cross-lens:focus-visible { outline: 2px solid var(--color-ring); outline-offset: 2px; border-radius: 3px; }
+  :global(.toolbar-cross-lens:hover) { text-decoration-thickness: 2px; }
+  :global(.toolbar-cross-lens:focus-visible) { outline: 2px solid var(--color-ring); outline-offset: 2px; border-radius: 3px; }
 ```
 
 - [ ] **Step 5: Run tests**
