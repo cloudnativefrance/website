@@ -4,7 +4,10 @@ import type { EventTrack } from "@/lib/tracks";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 
-interface Props { tracks: EventTrack[]; lang: Locale }
+interface Props {
+  tracks: EventTrack[];
+  lang: Locale;
+}
 const { tracks, lang } = Astro.props;
 const t = useTranslations(lang);
 
@@ -14,84 +17,133 @@ const t = useTranslations(lang);
 const described = tracks.filter((track) => track.description.trim());
 ---
 
-{described.length > 0 && (
-  <nav class="parcours" aria-label={t("schedule.parcours.heading")}>
-    <ul class="parcours-list" role="list">
-      {described.map((track, i) => (
-        <li class="parcours-item">
-          {/* A button so it is keyboard-reachable and announced as interactive;
+{
+  described.length > 0 && (
+    <nav class="parcours" aria-label={t("schedule.parcours.heading")}>
+      <ul class="parcours-list" role="list">
+        {described.map((track, i) => (
+          <li class="parcours-item">
+            {/* A button so it is keyboard-reachable and announced as interactive;
               `aria-describedby` ties the popup to it, so a screen reader reads
               the description with the name instead of leaving it stranded. */}
-          <button
-            type="button"
-            class="parcours-chip"
-            style={track.color ? `--parcours-accent:${track.color};` : undefined}
-            aria-describedby={`parcours-pop-${i}`}
-          >
-            {track.name}
-          </button>
-          <span class="parcours-pop" id={`parcours-pop-${i}`} role="tooltip">
-            {track.description}
-          </span>
-        </li>
-      ))}
-    </ul>
-  </nav>
-)}
+            <button
+              type="button"
+              class="parcours-chip"
+              style={
+                track.color ? `--parcours-accent:${track.color};` : undefined
+              }
+              aria-describedby={`parcours-pop-${i}`}
+            >
+              {track.name}
+            </button>
+            <span class="parcours-pop" id={`parcours-pop-${i}`} role="tooltip">
+              {track.description}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
 
 <style>
-  .parcours { display: flex; justify-content: flex-end; }
+  .parcours {
+    display: flex;
+    justify-content: flex-end;
+  }
   .parcours-list {
-    display: flex; flex-wrap: wrap; justify-content: flex-end;
-    gap: 8px; margin: 0; padding: 0; max-width: 46rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    max-width: 46rem;
   }
   /* The anchor for the popup. Also the hover target, so the whole chip — not
      just its text — opens the description. */
-  .parcours-item { list-style: none; position: relative; }
+  .parcours-item {
+    list-style: none;
+    position: relative;
+  }
 
   .parcours-chip {
-    display: inline-flex; align-items: center; gap: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     /* --color-border alone measured 1.34:1 against the page, under the 3:1
        non-text UI wants, and there is no --color-border-strong token. Mixed
        toward --color-muted-foreground, NOT --color-foreground: foreground
        inverts between themes, so a foreground-weighted mix landed 4.40:1 in
        light and 2.00:1 in dark. muted-foreground is mid-tone in both, so one
        expression clears the bar either way. */
-    border: 1px solid color-mix(in oklch, var(--color-border) 20%, var(--color-muted-foreground) 80%);
+    border: 1px solid
+      color-mix(
+        in oklch,
+        var(--color-border) 20%,
+        var(--color-muted-foreground) 80%
+      );
     border-radius: 999px;
-    background: var(--color-card); color: var(--color-foreground);
+    background: var(--color-card);
+    color: var(--color-foreground);
     /* 8px vertical, not 5px: at 5px the chip measured 30.8px tall, under the
        40px a pointer target should offer. It cannot grow much further without
        reading as a button rather than a label, and the row gap grew with it so
        neighbouring rows do not collide. */
-    padding: 8px 13px; font-size: 12.5px; font-weight: 600; cursor: help;
+    padding: 8px 13px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: help;
     transition-property: border-color, background-color;
-    transition-duration: 120ms; transition-timing-function: ease-out;
+    transition-duration: 120ms;
+    transition-timing-function: ease-out;
   }
   /* The accent is the colour Pretalx gives the track, so a chip here and a
      track pill on a session card read as the same thing. */
   .parcours-chip::before {
-    content: ""; width: 7px; height: 7px; border-radius: 999px; flex: none;
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    flex: none;
     background: var(--parcours-accent, var(--color-primary));
   }
   .parcours-item:hover .parcours-chip,
   .parcours-item:has(:focus-visible) .parcours-chip {
     border-color: var(--parcours-accent, var(--color-primary));
-    background: color-mix(in oklch, var(--parcours-accent, var(--color-primary)) 10%, var(--color-card));
+    background: color-mix(
+      in oklch,
+      var(--parcours-accent, var(--color-primary)) 10%,
+      var(--color-card)
+    );
   }
-  .parcours-chip:focus-visible { outline: 2px solid var(--color-ring); outline-offset: 2px; }
+  .parcours-chip:focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
 
   .parcours-pop {
-    position: absolute; z-index: 40;
-    top: calc(100% + 8px); right: 0;
-    width: max-content; max-width: 22rem;
+    position: absolute;
+    z-index: 40;
+    top: calc(100% + 8px);
+    right: 0;
+    width: max-content;
+    max-width: 22rem;
     padding: 10px 13px;
-    border: 1px solid var(--color-border); border-radius: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
     background: var(--color-card);
-    box-shadow: 0 1px 2px oklch(0 0 0 / 0.06), 0 8px 24px oklch(0 0 0 / 0.12);
-    font-size: 13px; line-height: 1.5; font-weight: 400;
-    color: var(--color-muted-foreground); text-align: left; text-wrap: pretty;
-    opacity: 0; visibility: hidden;
+    box-shadow:
+      0 1px 2px oklch(0 0 0 / 0.06),
+      0 8px 24px oklch(0 0 0 / 0.12);
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: 400;
+    color: var(--color-muted-foreground);
+    text-align: left;
+    text-wrap: pretty;
+    opacity: 0;
+    visibility: hidden;
     /* A short fade, within the 150ms a high-frequency hover can afford. The
        delay is on `visibility` alone and only applies while hiding, so the
        popup fades out instead of vanishing mid-fade. */
@@ -113,27 +165,35 @@ const described = tracks.filter((track) => track.description.trim());
      a mouse click no longer pins it. */
   .parcours-item:hover .parcours-pop,
   .parcours-item:has(:focus-visible) .parcours-pop {
-    opacity: 1; visibility: visible;
+    opacity: 1;
+    visibility: visible;
     /* Showing is immediate — no delay on visibility, or the fade starts on a
        hidden element and the first frames are wasted. */
     transition-delay: 0s, 0s;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .parcours-chip, .parcours-pop { transition-duration: 0s; transition-delay: 0s; }
+    .parcours-chip,
+    .parcours-pop {
+      transition-duration: 0s;
+      transition-delay: 0s;
+    }
   }
 
-  /* No hover on touch, and a popup that only opens on tap reads as broken. The
-     chips become a plain list with their descriptions always shown. */
+  /* Hidden on phones, deliberately. Two reasons stack up:
+     1. UX — the touch design (chips plus their descriptions always expanded)
+        is a wall of text above the schedule, with no hover to lean on.
+     2. Layout — the popovers keep their desktop `width: max-content` as
+        single-line paragraphs (only `max-width` was lifted), and Chrome
+        Android answers that with the legacy wide-viewport fallback: the
+        layout viewport grows to the content's minimum width — measured at
+        929px on a 390px phone — and every fixed-position element, the session
+        modal included, then centres against a width the screen does not have.
+        Hiding the strip collapses the viewport back to 390px. Verified live:
+        innerWidth 929 → 390, modal centred again. */
   @media (max-width: 767px) {
-    .parcours { justify-content: flex-start; margin-top: 18px; }
-    .parcours-list { flex-direction: column; justify-content: flex-start; gap: 12px; max-width: none; }
-    .parcours-item { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
-    .parcours-chip { cursor: default; }
-    .parcours-pop {
-      position: static; opacity: 1; visibility: visible;
-      border: 0; box-shadow: none; padding: 0; background: none; max-width: none;
-      pointer-events: auto;
+    .parcours {
+      display: none;
     }
   }
 </style>
