@@ -33,17 +33,22 @@ if (root) {
   const gridView = root.querySelector<HTMLElement>(".grid-view");
   const listView = root.querySelector<HTMLElement>(".list-view");
   const countEl = document.getElementById("schedule-result-count");
-  const searchEl = document.getElementById("schedule-search") as HTMLInputElement | null;
+  const searchEl = document.getElementById(
+    "schedule-search",
+  ) as HTMLInputElement | null;
   const clearSearchEl = document.getElementById("schedule-search-clear");
   const total = Number(countEl?.getAttribute("data-total") ?? "0");
-  const countTemplate = root.getAttribute("data-count-template") ?? "{n}/{total}";
+  const countTemplate =
+    root.getAttribute("data-count-template") ?? "{n}/{total}";
   const noneLabel = root.getAttribute("data-none-label") ?? "";
 
   function apply() {
     const query = normalise(state.query.trim());
     const visible = new Set<string>();
 
-    for (const card of document.querySelectorAll<HTMLElement>(".session-card")) {
+    for (const card of document.querySelectorAll<HTMLElement>(
+      ".session-card",
+    )) {
       const room = card.getAttribute("data-room") ?? "";
       const format = card.getAttribute("data-format") ?? "";
       const track = card.getAttribute("data-track") ?? "";
@@ -55,7 +60,9 @@ if (root) {
         facetMatches(state.format, format) &&
         facetMatches(state.track, track) &&
         facetMatches(state.level, level);
-      const searchOk = !query || normalise(card.getAttribute("data-search") ?? "").includes(query);
+      const searchOk =
+        !query ||
+        normalise(card.getAttribute("data-search") ?? "").includes(query);
       const show = facetOk && searchOk;
       card.classList.toggle("is-hidden", !show);
       if (show) visible.add(card.getAttribute("data-session-id") ?? "");
@@ -63,7 +70,9 @@ if (root) {
 
     // Hide a slot or group whose cards are all filtered out, so the page does
     // not fill with empty time headings.
-    for (const container of document.querySelectorAll<HTMLElement>(".grid-view-row, .list-view-group")) {
+    for (const container of document.querySelectorAll<HTMLElement>(
+      ".grid-view-row, .list-view-group",
+    )) {
       const any = container.querySelector(".session-card:not(.is-hidden)");
       container.classList.toggle("is-hidden", !any);
     }
@@ -75,7 +84,9 @@ if (root) {
     // 360px of void under a "no results" message, where the list view collapses
     // to nothing. Collapse the whole body instead.
     gridView?.classList.toggle("is-empty", visible.size === 0);
-    for (const band of document.querySelectorAll<HTMLElement>(".grid-view-break")) {
+    for (const band of document.querySelectorAll<HTMLElement>(
+      ".grid-view-break",
+    )) {
       band.classList.toggle("is-hidden", active > 0);
     }
 
@@ -83,10 +94,14 @@ if (root) {
       countEl.textContent =
         visible.size === 0
           ? noneLabel
-          : countTemplate.replace("{n}", String(visible.size)).replace("{total}", String(total));
+          : countTemplate
+              .replace("{n}", String(visible.size))
+              .replace("{total}", String(total));
     }
 
-    for (const btn of document.querySelectorAll<HTMLElement>(".schedule-filter")) {
+    for (const btn of document.querySelectorAll<HTMLElement>(
+      ".schedule-filter",
+    )) {
       const f = btn.getAttribute("data-filter") as keyof FilterState | null;
       const v = btn.getAttribute("data-value");
       if (!f || !v || f === "query") continue;
@@ -116,7 +131,8 @@ if (root) {
   // is what the viewport can actually display.
   const narrow = window.matchMedia("(max-width: 767px)");
   /** The server's edition-aware default: the lowest-priority of the three. */
-  const serverDefaultView = (root.getAttribute("data-default-view") as "grid" | "list") ?? "grid";
+  const serverDefaultView =
+    (root.getAttribute("data-default-view") as "grid" | "list") ?? "grid";
   // Placeholder until the stored/URL preference is resolved below; the
   // `setView(initial, false)` call there is what actually settles it.
   let preferredView: "grid" | "list" = serverDefaultView;
@@ -169,7 +185,8 @@ if (root) {
   // deferred callback, and this is the reference the callback actually needs.
   const rootStyle = root.style;
   function syncStickyOffsets() {
-    const headerH = document.querySelector("header")?.getBoundingClientRect().height ?? 0;
+    const headerH =
+      document.querySelector("header")?.getBoundingClientRect().height ?? 0;
     rootStyle.setProperty("--schedule-header-h", `${Math.round(headerH)}px`);
     rootStyle.setProperty(
       "--schedule-toolbar-h",
@@ -185,12 +202,19 @@ if (root) {
   }
 
   for (const btn of document.querySelectorAll<HTMLElement>("[data-view]")) {
-    btn.addEventListener("click", () => setView(btn.getAttribute("data-view") as "grid" | "list"));
+    btn.addEventListener("click", () =>
+      setView(btn.getAttribute("data-view") as "grid" | "list"),
+    );
   }
 
-  for (const btn of document.querySelectorAll<HTMLElement>(".schedule-filter")) {
+  for (const btn of document.querySelectorAll<HTMLElement>(
+    ".schedule-filter",
+  )) {
     btn.addEventListener("click", () => {
-      const f = btn.getAttribute("data-filter") as Exclude<keyof FilterState, "query"> | null;
+      const f = btn.getAttribute("data-filter") as Exclude<
+        keyof FilterState,
+        "query"
+      > | null;
       const v = btn.getAttribute("data-value");
       if (!f || !v) return;
       const set = state[f] as Set<string>;
@@ -200,18 +224,20 @@ if (root) {
     });
   }
 
-  document.getElementById("schedule-filter-clear")?.addEventListener("click", () => {
-    state.room.clear();
-    state.format.clear();
-    state.track.clear();
-    state.level.clear();
-    // The search query counts towards the active-filter badge, so leaving it
-    // set meant "clear all" left the badge showing 1 and the results still
-    // narrowed, with nothing in this panel able to explain why.
-    state.query = "";
-    if (searchEl) searchEl.value = "";
-    apply();
-  });
+  document
+    .getElementById("schedule-filter-clear")
+    ?.addEventListener("click", () => {
+      state.room.clear();
+      state.format.clear();
+      state.track.clear();
+      state.level.clear();
+      // The search query counts towards the active-filter badge, so leaving it
+      // set meant "clear all" left the badge showing 1 and the results still
+      // narrowed, with nothing in this panel able to explain why.
+      state.query = "";
+      if (searchEl) searchEl.value = "";
+      apply();
+    });
 
   let debounce: ReturnType<typeof setTimeout> | undefined;
   searchEl?.addEventListener("input", () => {
@@ -268,7 +294,8 @@ if (root) {
     if (s.startsWith("/") && !s.startsWith("//")) return s;
     try {
       const u = new URL(s);
-      if (u.protocol === "http:" || u.protocol === "https:") return u.toString();
+      if (u.protocol === "http:" || u.protocol === "https:")
+        return u.toString();
     } catch {
       /* fallthrough */
     }
@@ -295,7 +322,9 @@ if (root) {
   // -----------------------------------------------------------------------
   function getBookmarks(): Set<string> {
     try {
-      return new Set<string>(JSON.parse(localStorage.getItem(BOOKMARKS_KEY) || "[]") as string[]);
+      return new Set<string>(
+        JSON.parse(localStorage.getItem(BOOKMARKS_KEY) || "[]") as string[],
+      );
     } catch {
       return new Set<string>();
     }
@@ -326,9 +355,11 @@ if (root) {
    * bookmarked.
    */
   function syncBookmarkButtons(id: string): void {
-    document.querySelectorAll<HTMLElement>(`[data-bookmark="${id}"]`).forEach((btn) => {
-      btn.classList.toggle("is-on", bookmarks.has(id));
-    });
+    document
+      .querySelectorAll<HTMLElement>(`[data-bookmark="${id}"]`)
+      .forEach((btn) => {
+        btn.classList.toggle("is-on", bookmarks.has(id));
+      });
   }
 
   // Apply initial state + hook bookmark buttons
@@ -363,15 +394,21 @@ if (root) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
     let h = esc(src);
-    h = h.replace(/`([^`\n]+)`/g, '<code class="rounded bg-background/60 px-1 py-0.5 text-[0.95em]">$1</code>');
+    h = h.replace(
+      /`([^`\n]+)`/g,
+      '<code class="rounded bg-background/60 px-1 py-0.5 text-[0.95em]">$1</code>',
+    );
     h = h.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
     h = h.replace(/__([^_\n]+)__/g, "<strong>$1</strong>");
     h = h.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
     h = h.replace(/(^|[^_])_([^_\n]+)_(?!_)/g, "$1<em>$2</em>");
-    h = h.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_match: string, label: string, url: string) => {
-      if (!/^(https?:\/\/|\/)/.test(url)) return `[${label}](${url})`;
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">${label}</a>`;
-    });
+    h = h.replace(
+      /\[([^\]]+)\]\(([^)\s]+)\)/g,
+      (_match: string, label: string, url: string) => {
+        if (!/^(https?:\/\/|\/)/.test(url)) return `[${label}](${url})`;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">${label}</a>`;
+      },
+    );
     return h
       .split(/\n{2,}/)
       .map((p) => `<p>${p.replace(/\n/g, "<br>")}</p>`)
@@ -387,17 +424,35 @@ if (root) {
     href: string | null;
   }
 
-  const modal = document.getElementById("schedule-session-modal");
+  const modal = document.getElementById(
+    "schedule-session-modal",
+  ) as HTMLDialogElement | null;
   const modalTitle = document.getElementById("schedule-session-modal-title");
-  const modalMetaTop = document.getElementById("schedule-session-modal-meta-top");
-  const modalSpeakers = document.getElementById("schedule-session-modal-speakers");
+  const modalMetaTop = document.getElementById(
+    "schedule-session-modal-meta-top",
+  );
+  const modalSpeakers = document.getElementById(
+    "schedule-session-modal-speakers",
+  );
   const modalTags = document.getElementById("schedule-session-modal-tags");
-  const modalDescription = document.getElementById("schedule-session-modal-description");
-  const modalBookmarkBtn = document.getElementById("schedule-session-modal-bookmark");
-  const modalFeedback = document.getElementById("schedule-session-modal-feedback") as HTMLAnchorElement | null;
-  const modalSlides = document.getElementById("schedule-session-modal-slides") as HTMLAnchorElement | null;
-  const modalRecording = document.getElementById("schedule-session-modal-recording") as HTMLAnchorElement | null;
-  const modalCover = document.getElementById("schedule-session-modal-cover") as HTMLImageElement | null;
+  const modalDescription = document.getElementById(
+    "schedule-session-modal-description",
+  );
+  const modalBookmarkBtn = document.getElementById(
+    "schedule-session-modal-bookmark",
+  );
+  const modalFeedback = document.getElementById(
+    "schedule-session-modal-feedback",
+  ) as HTMLAnchorElement | null;
+  const modalSlides = document.getElementById(
+    "schedule-session-modal-slides",
+  ) as HTMLAnchorElement | null;
+  const modalRecording = document.getElementById(
+    "schedule-session-modal-recording",
+  ) as HTMLAnchorElement | null;
+  const modalCover = document.getElementById(
+    "schedule-session-modal-cover",
+  ) as HTMLImageElement | null;
   let modalSessionId: string | null = null;
 
   // ---- Focus management for the two overlays ------------------------------
@@ -426,16 +481,24 @@ if (root) {
   const overlayOpeners = new WeakMap<HTMLElement, HTMLElement>();
 
   function focusableWithin(container: HTMLElement): HTMLElement[] {
-    return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+    return Array.from(
+      container.querySelectorAll<HTMLElement>(FOCUSABLE),
+    ).filter(
       // The selector matches controls that are hidden (a link toggled off, the
       // export button in a closed drawer). They cannot take focus, and including
       // them makes Tab appear to do nothing when it wraps onto one.
-      (el) => el.offsetWidth > 0 || el.offsetHeight > 0 || el === document.activeElement,
+      (el) =>
+        el.offsetWidth > 0 ||
+        el.offsetHeight > 0 ||
+        el === document.activeElement,
     );
   }
 
   /** Remember what had focus, then move it into the overlay. */
-  function captureFocus(overlay: HTMLElement, initial: HTMLElement | null): void {
+  function captureFocus(
+    overlay: HTMLElement,
+    initial: HTMLElement | null,
+  ): void {
     const opener = document.activeElement;
     if (opener instanceof HTMLElement) overlayOpeners.set(overlay, opener);
     (initial ?? focusableWithin(overlay)[0] ?? overlay).focus();
@@ -447,29 +510,11 @@ if (root) {
     overlayOpeners.delete(overlay);
     // Skip an opener that has since been filtered out of the DOM or hidden —
     // focusing it would silently drop focus to <body>.
-    if (opener?.isConnected && (opener.offsetWidth > 0 || opener.offsetHeight > 0)) opener.focus();
-  }
-
-  /** Cycle Tab within the modal. Called only while it is open. */
-  function trapTab(container: HTMLElement, ev: KeyboardEvent): void {
-    const items = focusableWithin(container);
-    if (items.length === 0) {
-      ev.preventDefault();
-      container.focus();
-      return;
-    }
-    const first = items[0];
-    const last = items[items.length - 1];
-    const active = document.activeElement;
-    const leavingBackwards = ev.shiftKey && (active === first || active === container);
-    const leavingForwards = !ev.shiftKey && active === last;
-    if (leavingBackwards) {
-      ev.preventDefault();
-      last.focus();
-    } else if (leavingForwards || !container.contains(active)) {
-      ev.preventDefault();
-      first.focus();
-    }
+    if (
+      opener?.isConnected &&
+      (opener.offsetWidth > 0 || opener.offsetHeight > 0)
+    )
+      opener.focus();
   }
 
   const formatPalette: Record<string, { label: string; cls: string }> = {
@@ -495,11 +540,15 @@ if (root) {
   // "Tout public".
   const levelLabels: Record<string, string> = {
     beginner: root.getAttribute("data-schedule-level-beginner") || "beginner",
-    intermediate: root.getAttribute("data-schedule-level-intermediate") || "intermediate",
+    intermediate:
+      root.getAttribute("data-schedule-level-intermediate") || "intermediate",
     advanced: root.getAttribute("data-schedule-level-advanced") || "advanced",
   };
-  const agendaRemoveLabel = root.getAttribute("data-schedule-agenda-remove") || "Remove";
-  const clashLabel = root.getAttribute("data-schedule-agenda-clash") || "overlaps with {title} ({room})";
+  const agendaRemoveLabel =
+    root.getAttribute("data-schedule-agenda-remove") || "Remove";
+  const clashLabel =
+    root.getAttribute("data-schedule-agenda-clash") ||
+    "overlaps with {title} ({room})";
 
   function openModal(card: HTMLElement): void {
     if (!modal) return;
@@ -519,7 +568,9 @@ if (root) {
     const language = card.getAttribute("data-language") || "";
     let speakers: ModalSpeaker[] = [];
     try {
-      speakers = JSON.parse(card.getAttribute("data-speakers") || "[]") as ModalSpeaker[];
+      speakers = JSON.parse(
+        card.getAttribute("data-speakers") || "[]",
+      ) as ModalSpeaker[];
     } catch {
       /* malformed payload — render with no speakers rather than throw */
     }
@@ -534,7 +585,9 @@ if (root) {
       const [sH, sM] = startHm.split(":").map(Number);
       const endTotal = sH * 60 + sM + duration;
       const endHm =
-        String(Math.floor(endTotal / 60) % 24).padStart(2, "0") + ":" + String(endTotal % 60).padStart(2, "0");
+        String(Math.floor(endTotal / 60) % 24).padStart(2, "0") +
+        ":" +
+        String(endTotal % 60).padStart(2, "0");
       const timeRange = startHm + " — " + endHm;
       const parts: string[] = [];
       parts.push(
@@ -626,9 +679,7 @@ if (root) {
     toggleLink(modalSlides, slidesUrl);
     toggleLink(modalRecording, recordingUrl);
 
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-    modal.setAttribute("aria-hidden", "false");
+    modal.showModal();
     document.body.classList.add("overflow-hidden");
     // Focus the dialog itself rather than its first control: aria-labelledby
     // points at the title, so this announces the session name and the dialog
@@ -637,14 +688,23 @@ if (root) {
   }
 
   function closeModal(): void {
-    if (!modal) return;
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-    modal.setAttribute("aria-hidden", "true");
+    // Native close (also fired by Escape) — cleanup lives on the `close`
+    // listener below, so every exit path runs exactly once.
+    if (!modal || !modal.open) return;
+    modal.close();
+  }
+
+  modal?.addEventListener("close", () => {
     document.body.classList.remove("overflow-hidden");
     modalSessionId = null;
     restoreFocus(modal);
-  }
+  });
+
+  // Click on the backdrop (the ::backdrop is not itself a target, so clicks
+  // outside the panel surface as `target === dialog`).
+  modal?.addEventListener("click", (ev) => {
+    if (ev.target === modal) closeModal();
+  });
 
   // Open modal on card click (but not when clicking the inline bookmark icon)
   document.querySelectorAll<HTMLElement>(".session-card").forEach((card) => {
@@ -666,25 +726,22 @@ if (root) {
     });
   });
 
-  // Close on backdrop / X click, Escape key
+  // Close on backdrop / X click. Escape and the Tab trap are native now: the
+  // dialog fires `cancel` on Escape and showModal() keeps focus in the top
+  // layer, so the document-level handler only still serves the drawer.
   modal?.querySelectorAll("[data-close-modal]").forEach((el) => {
     el.addEventListener("click", closeModal);
   });
   document.addEventListener("keydown", (ev) => {
-    const modalOpen = !!modal && !modal.classList.contains("hidden");
-    if (ev.key === "Escape") {
-      if (modalOpen) {
-        closeModal();
-      } else if (drawer && drawer.getAttribute("aria-hidden") === "false") {
-        // The drawer had no Escape at all: once open, the only way out was to
-        // find and click its X.
-        closeDrawer();
-      }
-      return;
+    if (
+      ev.key === "Escape" &&
+      drawer &&
+      drawer.getAttribute("aria-hidden") === "false"
+    ) {
+      // The drawer had no Escape at all: once open, the only way out was to
+      // find and click its X.
+      closeDrawer();
     }
-    // Bound at document level rather than on the modal, so a Tab pressed while
-    // focus has somehow landed outside is still pulled back in.
-    if (ev.key === "Tab" && modalOpen && modal) trapTab(modal, ev);
   });
 
   // Auto-open a session modal when the URL hash matches #session-{id}
@@ -695,7 +752,9 @@ if (root) {
     if (!m) return;
     const id = decodeURIComponent(m[1]);
     const matches = Array.from(
-      document.querySelectorAll<HTMLElement>(`.session-card[data-session-id="${CSS.escape(id)}"]`),
+      document.querySelectorAll<HTMLElement>(
+        `.session-card[data-session-id="${CSS.escape(id)}"]`,
+      ),
     );
     // Two duplicates can match (grid + list) — prefer whichever one is
     // actually visible in the current view, so the scroll lands somewhere
@@ -758,11 +817,15 @@ if (root) {
     drawer.setAttribute("inert", "");
     restoreFocus(drawer);
   }
-  document.getElementById("schedule-agenda-toggle")?.addEventListener("click", () => {
-    refreshAgenda();
-    openDrawer();
-  });
-  document.getElementById("schedule-agenda-close")?.addEventListener("click", closeDrawer);
+  document
+    .getElementById("schedule-agenda-toggle")
+    ?.addEventListener("click", () => {
+      refreshAgenda();
+      openDrawer();
+    });
+  document
+    .getElementById("schedule-agenda-close")
+    ?.addEventListener("click", closeDrawer);
 
   function refreshAgenda(): void {
     if (!agendaList) return;
@@ -779,10 +842,16 @@ if (root) {
       const card = findCard(id);
       if (card) picked.push(card);
     });
-    picked.sort((a, b) => (a.getAttribute("data-start") || "").localeCompare(b.getAttribute("data-start") || ""));
+    picked.sort((a, b) =>
+      (a.getAttribute("data-start") || "").localeCompare(
+        b.getAttribute("data-start") || "",
+      ),
+    );
     // Which bookmarks collide. Computed once per render over the resolved
     // cards, not per entry, so the pairing is done in one pass.
-    const byId = new Map(picked.map((c) => [c.getAttribute("data-session-id") ?? "", c]));
+    const byId = new Map(
+      picked.map((c) => [c.getAttribute("data-session-id") ?? "", c]),
+    );
     const clashes = findClashes(
       picked.map((c) => ({
         id: c.getAttribute("data-session-id") ?? "",
@@ -801,7 +870,8 @@ if (root) {
       const timeLabel = start.slice(11, 16);
       const room = card.getAttribute("data-room") || "";
       const item = document.createElement("div");
-      item.className = "flex items-start justify-between gap-3 rounded-md border border-border bg-background/40 p-3";
+      item.className =
+        "flex items-start justify-between gap-3 rounded-md border border-border bg-background/40 p-3";
       // A five-room day puts two bookmarked talks screens apart in the grid;
       // this is where a visitor finds out they overlap, while they are still
       // planning rather than in the corridor.
@@ -853,7 +923,11 @@ if (root) {
     return `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
   }
   function icsEscape(s: string): string {
-    return String(s).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+    return String(s)
+      .replace(/\\/g, "\\\\")
+      .replace(/;/g, "\\;")
+      .replace(/,/g, "\\,")
+      .replace(/\r?\n/g, "\\n");
   }
   /**
    * The edition an agenda export belongs to, read from the sessions being
@@ -880,7 +954,9 @@ if (root) {
       if (!card) return;
       const start = card.getAttribute("data-start") || "";
       const duration = Number(card.getAttribute("data-duration") || 0);
-      const end = new Date(new Date(start).getTime() + duration * 60000).toISOString();
+      const end = new Date(
+        new Date(start).getTime() + duration * 60000,
+      ).toISOString();
       const title = card.getAttribute("data-title") || "";
       const room = card.getAttribute("data-room") || "";
       events.push(
@@ -918,13 +994,17 @@ if (root) {
     URL.revokeObjectURL(url);
   }
 
-  document.getElementById("schedule-export-all")?.addEventListener("click", () => {
-    // Link straight to the static /programme.ics build endpoint
-    window.location.href = "/programme.ics";
-  });
-  document.getElementById("schedule-export-agenda")?.addEventListener("click", () => {
-    if (bookmarks.size === 0) return;
-    const ids = [...bookmarks];
-    download(`cnd-france-${icsYear(ids)}-agenda.ics`, buildIcs(ids));
-  });
+  document
+    .getElementById("schedule-export-all")
+    ?.addEventListener("click", () => {
+      // Link straight to the static /programme.ics build endpoint
+      window.location.href = "/programme.ics";
+    });
+  document
+    .getElementById("schedule-export-agenda")
+    ?.addEventListener("click", () => {
+      if (bookmarks.size === 0) return;
+      const ids = [...bookmarks];
+      download(`cnd-france-${icsYear(ids)}-agenda.ics`, buildIcs(ids));
+    });
 }
