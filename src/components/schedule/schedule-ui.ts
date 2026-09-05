@@ -681,6 +681,7 @@ if (root) {
 
     modal.showModal();
     document.body.classList.add("overflow-hidden");
+    startFitModalLoop();
     // Focus the dialog itself rather than its first control: aria-labelledby
     // points at the title, so this announces the session name and the dialog
     // role, where focusing the X would announce only "Close, button".
@@ -704,6 +705,92 @@ if (root) {
   // outside the panel surface as `target === dialog`).
   modal?.addEventListener("click", (ev) => {
     if (ev.target === modal) closeModal();
+  });
+
+  // ---- Zoomed visual viewports --------------------------------------------
+  //
+  // The top layer is positioned against the layout viewport, and Chromium does
+  // not re-anchor it for a zoomed visual viewport (pinch zoom, or Chrome's
+  // accessibility page zoom). Open the dialog at scale 2 and it renders
+  // off-screen: reproduced headlessly, on-screen rect [-358..358] at scale 2.
+  // While the modal is open, follow visualViewport: shrink the panel into the
+  // visible window and translate it so it stays centred on what the visitor
+  // actually sees. The zoom scale also renders it larger — text stays legible,
+  // which is the point of being zoomed.
+  const ZOOM_EPSILON = 1.01;
+  const EDGE = 8;
+
+  function fitModalToViewport(): void {
+    if (!modal || !modal.open) return;
+    const vv = window.visualViewport;
+    if (!vv || vv.scale <= ZOOM_EPSILON) {
+      modal.style.width = "";
+      modal.style.maxHeight = "";
+      modal.style.transform = "";
+      return;
+    }
+    // visualViewport dims are in layout px: the visible window's size and
+    // offset, both already divided by the zoom scale.
+    modal.style.width = `${Math.max(160, Math.floor(vv.width) - EDGE * 2)}px`;
+    // The 85dvh cap is relative to the layout viewport — taller than the
+    // visible window once zoomed, which would strand the action buttons
+    // below the fold. Cap into the window instead; the panel scrolls.
+    modal.style.maxHeight = `${Math.floor(vv.height) - EDGE * 2}px`;
+    // Clamp, don't centre: the browser keeps panning the zoomed viewport to
+    // bring the focused control into view, and a centring transform retargets
+    // that pan every frame — the two chase each other. A minimal translate
+    // that just pulls the panel inside the visible window converges: once the
+    // panel is fully visible, the focused control is too, and panning stops.
+    //
+    // Measured against the UNTRANSFORMED base each frame, and the translate is
+    // absolute, never incremental: reading a rect that includes the previous
+    // translate, clearing it once in range and re-applying once out of range
+    // oscillates between the two states forever (observed live: transform
+    // toggling `translate(97px, -147px)` ↔ `none` at frame rate).
+    modal.style.transform = "none";
+    const rect = modal.getBoundingClientRect();
+    const minLeft = vv.offsetLeft + EDGE;
+    const maxRight = vv.offsetLeft + Math.floor(vv.width) - EDGE;
+    const minTop = vv.offsetTop + EDGE;
+    const maxBottom = vv.offsetTop + Math.floor(vv.height) - EDGE;
+    let dx = 0;
+    let dy = 0;
+    if (rect.left < minLeft) dx = minLeft - rect.left;
+    else if (rect.right > maxRight) dx = maxRight - rect.right;
+    if (rect.top < minTop) dy = minTop - rect.top;
+    else if (rect.bottom > maxBottom)
+      dy = Math.min(maxBottom - rect.bottom, minTop - rect.top);
+    modal.style.transform =
+      dx === 0 && dy === 0 ? "" : `translate(${dx}px, ${dy}px)`;
+  }
+
+  // Chromium pans the visual viewport when the dialog takes focus, without a
+  // matching visualViewport scroll event — so event-driven fitting goes stale.
+  // While the modal is open, re-fit each frame; it is one getBoundingClientRect
+  // per frame behind an open modal, and the loop stops on close.
+  let fitFrame = 0;
+
+  function fitModalLoop(): void {
+    fitModalToViewport();
+    fitFrame = requestAnimationFrame(fitModalLoop);
+  }
+
+  function startFitModalLoop(): void {
+    cancelAnimationFrame(fitFrame);
+    fitFrame = requestAnimationFrame(fitModalLoop);
+  }
+
+  function stopFitModalLoop(): void {
+    cancelAnimationFrame(fitFrame);
+  }
+
+  modal?.addEventListener("close", () => {
+    stopFitModalLoop();
+    if (modal) {
+      modal.style.width = "";
+      modal.style.maxHeight = "";
+      modal.style.transform = "";
+    }
   });
 
   // Open modal on card click (but not when clicking the inline bookmark icon)
