@@ -28,7 +28,9 @@ describe("programme page", () => {
     expect(listAt).toBeGreaterThan(gridAt);
 
     const idsIn = (s: string) =>
-      new Set([...s.matchAll(/data-session-id="([A-Z0-9]{6})"/g)].map((m) => m[1]));
+      new Set(
+        [...s.matchAll(/data-session-id="([A-Z0-9]{6})"/g)].map((m) => m[1]),
+      );
 
     // Counted PER VIEW. A single `new Set` over the whole page cannot tell 51
     // sessions rendered twice from 51 rendered once, so it stayed green with an
@@ -66,13 +68,21 @@ describe("overlay focus contract", () => {
     return html.slice(html.lastIndexOf("<", at), html.indexOf(">", at) + 1);
   };
 
-  it("gives the modal a focus target and the dialog semantics to match", () => {
-    const tag = tagFor("schedule-session-modal");
+  it("opens the modal through a native dialog, not a hand-rolled overlay", () => {
+    const at = html.indexOf('id="schedule-session-modal"');
+    expect(at, "modal missing from the page").toBeGreaterThan(-1);
+    // The element itself must be a <dialog>: showModal() places it in the top
+    // layer, which no layout-viewport quirk (mobile zoom, transformed
+    // ancestor) can pull out of the visual viewport. A div overlay — however
+    // positioned — regresses the Chrome Android bug this replaced.
+    const tag = html.slice(
+      html.lastIndexOf("<", at),
+      html.indexOf(">", at) + 1,
+    );
+    expect(tag.startsWith("<dialog")).toBe(true);
     expect(tag).toContain('tabindex="-1"');
-    expect(tag).toContain('role="dialog"');
-    // aria-modal is what tells a screen reader the rest of the page is out of
-    // play; the Tab trap in schedule-ui.ts is the keyboard half of that promise.
-    expect(tag).toContain('aria-modal="true"');
+    // aria-labelledby is the announcement contract: focusing the dialog reads
+    // the session title and the implicit dialog role.
     expect(tag).toContain('aria-labelledby="schedule-session-modal-title"');
   });
 
