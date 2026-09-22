@@ -1,0 +1,83 @@
+---
+/**
+ * Door 2, "Venir en équipe". It is rendered only when a group rate actually
+ * beats the price of the moment *and* fits the tier's order cap
+ * (`cheaperGroupRates`) — before that it had nothing to sell and said so, which
+ * read as a dead end in a card that promises an offer.
+ *
+ * Variant A holds two ways of buying for a team, and draws them as two: pick a
+ * rate and the discount applies in door 1's stepper, **or** — an "ou" rule
+ * across the card — write to the ticketing team for what the site cannot do,
+ * a quote, a company invoice, a bank transfer. Nothing explains that the
+ * discount applies by itself or that a rate is granted by a human: both were
+ * saying out loud what the buttons already do (22/09/2026).
+ *
+ * Variant B has no online group purchase at all, so it has no duality: the
+ * rates, then one call to action asking for one.
+ */
+import type { GroupRate, TierDefinition } from "@/config/tickets";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import type { Variant } from "@/lib/tickets/purchase";
+import GroupRates from "./GroupRates.astro";
+import Icon from "./Icon.astro";
+
+interface Props {
+  lang: Locale;
+  tier: TierDefinition;
+  rates: GroupRate[];
+  variant: Variant;
+  groupMailto: string;
+}
+
+const { lang, tier, rates, variant, groupMailto } = Astro.props;
+const t = useTranslations(lang);
+const direct = variant === "a";
+---
+
+{/* `id="equipe"`: the group rates now live here and nowhere else, so what used
+    to point at a section further down points at this card. */}
+<article
+  id="equipe"
+  class="door flex grow flex-col gap-5 rounded-xl border border-border bg-card p-5 sm:p-6"
+  aria-labelledby="door-team-title"
+  style="--door-index: 1"
+>
+  <h2 id="door-team-title" class="text-2xl font-semibold tracking-[-0.01em] text-foreground">
+    {t("tickets.team.title")}
+  </h2>
+
+  <div class="flex flex-col gap-2">
+    <p class="text-sm font-medium text-muted-foreground">{t("tickets.team.rates")}</p>
+    <GroupRates lang={lang} tier={tier} rates={rates} variant={variant} source="door" />
+  </div>
+
+  <div class="mt-auto flex flex-col gap-4">
+    {/* The fork, drawn rather than described: a rule across the card with the
+        word in it. The rules are decorative, the "ou" is not — it is the only
+        thing that tells a screen reader these are alternatives. */}
+    {direct && (
+      <p class="flex items-center gap-3" data-team-or>
+        <span class="h-px flex-1 bg-border" aria-hidden="true"></span>
+        <span class="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+          {t("tickets.team.or")}
+        </span>
+        <span class="h-px flex-1 bg-border" aria-hidden="true"></span>
+      </p>
+    )}
+
+    {direct && <p class="text-sm text-muted-foreground text-pretty">{t("tickets.team.custom.lead")}</p>}
+
+    <div>
+      <a
+        href={groupMailto}
+        class="inline-flex h-11 items-center gap-2 rounded-lg border border-input bg-card px-4 text-base font-semibold text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-muted active:scale-[0.96] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        data-umami-event="tickets-group-contact"
+        data-umami-event-source="door"
+      >
+        <Icon name="mail" size={18} />
+        {t(direct ? "tickets.team.cta.contact" : "tickets.team.cta.group")}
+      </a>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,215 @@
+/**
+ * Ticketing registry — the single place prices, dates and the selling phase live.
+ *
+ * In the spirit of `src/config/flags.ts`: typed, committed, reviewed. Nothing
+ * else in the codebase may spell a ticket price, a tier date or an alf.io URL;
+ * components read them from here and the purchase action is built from here by
+ * `src/lib/tickets/purchase.ts` alone.
+ *
+ * Source of truth for the numbers is the Drive sheet "Pilotage billetterie
+ * 2027" (Simulateur and Params tabs) and "Dates clés CND France 2027". This file
+ * is their published subset: never quotas, never stock — the team adjusts those
+ * live in alf.io.
+ *
+ * **Changing phase is changing `currentPhase` and shipping.** There is no date
+ * logic: when a tier ends — early or on its date — set `currentPhase` to the
+ * next tier. Every tier behind the current one reads "Épuisé" on the page.
+ *
+ * **Unknowns are `tbd()`, never a plausible guess.** A `tbd` renders as a
+ * visible "À confirmer" chip on non-production builds, and a production build
+ * that would render one fails (see `placeholdersAllowed` in
+ * `src/lib/tickets/demo.ts`). `grep -n "tbd(" src/config/tickets.ts` lists
+ * everything still open.
+ */
+
+/** A value the organising team has not decided yet. `draft` is what the demo
+ *  shows next to the chip when the page needs something to render. */
+export interface Tbd<T = never> {
+  readonly tbd: true;
+  readonly note: string;
+  readonly draft?: T;
+}
+
+export function tbd<T = never>(note: string, draft?: T): Tbd<T> {
+  return draft === undefined ? { tbd: true, note } : { tbd: true, note, draft };
+}
+
+export function isTbd(value: unknown): value is Tbd<unknown> {
+  return typeof value === "object" && value !== null && (value as Tbd).tbd === true;
+}
+
+export type Maybe<T> = T | Tbd<T>;
+
+export type Localized = { fr: string; en: string };
+
+export type TierId = "seb" | "eb" | "regular" | "last_chance";
+export type Phase = "pre_opening" | TierId;
+export type StrategicState = "hidden" | "announced" | "on_sale";
+
+export interface TierDefinition {
+  id: TierId;
+  name: Localized;
+  /** Euros, VAT included. */
+  price: number;
+  /**
+   * Indicative end, ISO-8601 with the Europe/Paris offset. Shown only while the
+   * tier is the current one: future tiers never show a date, because the team
+   * may extend a tier's period or raise its quota live.
+   */
+  endsAt: string;
+  /** The tier also closes when its alf.io quota runs out, whichever comes first. */
+  closesWhenSoldOut: boolean;
+  /** alf.io caps a single order at this many tickets. */
+  maxPerOrder: number;
+  /** alf.io category code behind the variant-A reservation link (created by JC). */
+  alfioCategoryCode: Maybe<string>;
+}
+
+export interface GroupRate {
+  id: "4_9" | "10_plus";
+  min: number;
+  max?: number;
+  /** Euros per person, VAT included. Fixed for the whole season. */
+  price: number;
+  /**
+   * The alf.io code that carries the rate — a promo code or a category,
+   * depending on which of the three mechanisms under study lands (see
+   * `src/lib/tickets/purchase.ts`). Deliberately not named "category".
+   */
+  alfioCode: Maybe<string>;
+}
+
+export type StrategicPrice =
+  | { kind: "fixed"; amount: number }
+  | { kind: "per_tier"; amounts: Record<TierId, number> };
+
+export interface StrategicTicket {
+  state: StrategicState;
+  name: Maybe<Localized>;
+  price: Maybe<StrategicPrice>;
+  /** What it includes from the standard ticket (talks, evening…). */
+  includesStandard: Maybe<Localized>;
+  programme: Maybe<Localized>;
+  /** Idea under study: dedicated networking area with catering. */
+  networking: Maybe<Localized>;
+  accessConditions: Maybe<Localized>;
+  maxPerOrder: Maybe<number>;
+  groupRatesApply: Maybe<boolean>;
+  onSaleFrom: Maybe<string>;
+  alfioCategoryCode: Maybe<string>;
+}
+
+export interface TicketingConfig {
+  alfio: { baseUrl: string; eventSlug: string };
+  opening: { date: string; time: Maybe<string> };
+  currentPhase: Phase;
+  tiers: readonly TierDefinition[];
+  /** Public tier names are still the working names of the pricing sheet. */
+  tierNames: Maybe<true>;
+  groupRates: readonly GroupRate[];
+  strategic: StrategicTicket;
+  /** Contents of the standard ticket, evening included — pending the evening team. */
+  contents: Maybe<true>;
+  /** The evening is open to every attendee, with no add-on — to confirm with the evening team. */
+  eveningIncluded: Maybe<true>;
+  eveningDetails: Maybe<Localized>;
+  vatRate: Maybe<string>;
+  invoice: Maybe<Localized>;
+  transferAndRefund: Maybe<Localized>;
+  termsUrl: Maybe<string>;
+  managerKitUrl: Maybe<string>;
+  programmeAnnouncement: Maybe<Localized>;
+}
+
+export const TICKETING: TicketingConfig = {
+  alfio: {
+    // The new alf.io instance (blue/green upgrade, Sept 2026). Whether this
+    // host or tickets.cloudnativedays.fr is the public one after the switch is
+    // still open; every URL and the host named in the copy derive from here.
+    baseUrl: "https://billetterie.cloudnativedays.fr",
+    eventSlug: "cnd-2027",
+  },
+  opening: {
+    date: "2026-10-13",
+    time: tbd("Heure d'ouverture des ventes", "10:00"),
+  },
+  currentPhase: "pre_opening",
+  tiers: [
+    {
+      id: "seb",
+      name: { fr: "Super Early Bird", en: "Super Early Bird" },
+      price: 129,
+      endsAt: "2026-11-29T23:59:59+01:00",
+      closesWhenSoldOut: true,
+      maxPerOrder: 5,
+      alfioCategoryCode: tbd("Code de catégorie alf.io (JC)", "DEMO-SEB"),
+    },
+    {
+      id: "eb",
+      name: { fr: "Early Bird", en: "Early Bird" },
+      price: 159,
+      endsAt: "2027-02-07T23:59:59+01:00",
+      closesWhenSoldOut: true,
+      maxPerOrder: 5,
+      alfioCategoryCode: tbd("Code de catégorie alf.io (JC)", "DEMO-EB"),
+    },
+    {
+      id: "regular",
+      name: { fr: "Regular", en: "Regular" },
+      price: 199,
+      endsAt: "2027-05-16T23:59:59+02:00",
+      closesWhenSoldOut: false,
+      maxPerOrder: 20,
+      alfioCategoryCode: tbd("Code de catégorie alf.io (JC)", "DEMO-REGULAR"),
+    },
+    {
+      id: "last_chance",
+      name: { fr: "Last Chance", en: "Last Chance" },
+      price: 229,
+      endsAt: "2027-06-03T23:59:59+02:00",
+      closesWhenSoldOut: false,
+      maxPerOrder: 20,
+      alfioCategoryCode: tbd("Code de catégorie alf.io (JC)", "DEMO-LAST-CHANCE"),
+    },
+  ],
+  tierNames: tbd("Noms publics des paliers en français et en anglais"),
+  // Only offered on a tier whose order cap allows a group that size — see
+  // `cheaperGroupRates`. Super Early Bird and Early Bird are quota-protected at
+  // 5 seats per order, so they carry no group rate today (22/09/2026); lifting
+  // that cap is the one change that brings them back.
+  groupRates: [
+    { id: "4_9", min: 4, max: 9, price: 169, alfioCode: tbd("Code alf.io du tarif de groupe 4-9 (JC)", "DEMO-GROUPE-4-9") },
+    { id: "10_plus", min: 10, price: 149, alfioCode: tbd("Code alf.io du tarif de groupe 10+ (JC)", "DEMO-GROUPE-10") },
+  ],
+  strategic: {
+    state: "announced",
+    name: tbd("Nom public (« Stratégie & Leadership » est le nom de travail)", {
+      fr: "Stratégie & Leadership",
+      en: "Strategy & Leadership",
+    }),
+    price: tbd("Prix : fixe, ou décliné par palier ?"),
+    includesStandard: tbd("Ce qu'il inclut du billet standard (conférences, soirée)"),
+    programme: tbd("Programme et intervenant(e)s de la salle dédiée"),
+    networking: tbd("Piste non actée : espace d'échange dédié avec restauration", {
+      fr: "Un espace d'échange dédié, avec restauration",
+      en: "A dedicated networking area, with catering",
+    }),
+    accessConditions: tbd("Conditions d'accès éventuelles"),
+    maxPerOrder: tbd("Nombre maximum de billets par commande", 20),
+    groupRatesApply: tbd("Les tarifs de groupe s'appliquent-ils ?"),
+    onSaleFrom: tbd("Date de mise en vente"),
+    alfioCategoryCode: tbd("Code de catégorie alf.io (JC)", "DEMO-STRATEGIE"),
+  },
+  contents: tbd("Contenu exact du billet standard"),
+  eveningIncluded: tbd("Soirée ouverte à tous les participants, sans option (pôle soirée)"),
+  eveningDetails: tbd("Contenu de la soirée (pôle soirée)"),
+  vatRate: tbd("Taux de TVA affiché (10 % aujourd'hui ?)"),
+  invoice: tbd("Facture au nom de la société, devis, virement (question à JC)"),
+  transferAndRefund: tbd("Annulation et changement de nom"),
+  termsUrl: tbd("Lien vers les conditions générales de vente"),
+  managerKitUrl: tbd("Kit « convaincre son manager » (planifié)"),
+  programmeAnnouncement: tbd("Date publique d'annonce du programme", {
+    fr: "en mars 2027",
+    en: "in March 2027",
+  }),
+};

@@ -1,0 +1,63 @@
+---
+/**
+ * "Convaincre votre manager": the argument kit, down the page, in every phase.
+ *
+ * It used to double as a "coming as a team" section repeating the group rates.
+ * Those live in door 2 and nowhere else now (22/09/2026) — the repetition
+ * added nothing, and what the page still owes a manager is not a second price
+ * list but something to forward: when the programme lands, the 2026 replays,
+ * and the kit itself.
+ *
+ * The person who decides is often not the one who attends, decides on the
+ * programme and the purchase process rather than on the price, and has their
+ * own manager to convince.
+ */
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { fill } from "@/lib/tickets/format";
+import Icon from "./Icon.astro";
+import Tbd from "./Tbd.astro";
+
+interface Props {
+  lang: Locale;
+  programmeWhen: string;
+  programmeNote?: string;
+  /** Set while the kit is still to be produced; the link is `kitUrl` once it is. */
+  kitNote?: string;
+  kitUrl?: string;
+}
+
+const { lang, programmeWhen, programmeNote, kitNote, kitUrl } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section id="convaincre" class="flex max-w-3xl flex-col gap-5" aria-labelledby="team-title">
+  <h2 id="team-title" class="text-3xl font-bold tracking-[-0.02em] text-balance text-foreground sm:text-4xl">
+    {t("tickets.team.convince.title")}
+  </h2>
+  <p class="max-w-[46ch] text-lg text-foreground text-pretty">{t("tickets.team.convince.lead")}</p>
+  <p class="flex max-w-[52ch] flex-wrap items-center gap-2 text-base text-muted-foreground text-pretty">
+    {fill(t("tickets.team.programme"), { when: programmeWhen })}
+    {programmeNote && <Tbd note={programmeNote} lang={lang} />}
+  </p>
+
+  {/* It must not vanish the day the kit's URL is decided: the chip stands in
+      for the link until then. */}
+  <div class="mt-2 flex flex-col items-start gap-2 rounded-lg border border-dashed border-input p-5">
+    <p class="flex flex-wrap items-center gap-2 text-base font-semibold text-foreground">
+      {t("tickets.team.kit.title")}
+      {kitNote && <Tbd note={kitNote} lang={lang} />}
+    </p>
+    <p class="text-sm text-muted-foreground text-pretty">{t("tickets.team.kit.body")}</p>
+    {kitUrl && (
+      <a
+        href={kitUrl}
+        class="inline-flex items-center gap-1.5 text-sm font-medium text-primary-strong underline-offset-4 hover:underline"
+        data-umami-event="tickets-manager-kit"
+      >
+        {t("tickets.team.kit.cta")}
+        <Icon name="arrow-right" size={14} />
+      </a>
+    )}
+  </div>
+</section>

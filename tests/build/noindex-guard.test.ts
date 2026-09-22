@@ -28,9 +28,13 @@ describe("Layout.astro robots meta", () => {
     );
   });
 
-  it("emits noindex, nofollow only when not indexable", () => {
+  it("emits noindex, nofollow when not indexable, or when a page forces it", () => {
     expect(source).toMatch(
-      /\{\s*!indexable\s*&&\s*\(?\s*<meta\s+name="robots"\s+content="noindex, nofollow"\s*\/>/,
+      /\{\s*\(\s*!indexable\s*\|\|\s*noindex\s*\)\s*&&\s*\(?\s*<meta\s+name="robots"\s+content="noindex, nofollow"\s*\/>/,
     );
+  });
+
+  it("defaults the forced noindex to off, so only opting-in pages carry it", () => {
+    expect(source).toMatch(/noindex\s*=\s*false/);
   });
 });

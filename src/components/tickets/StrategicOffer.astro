@@ -1,0 +1,156 @@
+---
+/**
+ * The Strategy & Leadership ticket: another product, not a fifth tier. It sits
+ * under the three doors in its own material (the deep brand purple) so
+ * decision-makers find it without it outshining the standard ticket.
+ *
+ * Two visible states: announced (presentation, placeholders, "tell me") and on
+ * sale (the same purchase control as the tiers). Hidden renders nothing and is
+ * decided by the page. Its quota is never shown, like every other.
+ */
+import { isTbd, type Maybe, type StrategicState, type StrategicTicket } from "@/config/tickets";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { formatPrice } from "@/lib/tickets/format";
+import Icon from "./Icon.astro";
+import Tbd from "./Tbd.astro";
+
+interface Props {
+  lang: Locale;
+  state: Exclude<StrategicState, "hidden">;
+  ticket: StrategicTicket;
+  notifyMailto: string;
+  newsletterUrl: string;
+  /** Door 2's anchor, set only while a group rate applies — there is nowhere
+   *  else on the page to send a reader looking for one. */
+  teamHref?: string;
+}
+
+const { lang, state, ticket, notifyMailto, newsletterUrl, teamHref } = Astro.props;
+const t = useTranslations(lang);
+
+const name = isTbd(ticket.name) ? ticket.name.draft?.[lang] ?? "" : ticket.name[lang];
+
+function text(value: Maybe<{ fr: string; en: string }>): string | undefined {
+  if (isTbd(value)) return value.draft?.[lang];
+  return value[lang];
+}
+
+const priceText = isTbd(ticket.price)
+  ? undefined
+  : ticket.price.kind === "fixed"
+    ? formatPrice(ticket.price.amount, lang)
+    : undefined;
+
+const facts: Array<{ label: string; value?: string; tbd?: string }> = [
+  { label: t("tickets.strategic.fact.price"), value: priceText, tbd: isTbd(ticket.price) ? ticket.price.note : undefined },
+  { label: t("tickets.strategic.fact.includes"), value: text(ticket.includesStandard), tbd: isTbd(ticket.includesStandard) ? ticket.includesStandard.note : undefined },
+  { label: t("tickets.strategic.fact.programme"), value: text(ticket.programme), tbd: isTbd(ticket.programme) ? ticket.programme.note : undefined },
+  { label: t("tickets.strategic.fact.networking"), value: text(ticket.networking), tbd: isTbd(ticket.networking) ? ticket.networking.note : undefined },
+  ...(state === "announced"
+    ? [{ label: t("tickets.strategic.fact.on_sale"), value: isTbd(ticket.onSaleFrom) ? undefined : ticket.onSaleFrom, tbd: isTbd(ticket.onSaleFrom) ? ticket.onSaleFrom.note : undefined }]
+    : []),
+  { label: t("tickets.strategic.fact.access"), value: text(ticket.accessConditions), tbd: isTbd(ticket.accessConditions) ? ticket.accessConditions.note : undefined },
+];
+
+const topics = [1, 2, 3, 4, 5, 6].map((n) => t(`tickets.strategic.topic.${n}` as Parameters<typeof t>[0]));
+---
+
+<section
+  id="strategie-leadership"
+  class="strategic relative overflow-hidden rounded-xl bg-chart-5 text-primary-foreground dark:bg-secondary dark:ring-1 dark:ring-accent/30"
+  aria-labelledby="strategic-title"
+  data-strategic-state={state}
+>
+  <div class="grid gap-10 p-6 sm:p-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-14">
+    <div class="flex flex-col gap-5">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <h2 id="strategic-title" class="text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl">{name}</h2>
+        {isTbd(ticket.name) && <Tbd note={ticket.name.note} lang={lang} tone="inverse" />}
+      </div>
+      <p class="max-w-[60ch] text-lg text-pretty">{t("tickets.strategic.lead")}</p>
+      <p class="max-w-[60ch] text-base text-chart-4 text-pretty">{t("tickets.strategic.body")}</p>
+      <div class="flex flex-col gap-3">
+        <p class="text-sm font-medium text-chart-4">{t("tickets.strategic.topics")}</p>
+        <ul class="flex flex-wrap gap-2">
+          {topics.map((topic) => (
+            <li class="rounded-full border border-primary-foreground/25 px-3 py-1 text-sm font-medium">{topic}</li>
+          ))}
+        </ul>
+      </div>
+      <p class="text-base font-medium text-accent">{t("tickets.strategic.no_pitch")}</p>
+    </div>
+
+    <div class="flex flex-col gap-6">
+      <dl class="divide-y divide-primary-foreground/15 border-y border-primary-foreground/15">
+        {facts.map((fact) => (
+          <div
+            class="flex flex-col gap-1 py-3 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:gap-x-4"
+            data-tbd-only={fact.value ? undefined : true}
+          >
+            <dt class="text-sm text-chart-4">{fact.label}</dt>
+            <dd class="flex flex-wrap items-center gap-2 text-base font-semibold sm:justify-end sm:text-right">
+              {fact.value && <span class="tabular-nums">{fact.value}</span>}
+              {fact.tbd && <Tbd note={fact.tbd} lang={lang} tone="inverse" />}
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      {state === "announced" ? (
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
+          <a
+            href={notifyMailto}
+            class="inline-flex h-13 items-center gap-2 rounded-lg bg-primary px-7 text-xl font-bold text-primary-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-primary/90 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary-foreground/60"
+            data-umami-event="tickets-strategic-notify"
+          >
+            <Icon name="bell" size={20} />
+            {t("tickets.strategic.notify")}
+          </a>
+          <a href={newsletterUrl} target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-chart-4 underline underline-offset-4 decoration-chart-4/40 hover:decoration-chart-4">
+            {t("tickets.strategic.notify_alt")}
+          </a>
+        </div>
+      ) : (
+        <div class="strategic-purchase">
+          <slot name="purchase" />
+        </div>
+      )}
+
+      {teamHref && (
+        <a href={teamHref} class="inline-flex items-center gap-1.5 self-start text-sm font-medium text-primary-foreground underline-offset-4 hover:underline">
+          {t("tickets.strategic.team")}
+          <Icon name="arrow-right" size={14} />
+        </a>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* The shared purchase control is drawn for light cards; on the purple band
+     its secondary text and stepper take the band's own ink. */
+  .strategic-purchase :global(.text-muted-foreground),
+  .strategic-purchase :global(label) {
+    color: var(--color-chart-4);
+  }
+  .strategic-purchase :global([role="group"]) {
+    background: transparent;
+    border-color: color-mix(in oklab, var(--color-primary-foreground) 35%, transparent);
+  }
+  .strategic-purchase :global([role="group"] button),
+  .strategic-purchase :global([data-qty-input]),
+  .strategic-purchase :global([data-qty-total]) {
+    color: var(--color-primary-foreground);
+  }
+  .strategic-purchase :global([role="group"] button:hover) {
+    background: color-mix(in oklab, var(--color-primary-foreground) 12%, transparent);
+  }
+  .strategic-purchase :global(ol span[aria-hidden="true"]) {
+    color: var(--color-primary-foreground);
+    border-color: color-mix(in oklab, var(--color-primary-foreground) 35%, transparent);
+  }
+  .strategic-purchase :global(a.text-primary-strong) {
+    color: var(--color-primary-foreground);
+  }
+</style>

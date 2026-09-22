@@ -1,0 +1,45 @@
+---
+/**
+ * The ticketing page: the site layout around `TicketsContent`, plus — on demo
+ * routes only — the state switcher and a forced noindex.
+ */
+import Layout from "@/layouts/Layout.astro";
+import { TICKETING, type Phase, type StrategicState } from "@/config/tickets";
+import { useTranslations } from "@/i18n/utils";
+import type { Locale } from "@/i18n/ui";
+import type { Variant } from "@/lib/tickets/purchase";
+import type { RexSummary } from "@/lib/tickets/rex";
+import TicketsContent from "./TicketsContent.astro";
+import DemoBar from "./DemoBar.astro";
+
+interface Props {
+  lang: Locale;
+  variant: Variant;
+  phase: Phase;
+  strategicState: StrategicState;
+  rex: RexSummary;
+  /** Present on demo routes only: renders the switcher and forces noindex. */
+  demo?: { fromConfig: boolean };
+}
+
+const { lang, variant, phase, strategicState, rex, demo } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<Layout title={t("tickets.meta.title")} description={t("tickets.meta.description")} lang={lang} newsletter={false} noindex={Boolean(demo)}>
+  {demo && (
+    <DemoBar lang={lang} config={TICKETING} variant={variant} phase={phase} strategicState={strategicState} fromConfig={demo.fromConfig} />
+  )}
+  <TicketsContent
+    lang={lang}
+    variant={variant}
+    phase={phase}
+    strategicState={strategicState}
+    rex={rex}
+    demo={Boolean(demo)}
+  />
+</Layout>
+
+<script>
+  import "./tickets-ui.ts";
+</script>

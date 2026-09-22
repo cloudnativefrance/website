@@ -1,0 +1,43 @@
+---
+/**
+ * Hidden demos of the 2027 ticketing page, for the team to compare the two
+ * purchase paths on staging:
+ *
+ *   /billetterie/demo-a/                     variant A, the config's own state
+ *   /billetterie/demo-b/early-bird/annonce/  variant B, one simulated state
+ *
+ * `getStaticPaths` returns nothing on a build for the production origin, so
+ * these URLs never exist on cloudnativedays.fr (see src/lib/tickets/demo.ts).
+ * French only; the i18n keys exist in both languages for the real page.
+ * /billetterie itself stays the "coming soon" page until the switch.
+ */
+import TicketsPage from "@/components/tickets/TicketsPage.astro";
+import { TICKETING } from "@/config/tickets";
+import { demoStaticPaths, ticketDemosEnabled, type DemoState } from "@/lib/tickets/demo";
+import { loadSessions } from "@/lib/schedule";
+import { assertEditionPublishable } from "@/lib/edition-visibility";
+import { rexSummary } from "@/lib/tickets/rex";
+
+export function getStaticPaths() {
+  return ticketDemosEnabled() ? demoStaticPaths() : [];
+}
+
+const { variant, phase, strategicState } = Astro.props as DemoState;
+const fromConfig = !phase || !strategicState;
+
+// The proof section quotes the last edition's experience reports, and that
+// edition only: the page has no coming-soon state, so it refuses any edition
+// that is not public rather than reading it.
+const PROOF_EDITION = 2026;
+assertEditionPublishable(PROOF_EDITION, "billetterie");
+const rex = rexSummary(await loadSessions(PROOF_EDITION));
+---
+
+<TicketsPage
+  lang="fr"
+  variant={variant}
+  phase={phase ?? TICKETING.currentPhase}
+  strategicState={strategicState ?? TICKETING.strategic.state}
+  rex={rex}
+  demo={{ fromConfig }}
+/>

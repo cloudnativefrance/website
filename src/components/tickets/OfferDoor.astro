@@ -1,0 +1,88 @@
+---
+/**
+ * Door 1, "I'm taking my seat": the dominant door. The price of the moment at
+ * monumental scale, the purchase action, and the whole season's ladder
+ * underneath — the ladder is the offer, not a second section repeating it,
+ * and it is where the date that ends this price is written.
+ */
+import type { Phase, TierDefinition } from "@/config/tickets";
+import type { TierWithState } from "@/lib/tickets/phase";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { fill, formatDayMonth, priceParts } from "@/lib/tickets/format";
+import TierLadder from "./TierLadder.astro";
+import Tbd from "./Tbd.astro";
+
+interface Props {
+  lang: Locale;
+  phase: Phase;
+  tier: TierDefinition;
+  ladder: TierWithState[];
+  /** Opening day and time, shown before the ticketing opens. */
+  opening: { date: string; time: string; timeNote?: string };
+  namesNote?: string;
+}
+
+const { lang, phase, tier, ladder, opening, namesNote } = Astro.props;
+const t = useTranslations(lang);
+const price = priceParts(tier.price, lang);
+// Derived rather than passed: the ladder already knows the order of the tiers.
+const isLastTier = ladder[ladder.length - 1]?.tier.id === tier.id;
+---
+
+<article
+  id="offre"
+  class="door relative flex grow flex-col gap-8 rounded-xl border border-primary/35 bg-card p-5 shadow-[0_1px_2px_oklch(15.5%_0.04_268/0.05),0_12px_32px_-12px_oklch(15.5%_0.04_268/0.18)] sm:p-8 dark:shadow-[0_0_0_1px_oklch(62.5%_0.162_259.9/0.25),var(--shadow-glow-primary)]"
+  aria-labelledby="door-offer-title"
+  style="--door-index: 0"
+>
+  <h2 id="door-offer-title" class="text-2xl font-semibold tracking-[-0.01em] text-foreground">
+    {t("tickets.door.offer")}
+  </h2>
+
+  <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-10">
+    <div class="flex flex-col justify-center gap-3">
+      {/* The name, and on the last tier the section's one pink: nothing
+          follows it, so the ladder box below has no date to carry and the
+          pill would be alone there — and too wide for one line. Never a
+          quota, never a count. */}
+      <p class="flex flex-wrap items-center gap-x-3 gap-y-2 text-lg font-semibold text-foreground">
+        <span>{phase === "pre_opening" ? `${t("tickets.offer.opening_label")} · ${tier.name[lang]}` : tier.name[lang]}</span>
+        {isLastTier && (
+          <span class="inline-flex items-center rounded-full bg-accent px-2.5 py-1 text-xs font-bold uppercase leading-none tracking-[0.06em] text-accent-foreground">
+            {t("tickets.offer.last_seats")}
+          </span>
+        )}
+      </p>
+      <p class="flex items-baseline gap-3 text-foreground" data-offer-price={tier.price}>
+        <span class="font-bold tabular-nums leading-none tracking-[-0.035em] text-[clamp(3.5rem,11vw,5.5rem)]">
+          {price.before && <span class="mr-1 align-top text-[0.45em] font-semibold tracking-normal">{price.before}</span>}
+          {price.amount}
+          {price.after && <span class="ml-1.5 text-[0.45em] font-semibold tracking-normal">{price.after}</span>}
+        </span>
+        <span class="text-base font-medium text-muted-foreground">{t("tickets.offer.ttc")}</span>
+      </p>
+    </div>
+
+    {/* The action column — the mobile bar watches it (tickets-ui.ts) and takes
+        over as soon as it leaves the screen. Before the opening it carries the
+        opening day and time next to the notification, not a lone button. */}
+    <div class="flex flex-col justify-center gap-4" data-offer-action>
+      {phase === "pre_opening" && (
+        <p class="text-lg font-semibold text-foreground text-pretty">
+          {fill(t("tickets.offer.opens"), { date: formatDayMonth(opening.date, lang), time: opening.time })}
+          {opening.timeNote && <Tbd note={opening.timeNote} lang={lang} class="ml-1.5" />}
+        </p>
+      )}
+      <slot name="purchase" />
+    </div>
+  </div>
+
+  {/* `lg:mt-auto`: when the right column is taller than door 1, the slack lands
+      here, between the offer and the timeline, rather than around the price —
+      the ladder then sits flush with the bottom of the card and the two
+      columns end on the same line. */}
+  <div class="border-t border-border pt-7 lg:mt-auto">
+    <TierLadder items={ladder} phase={phase} lang={lang} namesNote={namesNote} />
+  </div>
+</article>

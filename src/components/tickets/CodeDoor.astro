@@ -1,0 +1,105 @@
+---
+/**
+ * Door 3, "I have a code": partners, invitations, promo codes. The site checks
+ * nothing and prices nothing — it hands the code to alf.io, which knows them.
+ *
+ * Two layouts, same markup: a card in the right column when door 2 is there,
+ * and a slim full-width band under door 1 when it is not — a lone short card
+ * beside the tall offer card leaves a hole, a band does not. It is never
+ * rendered before the ticketing opens, where a code has nothing to buy.
+ *
+ * Without JavaScript the form is a plain GET to the listing with `?code=`
+ * (support to confirm with JC); `tickets-ui.ts` upgrades it to
+ * `/code/<CODE>`, strips whitespace and refuses an empty code with a message.
+ * The hand-off to the ticketing host is announced before the click.
+ */
+import type { Phase } from "@/config/tickets";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { fill } from "@/lib/tickets/format";
+import Icon from "./Icon.astro";
+
+interface Props {
+  lang: Locale;
+  phase: Phase;
+  listingUrl: string;
+  fallback: { action: string; param: "code" };
+  host: string;
+  variant: string;
+  layout: "card" | "band";
+}
+
+const { lang, phase, listingUrl, fallback, host, variant, layout } = Astro.props;
+const t = useTranslations(lang);
+const band = layout === "band";
+---
+
+<article
+  class:list={[
+    "door flex flex-col rounded-xl border border-border bg-card p-5 sm:p-6",
+    band ? "gap-4 lg:flex-row lg:items-center lg:gap-8" : "gap-4",
+  ]}
+  aria-labelledby="door-code-title"
+  style={`--door-index: ${band ? 1 : 2}`}
+>
+  <div class:list={["flex flex-col gap-1", band && "lg:shrink-0"]}>
+    <h2 id="door-code-title" class="text-2xl font-semibold tracking-[-0.01em] text-foreground">
+      {t("tickets.door.code")}
+    </h2>
+    {band && <p class="text-sm text-muted-foreground">{t("tickets.code.intro")}</p>}
+  </div>
+
+  <form
+    method="get"
+    action={fallback.action}
+    class:list={["flex flex-col gap-2", band && "lg:min-w-0 lg:flex-1 lg:flex-row lg:items-center lg:gap-6"]}
+    novalidate
+    data-tickets-code
+    data-listing={listingUrl}
+  >
+    <label for="ticket-code" class:list={["text-sm text-muted-foreground", band && "sr-only"]}>
+      {t("tickets.code.intro")} <span class="sr-only">{t("tickets.code.label")}</span>
+    </label>
+    {/* A code is short: in the band the field keeps a sensible width and the
+        hand-off note takes the rest of the row rather than trailing under it. */}
+    <div class:list={["flex flex-col gap-2", band && "lg:min-w-0 lg:flex-1 lg:max-w-md"]}>
+    <div class="flex flex-col gap-2 min-[380px]:flex-row">
+      <input
+        id="ticket-code"
+        name={fallback.param}
+        type="text"
+        autocomplete="off"
+        autocapitalize="characters"
+        spellcheck="false"
+        enterkeyhint="go"
+        placeholder={t("tickets.code.label")}
+        aria-describedby="ticket-code-handoff"
+        class="h-11 min-w-0 flex-1 rounded-lg border border-input bg-background px-3 text-base text-foreground caret-primary placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-150 focus-visible:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/40 aria-invalid:border-destructive-strong aria-invalid:ring-3 aria-invalid:ring-destructive/20"
+        data-code-input
+      />
+      {/* `whitespace-nowrap` only where the band puts it on one row: on a phone
+          it would make the door's min-content wider than the viewport and push
+          the whole grid column out. */}
+      <button
+        type="submit"
+        class:list={[
+          "inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-input bg-card px-4 text-base font-semibold text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-muted active:scale-[0.96] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+          band && "lg:whitespace-nowrap",
+        ]}
+        data-umami-event="tickets-code"
+        data-umami-event-variante={variant}
+        data-umami-event-phase={phase}
+      >
+        {t("tickets.code.submit")}
+        <Icon name="arrow-right" size={16} />
+      </button>
+    </div>
+      <p id="ticket-code-error" class="text-sm font-medium text-destructive-strong" role="alert" hidden data-code-error>
+        {t("tickets.code.empty")}
+      </p>
+    </div>
+    <p id="ticket-code-handoff" class:list={["text-sm text-muted-foreground text-pretty", band && "lg:max-w-[34ch]"]}>
+      {fill(t("tickets.code.handoff"), { host })}
+    </p>
+  </form>
+</article>

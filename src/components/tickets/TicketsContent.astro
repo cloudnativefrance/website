@@ -1,0 +1,360 @@
+---
+/**
+ * The ticketing page's content, composed around the three ways people arrive —
+ * take my seat, send my team, I have a code — weighted by importance.
+ * `TicketsPage` wraps it in the layout; kept apart so the demo matrix test can
+ * render every state without a site origin.
+ *
+ * Everything is derived from `src/config/tickets.ts` and the props below, so
+ * the demo routes and a future production route render the same page: the
+ * demo only picks the phase and the Strategy & Leadership state. The variant
+ * changes the purchase action and nothing else.
+ */
+import GeoBackground from "@/components/patterns/GeoBackground.astro";
+import { TICKETING, isTbd, type Maybe, type Phase, type StrategicState } from "@/config/tickets";
+import { useTranslations } from "@/i18n/utils";
+import type { Locale } from "@/i18n/ui";
+import { CONTACT_EMAILS, NEWSLETTER_URL, TARGET_DATE } from "@/lib/event";
+import { buildMailto } from "@/lib/tickets/mailto";
+import { placeholdersAllowed } from "@/lib/tickets/demo";
+import { fill, formatDayMonth, formatFullDate, formatPrice, formatTime } from "@/lib/tickets/format";
+import {
+  assertTicketingConfig,
+  cheaperGroupRates,
+  offerTier,
+  tierStates,
+} from "@/lib/tickets/phase";
+import { orderSegments } from "@/lib/tickets/pricing";
+import {
+  alfioHost,
+  codeFallbackAction,
+  listingUrl,
+  purchaseTarget,
+  type Variant,
+} from "@/lib/tickets/purchase";
+import type { RexSummary } from "@/lib/tickets/rex";
+import type { PriceSegment } from "./PurchaseControl.astro";
+import OfferDoor from "./OfferDoor.astro";
+import TeamDoor from "./TeamDoor.astro";
+import CodeDoor from "./CodeDoor.astro";
+import PurchaseControl from "./PurchaseControl.astro";
+import StrategicOffer from "./StrategicOffer.astro";
+import IncludedInTicket from "./IncludedInTicket.astro";
+import EditionProof from "./EditionProof.astro";
+import TeamOffer from "./TeamOffer.astro";
+import TicketsFaq from "./TicketsFaq.astro";
+import InclusionNote from "./InclusionNote.astro";
+import StickyTicketBar from "./StickyTicketBar.astro";
+import Tbd from "./Tbd.astro";
+
+interface Props {
+  lang: Locale;
+  variant: Variant;
+  phase: Phase;
+  strategicState: StrategicState;
+  rex: RexSummary;
+  /** Demo routes stripe the mobile bar so no capture passes for the real page. */
+  demo?: boolean;
+}
+
+const { lang, variant, phase, strategicState, rex, demo } = Astro.props;
+const t = useTranslations(lang);
+const config = TICKETING;
+assertTicketingConfig(config);
+const allowDrafts = placeholdersAllowed();
+
+/** The note of a `tbd` value, for its chip; undefined once the value is decided. */
+const note = (value: Maybe<unknown>) => (isTbd(value) ? value.note : undefined);
+const draftText = (value: Maybe<{ fr: string; en: string }>) =>
+  isTbd(value) ? (value.draft?.[lang] ?? "") : value[lang];
+
+const tier = offerTier(config, phase);
+const ladder = tierStates(config, phase);
+const rates = cheaperGroupRates(config, tier);
+const host = alfioHost(config);
+const email = CONTACT_EMAILS.tickets;
+
+const groupMailto = buildMailto(email, t("tickets.team.mail.subject"), t("tickets.team.mail.body"));
+const inclusionMailto = buildMailto(email, t("tickets.inclusion.mail.subject"), t("tickets.inclusion.mail.body"));
+const strategicMailto = buildMailto(email, t("tickets.strategic.mail.subject"), t("tickets.strategic.mail.body"));
+
+const tierTarget = purchaseTarget(config, variant, { kind: "tier", tier }, phase, { allowDrafts });
+
+// Door 2 is rendered only when a group rate actually beats the price of the
+// moment and fits the tier's order cap; below that it had nothing to sell.
+// Everything else about the first viewport follows from it.
+const showTeam = rates.length > 0;
+const showCode = phase !== "pre_opening";
+const wideOffer = !showTeam;
+
+// The price of a seat at each quantity, with the alf.io action that sells it —
+// the table `tickets-ui.ts` walks so the discount applies on its own. Variant A
+// only: variant B picks the quantity on alf.io.
+const segments: PriceSegment[] | undefined =
+  tierTarget.kind === "reserve"
+    ? orderSegments(tier, rates).map((segment) => ({
+        min: segment.min,
+        max: segment.max,
+        price: segment.price,
+        rate: segment.product.kind === "group" ? segment.product.rateId : undefined,
+        action: actionOf(segment.product),
+      }))
+    : undefined;
+
+function actionOf(product: { kind: "tier" } | { kind: "group"; rateId: string }): string {
+  const rate = product.kind === "group" ? rates.find((r) => r.id === product.rateId) : undefined;
+  const target = purchaseTarget(
+    config,
+    variant,
+    rate ? { kind: "group", tier, rate } : { kind: "tier", tier },
+    phase,
+    { allowDrafts },
+  );
+  if (target.kind !== "reserve") throw new Error("[tickets] a segment needs a reservation action");
+  return target.action;
+}
+
+const openingTime = isTbd(config.opening.time) ? (config.opening.time.draft ?? "") : config.opening.time;
+const opening = {
+  date: config.opening.date,
+  time: formatTime(openingTime, lang),
+  timeNote: note(config.opening.time),
+};
+const programmeWhen = draftText(config.programmeAnnouncement);
+const programmeNote = note(config.programmeAnnouncement);
+
+const showStrategic = strategicState !== "hidden";
+const strategic = config.strategic;
+const strategicTarget =
+  strategicState === "on_sale"
+    ? purchaseTarget(
+        config,
+        variant,
+        { kind: "strategic", categoryCode: strategic.alfioCategoryCode, maxPerOrder: strategic.maxPerOrder },
+        phase,
+        { allowDrafts },
+      )
+    : undefined;
+const strategicPrice =
+  !isTbd(strategic.price) && strategic.price.kind === "fixed"
+    ? strategic.price.amount
+    : !isTbd(strategic.price) && strategic.price.kind === "per_tier" && phase !== "pre_opening"
+      ? strategic.price.amounts[phase]
+      : undefined;
+
+const eventDate = formatFullDate(TARGET_DATE, lang);
+// Split around {venue} so the venue can be set unbreakable: "CENTQUATRE-PARIS"
+// must never break at its hyphen on a narrow screen.
+const [whenBefore, whenAfter = ""] = t("tickets.when").split("{venue}");
+const when = {
+  before: fill(whenBefore, { date: eventDate.charAt(0).toUpperCase() + eventDate.slice(1) }),
+  venue: t("hero.venue"),
+  after: whenAfter,
+};
+
+const analytics = { palier: tier.id, variante: variant, phase };
+const sticky = {
+  label: phase === "pre_opening" ? fill(t("tickets.sticky.opens"), { date: formatDayMonth(config.opening.date, lang) }) : tier.name[lang],
+  price: formatPrice(tier.price, lang),
+  action:
+    tierTarget.kind === "reserve"
+      ? { kind: "scroll" as const, href: "#offre", text: t("tickets.sticky.reserve") }
+      : tierTarget.kind === "listing"
+        ? { kind: "link" as const, href: tierTarget.href, text: t("tickets.sticky.buy") }
+        : { kind: "link" as const, href: tierTarget.href, text: t("tickets.sticky.notify"), external: true },
+  analytics: {
+    "data-umami-event-billet": "standard",
+    "data-umami-event-palier": analytics.palier,
+    "data-umami-event-variante": variant,
+    "data-umami-event-phase": phase,
+  },
+};
+
+const early = config.tiers.filter((x) => x.closesWhenSoldOut).map((x) => x.maxPerOrder);
+const later = config.tiers.filter((x) => !x.closesWhenSoldOut).map((x) => x.maxPerOrder);
+const perOrder = { early: Math.max(...early), later: Math.max(...later) };
+---
+
+<main class="tickets-page" data-variant={variant} data-phase={phase} data-strategic={strategicState}>
+  <section class="relative isolate overflow-hidden">
+    <GeoBackground class="tickets-mesh absolute inset-0 -z-10" />
+    <div class="mx-auto flex max-w-7xl flex-col gap-8 px-4 pb-16 pt-8 md:px-6 md:pb-20 md:pt-12 lg:px-8">
+      <header class="flex max-w-4xl flex-col gap-3">
+        <h1 class="text-4xl font-bold leading-[1.05] tracking-[-0.025em] text-balance text-foreground sm:text-5xl">
+          {t("tickets.h1")}
+        </h1>
+        <p class="text-lg font-semibold text-foreground text-pretty sm:text-xl">
+          {when.before}<span class="whitespace-nowrap">{when.venue}</span>{when.after}, {t("tickets.when_evening")}
+          {note(config.eveningIncluded) && <Tbd note={note(config.eveningIncluded)!} lang={lang} class="ml-1.5 align-[0.15em]" />}
+        </p>
+        <p class="max-w-[58ch] text-base text-muted-foreground text-pretty sm:text-lg">{t("tickets.lead")}</p>
+      </header>
+
+      {/* Door 1 spans the grid whenever door 2 has nothing to sell: a lone short
+          card beside it would leave the right column hollow. "J'ai un code"
+          then becomes a slim band underneath rather than that lone card. */}
+      <div class="grid gap-5 lg:grid-cols-12 lg:gap-6">
+        {/* `flex flex-col` so door 1 inherits the row height the right column
+            sets, rather than sitting short inside a stretched wrapper. */}
+        <div class:list={["flex flex-col", wideOffer ? "lg:col-span-12" : "lg:col-span-8"]}>
+          <OfferDoor
+            lang={lang}
+            phase={phase}
+            tier={tier}
+            ladder={ladder}
+            opening={opening}
+            namesNote={note(config.tierNames)}
+          >
+            <PurchaseControl
+              slot="purchase"
+              target={tierTarget}
+              lang={lang}
+              idBase="offer"
+              price={tier.price}
+              variant={variant}
+              phase={phase}
+              analytics={{ billet: "standard", palier: tier.id }}
+              segments={segments}
+              capMailto={groupMailto}
+            />
+          </OfferDoor>
+        </div>
+        {showTeam && (
+          <div class="flex flex-col gap-5 lg:col-span-4 lg:gap-6">
+            <TeamDoor lang={lang} tier={tier} rates={rates} variant={variant} groupMailto={groupMailto} />
+            <CodeDoor
+              lang={lang}
+              phase={phase}
+              listingUrl={listingUrl(config)}
+              fallback={codeFallbackAction(config)}
+              host={host}
+              variant={variant}
+              layout="card"
+            />
+          </div>
+        )}
+        {showCode && !showTeam && (
+          <div class="lg:col-span-12">
+            <CodeDoor
+              lang={lang}
+              phase={phase}
+              listingUrl={listingUrl(config)}
+              fallback={codeFallbackAction(config)}
+              host={host}
+              variant={variant}
+              layout="band"
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  {showStrategic && (
+    <div class="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
+      <StrategicOffer
+        lang={lang}
+        state={strategicState as Exclude<StrategicState, "hidden">}
+        ticket={strategic}
+        notifyMailto={strategicMailto}
+        newsletterUrl={NEWSLETTER_URL}
+        teamHref={showTeam ? "#equipe" : undefined}
+      >
+        {strategicTarget && (
+          <PurchaseControl
+            slot="purchase"
+            target={strategicTarget}
+            lang={lang}
+            idBase="strategic"
+            price={strategicPrice}
+            variant={variant}
+            phase={phase}
+            analytics={{ billet: "strategique", palier: "strategique" }}
+            capMailto={groupMailto}
+          />
+        )}
+      </StrategicOffer>
+    </div>
+  )}
+
+  <div class="mx-auto max-w-7xl px-4 pb-20 pt-24 md:px-6 md:pb-24 md:pt-28 lg:px-8">
+    <IncludedInTicket
+      lang={lang}
+      contentsNote={note(config.contents)}
+      eveningIncludedNote={note(config.eveningIncluded)}
+      eveningNote={note(config.eveningDetails)}
+    />
+  </div>
+
+  <div class="border-y border-border bg-card/60 py-20 md:py-24">
+    <EditionProof lang={lang} rex={rex} programmeWhen={programmeWhen} programmeNote={programmeNote} />
+  </div>
+
+  <div class="mx-auto max-w-7xl px-4 pb-20 pt-24 md:px-6 md:pb-24 md:pt-28 lg:px-8">
+    <TeamOffer
+      lang={lang}
+      programmeWhen={programmeWhen}
+      programmeNote={programmeNote}
+      kitNote={note(config.managerKitUrl)}
+      kitUrl={isTbd(config.managerKitUrl) ? undefined : config.managerKitUrl}
+    />
+  </div>
+
+  <div class="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-24 lg:px-8">
+    <TicketsFaq
+      lang={lang}
+      host={host}
+      email={email}
+      inclusionMailto={inclusionMailto}
+      perOrder={perOrder}
+      programmeWhen={programmeWhen}
+      notes={{
+        vat: note(config.vatRate),
+        invoice: note(config.invoice),
+        transfer: note(config.transferAndRefund),
+        terms: note(config.termsUrl),
+        programme: programmeNote,
+      }}
+    />
+  </div>
+
+  <div class="mx-auto max-w-7xl px-4 pb-28 md:px-6 md:pb-24 lg:px-8">
+    <InclusionNote lang={lang} inclusionMailto={inclusionMailto} />
+  </div>
+</main>
+
+<StickyTicketBar
+  lang={lang}
+  label={sticky.label}
+  price={sticky.price}
+  action={sticky.action}
+  analytics={sticky.analytics}
+  demo={Boolean(demo)}
+/>
+
+<style>
+  .tickets-page :global(::selection) {
+    background: color-mix(in oklab, var(--color-primary) 28%, transparent);
+    color: var(--color-foreground);
+  }
+  .tickets-page :global(.tickets-mesh) {
+    mask-image: linear-gradient(to bottom, black 0%, black 35%, transparent 85%);
+    opacity: 0.9;
+  }
+
+  /* One authored entrance: the three doors settle in sequence, once, from an
+     already-visible default (reduced motion keeps them still, global.css). */
+  @media (prefers-reduced-motion: no-preference) {
+    .tickets-page :global(.door) {
+      animation: door-in 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-delay: calc(var(--door-index, 0) * 90ms + 60ms);
+    }
+  }
+  @keyframes door-in {
+    from {
+      opacity: 0;
+      translate: 0 14px;
+      filter: blur(3px);
+    }
+  }
+</style>
