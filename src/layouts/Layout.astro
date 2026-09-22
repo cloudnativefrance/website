@@ -21,6 +21,11 @@ interface Props {
    * ComingSoonLayout, which is itself a newsletter appeal and would duplicate it.
    */
   newsletter?: boolean;
+  /**
+   * Force the noindex meta even on a production-origin build. Used by pages
+   * that must never be indexed whatever the origin (the ticketing demos).
+   */
+  noindex?: boolean;
 }
 
 // Bump ?v= whenever public/og-default.png changes. The asset is served
@@ -36,6 +41,7 @@ const {
   lang,
   canonicalPath,
   newsletter = true,
+  noindex = false,
 } = Astro.props;
 
 const resolvedLang = (lang ?? getLangFromUrl(Astro.url)) as Locale;
@@ -95,7 +101,7 @@ const analyticsEnabled = isProductionOrigin(Astro.site?.origin);
     <title>{title}</title>
     <meta name="description" content={metaDescription} />
 
-    {!indexable && <meta name="robots" content="noindex, nofollow" />}
+    {(!indexable || noindex) && <meta name="robots" content="noindex, nofollow" />}
 
     {/* Self-hosted Umami. Cookieless, no personal data, DNT honoured. Served
         from /cnd.js rather than the default /script.js because ad-blocker

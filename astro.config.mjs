@@ -83,8 +83,12 @@ export default defineConfig({
       // and don't redeploy post-event just to add routes to the sitemap, so
       // these routes are excluded permanently. Post-event inbound links come
       // from CountdownTimer and the conditional nav entry.
+      // The ticketing demos only exist on non-production builds (see
+      // src/lib/tickets/demo.ts); kept out of the sitemap there too.
       filter: (page) =>
-        !/\/replays\/?$/.test(page) && !/\/en\/replays\/?$/.test(page),
+        !/\/replays\/?$/.test(page) &&
+        !/\/en\/replays\/?$/.test(page) &&
+        !/\/billetterie\/demo-/.test(page),
       i18n: {
         defaultLocale: "fr",
         locales: { fr: "fr-FR", en: "en-US" },

@@ -57,6 +57,8 @@ export const ROUTE_CONSUMERS = [
   "src/pages/programme.ics.ts",
   "src/pages/replays/index.astro",
   "src/pages/en/replays/index.astro",
+  // The ticketing demos quote the 2026 experience reports (proof section).
+  "src/pages/billetterie/[...demo].astro",
 ] as const;
 
 /**

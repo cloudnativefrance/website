@@ -1,0 +1,298 @@
+---
+/**
+ * Demo-only switcher: variant, phase and Strategy & Leadership state, each a
+ * link to a pre-rendered page — every state is exactly what a production build
+ * renders for that config, with no client re-implementation. Never rendered
+ * outside the demo routes.
+ *
+ * It stays out of the way on purpose: the page must look exactly like the
+ * future production page, so the only permanent mark is the striped "DÉMO · A"
+ * pill in the bottom-left corner. Clicking it opens the controls in a native
+ * popover (top layer, light-dismiss and Esc for free, no JS needed to open it).
+ */
+import type { Phase, StrategicState, TicketingConfig } from "@/config/tickets";
+import type { Variant } from "@/lib/tickets/purchase";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { DEMO_PHASES, DEMO_STRATEGIC_STATES, demoPath } from "@/lib/tickets/demo";
+
+interface Props {
+  lang: Locale;
+  config: TicketingConfig;
+  variant: Variant;
+  phase: Phase;
+  strategicState: StrategicState;
+  /** True on the entry URL, which shows the config's own state. */
+  fromConfig: boolean;
+}
+
+const { lang, config, variant, phase, strategicState, fromConfig } = Astro.props;
+const t = useTranslations(lang);
+
+const phaseLabel = (p: Phase) =>
+  p === "pre_opening" ? t("tickets.demo.pre_opening") : config.tiers.find((tier) => tier.id === p)!.name[lang];
+
+const group = "flex flex-col gap-1.5";
+const legend = "text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-muted-foreground";
+const chip =
+  "inline-flex min-h-8 items-center rounded-md px-2.5 text-[0.8125rem] font-medium transition-[background-color,color] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+const idle = "text-foreground hover:bg-muted";
+const active = "bg-foreground text-background";
+---
+
+<div class="demo-root" data-demo-bar>
+  <button
+    type="button"
+    popovertarget="demo-panel"
+    class="demo-trigger fixed left-4 z-50 inline-flex h-8 items-center gap-2 rounded-md px-3 text-xs font-bold uppercase tracking-widest text-destructive-foreground shadow-[0_2px_8px_oklch(0_0_0/0.25)] transition-[scale] duration-150 ease-out active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    aria-label={t("tickets.demo.settings")}
+  >
+    <span>{t("tickets.demo.badge")} · {variant.toUpperCase()}</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="shrink-0 opacity-80">
+      <path d="M4 6h10"></path>
+      <path d="M18 6h2"></path>
+      <path d="M4 12h4"></path>
+      <path d="M12 12h8"></path>
+      <path d="M4 18h10"></path>
+      <path d="M18 18h2"></path>
+      <circle cx="16" cy="6" r="2"></circle>
+      <circle cx="10" cy="12" r="2"></circle>
+      <circle cx="16" cy="18" r="2"></circle>
+    </svg>
+  </button>
+
+  <div id="demo-panel" popover class="demo-panel" data-demo-panel>
+    <div class="flex max-h-[min(30rem,calc(100dvh-8rem))] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-y-auto rounded-xl border border-border bg-card shadow-[0_12px_32px_oklch(0_0_0/0.22)]">
+      <div class="demo-stripe h-1.5 shrink-0" aria-hidden="true"></div>
+
+      <div class="flex items-start justify-between gap-3 px-4 pb-2 pt-3">
+        <p class="flex flex-col gap-1">
+          <strong class="w-fit rounded-sm bg-destructive px-2 py-0.5 text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-destructive-foreground">
+            {t("tickets.demo.badge")}
+          </strong>
+          <span class="text-xs text-muted-foreground">{t("tickets.demo.notice")}</span>
+        </p>
+        <button
+          type="button"
+          popovertarget="demo-panel"
+          popovertargetaction="hide"
+          class="-mr-1 -mt-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color] duration-150 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={t("tickets.demo.close")}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-3 border-t border-border px-4 py-3">
+        <nav class:list={[group]} aria-label={t("tickets.demo.variant")}>
+          <span class:list={[legend]}>{t("tickets.demo.variant")}</span>
+          <div class="flex flex-wrap gap-1">
+            {(["a", "b"] as const).map((v) => (
+              <a
+                href={demoPath({ variant: v, phase: fromConfig ? undefined : phase, strategicState: fromConfig ? undefined : strategicState })}
+                class:list={[chip, v === variant ? active : idle]}
+                aria-current={v === variant ? "page" : undefined}
+                data-demo-link
+              >
+                {t(`tickets.demo.variant.${v}`)}
+              </a>
+            ))}
+          </div>
+        </nav>
+
+        <nav class:list={[group]} aria-label={t("tickets.demo.phase")}>
+          <span class:list={[legend]}>{t("tickets.demo.phase")}</span>
+          <div class="flex flex-wrap gap-1">
+            {DEMO_PHASES.map((p) => (
+              <a
+                href={demoPath({ variant, phase: p, strategicState })}
+                class:list={[chip, !fromConfig && p === phase ? active : idle]}
+                aria-current={!fromConfig && p === phase ? "page" : undefined}
+                data-demo-link
+              >
+                {phaseLabel(p)}
+              </a>
+            ))}
+          </div>
+        </nav>
+
+        <nav class:list={[group]} aria-label={t("tickets.demo.strategic")}>
+          <span class:list={[legend]}>{t("tickets.demo.strategic")}</span>
+          <div class="flex flex-wrap gap-1">
+            {DEMO_STRATEGIC_STATES.map((s) => (
+              <a
+                href={demoPath({ variant, phase, strategicState: s })}
+                class:list={[chip, !fromConfig && s === strategicState ? active : idle]}
+                aria-current={!fromConfig && s === strategicState ? "page" : undefined}
+                data-demo-link
+              >
+                {t(`tickets.demo.strategic.${s}`)}
+              </a>
+            ))}
+          </div>
+        </nav>
+        {/* Not a state of the page but a lens over it: the markup always
+            carries its placeholders, the switch only hides them so the team
+            can read the page as it will ship. */}
+        <div class:list={[group]}>
+          <span class:list={[legend]}>{t("tickets.demo.placeholders")}</span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked="true"
+            data-tbd-toggle
+            class="-ml-1 inline-flex w-fit items-center gap-2 rounded-md px-1 py-1 text-[0.8125rem] font-medium text-foreground transition-[background-color] duration-150 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <span class="tbd-track" aria-hidden="true"><span class="tbd-knob"></span></span>
+            {t("tickets.demo.placeholders.show")}
+          </button>
+        </div>
+      </div>
+
+      <p class="border-t border-border px-4 py-3 text-[0.6875rem] leading-relaxed text-muted-foreground">
+        {fromConfig ? `${t("tickets.demo.config")} · ` : ""}{t("tickets.demo.scenario")}
+      </p>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  // Demo-only, and deliberately not in tickets-ui.ts: that module ships with
+  // the production page, this never does. Inline and placed after the panel so
+  // it runs before the page content is parsed — the chips never flash before
+  // being hidden. Every placeholder stays in the markup; only CSS hides it.
+  (() => {
+    const KEY = "cnd-tickets-demo-tbd";
+    const root = document.documentElement;
+    const toggle = document.querySelector("[data-tbd-toggle]");
+    let shown = true;
+    try {
+      shown = localStorage.getItem(KEY) !== "hidden";
+    } catch {
+      // Storage can be unavailable (private mode); the toggle still works.
+    }
+    const apply = () => {
+      root.dataset.ticketsTbd = shown ? "shown" : "hidden";
+      toggle?.setAttribute("aria-checked", String(shown));
+    };
+    apply();
+    toggle?.addEventListener("click", () => {
+      shown = !shown;
+      apply();
+      try {
+        localStorage.setItem(KEY, shown ? "shown" : "hidden");
+      } catch {
+        // Not persisted; the page still reflects the choice.
+      }
+    });
+  })();
+</script>
+
+<style is:global>
+  /* The lens itself. `[data-tbd-only]` marks a line the chip is the whole
+     point of — "Taux de TVA", a Strategy & Leadership row with no value yet —
+     which would read as a dangling label if only the chip went away. */
+  html[data-tickets-tbd="hidden"] .tbd-chip,
+  html[data-tickets-tbd="hidden"] [data-tbd-only] {
+    display: none !important;
+  }
+</style>
+
+<style>
+  .demo-root {
+    /* Clear of the mobile sticky ticket bar; in the corner on wider screens. */
+    --demo-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+  }
+  @media (min-width: 768px) {
+    .demo-root {
+      --demo-bottom: 1rem;
+    }
+  }
+
+  .demo-trigger {
+    bottom: var(--demo-bottom);
+    background: var(--color-destructive);
+  }
+
+  /* Override the UA popover box: it centres itself and draws its own frame. */
+  .demo-panel {
+    position: fixed;
+    inset: auto;
+    left: 1rem;
+    bottom: calc(var(--demo-bottom) + 2.5rem);
+    margin: 0;
+    border: 0;
+    padding: 0;
+    overflow: visible;
+    background: transparent;
+    color: inherit;
+    opacity: 0;
+    translate: 0 0.5rem;
+    transition:
+      opacity 150ms ease-out,
+      translate 150ms cubic-bezier(0.2, 0, 0, 1),
+      overlay 150ms allow-discrete,
+      display 150ms allow-discrete;
+  }
+  .demo-panel:popover-open {
+    opacity: 1;
+    translate: 0 0;
+  }
+  @starting-style {
+    .demo-panel:popover-open {
+      opacity: 0;
+      translate: 0 0.5rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .demo-panel {
+      transition: none;
+      translate: none;
+    }
+  }
+
+  .tbd-track {
+    position: relative;
+    display: inline-block;
+    width: 2rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: var(--color-border);
+    transition: background-color 150ms ease-out;
+  }
+  .tbd-knob {
+    position: absolute;
+    top: 0.1875rem;
+    left: 0.1875rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 999px;
+    background: var(--color-card);
+    box-shadow: 0 1px 2px oklch(0 0 0 / 0.3);
+    transition: translate 150ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  [aria-checked="true"] .tbd-track {
+    background: var(--color-foreground);
+  }
+  [aria-checked="true"] .tbd-knob {
+    translate: 0.875rem 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tbd-track,
+    .tbd-knob {
+      transition: none;
+    }
+  }
+
+  .demo-stripe {
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--color-destructive) 0 10px,
+      var(--color-background) 10px 20px
+    );
+  }
+</style>

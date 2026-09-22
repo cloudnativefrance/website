@@ -1,0 +1,203 @@
+---
+/**
+ * The purchase action, rendered from a `PurchaseTarget` — the only component
+ * that knows the two demo variants apart.
+ *
+ *   reserve (A) — a GET form to alf.io's booking link with a quantity stepper.
+ *                 It works without JavaScript (native number input and bounds);
+ *                 `tickets-ui.ts` adds the live total, the cap note and the
+ *                 group-rate note. Never an `<a href>`: every hit on that URL
+ *                 reserves tickets, so nothing a crawler follows may point at it.
+ *   listing (B) — one link to the alf.io listing, where the quantity is chosen.
+ *   notify      — before the opening: the newsletter, no purchase anywhere.
+ */
+import type { PurchaseTarget, Variant } from "@/lib/tickets/purchase";
+import type { Phase } from "@/config/tickets";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { fill, formatPrice } from "@/lib/tickets/format";
+import Icon from "./Icon.astro";
+
+/**
+ * A stretch of quantities sold at one price, with the alf.io action that sells
+ * it. The buyer never picks a product: crossing 4 seats during Regular *is*
+ * taking the group rate, and the table below is how the browser knows.
+ */
+export interface PriceSegment {
+  min: number;
+  max: number;
+  price: number;
+  action: string;
+  /** Undefined on the tier's own price; the rate id on a group stretch. */
+  rate?: string;
+}
+
+interface Props {
+  target: PurchaseTarget;
+  lang: Locale;
+  /** Unique per control on the page (door 1 and the Strategy & Leadership block). */
+  idBase: string;
+  /** Unit price for the live total; undefined when the price is not decided. */
+  price?: number;
+  variant: Variant;
+  phase: Phase;
+  analytics: { billet: "standard" | "strategique"; palier: string };
+  /** Price per quantity, cheapest first at every quantity (variant A only). */
+  segments?: PriceSegment[];
+  capMailto: string;
+  notifyLabel?: string;
+}
+
+const {
+  target,
+  lang,
+  idBase,
+  price,
+  variant,
+  phase,
+  analytics,
+  segments,
+  capMailto,
+  notifyLabel,
+} = Astro.props;
+const t = useTranslations(lang);
+
+const umami = {
+  "data-umami-event-billet": analytics.billet,
+  "data-umami-event-palier": analytics.palier,
+  "data-umami-event-variante": variant,
+  "data-umami-event-phase": phase,
+};
+
+const buttonClass =
+  "inline-flex h-13 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-primary px-7 text-xl font-bold text-primary-foreground shadow-[var(--shadow-glow-primary)] transition-[background-color,scale] duration-150 ease-out hover:bg-primary/90 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-card";
+
+const stepButtonClass =
+  "grid size-11 place-items-center rounded-sm text-foreground transition-[background-color,scale,opacity] duration-150 ease-out hover:bg-muted active:scale-[0.96] disabled:pointer-events-none disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+
+const totalTemplate = t("tickets.purchase.total");
+const initialTotal = price !== undefined ? fill(totalTemplate, { total: formatPrice(price, lang) }) : "";
+const qtyId = `${idBase}-qty`;
+const labelId = `${idBase}-qty-label`;
+
+// The group stretches, with the one line each of them shows: their threshold
+// while the buyer is below it, the applied price once they are in it. Rendered
+// server-side and toggled, so the browser formats no price of its own.
+const groupSegments = (segments ?? []).filter((segment) => segment.rate !== undefined);
+---
+
+{target.kind === "reserve" && (
+  <form
+    method="get"
+    action={target.action}
+    class="flex flex-col gap-4"
+    data-tickets-reserve
+    data-max={target.max}
+    data-price={price}
+    data-lang={lang}
+    data-total-template={totalTemplate}
+    data-was-template={t("tickets.purchase.was")}
+    data-saving-template={t("tickets.purchase.saving")}
+    data-segments={segments && segments.length > 1 ? JSON.stringify(segments) : undefined}
+  >
+    <div class="flex flex-col gap-2">
+      <label id={labelId} for={qtyId} class="text-sm font-medium text-foreground">
+        {t("tickets.purchase.qty_label")}
+      </label>
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <div role="group" aria-labelledby={labelId} class="inline-flex items-center rounded-lg border border-input bg-card p-1">
+          <button type="button" class={stepButtonClass} data-qty-step="-1" aria-label={t("tickets.purchase.decrease")} aria-controls={qtyId} disabled>
+            <Icon name="minus" size={18} />
+          </button>
+          <input
+            id={qtyId}
+            name={target.qtyParam}
+            type="number"
+            inputmode="numeric"
+            min={target.min}
+            max={target.max}
+            value="1"
+            required
+            class="h-11 w-14 rounded-sm bg-transparent text-center text-xl font-semibold tabular-nums text-foreground caret-primary outline-none [appearance:textfield] focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            data-qty-input
+          />
+          <button type="button" class={stepButtonClass} data-qty-step="1" aria-label={t("tickets.purchase.increase")} aria-controls={qtyId} disabled>
+            <Icon name="plus" size={18} />
+          </button>
+        </div>
+        {initialTotal && (
+          <p class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5" aria-live="polite">
+            <span class="text-lg font-semibold tabular-nums text-foreground" data-qty-total>{initialTotal}</span>
+            {/* The price the group rate replaces, struck through: the usual
+                visual code, and the only place the saving is worth spelling. */}
+            <span class="text-sm tabular-nums text-muted-foreground line-through decoration-muted-foreground/50 decoration-[1.5px]" data-qty-was hidden></span>
+            {/* Brand blue, not the pill's ink: `--accent-foreground` is made to
+                sit on pink, and this line sits on the card. */}
+            <span class="text-sm font-semibold tabular-nums text-primary-strong" data-qty-saving hidden></span>
+          </p>
+        )}
+      </div>
+    </div>
+
+    <p class="text-sm text-muted-foreground text-pretty" data-qty-cap hidden>
+      {fill(t("tickets.purchase.cap"), { max: target.max })}{" "}
+      <a href={capMailto} class="font-medium text-primary-strong underline underline-offset-4 decoration-primary-strong/40 hover:decoration-primary-strong" data-umami-event="tickets-group-contact" data-umami-event-source="cap">
+        {fill(t("tickets.purchase.cap_link"), { max: target.max })}
+      </a>
+    </p>
+
+    {/* The state, not the price: the total right above already says what a seat
+        costs. The thresholds are read in door 2, which is where they are sold. */}
+    {groupSegments.map((segment) => (
+      <p class="flex flex-wrap items-center gap-2 text-sm font-medium text-foreground" data-group-applied={segment.rate} hidden>
+        <Icon name="check" size={16} class="text-primary-strong" />
+        {t("tickets.purchase.group_applied")}
+      </p>
+    ))}
+
+    <div>
+      <button type="submit" class={buttonClass} data-umami-event="tickets-purchase" data-umami-event-quantite="1" {...umami}>
+        {t("tickets.purchase.reserve")}
+        <Icon name="arrow-right" size={20} />
+      </button>
+    </div>
+
+  </form>
+)}
+
+{target.kind === "listing" && (
+  <div class="flex flex-col gap-4">
+    <div>
+      <a href={target.href} class={buttonClass} data-umami-event="tickets-purchase" {...umami}>
+        {t("tickets.purchase.buy")}
+        <Icon name="arrow-right" size={20} />
+      </a>
+    </div>
+  </div>
+)}
+
+{target.kind === "notify" && (
+  <div class="flex flex-col items-start gap-2">
+    <a href={target.href} target="_blank" rel="noopener noreferrer" class={buttonClass} data-umami-event="tickets-notify" {...umami}>
+      <Icon name="bell" size={20} />
+      {notifyLabel ?? t("tickets.offer.notify")}
+    </a>
+    <p class="text-sm text-muted-foreground">{t("tickets.offer.notify_note")}</p>
+  </div>
+)}
+
+<style>
+  /* The cap and group-rate notes arrive rather than pop: a short fade and lift
+     each time they are shown (re-runs whenever `hidden` is lifted). Reduced
+     motion snaps them in, see global.css. */
+  [data-qty-cap]:not([hidden]),
+  [data-group-hint]:not([hidden]) {
+    animation: note-in 150ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  @keyframes note-in {
+    from {
+      opacity: 0;
+      translate: 0 -4px;
+    }
+  }
+</style>

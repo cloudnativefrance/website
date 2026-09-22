@@ -1,0 +1,62 @@
+---
+/**
+ * The one visual for "not decided yet": a hatched, dashed chip in the error
+ * red, a look no real badge on the page ever wears. The note travels as a
+ * tooltip and as screen-reader text.
+ *
+ * Refuses to render on a production build: an unknown must be decided, or its
+ * block hidden, before the page can ship — never published as if it were real.
+ */
+import { placeholdersAllowed } from "@/lib/tickets/demo";
+import { useTranslations } from "@/i18n/utils";
+import type { Locale } from "@/i18n/ui";
+import Icon from "./Icon.astro";
+
+interface Props {
+  note: string;
+  lang: Locale;
+  /** "inverse" on dark brand surfaces, where the error red loses its contrast. */
+  tone?: "default" | "inverse";
+  /**
+   * Visible wording when "À confirmer" alone would be ambiguous — e.g. next to
+   * confirmed prices, where only the names are pending.
+   */
+  label?: string;
+  class?: string;
+}
+
+const { note, lang, tone = "default", label, class: className } = Astro.props;
+
+if (!placeholdersAllowed()) {
+  throw new Error(
+    `[tickets] a placeholder would ship to production ("${note}"). Decide it in ` +
+      `src/config/tickets.ts or hide its block before building for the production origin.`,
+  );
+}
+
+const t = useTranslations(lang);
+---
+
+<span
+  class:list={[
+    "tbd-chip inline-flex items-center gap-1 whitespace-nowrap rounded-sm border border-dashed border-current px-1.5 py-0.5 align-middle text-xs font-semibold tracking-[0.02em]",
+    tone === "inverse" ? "text-accent" : "text-destructive-strong",
+    className,
+  ]}
+  title={note}
+  data-tbd={note}
+>
+  <Icon name="pencil" size={12} stroke={2} />
+  {label ?? t("tickets.tbd")}
+  <span class="sr-only">: {note}</span>
+</span>
+
+<style>
+  .tbd-chip {
+    background-image: repeating-linear-gradient(
+      135deg,
+      transparent 0 4px,
+      color-mix(in oklab, currentColor 14%, transparent) 4px 7px
+    );
+  }
+</style>

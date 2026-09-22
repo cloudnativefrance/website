@@ -1,0 +1,144 @@
+---
+/**
+ * Reassurance and FAQ, as native <details>: keyboard and screen readers get
+ * disclosure for free, and the page works without JavaScript. Answers the
+ * ticketing team cannot give yet say so, with the placeholder chip.
+ */
+import type { Locale } from "@/i18n/ui";
+import { useTranslations, getLocalePath } from "@/i18n/utils";
+import { fill } from "@/lib/tickets/format";
+import Icon from "./Icon.astro";
+import Tbd from "./Tbd.astro";
+
+interface Props {
+  lang: Locale;
+  host: string;
+  email: string;
+  inclusionMailto: string;
+  perOrder: { early: number; later: number };
+  programmeWhen: string;
+  notes: { vat?: string; invoice?: string; transfer?: string; terms?: string; programme?: string };
+}
+
+const { lang, host, email, inclusionMailto, perOrder, programmeWhen, notes } = Astro.props;
+const t = useTranslations(lang);
+const practicalPath = `${getLocalePath(lang, "/informations-utiles")}#accessibilite`;
+const cocPath = getLocalePath(lang, "/code-of-conduct");
+const link = "font-medium text-primary-strong underline underline-offset-4 decoration-primary-strong/40 hover:decoration-primary-strong";
+---
+
+<section class="grid gap-8 lg:grid-cols-[minmax(0,0.6fr)_minmax(0,1.4fr)] lg:gap-16" aria-labelledby="faq-title">
+  <h2 id="faq-title" class="text-3xl font-bold tracking-[-0.02em] text-balance text-foreground sm:text-4xl">
+    {t("tickets.faq.title")}
+  </h2>
+
+  <div class="divide-y divide-border border-y border-border">
+    <details class="faq group">
+      <summary>{t("tickets.faq.payment.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <p>{fill(t("tickets.faq.payment.a"), { host })}</p>
+    </details>
+    <details class="faq group">
+      <summary>{t("tickets.faq.change.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <p>{t("tickets.faq.change.a")}</p>
+    </details>
+    <details class="faq group">
+      <summary>{t("tickets.faq.ttc.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <p>
+        {t("tickets.faq.ttc.a")}
+        {notes.vat && <span class="ml-1 inline-flex items-center gap-2" data-tbd-only>{t("tickets.faq.ttc.rate")} <Tbd note={notes.vat} lang={lang} /></span>}
+      </p>
+    </details>
+    <details class="faq group">
+      <summary>{t("tickets.faq.per_order.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <p>{fill(t("tickets.faq.per_order.a"), perOrder)}</p>
+    </details>
+    <details class="faq group">
+      <summary>{t("tickets.faq.invoice.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <p>
+        {fill(t("tickets.faq.invoice.a"), { email })}
+        {notes.invoice && <Tbd note={notes.invoice} lang={lang} class="ml-1" />}
+      </p>
+    </details>
+    <details class="faq group">
+      <summary>{t("tickets.faq.transfer.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <p>
+        {t("tickets.faq.transfer.a")}
+        {notes.transfer && <Tbd note={notes.transfer} lang={lang} class="ml-1" />}
+      </p>
+      <p class="flex flex-wrap items-center gap-2" data-tbd-only={notes.terms ? true : undefined}>
+        {t("tickets.faq.transfer.terms")}
+        {notes.terms && <Tbd note={notes.terms} lang={lang} />}
+      </p>
+    </details>
+    <details class="faq group">
+      <summary>{t("tickets.faq.code.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <p>{t("tickets.faq.code.a")}</p>
+    </details>
+    <details class="faq group">
+      <summary>{t("tickets.faq.inclusion.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <p>
+        {t("tickets.faq.inclusion.a")}{" "}
+        <a href={inclusionMailto} class={link} data-umami-event="tickets-inclusion-contact" data-umami-event-source="faq">{email}</a>
+      </p>
+    </details>
+    <details class="faq group">
+      <summary>{t("tickets.faq.access.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <p>
+        {t("tickets.faq.access.a")} <a href={practicalPath} class={link}>{t("tickets.faq.access.link")}</a>
+      </p>
+    </details>
+    <details class="faq group">
+      <summary>{t("tickets.faq.coc.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <p>
+        {t("tickets.faq.coc.a")} <a href={cocPath} class={link}>{t("tickets.faq.coc.link")}</a>
+      </p>
+    </details>
+    <details class="faq group">
+      <summary>{t("tickets.faq.programme.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <p>
+        {fill(t("tickets.faq.programme.a"), { when: programmeWhen })}
+        {notes.programme && <Tbd note={notes.programme} lang={lang} class="ml-1" />}
+      </p>
+    </details>
+  </div>
+</section>
+
+<style>
+  .faq > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 3.5rem;
+    padding-block: 1rem;
+    cursor: pointer;
+    list-style: none;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-foreground);
+    border-radius: var(--radius-sm);
+  }
+  .faq > summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq > summary:focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+  .faq > summary :global(.faq-icon) {
+    color: var(--color-muted-foreground);
+    transition: rotate 150ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  .faq[open] > summary :global(.faq-icon) {
+    rotate: 45deg;
+  }
+  .faq > p {
+    max-width: 68ch;
+    padding-bottom: 1.25rem;
+    color: var(--color-muted-foreground);
+    text-wrap: pretty;
+  }
+  .faq > p + p {
+    margin-top: -0.5rem;
+  }
+</style>

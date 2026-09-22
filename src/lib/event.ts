@@ -50,6 +50,8 @@ export const CONTACT_EMAILS = {
   participants: "contact@cloudnativedays.fr",
   speakers: "speakers@cloudnativedays.fr",
   sponsors: "sponsors@cloudnativedays.fr",
+  /** Group quotes, inclusion and student requests, Strategy & Leadership waiting list. */
+  tickets: "billetterie@cloudnativedays.fr",
 } as const;
 
 /**
