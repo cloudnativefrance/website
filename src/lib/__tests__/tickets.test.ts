@@ -9,7 +9,7 @@ import {
   tierStates,
 } from "@/lib/tickets/phase";
 import { alfioHost, codeFallbackAction, codeUrl, listingUrl, onHost, purchaseTarget } from "@/lib/tickets/purchase";
-import { openInNewTab } from "@/lib/tickets/url";
+import { handOffOnce, openInNewTab } from "@/lib/tickets/url";
 import { NEWSLETTER_URL } from "@/lib/event";
 import { buildMailto } from "@/lib/tickets/mailto";
 import {
@@ -385,5 +385,27 @@ describe("openInNewTab", () => {
       location: { assign: (url) => void assigned.push(url) },
     });
     expect(assigned).toEqual(["https://x.test/code/A"]);
+  });
+});
+
+describe("handOffOnce", () => {
+  // Each hand-off of a real code creates an alf.io reservation that holds
+  // tickets: a double-click must not open a second tab, and a second hold.
+  it("lets the first hand-off through and ignores a repeat within the window", () => {
+    let now = 1_000;
+    const handOff = handOffOnce(3_000, () => now);
+    expect(handOff()).toBe(true);
+    now += 400;
+    expect(handOff()).toBe(false);
+    now += 2_500;
+    expect(handOff()).toBe(false);
+  });
+
+  it("lets a deliberate new hand-off through once the window has passed", () => {
+    let now = 0;
+    const handOff = handOffOnce(3_000, () => now);
+    expect(handOff()).toBe(true);
+    now += 3_000;
+    expect(handOff()).toBe(true);
   });
 });

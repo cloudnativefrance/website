@@ -35,3 +35,20 @@ export function openInNewTab(url: string, win: TabOpener): void {
   if (tab) tab.opener = null;
   else win.location.assign(url);
 }
+
+/**
+ * Lets one hand-off through, then ignores repeats for `ms`. Each hand-off of a
+ * real code creates an alf.io reservation that holds tickets, and the page now
+ * stays put behind the new tab — so a double-click must not open a second tab,
+ * and a second hold. Once the window has passed, a new submit is a deliberate
+ * one (the buyer closed the tab and came back) and goes through.
+ */
+export function handOffOnce(ms: number, now: () => number = Date.now): () => boolean {
+  let last = Number.NEGATIVE_INFINITY;
+  return () => {
+    const t = now();
+    if (t - last < ms) return false;
+    last = t;
+    return true;
+  };
+}

@@ -4,7 +4,10 @@
  * rule. The code URL comes from src/lib/tickets/url.ts, shared with the server
  * render.
  */
-import { codeUrlFrom, openInNewTab } from "@/lib/tickets/url";
+import { codeUrlFrom, handOffOnce, openInNewTab } from "@/lib/tickets/url";
+
+/** A double-click on "Utiliser mon code" must not open two tabs (two alf.io holds). */
+const HANDOFF_COOLDOWN_MS = 3_000;
 
 // ── "I have a code": strip spaces, refuse empty, hand over to alf.io ────────────
 for (const form of document.querySelectorAll<HTMLFormElement>("[data-tickets-code]")) {
@@ -13,6 +16,7 @@ for (const form of document.querySelectorAll<HTMLFormElement>("[data-tickets-cod
   const listing = form.dataset.listing;
   if (!input || !error || !listing) continue;
   const describedBy = input.getAttribute("aria-describedby") ?? "";
+  const handOff = handOffOnce(HANDOFF_COOLDOWN_MS);
 
   const clearError = () => {
     error.hidden = true;
@@ -32,7 +36,7 @@ for (const form of document.querySelectorAll<HTMLFormElement>("[data-tickets-cod
     }
     clearError();
     input.value = result.code;
-    openInNewTab(result.url, window);
+    if (handOff()) openInNewTab(result.url, window);
   });
   input.addEventListener("input", () => {
     if (!error.hidden) clearError();
