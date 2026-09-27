@@ -1,82 +1,41 @@
 ---
 /**
- * The group rates of the moment, as a price list — shared by door 2 and by the
- * "coming as a team" section so the two can never drift.
+ * The group rates of the moment, as a price list in door 2.
  *
  * Each row carries the discount against the current tier in the section's pink,
  * the same pill as "Stock limité": the percentage is what a manager reads first,
- * the price per seat is what they check second.
- *
- * In variant A a row is a purchase shortcut: it is a link to door 1 that
- * `tickets-ui.ts` upgrades into "set the quantity to this rate's minimum". It
- * stays a plain anchor so that without JavaScript it still lands on the stepper
- * rather than doing nothing. In variant B nothing is clickable — the rates are
- * granted by hand, and the card's own CTA is the way to ask.
+ * the price per seat is what they check second. Nothing is clickable — door 2's
+ * own call to action is the way to ask for a rate.
  */
 import type { GroupRate, TierDefinition } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { formatDiscount, formatPrice } from "@/lib/tickets/format";
-import type { Variant } from "@/lib/tickets/purchase";
-import Icon from "./Icon.astro";
 
 interface Props {
   lang: Locale;
   /** The tier the discount is measured against — the price on offer today. */
   tier: TierDefinition;
   rates: GroupRate[];
-  variant: Variant;
-  /** Umami source, so a click from the door and one from the section differ. */
-  source: string;
   class?: string;
 }
 
-const { lang, tier, rates, variant, source, class: className } = Astro.props;
+const { lang, tier, rates, class: className } = Astro.props;
 const t = useTranslations(lang);
-const clickable = variant === "a";
 ---
 
 <ul class:list={["flex flex-col divide-y divide-border overflow-hidden rounded-lg border border-border", className]}>
-  {rates.map((rate) => {
-    const row = (
-      <>
-        <span class="flex items-center justify-between gap-3">
-          <span class="text-sm text-muted-foreground">{t(`tickets.team.rate.${rate.id}`)}</span>
-          <span class="inline-flex items-center rounded-full bg-accent px-2 py-1 text-xs font-bold leading-none tabular-nums tracking-[0.02em] text-accent-foreground">
-            {formatDiscount(tier.price, rate.price, lang)}
-          </span>
+  {rates.map((rate) => (
+    <li class="flex flex-col gap-1 px-4 py-3" data-group-rate={rate.id}>
+      <span class="flex items-center justify-between gap-3">
+        <span class="text-sm text-muted-foreground">{t(`tickets.team.rate.${rate.id}`)}</span>
+        <span class="inline-flex items-center rounded-full bg-accent px-2 py-1 text-xs font-bold leading-none tabular-nums tracking-[0.02em] text-accent-foreground">
+          {formatDiscount(tier.price, rate.price, lang)}
         </span>
-        <span class="flex items-baseline justify-between gap-3">
-          <span class="text-xl font-bold tabular-nums tracking-[-0.02em] text-foreground">
-            {formatPrice(rate.price, lang)}
-          </span>
-          {clickable && (
-            <span class="inline-flex items-center gap-1 text-sm font-medium text-primary-strong">
-              {t("tickets.team.apply")}
-              <Icon name="arrow-right" size={14} />
-            </span>
-          )}
-        </span>
-      </>
-    );
-    return (
-      <li data-group-rate={rate.id}>
-        {clickable ? (
-          <a
-            href="#offre"
-            class="flex flex-col gap-1 px-4 py-3 transition-[background-color] duration-150 ease-out hover:bg-muted focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-            data-group-apply={rate.id}
-            data-qty={rate.min}
-            data-umami-event="tickets-group-apply"
-            data-umami-event-tarif={rate.id}
-            data-umami-event-source={source}
-          >
-            {row}
-          </a>
-        ) : (
-          <div class="flex flex-col gap-1 px-4 py-3">{row}</div>
-        )}
-      </li>
-    );
-  })}
+      </span>
+      <span class="text-xl font-bold tabular-nums tracking-[-0.02em] text-foreground">
+        {formatPrice(rate.price, lang)}
+      </span>
+    </li>
+  ))}
 </ul>

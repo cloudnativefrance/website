@@ -44,7 +44,6 @@ export type Localized = { fr: string; en: string };
 
 export type TierId = "seb" | "eb" | "regular" | "last_chance";
 export type Phase = "pre_opening" | TierId;
-export type StrategicState = "hidden" | "announced" | "on_sale";
 
 export interface TierDefinition {
   id: TierId;
@@ -61,8 +60,6 @@ export interface TierDefinition {
   closesWhenSoldOut: boolean;
   /** alf.io caps a single order at this many tickets. */
   maxPerOrder: number;
-  /** alf.io category code behind the variant-A reservation link (created by JC). */
-  alfioCategoryCode: Maybe<string>;
 }
 
 export interface GroupRate {
@@ -71,20 +68,14 @@ export interface GroupRate {
   max?: number;
   /** Euros per person, VAT included. Fixed for the whole season. */
   price: number;
-  /**
-   * The alf.io code that carries the rate — a promo code or a category,
-   * depending on which of the three mechanisms under study lands (see
-   * `src/lib/tickets/purchase.ts`). Deliberately not named "category".
-   */
-  alfioCode: Maybe<string>;
 }
 
 export type StrategicPrice =
   | { kind: "fixed"; amount: number }
   | { kind: "per_tier"; amounts: Record<TierId, number> };
 
+/** Always displayed and always on sale (22/09/2026): every fact is due for the opening. */
 export interface StrategicTicket {
-  state: StrategicState;
   name: Maybe<Localized>;
   price: Maybe<StrategicPrice>;
   /** What it includes from the standard ticket (talks, evening…). */
@@ -93,10 +84,6 @@ export interface StrategicTicket {
   /** Idea under study: dedicated networking area with catering. */
   networking: Maybe<Localized>;
   accessConditions: Maybe<Localized>;
-  maxPerOrder: Maybe<number>;
-  groupRatesApply: Maybe<boolean>;
-  onSaleFrom: Maybe<string>;
-  alfioCategoryCode: Maybe<string>;
 }
 
 export interface TicketingConfig {
@@ -142,7 +129,6 @@ export const TICKETING: TicketingConfig = {
       endsAt: "2026-11-29T23:59:59+01:00",
       closesWhenSoldOut: true,
       maxPerOrder: 5,
-      alfioCategoryCode: tbd("Code de catégorie alf.io (JC)", "DEMO-SEB"),
     },
     {
       id: "eb",
@@ -151,7 +137,6 @@ export const TICKETING: TicketingConfig = {
       endsAt: "2027-02-07T23:59:59+01:00",
       closesWhenSoldOut: true,
       maxPerOrder: 5,
-      alfioCategoryCode: tbd("Code de catégorie alf.io (JC)", "DEMO-EB"),
     },
     {
       id: "regular",
@@ -160,7 +145,6 @@ export const TICKETING: TicketingConfig = {
       endsAt: "2027-05-16T23:59:59+02:00",
       closesWhenSoldOut: false,
       maxPerOrder: 20,
-      alfioCategoryCode: tbd("Code de catégorie alf.io (JC)", "DEMO-REGULAR"),
     },
     {
       id: "last_chance",
@@ -169,7 +153,6 @@ export const TICKETING: TicketingConfig = {
       endsAt: "2027-06-03T23:59:59+02:00",
       closesWhenSoldOut: false,
       maxPerOrder: 20,
-      alfioCategoryCode: tbd("Code de catégorie alf.io (JC)", "DEMO-LAST-CHANCE"),
     },
   ],
   tierNames: tbd("Noms publics des paliers en français et en anglais"),
@@ -178,11 +161,10 @@ export const TICKETING: TicketingConfig = {
   // 5 seats per order, so they carry no group rate today (22/09/2026); lifting
   // that cap is the one change that brings them back.
   groupRates: [
-    { id: "4_9", min: 4, max: 9, price: 169, alfioCode: tbd("Code alf.io du tarif de groupe 4-9 (JC)", "DEMO-GROUPE-4-9") },
-    { id: "10_plus", min: 10, price: 149, alfioCode: tbd("Code alf.io du tarif de groupe 10+ (JC)", "DEMO-GROUPE-10") },
+    { id: "4_9", min: 4, max: 9, price: 169 },
+    { id: "10_plus", min: 10, price: 149 },
   ],
   strategic: {
-    state: "announced",
     name: tbd("Nom public (« Stratégie & Leadership » est le nom de travail)", {
       fr: "Stratégie & Leadership",
       en: "Strategy & Leadership",
@@ -195,10 +177,6 @@ export const TICKETING: TicketingConfig = {
       en: "A dedicated networking area, with catering",
     }),
     accessConditions: tbd("Conditions d'accès éventuelles"),
-    maxPerOrder: tbd("Nombre maximum de billets par commande", 20),
-    groupRatesApply: tbd("Les tarifs de groupe s'appliquent-ils ?"),
-    onSaleFrom: tbd("Date de mise en vente"),
-    alfioCategoryCode: tbd("Code de catégorie alf.io (JC)", "DEMO-STRATEGIE"),
   },
   contents: tbd("Contenu exact du billet standard"),
   eveningIncluded: tbd("Soirée ouverte à tous les participants, sans option (pôle soirée)"),

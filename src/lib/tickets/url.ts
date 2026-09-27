@@ -1,15 +1,8 @@
 /**
- * The two pieces of purchase logic the browser also runs (quantity bounds and
- * the "I have a code" URL). Dependency-free on purpose: `tickets-ui.ts` imports
- * this module, and anything it imports ships in the client bundle.
+ * The purchase logic the browser also runs: the "I have a code" URL.
+ * Dependency-free on purpose: `tickets-ui.ts` imports this module, and
+ * anything it imports ships in the client bundle.
  */
-
-/** Whole number within [1, max]; anything unparseable falls back to 1. */
-export function clampQuantity(raw: number | string, max: number): number {
-  const n = typeof raw === "number" ? raw : Number.parseInt(raw, 10);
-  if (!Number.isFinite(n)) return 1;
-  return Math.min(max, Math.max(1, Math.trunc(n)));
-}
 
 export type CodeResult = { ok: true; code: string; url: string } | { ok: false; reason: "empty" };
 

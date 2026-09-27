@@ -25,11 +25,10 @@ interface Props {
   listingUrl: string;
   fallback: { action: string; param: "code" };
   host: string;
-  variant: string;
   layout: "card" | "band";
 }
 
-const { lang, phase, listingUrl, fallback, host, variant, layout } = Astro.props;
+const { lang, phase, listingUrl, fallback, host, layout } = Astro.props;
 const t = useTranslations(lang);
 const band = layout === "band";
 ---
@@ -87,7 +86,6 @@ const band = layout === "band";
           band && "lg:whitespace-nowrap",
         ]}
         data-umami-event="tickets-code"
-        data-umami-event-variante={variant}
         data-umami-event-phase={phase}
       >
         {t("tickets.code.submit")}

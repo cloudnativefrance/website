@@ -1,22 +1,18 @@
 ---
 /**
- * Mobile only: once door 1 has scrolled away, a bar keeps the price and the
- * action one thumb away. In variant A it brings the buyer back to the stepper
- * (the quantity is chosen there); in B it goes straight to the listing; before
- * the opening it offers the notification. Hidden while door 1 is on screen so
- * the page never shows the same call to action twice.
+ * Mobile only: once door 1's action has scrolled away, a bar keeps the price
+ * and the action one thumb away — the alf.io listing, or before the opening the
+ * notification. Hidden while door 1's action is on screen so the page never
+ * shows the same call to action twice.
  */
 import type { Locale } from "@/i18n/ui";
-import { useTranslations } from "@/i18n/utils";
 import Icon from "./Icon.astro";
 
 interface Props {
   lang: Locale;
   label: string;
   price: string;
-  action:
-    | { kind: "scroll"; href: string; text: string }
-    | { kind: "link"; href: string; text: string; external?: boolean };
+  action: { href: string; text: string; external: boolean };
   analytics: Record<string, string>;
   demo?: boolean;
 }
@@ -34,17 +30,15 @@ const { label, price, action, analytics, demo = false } = Astro.props;
   <div class="flex items-center justify-between gap-4 border-t border-border bg-background/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md">
     <p class="flex min-w-0 flex-col leading-tight">
       <span class="truncate text-sm text-muted-foreground">{label}</span>
-      {/* Follows the stepper: once a group rate applies up in door 1, the bar
-          must not keep quoting the unit price it replaced. */}
-      <span class="text-xl font-bold tabular-nums tracking-[-0.02em] text-foreground" data-sticky-price>{price}</span>
+      <span class="text-xl font-bold tabular-nums tracking-[-0.02em] text-foreground">{price}</span>
     </p>
     <a
       href={action.href}
-      target={action.kind === "link" && action.external ? "_blank" : undefined}
-      rel={action.kind === "link" && action.external ? "noopener noreferrer" : undefined}
+      target={action.external ? "_blank" : undefined}
+      rel={action.external ? "noopener noreferrer" : undefined}
       class="inline-flex h-12 shrink-0 items-center gap-2 rounded-lg bg-primary px-5 text-xl font-bold text-primary-foreground transition-[background-color,scale] duration-150 ease-out active:scale-[0.96] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       tabindex="-1"
-      data-sticky-action={action.kind}
+      data-sticky-action
       data-umami-event="tickets-sticky"
       {...analytics}
     >

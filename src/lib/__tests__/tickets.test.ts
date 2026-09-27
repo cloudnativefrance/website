@@ -7,17 +7,8 @@ import {
   ticketingConfigProblems,
   tierStates,
 } from "@/lib/tickets/phase";
-import { orderSegments, segmentAt } from "@/lib/tickets/pricing";
-import {
-  ALFIO_MAX_PER_ORDER,
-  alfioHost,
-  clampQuantity,
-  codeFallbackAction,
-  codeUrl,
-  listingUrl,
-  purchaseTarget,
-  reserveUrl,
-} from "@/lib/tickets/purchase";
+import { alfioHost, codeFallbackAction, codeUrl, listingUrl, purchaseTarget } from "@/lib/tickets/purchase";
+import { NEWSLETTER_URL } from "@/lib/event";
 import { buildMailto } from "@/lib/tickets/mailto";
 import {
   demoPath,
@@ -123,55 +114,12 @@ describe("group rates", () => {
     const problems = ticketingConfigProblems({
       ...TICKETING,
       groupRates: [
-        { id: "4_9", min: 4, max: 9, price: 169, alfioCode: "A" },
-        { id: "10_plus", min: 8, price: 179, alfioCode: "B" },
+        { id: "4_9", min: 4, max: 9, price: 169 },
+        { id: "10_plus", min: 8, price: 179 },
       ],
     });
     expect(problems).toContain('group rate "10_plus" overlaps "4_9"');
     expect(problems).toContain('group rate "10_plus" is not cheaper than "4_9"');
-  });
-});
-
-describe("orderSegments", () => {
-  const segmentsOf = (id: TierId) =>
-    orderSegments(tier(id), cheaperGroupRates(TICKETING, tier(id))).map((s) => [
-      s.min,
-      s.max,
-      s.price,
-      s.product.kind === "group" ? s.product.rateId : "tier",
-    ]);
-
-  it("prices a tier with no group rate as one stretch", () => {
-    expect(segmentsOf("seb")).toEqual([[1, 5, 129, "tier"]]);
-    expect(segmentsOf("eb")).toEqual([[1, 5, 159, "tier"]]);
-  });
-
-  it("drops to the cheaper rate as soon as its threshold is crossed", () => {
-    expect(segmentsOf("regular")).toEqual([
-      [1, 3, 199, "tier"],
-      [4, 9, 169, "4_9"],
-      [10, 20, 149, "10_plus"],
-    ]);
-    expect(segmentsOf("last_chance")).toEqual([
-      [1, 3, 229, "tier"],
-      [4, 9, 169, "4_9"],
-      [10, 20, 149, "10_plus"],
-    ]);
-  });
-
-  it("leaves no quantity unpriced, on any tier", () => {
-    for (const t of TICKETING.tiers) {
-      const segments = orderSegments(t, cheaperGroupRates(TICKETING, t));
-      expect(segments[0].min).toBe(1);
-      expect(segments[segments.length - 1].max).toBe(t.maxPerOrder);
-      for (let i = 1; i < segments.length; i++) {
-        expect(segments[i].min).toBe(segments[i - 1].max + 1);
-        expect(segments[i].price).toBeLessThan(segments[i - 1].price);
-      }
-      for (let q = 1; q <= t.maxPerOrder; q++) {
-        expect(segmentAt(segments, q).price).toBeLessThanOrEqual(t.price);
-      }
-    }
   });
 });
 
@@ -189,73 +137,17 @@ describe("formatDiscount", () => {
 });
 
 describe("purchaseTarget", () => {
-  const drafts = { allowDrafts: true };
-
-  it("sends every buyer to the listing in variant B", () => {
+  it("sends every buyer to the listing once the ticketing is open", () => {
     for (const id of ["seb", "eb", "regular", "last_chance"] as const) {
-      expect(purchaseTarget(TICKETING, "b", { kind: "tier", tier: tier(id) }, id, drafts)).toEqual({
+      expect(purchaseTarget(TICKETING, id)).toEqual({
         kind: "listing",
         href: "https://billetterie.cloudnativedays.fr/event/cnd-2027",
       });
     }
   });
 
-  it("offers no purchase before the opening, in either variant", () => {
-    for (const variant of ["a", "b"] as const) {
-      expect(purchaseTarget(TICKETING, variant, { kind: "tier", tier: tier("seb") }, "pre_opening", drafts).kind).toBe(
-        "notify",
-      );
-    }
-  });
-
-  it.each([
-    ["seb", 5, "DEMO-SEB"],
-    ["eb", 5, "DEMO-EB"],
-    ["regular", 20, "DEMO-REGULAR"],
-    ["last_chance", 20, "DEMO-LAST-CHANCE"],
-  ] as const)("reserves %s tickets through its category code, 1 to %i per order", (id, max, code) => {
-    const target = purchaseTarget(TICKETING, "a", { kind: "tier", tier: tier(id) }, id, drafts);
-    expect(target).toEqual({
-      kind: "reserve",
-      action: `https://billetterie.cloudnativedays.fr/event/cnd-2027/code/${code}`,
-      qtyParam: "qty",
-      min: 1,
-      max,
-    });
-    if (target.kind !== "reserve") throw new Error("unreachable");
-    expect(reserveUrl(target, 1)).toBe(`${target.action}?qty=1`);
-    expect(reserveUrl(target, max)).toBe(`${target.action}?qty=${max}`);
-    expect(reserveUrl(target, max + 1)).toBe(`${target.action}?qty=${max}`);
-    expect(reserveUrl(target, 0)).toBe(`${target.action}?qty=1`);
-  });
-
-  it("reserves a group order through the rate's own alf.io code, under the tier's cap", () => {
-    const rate = TICKETING.groupRates[1];
-    expect(purchaseTarget(TICKETING, "a", { kind: "group", tier: tier("regular"), rate }, "regular", drafts)).toEqual({
-      kind: "reserve",
-      action: "https://billetterie.cloudnativedays.fr/event/cnd-2027/code/DEMO-GROUPE-10",
-      qtyParam: "qty",
-      min: 1,
-      max: 20,
-    });
-  });
-
-  it("uses the same action for the Strategy & Leadership ticket, capped by alf.io while undecided", () => {
-    const { strategic } = TICKETING;
-    const target = purchaseTarget(
-      TICKETING,
-      "a",
-      { kind: "strategic", categoryCode: strategic.alfioCategoryCode, maxPerOrder: strategic.maxPerOrder },
-      "seb",
-      drafts,
-    );
-    expect(target).toMatchObject({ kind: "reserve", max: ALFIO_MAX_PER_ORDER });
-  });
-
-  it("refuses to build a demo category code on a production build", () => {
-    expect(() =>
-      purchaseTarget(TICKETING, "a", { kind: "tier", tier: tier("seb") }, "seb", { allowDrafts: false }),
-    ).toThrow(/still tbd/);
+  it("offers the newsletter, not a purchase, before the opening", () => {
+    expect(purchaseTarget(TICKETING, "pre_opening")).toEqual({ kind: "notify", href: NEWSLETTER_URL });
   });
 
   it("names the alf.io host buyers land on", () => {
@@ -263,20 +155,6 @@ describe("purchaseTarget", () => {
     expect(listingUrl({ ...TICKETING, alfio: { baseUrl: "https://x.test/", eventSlug: "e" } })).toBe(
       "https://x.test/event/e",
     );
-  });
-});
-
-describe("clampQuantity", () => {
-  it.each([
-    [3, 5, 3],
-    ["4", 5, 4],
-    [9, 5, 5],
-    [-2, 5, 1],
-    ["", 5, 1],
-    ["abc", 20, 1],
-    [2.7, 20, 2],
-  ] as const)("%s within 1..%i → %i", (raw, max, expected) => {
-    expect(clampQuantity(raw, max)).toBe(expected);
   });
 });
 
@@ -337,18 +215,27 @@ describe("demo gate", () => {
     expect(ticketDemosEnabled({ env: prod, dev: true })).toBe(true);
   });
 
-  it("emits both variants × 5 phases × 3 Strategy & Leadership states, plus the entry URLs", () => {
+  it("emits one page per phase, plus the entry URL", () => {
     const paths = demoStaticPaths();
-    expect(paths).toHaveLength(2 * (1 + 5 * 3));
-    expect(new Set(paths.map((p) => p.params.demo)).size).toBe(paths.length);
-    expect(paths.map((p) => p.params.demo)).toContain("demo-a/early-bird/annonce");
-    expect(demoPath({ variant: "b", phase: "pre_opening", strategicState: "hidden" })).toBe(
-      "/billetterie/demo-b/avant-ouverture/masque/",
-    );
+    expect(paths.map((p) => p.params.demo)).toEqual([
+      "demo",
+      "demo/avant-ouverture",
+      "demo/super-early-bird",
+      "demo/early-bird",
+      "demo/regular",
+      "demo/last-chance",
+    ]);
+    expect(paths[0].props).toEqual({});
+    expect(paths[3].props).toEqual({ phase: "eb" });
+    expect(demoPath()).toBe("/billetterie/demo/");
+    expect(demoPath("pre_opening")).toBe("/billetterie/demo/avant-ouverture/");
   });
 
-  it("keeps every demo URL under /billetterie/demo-", () => {
-    for (const p of demoStaticPaths()) expect(`/billetterie/${p.params.demo}`).toMatch(/^\/billetterie\/demo-[ab]/);
+  it("keeps every demo URL under /billetterie/demo/, and none of the old variant URLs", () => {
+    for (const p of demoStaticPaths()) {
+      expect(`/billetterie/${p.params.demo}/`).toMatch(/^\/billetterie\/demo\//);
+      expect(p.params.demo).not.toMatch(/^demo-/);
+    }
   });
 });
 

@@ -1,22 +1,21 @@
 ---
 /**
  * The ticketing page's content, composed around the three ways people arrive —
- * take my seat, send my team, I have a code — weighted by importance.
+ * take my seat, come as a team, I have a code — weighted by importance.
  * `TicketsPage` wraps it in the layout; kept apart so the demo matrix test can
- * render every state without a site origin.
+ * render every phase without a site origin.
  *
- * Everything is derived from `src/config/tickets.ts` and the props below, so
- * the demo routes and a future production route render the same page: the
- * demo only picks the phase and the Strategy & Leadership state. The variant
- * changes the purchase action and nothing else.
+ * Everything is derived from `src/config/tickets.ts` and the phase, so the demo
+ * routes and a future production route render the same page. Every purchase —
+ * door 1, the Strategy & Leadership band, the mobile bar — goes to the alf.io
+ * listing through one `purchaseTarget`.
  */
 import GeoBackground from "@/components/patterns/GeoBackground.astro";
-import { TICKETING, isTbd, type Maybe, type Phase, type StrategicState } from "@/config/tickets";
+import { TICKETING, isTbd, type Maybe, type Phase } from "@/config/tickets";
 import { useTranslations } from "@/i18n/utils";
 import type { Locale } from "@/i18n/ui";
-import { CONTACT_EMAILS, NEWSLETTER_URL, TARGET_DATE } from "@/lib/event";
+import { CONTACT_EMAILS, TARGET_DATE } from "@/lib/event";
 import { buildMailto } from "@/lib/tickets/mailto";
-import { placeholdersAllowed } from "@/lib/tickets/demo";
 import { fill, formatDayMonth, formatFullDate, formatPrice, formatTime } from "@/lib/tickets/format";
 import {
   assertTicketingConfig,
@@ -24,16 +23,8 @@ import {
   offerTier,
   tierStates,
 } from "@/lib/tickets/phase";
-import { orderSegments } from "@/lib/tickets/pricing";
-import {
-  alfioHost,
-  codeFallbackAction,
-  listingUrl,
-  purchaseTarget,
-  type Variant,
-} from "@/lib/tickets/purchase";
+import { alfioHost, codeFallbackAction, listingUrl, purchaseTarget } from "@/lib/tickets/purchase";
 import type { RexSummary } from "@/lib/tickets/rex";
-import type { PriceSegment } from "./PurchaseControl.astro";
 import OfferDoor from "./OfferDoor.astro";
 import TeamDoor from "./TeamDoor.astro";
 import CodeDoor from "./CodeDoor.astro";
@@ -49,19 +40,16 @@ import Tbd from "./Tbd.astro";
 
 interface Props {
   lang: Locale;
-  variant: Variant;
   phase: Phase;
-  strategicState: StrategicState;
   rex: RexSummary;
   /** Demo routes stripe the mobile bar so no capture passes for the real page. */
   demo?: boolean;
 }
 
-const { lang, variant, phase, strategicState, rex, demo } = Astro.props;
+const { lang, phase, rex, demo } = Astro.props;
 const t = useTranslations(lang);
 const config = TICKETING;
 assertTicketingConfig(config);
-const allowDrafts = placeholdersAllowed();
 
 /** The note of a `tbd` value, for its chip; undefined once the value is decided. */
 const note = (value: Maybe<unknown>) => (isTbd(value) ? value.note : undefined);
@@ -76,9 +64,10 @@ const email = CONTACT_EMAILS.tickets;
 
 const groupMailto = buildMailto(email, t("tickets.team.mail.subject"), t("tickets.team.mail.body"));
 const inclusionMailto = buildMailto(email, t("tickets.inclusion.mail.subject"), t("tickets.inclusion.mail.body"));
-const strategicMailto = buildMailto(email, t("tickets.strategic.mail.subject"), t("tickets.strategic.mail.body"));
 
-const tierTarget = purchaseTarget(config, variant, { kind: "tier", tier }, phase, { allowDrafts });
+// One action for the whole page: the alf.io listing, or before the opening the
+// newsletter. Door 1, the Strategy & Leadership band and the mobile bar share it.
+const target = purchaseTarget(config, phase);
 
 // Door 2 is rendered only when a group rate actually beats the price of the
 // moment and fits the tier's order cap; below that it had nothing to sell.
@@ -86,33 +75,6 @@ const tierTarget = purchaseTarget(config, variant, { kind: "tier", tier }, phase
 const showTeam = rates.length > 0;
 const showCode = phase !== "pre_opening";
 const wideOffer = !showTeam;
-
-// The price of a seat at each quantity, with the alf.io action that sells it —
-// the table `tickets-ui.ts` walks so the discount applies on its own. Variant A
-// only: variant B picks the quantity on alf.io.
-const segments: PriceSegment[] | undefined =
-  tierTarget.kind === "reserve"
-    ? orderSegments(tier, rates).map((segment) => ({
-        min: segment.min,
-        max: segment.max,
-        price: segment.price,
-        rate: segment.product.kind === "group" ? segment.product.rateId : undefined,
-        action: actionOf(segment.product),
-      }))
-    : undefined;
-
-function actionOf(product: { kind: "tier" } | { kind: "group"; rateId: string }): string {
-  const rate = product.kind === "group" ? rates.find((r) => r.id === product.rateId) : undefined;
-  const target = purchaseTarget(
-    config,
-    variant,
-    rate ? { kind: "group", tier, rate } : { kind: "tier", tier },
-    phase,
-    { allowDrafts },
-  );
-  if (target.kind !== "reserve") throw new Error("[tickets] a segment needs a reservation action");
-  return target.action;
-}
 
 const openingTime = isTbd(config.opening.time) ? (config.opening.time.draft ?? "") : config.opening.time;
 const opening = {
@@ -122,25 +84,6 @@ const opening = {
 };
 const programmeWhen = draftText(config.programmeAnnouncement);
 const programmeNote = note(config.programmeAnnouncement);
-
-const showStrategic = strategicState !== "hidden";
-const strategic = config.strategic;
-const strategicTarget =
-  strategicState === "on_sale"
-    ? purchaseTarget(
-        config,
-        variant,
-        { kind: "strategic", categoryCode: strategic.alfioCategoryCode, maxPerOrder: strategic.maxPerOrder },
-        phase,
-        { allowDrafts },
-      )
-    : undefined;
-const strategicPrice =
-  !isTbd(strategic.price) && strategic.price.kind === "fixed"
-    ? strategic.price.amount
-    : !isTbd(strategic.price) && strategic.price.kind === "per_tier" && phase !== "pre_opening"
-      ? strategic.price.amounts[phase]
-      : undefined;
 
 const eventDate = formatFullDate(TARGET_DATE, lang);
 // Split around {venue} so the venue can be set unbreakable: "CENTQUATRE-PARIS"
@@ -152,20 +95,16 @@ const when = {
   after: whenAfter,
 };
 
-const analytics = { palier: tier.id, variante: variant, phase };
 const sticky = {
   label: phase === "pre_opening" ? fill(t("tickets.sticky.opens"), { date: formatDayMonth(config.opening.date, lang) }) : tier.name[lang],
   price: formatPrice(tier.price, lang),
   action:
-    tierTarget.kind === "reserve"
-      ? { kind: "scroll" as const, href: "#offre", text: t("tickets.sticky.reserve") }
-      : tierTarget.kind === "listing"
-        ? { kind: "link" as const, href: tierTarget.href, text: t("tickets.sticky.buy") }
-        : { kind: "link" as const, href: tierTarget.href, text: t("tickets.sticky.notify"), external: true },
+    target.kind === "listing"
+      ? { href: target.href, text: t("tickets.sticky.buy"), external: false }
+      : { href: target.href, text: t("tickets.sticky.notify"), external: true },
   analytics: {
     "data-umami-event-billet": "standard",
-    "data-umami-event-palier": analytics.palier,
-    "data-umami-event-variante": variant,
+    "data-umami-event-palier": tier.id,
     "data-umami-event-phase": phase,
   },
 };
@@ -175,7 +114,7 @@ const later = config.tiers.filter((x) => !x.closesWhenSoldOut).map((x) => x.maxP
 const perOrder = { early: Math.max(...early), later: Math.max(...later) };
 ---
 
-<main class="tickets-page" data-variant={variant} data-phase={phase} data-strategic={strategicState}>
+<main class="tickets-page" data-phase={phase}>
   <section class="relative isolate overflow-hidden">
     <GeoBackground class="tickets-mesh absolute inset-0 -z-10" />
     <div class="mx-auto flex max-w-7xl flex-col gap-8 px-4 pb-16 pt-8 md:px-6 md:pb-20 md:pt-12 lg:px-8">
@@ -207,28 +146,22 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
           >
             <PurchaseControl
               slot="purchase"
-              target={tierTarget}
+              target={target}
               lang={lang}
-              idBase="offer"
-              price={tier.price}
-              variant={variant}
               phase={phase}
               analytics={{ billet: "standard", palier: tier.id }}
-              segments={segments}
-              capMailto={groupMailto}
             />
           </OfferDoor>
         </div>
         {showTeam && (
           <div class="flex flex-col gap-5 lg:col-span-4 lg:gap-6">
-            <TeamDoor lang={lang} tier={tier} rates={rates} variant={variant} groupMailto={groupMailto} />
+            <TeamDoor lang={lang} tier={tier} rates={rates} groupMailto={groupMailto} />
             <CodeDoor
               lang={lang}
               phase={phase}
               listingUrl={listingUrl(config)}
               fallback={codeFallbackAction(config)}
               host={host}
-              variant={variant}
               layout="card"
             />
           </div>
@@ -241,7 +174,6 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
               listingUrl={listingUrl(config)}
               fallback={codeFallbackAction(config)}
               host={host}
-              variant={variant}
               layout="band"
             />
           </div>
@@ -250,32 +182,18 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
     </div>
   </section>
 
-  {showStrategic && (
-    <div class="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
-      <StrategicOffer
+  {/* Always displayed, always on sale: the same action as door 1. */}
+  <div class="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
+    <StrategicOffer lang={lang} ticket={config.strategic} teamHref={showTeam ? "#equipe" : undefined}>
+      <PurchaseControl
+        slot="purchase"
+        target={target}
         lang={lang}
-        state={strategicState as Exclude<StrategicState, "hidden">}
-        ticket={strategic}
-        notifyMailto={strategicMailto}
-        newsletterUrl={NEWSLETTER_URL}
-        teamHref={showTeam ? "#equipe" : undefined}
-      >
-        {strategicTarget && (
-          <PurchaseControl
-            slot="purchase"
-            target={strategicTarget}
-            lang={lang}
-            idBase="strategic"
-            price={strategicPrice}
-            variant={variant}
-            phase={phase}
-            analytics={{ billet: "strategique", palier: "strategique" }}
-            capMailto={groupMailto}
-          />
-        )}
-      </StrategicOffer>
-    </div>
-  )}
+        phase={phase}
+        analytics={{ billet: "strategique", palier: "strategique" }}
+      />
+    </StrategicOffer>
+  </div>
 
   <div class="mx-auto max-w-7xl px-4 pb-20 pt-24 md:px-6 md:pb-24 md:pt-28 lg:px-8">
     <IncludedInTicket
