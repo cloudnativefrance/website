@@ -94,10 +94,11 @@ const when = {
 const sticky = {
   label: phase === "pre_opening" ? fill(t("tickets.sticky.opens"), { date: formatDayMonth(config.opening.date, lang) }) : tier.name[lang],
   price: formatPrice(tier.price, lang),
-  action:
-    target.kind === "listing"
-      ? { href: target.href, text: t("tickets.sticky.buy"), external: false }
-      : { href: target.href, text: t("tickets.sticky.notify"), external: true },
+  action: {
+    href: target.href,
+    rel: target.rel,
+    text: t(target.kind === "listing" ? "tickets.sticky.buy" : "tickets.sticky.notify"),
+  },
   analytics: {
     "data-umami-event-billet": "standard",
     "data-umami-event-palier": tier.id,

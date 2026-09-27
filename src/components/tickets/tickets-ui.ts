@@ -4,7 +4,7 @@
  * rule. The code URL comes from src/lib/tickets/url.ts, shared with the server
  * render.
  */
-import { codeUrlFrom } from "@/lib/tickets/url";
+import { codeUrlFrom, openInNewTab } from "@/lib/tickets/url";
 
 // ── "I have a code": strip spaces, refuse empty, hand over to alf.io ────────────
 for (const form of document.querySelectorAll<HTMLFormElement>("[data-tickets-code]")) {
@@ -32,7 +32,7 @@ for (const form of document.querySelectorAll<HTMLFormElement>("[data-tickets-cod
     }
     clearError();
     input.value = result.code;
-    window.location.assign(result.url);
+    openInNewTab(result.url, window);
   });
   input.addEventListener("input", () => {
     if (!error.hidden) clearError();

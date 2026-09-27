@@ -8,7 +8,8 @@ import {
   ticketingConfigProblems,
   tierStates,
 } from "@/lib/tickets/phase";
-import { alfioHost, codeFallbackAction, codeUrl, listingUrl, purchaseTarget } from "@/lib/tickets/purchase";
+import { alfioHost, codeFallbackAction, codeUrl, listingUrl, onHost, purchaseTarget } from "@/lib/tickets/purchase";
+import { openInNewTab } from "@/lib/tickets/url";
 import { NEWSLETTER_URL } from "@/lib/event";
 import { buildMailto } from "@/lib/tickets/mailto";
 import {
@@ -141,12 +142,17 @@ describe("purchaseTarget", () => {
       expect(purchaseTarget(TICKETING, id)).toEqual({
         kind: "listing",
         href: "https://billetterie.cloudnativedays.fr/event/cnd-2027",
+        rel: "noopener",
       });
     }
   });
 
   it("offers the newsletter, not a purchase, before the opening", () => {
-    expect(purchaseTarget(TICKETING, "pre_opening")).toEqual({ kind: "notify", href: NEWSLETTER_URL });
+    expect(purchaseTarget(TICKETING, "pre_opening")).toEqual({
+      kind: "notify",
+      href: NEWSLETTER_URL,
+      rel: "noopener noreferrer",
+    });
   });
 
   it("names the alf.io host buyers land on", () => {
@@ -344,5 +350,40 @@ describe("strategicPrice", () => {
     expect(strategicPrice(perTier, "pre_opening")).toBe(399);
     expect(strategicPrice(perTier, "eb")).toBe(449);
     expect(strategicPrice(perTier, "regular")).toBe(499);
+  });
+});
+
+describe("onHost", () => {
+  it("recognises a URL on the alf.io host, and nothing else", () => {
+    expect(onHost("https://billetterie.cloudnativedays.fr/terms", "billetterie.cloudnativedays.fr")).toBe(true);
+    expect(onHost("https://cloudnativedays.fr/cgv", "billetterie.cloudnativedays.fr")).toBe(false);
+    expect(onHost("#convaincre", "billetterie.cloudnativedays.fr")).toBe(false);
+  });
+});
+
+describe("openInNewTab", () => {
+  it("opens the URL in a new tab, cut from this page", () => {
+    const tab: { opener: unknown } = { opener: "this page" };
+    const opened: string[] = [];
+    const assigned: string[] = [];
+    openInNewTab("https://x.test/code/A", {
+      open: (url, target) => {
+        opened.push(`${target} ${url}`);
+        return tab;
+      },
+      location: { assign: (url) => void assigned.push(url) },
+    });
+    expect(opened).toEqual(["_blank https://x.test/code/A"]);
+    expect(tab.opener).toBeNull();
+    expect(assigned).toEqual([]);
+  });
+
+  it("goes there in this tab when the browser blocks the new one", () => {
+    const assigned: string[] = [];
+    openInNewTab("https://x.test/code/A", {
+      open: () => null,
+      location: { assign: (url) => void assigned.push(url) },
+    });
+    expect(assigned).toEqual(["https://x.test/code/A"]);
   });
 });

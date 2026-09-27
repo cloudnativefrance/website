@@ -241,6 +241,34 @@ describe.each(DEMO_PHASES)("phase %s", (phase) => {
     expect(text).toContain("Existe-t-il un tarif étudiant ou solidaire");
   });
 
+  it("opens every hand-off to alf.io in a new tab, and says so to screen readers", () => {
+    const alfioLinks = [
+      ...main.matchAll(/<a\b[^>]*href="https:\/\/billetterie\.cloudnativedays\.fr[^"]*"[^>]*>[\s\S]*?<\/a>/g),
+    ].map((m) => m[0]);
+    expect(alfioLinks).toHaveLength(phase === "pre_opening" ? 0 : 2);
+    for (const link of alfioLinks) {
+      expect(link).toContain('target="_blank"');
+      expect(link).toContain('rel="noopener"');
+    }
+    // Every link that leaves in a new tab says so, the newsletter included.
+    const newTab = [...main.matchAll(/<a\b[^>]*target="_blank"[^>]*>[\s\S]*?<\/a>/g)].map((m) => m[0]);
+    expect(newTab.length).toBeGreaterThan(0);
+    for (const link of newTab) expect(link).toContain("(nouvel onglet)");
+    // The code form too, with or without JavaScript.
+    const codeForm = main.match(/<form\b[^>]*data-tickets-code[^>]*>/)?.[0];
+    if (phase === "pre_opening") {
+      expect(codeForm).toBeUndefined();
+    } else {
+      expect(codeForm).toContain('target="_blank"');
+      const form = main.slice(main.indexOf(codeForm!), main.indexOf("</form>", main.indexOf(codeForm!)));
+      expect(form).toContain("(nouvel onglet)");
+    }
+    // And the mobile bar, rendered after <main>.
+    const sticky = html.match(/<a\b[^>]*data-sticky-action[^>]*>[\s\S]*?<\/a>/)?.[0];
+    expect(sticky).toContain('target="_blank"');
+    expect(sticky).toContain("(nouvel onglet)");
+  });
+
   it("stripes the mobile bar as a demo", () => {
     expect(html).toContain("demo-stripe");
   });

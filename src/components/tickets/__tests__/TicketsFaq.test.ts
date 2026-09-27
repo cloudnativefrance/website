@@ -48,4 +48,14 @@ describe("TicketsFaq", () => {
     expect(html).toMatch(/<a\b[^>]*href="https:\/\/cloudnativedays\.fr\/cgv"[^>]*>\s*Conditions générales de vente/);
     expect(html).toContain("Le programme 2027 sera publié en mars 2027.");
   });
+
+  it("opens the terms of sale in a new tab when they live on alf.io", async () => {
+    const onAlfio = await render({ termsUrl: "https://billetterie.cloudnativedays.fr/terms" });
+    expect(onAlfio).toMatch(
+      /<a\b[^>]*href="https:\/\/billetterie\.cloudnativedays\.fr\/terms"[^>]*target="_blank"[^>]*rel="noopener"/,
+    );
+    expect(onAlfio).toContain("(nouvel onglet)");
+    const onSite = await render({ termsUrl: "https://cloudnativedays.fr/cgv" });
+    expect(onSite).not.toContain('target="_blank"');
+  });
 });

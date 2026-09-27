@@ -19,7 +19,14 @@ import { codeUrlFrom, type CodeResult } from "./url";
 
 export type { CodeResult };
 
-export type PurchaseTarget = { kind: "listing"; href: string } | { kind: "notify"; href: string };
+/**
+ * Where a purchase action sends the buyer. Both open a new tab, so the site
+ * stays where the buyer left it; alf.io keeps the referrer, the newsletter
+ * does not need it.
+ */
+export type PurchaseTarget =
+  | { kind: "listing"; href: string; rel: "noopener" }
+  | { kind: "notify"; href: string; rel: "noopener noreferrer" };
 
 export function listingUrl(config: TicketingConfig): string {
   return `${trimSlash(config.alfio.baseUrl)}/event/${encodeURIComponent(config.alfio.eventSlug)}`;
@@ -30,10 +37,19 @@ export function alfioHost(config: TicketingConfig): string {
   return new URL(config.alfio.baseUrl).host;
 }
 
+/** Whether `href` points at `host` — a relative or unparseable href never does. */
+export function onHost(href: string, host: string): boolean {
+  try {
+    return new URL(href).host === host;
+  } catch {
+    return false;
+  }
+}
+
 /** Before the opening: the newsletter. Once selling: the alf.io listing. */
 export function purchaseTarget(config: TicketingConfig, phase: Phase): PurchaseTarget {
-  if (phase === "pre_opening") return { kind: "notify", href: NEWSLETTER_URL };
-  return { kind: "listing", href: listingUrl(config) };
+  if (phase === "pre_opening") return { kind: "notify", href: NEWSLETTER_URL, rel: "noopener noreferrer" };
+  return { kind: "listing", href: listingUrl(config), rel: "noopener" };
 }
 
 /** "I have a code" → the alf.io URL that applies it (see `codeUrlFrom`). */

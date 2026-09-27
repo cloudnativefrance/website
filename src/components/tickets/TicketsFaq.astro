@@ -8,6 +8,7 @@
 import type { Locale } from "@/i18n/ui";
 import { useTranslations, getLocalePath } from "@/i18n/utils";
 import { fill } from "@/lib/tickets/format";
+import { onHost } from "@/lib/tickets/purchase";
 import Icon from "./Icon.astro";
 
 interface Props {
@@ -29,6 +30,8 @@ const { lang, host, email, inclusionMailto, perOrder, programmeWhen, vatRate, in
 const t = useTranslations(lang);
 const practicalPath = `${getLocalePath(lang, "/informations-utiles")}#accessibilite`;
 const cocPath = getLocalePath(lang, "/code-of-conduct");
+// Terms of sale hosted on alf.io open in a new tab, like every hand-off there.
+const termsNewTab = termsUrl !== undefined && onHost(termsUrl, host);
 const link = "font-medium text-primary-strong underline underline-offset-4 decoration-primary-strong/40 hover:decoration-primary-strong";
 ---
 
@@ -66,7 +69,15 @@ const link = "font-medium text-primary-strong underline underline-offset-4 decor
       <p>{transfer ?? t("tickets.faq.transfer.a")}</p>
       {termsUrl && (
         <p>
-          <a href={termsUrl} class={link}>{t("tickets.faq.transfer.terms")}</a>
+          <a
+            href={termsUrl}
+            target={termsNewTab ? "_blank" : undefined}
+            rel={termsNewTab ? "noopener" : undefined}
+            class={link}
+          >
+            {t("tickets.faq.transfer.terms")}
+            {termsNewTab && <span class="sr-only"> {t("tickets.new_tab")}</span>}
+          </a>
         </p>
       )}
     </details>

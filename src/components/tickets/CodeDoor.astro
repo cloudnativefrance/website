@@ -8,9 +8,10 @@
  * beside the tall offer card leaves a hole, a band does not. It is never
  * rendered before the ticketing opens, where a code has nothing to buy.
  *
- * Without JavaScript the form is a plain GET to the listing with `?code=`
- * (support to confirm with JC); `tickets-ui.ts` upgrades it to
- * `/code/<CODE>`, strips whitespace and refuses an empty code with a message.
+ * Without JavaScript the form is a plain GET to the listing with `?code=`, in
+ * a new tab (support to confirm with JC); `tickets-ui.ts` upgrades it to
+ * `/code/<CODE>` (a new tab too, `openInNewTab`), strips whitespace and
+ * refuses an empty code with a message.
  * The hand-off to the ticketing host is announced before the click.
  */
 import type { Phase } from "@/config/tickets";
@@ -51,6 +52,7 @@ const band = layout === "band";
   <form
     method="get"
     action={fallback.action}
+    target="_blank"
     class:list={["flex flex-col gap-2", band && "lg:min-w-0 lg:flex-1 lg:flex-row lg:items-center lg:gap-6"]}
     novalidate
     data-tickets-code
@@ -89,6 +91,7 @@ const band = layout === "band";
         data-umami-event-phase={phase}
       >
         {t("tickets.code.submit")}
+        <span class="sr-only"> {t("tickets.new_tab")}</span>
         <Icon name="arrow-right" size={16} />
       </button>
     </div>

@@ -6,18 +6,20 @@
  * shows the same call to action twice.
  */
 import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
 import Icon from "./Icon.astro";
 
 interface Props {
   lang: Locale;
   label: string;
   price: string;
-  action: { href: string; text: string; external: boolean };
+  action: { href: string; text: string; rel: string };
   analytics: Record<string, string>;
   demo?: boolean;
 }
 
-const { label, price, action, analytics, demo = false } = Astro.props;
+const { lang, label, price, action, analytics, demo = false } = Astro.props;
+const t = useTranslations(lang);
 ---
 
 <div
@@ -34,8 +36,8 @@ const { label, price, action, analytics, demo = false } = Astro.props;
     </p>
     <a
       href={action.href}
-      target={action.external ? "_blank" : undefined}
-      rel={action.external ? "noopener noreferrer" : undefined}
+      target="_blank"
+      rel={action.rel}
       class="inline-flex h-12 shrink-0 items-center gap-2 rounded-lg bg-primary px-5 text-xl font-bold text-primary-foreground transition-[background-color,scale] duration-150 ease-out active:scale-[0.96] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       tabindex="-1"
       data-sticky-action
@@ -43,6 +45,7 @@ const { label, price, action, analytics, demo = false } = Astro.props;
       {...analytics}
     >
       {action.text}
+      <span class="sr-only"> {t("tickets.new_tab")}</span>
       <Icon name="arrow-right" size={20} />
     </a>
   </div>

@@ -441,6 +441,7 @@ export const ui = {
     "tickets.offer.notify": "Être prévenu(e)",
     "tickets.offer.notify_note": "Par e-mail, via la newsletter de CND France.",
     "tickets.purchase.buy": "Acheter mon billet",
+    "tickets.new_tab": "(nouvel onglet)",
     // "Quatre" is the config's four tiers; a test pins that count.
     "tickets.ladder.title": "Quatre tarifs jusqu'au jour J",
     "tickets.ladder.until": "Jusqu'au {date}",
@@ -964,6 +965,7 @@ export const ui = {
     "tickets.offer.notify": "Notify me",
     "tickets.offer.notify_note": "By email, through the CND France newsletter.",
     "tickets.purchase.buy": "Buy my ticket",
+    "tickets.new_tab": "(new tab)",
     // "Four" is the config's four tiers; a test pins that count.
     "tickets.ladder.title": "Four prices, up to the day itself",
     "tickets.ladder.until": "Until {date}",

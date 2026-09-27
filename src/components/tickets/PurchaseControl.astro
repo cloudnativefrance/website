@@ -5,6 +5,8 @@
  *
  *   listing — one link to the alf.io listing, where the quantity is chosen.
  *   notify  — before the opening: the newsletter, no purchase anywhere.
+ *
+ * Both open a new tab, and say so to screen readers.
  */
 import type { PurchaseTarget } from "@/lib/tickets/purchase";
 import type { Phase } from "@/config/tickets";
@@ -34,8 +36,9 @@ const buttonClass =
 
 {target.kind === "listing" && (
   <div>
-    <a href={target.href} class={buttonClass} data-umami-event="tickets-purchase" {...umami}>
+    <a href={target.href} target="_blank" rel={target.rel} class={buttonClass} data-umami-event="tickets-purchase" {...umami}>
       {t("tickets.purchase.buy")}
+      <span class="sr-only"> {t("tickets.new_tab")}</span>
       <Icon name="arrow-right" size={20} />
     </a>
   </div>
@@ -43,9 +46,10 @@ const buttonClass =
 
 {target.kind === "notify" && (
   <div class="flex flex-col items-start gap-2">
-    <a href={target.href} target="_blank" rel="noopener noreferrer" class={buttonClass} data-umami-event="tickets-notify" {...umami}>
+    <a href={target.href} target="_blank" rel={target.rel} class={buttonClass} data-umami-event="tickets-notify" {...umami}>
       <Icon name="bell" size={20} />
       {t("tickets.offer.notify")}
+      <span class="sr-only"> {t("tickets.new_tab")}</span>
     </a>
     <p class="text-sm text-muted-foreground">{t("tickets.offer.notify_note")}</p>
   </div>
