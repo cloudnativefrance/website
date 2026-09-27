@@ -15,17 +15,14 @@ import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { fill, formatDayMonthShort, formatPrice } from "@/lib/tickets/format";
 import Icon from "./Icon.astro";
-import Tbd from "./Tbd.astro";
 
 interface Props {
   items: TierWithState[];
   phase: Phase;
   lang: Locale;
-  /** Set while the public tier names are still working names. */
-  namesNote?: string;
 }
 
-const { items, phase, lang, namesNote } = Astro.props;
+const { items, phase, lang } = Astro.props;
 const t = useTranslations(lang);
 
 type Tone = "past" | "selected" | "upcoming";
@@ -56,10 +53,7 @@ const tierIds: TierId[] = items.map((i) => i.tier.id);
 ---
 
 <div class="flex flex-col gap-4" data-tier-ladder={tierIds.join(" ")}>
-  <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-    <h3 class="text-lg font-semibold tracking-[-0.01em] text-foreground">{t("tickets.ladder.title")}</h3>
-    {namesNote && <Tbd note={namesNote} label={t("tickets.ladder.names_tbd")} lang={lang} />}
-  </div>
+  <h3 class="text-lg font-semibold tracking-[-0.01em] text-foreground">{t("tickets.ladder.title")}</h3>
 
   <ol class="grid grid-cols-1 gap-6 sm:grid-cols-4 sm:items-start sm:gap-7">
     {items.map((item, index) => {

@@ -2,23 +2,19 @@
 /**
  * What the standard ticket includes. A plain checklist, not a grid of feature
  * cards; the evening — new in 2027 and the launch's main argument — gets the
- * one distinct block. Everything here waits on the evening team's
- * confirmation, and says so.
+ * one distinct block, and what it holds once the evening team has decided it.
  */
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Icon from "./Icon.astro";
-import Tbd from "./Tbd.astro";
 
 interface Props {
   lang: Locale;
-  contentsNote?: string;
-  /** Set while "the evening is part of every ticket" is not confirmed. */
-  eveningIncludedNote?: string;
-  eveningNote?: string;
+  /** What the evening holds; left out until decided. */
+  eveningDetails?: string;
 }
 
-const { lang, contentsNote, eveningIncludedNote, eveningNote } = Astro.props;
+const { lang, eveningDetails } = Astro.props;
 const t = useTranslations(lang);
 const items = [
   t("tickets.included.talks"),
@@ -30,12 +26,9 @@ const items = [
 
 <section class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-16" aria-labelledby="included-title">
   <div class="flex flex-col gap-6">
-    <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-      <h2 id="included-title" class="text-3xl font-bold tracking-[-0.02em] text-balance text-foreground sm:text-4xl">
-        {t("tickets.included.title")}
-      </h2>
-      {contentsNote && <Tbd note={contentsNote} lang={lang} />}
-    </div>
+    <h2 id="included-title" class="text-3xl font-bold tracking-[-0.02em] text-balance text-foreground sm:text-4xl">
+      {t("tickets.included.title")}
+    </h2>
     <ul class="flex flex-col gap-3">
       {items.map((item) => (
         <li class="flex items-start gap-3 text-lg text-foreground">
@@ -53,15 +46,7 @@ const items = [
       <Icon name="moon" size={22} />
     </span>
     <h3 class="text-2xl font-semibold tracking-[-0.01em] text-foreground text-balance">{t("tickets.included.evening.title")}</h3>
-    <p class="text-lg text-foreground text-pretty">
-      {t("tickets.included.evening.body")}
-      {eveningIncludedNote && <Tbd note={eveningIncludedNote} lang={lang} class="ml-1.5" />}
-    </p>
-    {eveningNote && (
-      <p class="flex flex-wrap items-center gap-2 text-sm text-muted-foreground" data-tbd-only>
-        {t("tickets.included.evening.details")}
-        <Tbd note={eveningNote} lang={lang} />
-      </p>
-    )}
+    <p class="text-lg text-foreground text-pretty">{t("tickets.included.evening.body")}</p>
+    {eveningDetails && <p class="text-base text-muted-foreground text-pretty">{eveningDetails}</p>}
   </div>
 </section>

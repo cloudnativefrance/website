@@ -8,19 +8,24 @@
  * Everything is derived from `src/config/tickets.ts` and the phase, so the demo
  * routes and a future production route render the same page. Every purchase —
  * door 1, the Strategy & Leadership band, the mobile bar — goes to the alf.io
- * listing through one `purchaseTarget`.
+ * listing through one `purchaseTarget`. An undecided value shows its draft or
+ * nothing (`shown`), and a production-origin build refuses the page while a
+ * draft is left (`assertShippable`).
  */
 import GeoBackground from "@/components/patterns/GeoBackground.astro";
-import { TICKETING, isTbd, type Maybe, type Phase } from "@/config/tickets";
+import { TICKETING, type Phase } from "@/config/tickets";
 import { useTranslations } from "@/i18n/utils";
 import type { Locale } from "@/i18n/ui";
 import { CONTACT_EMAILS, TARGET_DATE } from "@/lib/event";
 import { buildMailto } from "@/lib/tickets/mailto";
+import { placeholdersAllowed } from "@/lib/tickets/demo";
+import { assertShippable, shown } from "@/lib/tickets/drafts";
 import { fill, formatDayMonth, formatFullDate, formatPrice, formatTime } from "@/lib/tickets/format";
 import {
   assertTicketingConfig,
   cheaperGroupRates,
   offerTier,
+  strategicPrice,
   tierStates,
 } from "@/lib/tickets/phase";
 import { alfioHost, codeFallbackAction, listingUrl, purchaseTarget } from "@/lib/tickets/purchase";
@@ -33,7 +38,6 @@ import IncludedInTicket from "./IncludedInTicket.astro";
 import TeamOffer from "./TeamOffer.astro";
 import TicketsFaq from "./TicketsFaq.astro";
 import StickyTicketBar from "./StickyTicketBar.astro";
-import Tbd from "./Tbd.astro";
 
 interface Props {
   lang: Locale;
@@ -46,11 +50,9 @@ const { lang, phase, demo } = Astro.props;
 const t = useTranslations(lang);
 const config = TICKETING;
 assertTicketingConfig(config);
-
-/** The note of a `tbd` value, for its chip; undefined once the value is decided. */
-const note = (value: Maybe<unknown>) => (isTbd(value) ? value.note : undefined);
-const draftText = (value: Maybe<{ fr: string; en: string }>) =>
-  isTbd(value) ? (value.draft?.[lang] ?? "") : value[lang];
+// A draft is for staging eyes only: a production-origin build refuses the page
+// while one is left in the config, and names them all.
+if (!placeholdersAllowed()) assertShippable(config);
 
 const tier = offerTier(config, phase);
 const ladder = tierStates(config, phase);
@@ -72,14 +74,12 @@ const showTeam = rates.length > 0;
 const showCode = phase !== "pre_opening";
 const wideOffer = !showTeam;
 
-const openingTime = isTbd(config.opening.time) ? (config.opening.time.draft ?? "") : config.opening.time;
+const openingTime = shown(config.opening.time);
 const opening = {
   date: config.opening.date,
-  time: formatTime(openingTime, lang),
-  timeNote: note(config.opening.time),
+  time: openingTime === undefined ? undefined : formatTime(openingTime, lang),
 };
-const programmeWhen = draftText(config.programmeAnnouncement);
-const programmeNote = note(config.programmeAnnouncement);
+const programmeWhen = shown(config.programmeAnnouncement)?.[lang];
 
 const eventDate = formatFullDate(TARGET_DATE, lang);
 // Split around {venue} so the venue can be set unbreakable: "CENTQUATRE-PARIS"
@@ -120,7 +120,6 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
         </h1>
         <p class="text-lg font-semibold text-foreground text-pretty sm:text-xl">
           {when.before}<span class="whitespace-nowrap">{when.venue}</span>{when.after}, {t("tickets.when_evening")}
-          {note(config.eveningIncluded) && <Tbd note={note(config.eveningIncluded)!} lang={lang} class="ml-1.5 align-[0.15em]" />}
         </p>
         <p class="max-w-[58ch] text-base text-muted-foreground text-pretty sm:text-lg">{t("tickets.lead")}</p>
       </header>
@@ -132,14 +131,7 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
         {/* `flex flex-col` so door 1 inherits the row height the right column
             sets, rather than sitting short inside a stretched wrapper. */}
         <div class:list={["flex flex-col", wideOffer ? "lg:col-span-12" : "lg:col-span-8"]}>
-          <OfferDoor
-            lang={lang}
-            phase={phase}
-            tier={tier}
-            ladder={ladder}
-            opening={opening}
-            namesNote={note(config.tierNames)}
-          >
+          <OfferDoor lang={lang} phase={phase} tier={tier} ladder={ladder} opening={opening}>
             <PurchaseControl
               slot="purchase"
               target={target}
@@ -180,7 +172,12 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
 
   {/* Always displayed, always on sale: the same action as door 1. */}
   <div class="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
-    <StrategicOffer lang={lang} ticket={config.strategic} teamHref={showTeam ? "#equipe" : undefined}>
+    <StrategicOffer
+      lang={lang}
+      ticket={config.strategic}
+      price={strategicPrice(config, phase)}
+      teamHref={showTeam ? "#equipe" : undefined}
+    >
       <PurchaseControl
         slot="purchase"
         target={target}
@@ -192,22 +189,11 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
   </div>
 
   <div class="mx-auto max-w-7xl px-4 pb-20 pt-24 md:px-6 md:pb-24 md:pt-28 lg:px-8">
-    <IncludedInTicket
-      lang={lang}
-      contentsNote={note(config.contents)}
-      eveningIncludedNote={note(config.eveningIncluded)}
-      eveningNote={note(config.eveningDetails)}
-    />
+    <IncludedInTicket lang={lang} eveningDetails={shown(config.eveningDetails)?.[lang]} />
   </div>
 
   <div class="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-24 lg:px-8">
-    <TeamOffer
-      lang={lang}
-      programmeWhen={programmeWhen}
-      programmeNote={programmeNote}
-      kitNote={note(config.managerKitUrl)}
-      kitUrl={isTbd(config.managerKitUrl) ? undefined : config.managerKitUrl}
-    />
+    <TeamOffer lang={lang} programmeWhen={programmeWhen} kitUrl={shown(config.managerKitUrl)} />
   </div>
 
   <div class="mx-auto max-w-7xl px-4 pb-28 md:px-6 md:pb-24 lg:px-8">
@@ -218,13 +204,10 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
       inclusionMailto={inclusionMailto}
       perOrder={perOrder}
       programmeWhen={programmeWhen}
-      notes={{
-        vat: note(config.vatRate),
-        invoice: note(config.invoice),
-        transfer: note(config.transferAndRefund),
-        terms: note(config.termsUrl),
-        programme: programmeNote,
-      }}
+      vatRate={shown(config.vatRate)}
+      invoice={shown(config.invoice)?.[lang]}
+      transfer={shown(config.transferAndRefund)?.[lang]}
+      termsUrl={shown(config.termsUrl)}
     />
   </div>
 </main>

@@ -4,6 +4,7 @@ import {
   assertTicketingConfig,
   cheaperGroupRates,
   offerTier,
+  strategicPrice,
   ticketingConfigProblems,
   tierStates,
 } from "@/lib/tickets/phase";
@@ -305,5 +306,43 @@ describe("drafts", () => {
       strategic: { ...decided.strategic, price: tbd("Prix") },
     };
     expect(() => assertShippable(config)).toThrow(/vatRate — Taux de TVA[\s\S]*strategic\.price — Prix/);
+  });
+
+  it("lists what still blocks a production build of the committed config", () => {
+    expect(shippingProblems(TICKETING).map((p) => p.path)).toEqual([
+      "opening.time",
+      "tierNames",
+      "strategic.name",
+      "strategic.networking",
+      "contents",
+      "eveningIncluded",
+      "managerKitUrl",
+      "programmeAnnouncement",
+      "strategic.price",
+    ]);
+  });
+});
+
+describe("strategicPrice", () => {
+  const withPrice = (price: TicketingConfig["strategic"]["price"]): TicketingConfig => ({
+    ...TICKETING,
+    strategic: { ...TICKETING.strategic, price },
+  });
+
+  it("shows nothing while the price is undecided", () => {
+    expect(strategicPrice(withPrice(tbd("Prix")), "regular")).toBeUndefined();
+  });
+
+  it("shows a fixed price in every phase", () => {
+    const fixed = withPrice({ kind: "fixed", amount: 449 });
+    expect(strategicPrice(fixed, "pre_opening")).toBe(449);
+    expect(strategicPrice(fixed, "last_chance")).toBe(449);
+  });
+
+  it("follows the tier on offer when priced per tier — the first one before the opening", () => {
+    const perTier = withPrice({ kind: "per_tier", amounts: { seb: 399, eb: 449, regular: 499, last_chance: 549 } });
+    expect(strategicPrice(perTier, "pre_opening")).toBe(399);
+    expect(strategicPrice(perTier, "eb")).toBe(449);
+    expect(strategicPrice(perTier, "regular")).toBe(499);
   });
 });

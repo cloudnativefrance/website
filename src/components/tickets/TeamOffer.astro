@@ -2,11 +2,9 @@
 /**
  * "Convaincre votre manager": the argument kit, down the page, in every phase.
  *
- * It used to double as a "coming as a team" section repeating the group rates.
- * Those live in door 2 and nowhere else now (22/09/2026) — the repetition
- * added nothing, and what the page still owes a manager is not a second price
- * list but something to forward: when the programme lands, the 2026 replays,
- * and the kit itself.
+ * The group rates live in door 2 and nowhere else (22/09/2026): what the page
+ * still owes a manager is not a second price list but something to forward —
+ * when the programme lands, the 2026 replays, and the kit itself.
  *
  * The person who decides is often not the one who attends, decides on the
  * programme and the purchase process rather than on the price, and has their
@@ -16,18 +14,16 @@ import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { fill } from "@/lib/tickets/format";
 import Icon from "./Icon.astro";
-import Tbd from "./Tbd.astro";
 
 interface Props {
   lang: Locale;
-  programmeWhen: string;
-  programmeNote?: string;
-  /** Set while the kit is still to be produced; the link is `kitUrl` once it is. */
-  kitNote?: string;
+  /** When the programme is announced; the sentence is left out while undecided. */
+  programmeWhen?: string;
+  /** The kit's link. The box stays either way; the link appears once there is one. */
   kitUrl?: string;
 }
 
-const { lang, programmeWhen, programmeNote, kitNote, kitUrl } = Astro.props;
+const { lang, programmeWhen, kitUrl } = Astro.props;
 const t = useTranslations(lang);
 ---
 
@@ -36,18 +32,14 @@ const t = useTranslations(lang);
     {t("tickets.team.convince.title")}
   </h2>
   <p class="max-w-[46ch] text-lg text-foreground text-pretty">{t("tickets.team.convince.lead")}</p>
-  <p class="flex max-w-[52ch] flex-wrap items-center gap-2 text-base text-muted-foreground text-pretty">
-    {fill(t("tickets.team.programme"), { when: programmeWhen })}
-    {programmeNote && <Tbd note={programmeNote} lang={lang} />}
-  </p>
-
-  {/* It must not vanish the day the kit's URL is decided: the chip stands in
-      for the link until then. */}
-  <div class="mt-2 flex flex-col items-start gap-2 rounded-lg border border-dashed border-input p-5">
-    <p class="flex flex-wrap items-center gap-2 text-base font-semibold text-foreground">
-      {t("tickets.team.kit.title")}
-      {kitNote && <Tbd note={kitNote} lang={lang} />}
+  {programmeWhen && (
+    <p class="max-w-[52ch] text-base text-muted-foreground text-pretty">
+      {fill(t("tickets.team.programme"), { when: programmeWhen })}
     </p>
+  )}
+
+  <div class="mt-2 flex flex-col items-start gap-2 rounded-lg border border-dashed border-input p-5">
+    <p class="text-base font-semibold text-foreground">{t("tickets.team.kit.title")}</p>
     <p class="text-sm text-muted-foreground text-pretty">{t("tickets.team.kit.body")}</p>
     {kitUrl && (
       <a

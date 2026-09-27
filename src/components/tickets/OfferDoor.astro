@@ -11,19 +11,17 @@ import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { fill, formatDayMonth, priceParts } from "@/lib/tickets/format";
 import TierLadder from "./TierLadder.astro";
-import Tbd from "./Tbd.astro";
 
 interface Props {
   lang: Locale;
   phase: Phase;
   tier: TierDefinition;
   ladder: TierWithState[];
-  /** Opening day and time, shown before the ticketing opens. */
-  opening: { date: string; time: string; timeNote?: string };
-  namesNote?: string;
+  /** Opening day and, once decided, time — shown before the ticketing opens. */
+  opening: { date: string; time?: string };
 }
 
-const { lang, phase, tier, ladder, opening, namesNote } = Astro.props;
+const { lang, phase, tier, ladder, opening } = Astro.props;
 const t = useTranslations(lang);
 const price = priceParts(tier.price, lang);
 // Derived rather than passed: the ladder already knows the order of the tiers.
@@ -70,8 +68,9 @@ const isLastTier = ladder[ladder.length - 1]?.tier.id === tier.id;
     <div class="flex flex-col justify-center gap-4" data-offer-action>
       {phase === "pre_opening" && (
         <p class="text-lg font-semibold text-foreground text-pretty">
-          {fill(t("tickets.offer.opens"), { date: formatDayMonth(opening.date, lang), time: opening.time })}
-          {opening.timeNote && <Tbd note={opening.timeNote} lang={lang} class="ml-1.5" />}
+          {opening.time
+            ? fill(t("tickets.offer.opens"), { date: formatDayMonth(opening.date, lang), time: opening.time })
+            : fill(t("tickets.offer.opens_day"), { date: formatDayMonth(opening.date, lang) })}
         </p>
       )}
       <slot name="purchase" />
@@ -83,6 +82,6 @@ const isLastTier = ladder[ladder.length - 1]?.tier.id === tier.id;
       the ladder then sits flush with the bottom of the card and the two
       columns end on the same line. */}
   <div class="border-t border-border pt-7 lg:mt-auto">
-    <TierLadder items={ladder} phase={phase} lang={lang} namesNote={namesNote} />
+    <TierLadder items={ladder} phase={phase} lang={lang} />
   </div>
 </article>

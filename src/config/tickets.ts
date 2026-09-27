@@ -15,15 +15,16 @@
  * logic: when a tier ends — early or on its date — set `currentPhase` to the
  * next tier. Every tier behind the current one reads "Épuisé" on the page.
  *
- * **Unknowns are `tbd()`, never a plausible guess.** A `tbd` renders as a
- * visible "À confirmer" chip on non-production builds, and a production build
- * that would render one fails (see `placeholdersAllowed` in
- * `src/lib/tickets/demo.ts`). `grep -n "tbd(" src/config/tickets.ts` lists
+ * **Unknowns are `tbd()`, never a plausible guess.** A `tbd` renders nothing
+ * of its own: the page shows its draft when it has one — as the copy it will
+ * become — and leaves its line out when it has none. A production-origin
+ * build refuses the page while a draft is left (`assertShippable` in
+ * `src/lib/tickets/drafts.ts`). `grep -n "tbd(" src/config/tickets.ts` lists
  * everything still open.
  */
 
-/** A value the organising team has not decided yet. `draft` is what the demo
- *  shows next to the chip when the page needs something to render. */
+/** A value the organising team has not decided yet. `draft` is what the page
+ *  shows until then — on staging only. */
 export interface Tbd<T = never> {
   readonly tbd: true;
   readonly note: string;
@@ -91,13 +92,13 @@ export interface TicketingConfig {
   opening: { date: string; time: Maybe<string> };
   currentPhase: Phase;
   tiers: readonly TierDefinition[];
-  /** Public tier names are still the working names of the pricing sheet. */
+  /** Public tier names are still the working names of the pricing sheet: `true` once final. */
   tierNames: Maybe<true>;
   groupRates: readonly GroupRate[];
   strategic: StrategicTicket;
-  /** Contents of the standard ticket, evening included — pending the evening team. */
+  /** The contents list on the page, pending the evening team: `true` once confirmed. */
   contents: Maybe<true>;
-  /** The evening is open to every attendee, with no add-on — to confirm with the evening team. */
+  /** "Soirée comprise" on the page — to confirm with the evening team: `true` once confirmed. */
   eveningIncluded: Maybe<true>;
   eveningDetails: Maybe<Localized>;
   vatRate: Maybe<string>;
@@ -155,7 +156,7 @@ export const TICKETING: TicketingConfig = {
       maxPerOrder: 20,
     },
   ],
-  tierNames: tbd("Noms publics des paliers en français et en anglais"),
+  tierNames: tbd("Noms publics des paliers en français et en anglais", true),
   // Only offered on a tier whose order cap allows a group that size — see
   // `cheaperGroupRates`. Super Early Bird and Early Bird are quota-protected at
   // 5 seats per order, so they carry no group rate today (22/09/2026); lifting
@@ -178,14 +179,14 @@ export const TICKETING: TicketingConfig = {
     }),
     accessConditions: tbd("Conditions d'accès éventuelles"),
   },
-  contents: tbd("Contenu exact du billet standard"),
-  eveningIncluded: tbd("Soirée ouverte à tous les participants, sans option (pôle soirée)"),
+  contents: tbd("Contenu exact du billet standard", true),
+  eveningIncluded: tbd("Soirée ouverte à tous les participants, sans option (pôle soirée)", true),
   eveningDetails: tbd("Contenu de la soirée (pôle soirée)"),
   vatRate: tbd("Taux de TVA affiché (10 % aujourd'hui ?)"),
   invoice: tbd("Facture au nom de la société, devis, virement (question à JC)"),
   transferAndRefund: tbd("Annulation et changement de nom"),
   termsUrl: tbd("Lien vers les conditions générales de vente"),
-  managerKitUrl: tbd("Kit « convaincre son manager » (planifié)"),
+  managerKitUrl: tbd("Kit « convaincre son manager » (planifié) — URL bidon en attendant", "#convaincre"),
   programmeAnnouncement: tbd("Date publique d'annonce du programme", {
     fr: "en mars 2027",
     en: "in March 2027",

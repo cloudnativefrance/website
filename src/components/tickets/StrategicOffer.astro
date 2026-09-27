@@ -8,44 +8,36 @@
  * alf.io listing, or the newsletter before the opening — passed in the
  * `purchase` slot. Its quota is never shown, like every other.
  */
-import { isTbd, type Maybe, type StrategicTicket } from "@/config/tickets";
+import type { StrategicTicket } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
+import { shown } from "@/lib/tickets/drafts";
 import { formatPrice } from "@/lib/tickets/format";
 import Icon from "./Icon.astro";
-import Tbd from "./Tbd.astro";
 
 interface Props {
   lang: Locale;
   ticket: StrategicTicket;
+  /** Euros, VAT included, in the phase on screen (`strategicPrice`); undefined while undecided. */
+  price?: number;
   /** Door 2's anchor, set only while a group rate applies — there is nowhere
    *  else on the page to send a reader looking for one. */
   teamHref?: string;
 }
 
-const { lang, ticket, teamHref } = Astro.props;
+const { lang, ticket, price, teamHref } = Astro.props;
 const t = useTranslations(lang);
 
-const name = isTbd(ticket.name) ? ticket.name.draft?.[lang] ?? "" : ticket.name[lang];
+const name = shown(ticket.name)?.[lang] ?? "";
 
-function text(value: Maybe<{ fr: string; en: string }>): string | undefined {
-  if (isTbd(value)) return value.draft?.[lang];
-  return value[lang];
-}
-
-const priceText = isTbd(ticket.price)
-  ? undefined
-  : ticket.price.kind === "fixed"
-    ? formatPrice(ticket.price.amount, lang)
-    : undefined;
-
-const facts: Array<{ label: string; value?: string; tbd?: string }> = [
-  { label: t("tickets.strategic.fact.price"), value: priceText, tbd: isTbd(ticket.price) ? ticket.price.note : undefined },
-  { label: t("tickets.strategic.fact.includes"), value: text(ticket.includesStandard), tbd: isTbd(ticket.includesStandard) ? ticket.includesStandard.note : undefined },
-  { label: t("tickets.strategic.fact.programme"), value: text(ticket.programme), tbd: isTbd(ticket.programme) ? ticket.programme.note : undefined },
-  { label: t("tickets.strategic.fact.networking"), value: text(ticket.networking), tbd: isTbd(ticket.networking) ? ticket.networking.note : undefined },
-  { label: t("tickets.strategic.fact.access"), value: text(ticket.accessConditions), tbd: isTbd(ticket.accessConditions) ? ticket.accessConditions.note : undefined },
-];
+// A fact with no value yet has no row: never a label pointing at nothing.
+const facts = [
+  { label: t("tickets.strategic.fact.price"), value: price === undefined ? undefined : formatPrice(price, lang) },
+  { label: t("tickets.strategic.fact.includes"), value: shown(ticket.includesStandard)?.[lang] },
+  { label: t("tickets.strategic.fact.programme"), value: shown(ticket.programme)?.[lang] },
+  { label: t("tickets.strategic.fact.networking"), value: shown(ticket.networking)?.[lang] },
+  { label: t("tickets.strategic.fact.access"), value: shown(ticket.accessConditions)?.[lang] },
+].filter((fact): fact is { label: string; value: string } => fact.value !== undefined);
 
 const topics = [1, 2, 3, 4, 5, 6].map((n) => t(`tickets.strategic.topic.${n}` as Parameters<typeof t>[0]));
 ---
@@ -57,10 +49,7 @@ const topics = [1, 2, 3, 4, 5, 6].map((n) => t(`tickets.strategic.topic.${n}` as
 >
   <div class="grid gap-10 p-6 sm:p-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-14">
     <div class="flex flex-col gap-5">
-      <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <h2 id="strategic-title" class="text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl">{name}</h2>
-        {isTbd(ticket.name) && <Tbd note={ticket.name.note} lang={lang} tone="inverse" />}
-      </div>
+      <h2 id="strategic-title" class="text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl">{name}</h2>
       <p class="max-w-[60ch] text-lg text-pretty">{t("tickets.strategic.lead")}</p>
       <p class="max-w-[60ch] text-base text-chart-4 text-pretty">{t("tickets.strategic.body")}</p>
       <div class="flex flex-col gap-3">
@@ -75,20 +64,16 @@ const topics = [1, 2, 3, 4, 5, 6].map((n) => t(`tickets.strategic.topic.${n}` as
     </div>
 
     <div class="flex flex-col gap-6">
-      <dl class="divide-y divide-primary-foreground/15 border-y border-primary-foreground/15">
-        {facts.map((fact) => (
-          <div
-            class="flex flex-col gap-1 py-3 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:gap-x-4"
-            data-tbd-only={fact.value ? undefined : true}
-          >
-            <dt class="text-sm text-chart-4">{fact.label}</dt>
-            <dd class="flex flex-wrap items-center gap-2 text-base font-semibold sm:justify-end sm:text-right">
-              {fact.value && <span class="tabular-nums">{fact.value}</span>}
-              {fact.tbd && <Tbd note={fact.tbd} lang={lang} tone="inverse" />}
-            </dd>
-          </div>
-        ))}
-      </dl>
+      {facts.length > 0 && (
+        <dl class="divide-y divide-primary-foreground/15 border-y border-primary-foreground/15">
+          {facts.map((fact) => (
+            <div class="flex flex-col gap-1 py-3 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:gap-x-4">
+              <dt class="text-sm text-chart-4">{fact.label}</dt>
+              <dd class="text-base font-semibold tabular-nums sm:text-right">{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
 
       <div class="strategic-purchase">
         <slot name="purchase" />

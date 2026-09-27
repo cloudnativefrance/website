@@ -1,14 +1,14 @@
 ---
 /**
  * Reassurance and FAQ, as native <details>: keyboard and screen readers get
- * disclosure for free, and the page works without JavaScript. Answers the
- * ticketing team cannot give yet say so, with the placeholder chip.
+ * disclosure for free, and the page works without JavaScript. An answer the
+ * ticketing team has not decided keeps its waiting copy or is left out; the
+ * config's answer replaces it once decided.
  */
 import type { Locale } from "@/i18n/ui";
 import { useTranslations, getLocalePath } from "@/i18n/utils";
 import { fill } from "@/lib/tickets/format";
 import Icon from "./Icon.astro";
-import Tbd from "./Tbd.astro";
 
 interface Props {
   lang: Locale;
@@ -16,11 +16,16 @@ interface Props {
   email: string;
   inclusionMailto: string;
   perOrder: { early: number; later: number };
-  programmeWhen: string;
-  notes: { vat?: string; invoice?: string; transfer?: string; terms?: string; programme?: string };
+  /** When the programme is announced; its question is left out while undecided. */
+  programmeWhen?: string;
+  vatRate?: string;
+  /** Decided answers; the waiting copy stands in until then. */
+  invoice?: string;
+  transfer?: string;
+  termsUrl?: string;
 }
 
-const { lang, host, email, inclusionMailto, perOrder, programmeWhen, notes } = Astro.props;
+const { lang, host, email, inclusionMailto, perOrder, programmeWhen, vatRate, invoice, transfer, termsUrl } = Astro.props;
 const t = useTranslations(lang);
 const practicalPath = `${getLocalePath(lang, "/informations-utiles")}#accessibilite`;
 const cocPath = getLocalePath(lang, "/code-of-conduct");
@@ -45,7 +50,7 @@ const link = "font-medium text-primary-strong underline underline-offset-4 decor
       <summary>{t("tickets.faq.ttc.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
       <p>
         {t("tickets.faq.ttc.a")}
-        {notes.vat && <span class="ml-1 inline-flex items-center gap-2" data-tbd-only>{t("tickets.faq.ttc.rate")} <Tbd note={notes.vat} lang={lang} /></span>}
+        {vatRate && ` ${fill(t("tickets.faq.ttc.rate"), { rate: vatRate })}`}
       </p>
     </details>
     <details class="faq group">
@@ -54,21 +59,16 @@ const link = "font-medium text-primary-strong underline underline-offset-4 decor
     </details>
     <details class="faq group">
       <summary>{t("tickets.faq.invoice.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
-      <p>
-        {fill(t("tickets.faq.invoice.a"), { email })}
-        {notes.invoice && <Tbd note={notes.invoice} lang={lang} class="ml-1" />}
-      </p>
+      <p>{fill(invoice ?? t("tickets.faq.invoice.a"), { email })}</p>
     </details>
     <details class="faq group">
       <summary>{t("tickets.faq.transfer.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
-      <p>
-        {t("tickets.faq.transfer.a")}
-        {notes.transfer && <Tbd note={notes.transfer} lang={lang} class="ml-1" />}
-      </p>
-      <p class="flex flex-wrap items-center gap-2" data-tbd-only={notes.terms ? true : undefined}>
-        {t("tickets.faq.transfer.terms")}
-        {notes.terms && <Tbd note={notes.terms} lang={lang} />}
-      </p>
+      <p>{transfer ?? t("tickets.faq.transfer.a")}</p>
+      {termsUrl && (
+        <p>
+          <a href={termsUrl} class={link}>{t("tickets.faq.transfer.terms")}</a>
+        </p>
+      )}
     </details>
     <details class="faq group">
       <summary>{t("tickets.faq.code.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
@@ -93,13 +93,12 @@ const link = "font-medium text-primary-strong underline underline-offset-4 decor
         {t("tickets.faq.coc.a")} <a href={cocPath} class={link}>{t("tickets.faq.coc.link")}</a>
       </p>
     </details>
-    <details class="faq group">
-      <summary>{t("tickets.faq.programme.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
-      <p>
-        {fill(t("tickets.faq.programme.a"), { when: programmeWhen })}
-        {notes.programme && <Tbd note={notes.programme} lang={lang} class="ml-1" />}
-      </p>
-    </details>
+    {programmeWhen && (
+      <details class="faq group">
+        <summary>{t("tickets.faq.programme.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+        <p>{fill(t("tickets.faq.programme.a"), { when: programmeWhen })}</p>
+      </details>
+    )}
   </div>
 </section>
 

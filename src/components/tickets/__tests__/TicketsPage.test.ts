@@ -34,36 +34,6 @@ function visibleText(html: string): string {
     .replace(/\s+/g, " ");
 }
 
-/**
- * The page as the demo's "hide the placeholders" switch shows it: the CSS drops
- * every `.tbd-chip`, and every `[data-tbd-only]` line the chip was the whole
- * point of. Applied here the same way, so a test can read what is left.
- */
-function withoutPlaceholders(html: string): string {
-  let out = html;
-  for (const pattern of [/<span\b[^>]*\bclass="tbd-chip/, /<(\w+)\b[^>]*\bdata-tbd-only\b/]) {
-    for (let guard = 0; guard < 200; guard += 1) {
-      const match = pattern.exec(out);
-      if (!match) break;
-      const tag = match[1] ?? "span";
-      out = out.slice(0, match.index) + out.slice(endOfElement(out, match.index, tag));
-    }
-  }
-  return out;
-}
-
-/** Index just past the element opening at `start`, counting nested `<tag>`s. */
-function endOfElement(html: string, start: number, tag: string): number {
-  const scan = new RegExp(`<${tag}\\b|</${tag}>`, "g");
-  scan.lastIndex = start;
-  let depth = 0;
-  for (let m = scan.exec(html); m; m = scan.exec(html)) {
-    depth += m[0].startsWith("</") ? -1 : 1;
-    if (depth === 0) return scan.lastIndex;
-  }
-  throw new Error(`unbalanced <${tag}> from ${start}`);
-}
-
 /** The main page region, excluding the mobile bar rendered after it. */
 function mainOf(html: string): string {
   const start = html.indexOf("<main");
@@ -229,22 +199,39 @@ describe.each(DEMO_PHASES)("phase %s", (phase) => {
     expect(main.includes('id="equipe"')).toBe(selling);
   });
 
-  it("marks every placeholder as such", () => {
-    expect(main).toContain('class="tbd-chip');
-    expect(text).toContain("À confirmer");
+  it("renders no placeholder: a draft reads as copy, an undecided line is absent", () => {
+    expect(main).not.toContain("data-tbd");
+    expect(main).not.toContain("tbd-chip");
+    expect(text).not.toMatch(/à confirmer/i);
+    // Undecided with no draft: the whole line is gone, its label included.
+    for (const absent of ["Taux de TVA", "Conditions générales de vente", "Le détail de la soirée"]) {
+      expect(text).not.toContain(absent);
+    }
+    // No label left pointing at nothing.
+    expect(main).not.toMatch(/<(dd|dt)\b[^>]*>\s*<\/\1>/);
+    // Drafts show as the copy they will become (Astro escapes `&` and `'`).
+    expect(main).toMatch(/Stratégie (&amp;|&) Leadership/);
+    expect(text).toContain("en mars 2027");
+    expect(text).toContain("soirée comprise");
+    // What is left is still the page, not a shell.
+    expect(text).toContain("Je prends ma place");
+    expect(text).toContain("Ce que comprend votre billet");
+    expect(text).toContain("Questions fréquentes");
   });
 
-  it("still reads as finished copy once the placeholders are hidden", () => {
-    const left = visibleText(withoutPlaceholders(main));
-    for (const dangling of ["Taux de TVA", "Conditions générales de vente", "Le détail de la soirée"]) {
-      expect(left).not.toContain(dangling);
-    }
-    expect(left).not.toContain("À confirmer");
-    expect(left).not.toContain("à confirmer");
-    expect(withoutPlaceholders(main)).not.toMatch(/<(dd|dt)\b[^>]*>\s*<\/\1>/);
-    expect(left).toContain("Je prends ma place");
-    expect(left).toContain("Ce que comprend votre billet");
-    expect(left).toContain("Questions fréquentes");
+  it("keeps the manager kit box, linked to its draft URL", () => {
+    expect(text).toContain("Un kit pour convaincre votre manager");
+    expect(main).toMatch(/<a\b[^>]*href="#convaincre"[^>]*data-umami-event="tickets-manager-kit"/);
+  });
+
+  it("lists only the Strategy & Leadership facts that have a value", () => {
+    const start = main.indexOf('id="strategie-leadership"');
+    const band = main.slice(start, main.indexOf("</section>", start));
+    const terms = [...band.matchAll(/<dt\b[^>]*>([\s\S]*?)<\/dt>/g)].map((m) => m[1]);
+    // Only the networking area has a draft today; price, contents, programme
+    // and access have no row until they are decided.
+    expect(terms).toHaveLength(1);
+    expect(terms[0]).toMatch(/Espace d(&#39;|')échange/);
   });
 
   it("carries no proof section and no inclusion footer — the FAQ answers that", () => {
