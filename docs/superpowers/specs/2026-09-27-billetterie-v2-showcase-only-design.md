@@ -77,8 +77,11 @@ session; the switch of `/billetterie` to this page is a separate task still.
   visually.
 - **Door 3 (code).** The form gets `target="_blank"`, which covers the no-JS fallback
   (`GET` listing `?code=`). In `tickets-ui.ts`, `window.location.assign(url)` becomes
-  `window.open(url, "_blank", "noopener")`, called in the submit handler (user
-  activation, so popup blockers let it through). The submit button carries the same
+  `openInNewTab(url)` (in `url.ts`, unit-tested): `window.open(url, "_blank")`, called in
+  the submit handler (user activation, so popup blockers let it through), then
+  `opener = null` on the new tab — the `rel="noopener"` of a script. If the browser still
+  blocks it (`window.open` returns `null`), the buyer goes there in the same tab rather
+  than nothing happening. The submit button carries the same
   screen-reader "(nouvel onglet)". Validation, whitespace stripping and the hand-off
   sentence are unchanged.
 - **Mobile bar.** The `scroll` action kind goes: the action is always a link, and both
