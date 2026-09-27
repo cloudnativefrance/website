@@ -28,6 +28,7 @@ import {
 import { fill, formatDayMonth, formatDiscount, formatPrice } from "@/lib/tickets/format";
 import { rexSummary } from "@/lib/tickets/rex";
 import type { SessionRow } from "@/lib/schedule";
+import { assertShippable, shippingProblems, shown } from "@/lib/tickets/drafts";
 
 const tier = (id: TierId) => TICKETING.tiers.find((t) => t.id === id)!;
 
@@ -385,5 +386,54 @@ describe("rexSummary", () => {
       row("REX bpifrance - FinOps en action – la suite"),
     ]);
     expect(summary).toEqual({ sessions: 4, organisations: ["SNCF", "Air France-KLM", "bpifrance"] });
+  });
+});
+
+describe("drafts", () => {
+  // Every tbd() replaced by its draft, or by a stand-in when it has none: the
+  // config as it will be once the team has decided everything.
+  const decided = JSON.parse(JSON.stringify(TICKETING), (_key, value) =>
+    isTbd(value) ? (value.draft ?? "decided") : value,
+  ) as TicketingConfig;
+
+  it("shows the decided value, else the draft, else nothing", () => {
+    expect(shown("10:00")).toBe("10:00");
+    expect(shown(tbd("Heure d'ouverture", "10:00"))).toBe("10:00");
+    expect(shown(tbd("Taux de TVA"))).toBeUndefined();
+  });
+
+  it("lets a fully decided config ship", () => {
+    expect(shippingProblems(decided)).toEqual([]);
+    expect(() => assertShippable(decided)).not.toThrow();
+  });
+
+  it("blocks on a draft wherever it sits, arrays included, and names its path", () => {
+    const config = {
+      ...decided,
+      opening: { ...decided.opening, time: tbd("Heure d'ouverture", "10:00") },
+      tiers: decided.tiers.map((t, i) => (i === 0 ? { ...t, name: tbd("Nom public", t.name) } : t)),
+    } as unknown as TicketingConfig;
+    expect(shippingProblems(config)).toEqual([
+      { path: "opening.time", note: "Heure d'ouverture" },
+      { path: "tiers.0.name", note: "Nom public" },
+    ]);
+  });
+
+  it("lets an undecided value with no draft ship — its line is simply not rendered", () => {
+    expect(shippingProblems({ ...decided, vatRate: tbd("Taux de TVA") })).toEqual([]);
+  });
+
+  it("still requires the Strategy & Leadership price, which has no draft to show", () => {
+    const config = { ...decided, strategic: { ...decided.strategic, price: tbd("Prix") } };
+    expect(shippingProblems(config)).toEqual([{ path: "strategic.price", note: "Prix" }]);
+  });
+
+  it("names every problem at once when it refuses", () => {
+    const config = {
+      ...decided,
+      vatRate: tbd("Taux de TVA", "10 %"),
+      strategic: { ...decided.strategic, price: tbd("Prix") },
+    };
+    expect(() => assertShippable(config)).toThrow(/vatRate — Taux de TVA[\s\S]*strategic\.price — Prix/);
   });
 });
