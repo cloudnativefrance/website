@@ -435,11 +435,6 @@ export const ui = {
     "tickets.door.code": "J'ai un code",
     "tickets.offer.ttc": "TTC",
     "tickets.offer.last_seats": "Dernières places",
-    "tickets.offer.opening_label": "Tarif d'ouverture",
-    "tickets.offer.opens": "La billetterie ouvre le {date} à {time}.",
-    "tickets.offer.opens_day": "La billetterie ouvre le {date}.",
-    "tickets.offer.notify": "Être prévenu(e)",
-    "tickets.offer.notify_note": "Par e-mail, via la newsletter de CND France.",
     "tickets.purchase.buy": "Acheter mon billet",
     "tickets.new_tab": "(nouvel onglet)",
     // "Quatre" is the config's four tiers; a test pins that count.
@@ -450,7 +445,6 @@ export const ui = {
     "tickets.ladder.sold_out": "Épuisé",
     // Screen readers only: on screen, the selected card says it without a word.
     "tickets.ladder.current": "Tarif en cours",
-    "tickets.ladder.opening": "Tarif d'ouverture",
     "tickets.team.rates": "Tarifs de groupe, par place",
     "tickets.team.rate.4_9": "De 4 à 9 personnes",
     "tickets.team.rate.10_plus": "10 personnes et plus",
@@ -533,8 +527,6 @@ export const ui = {
     "tickets.inclusion.mail.body":
       "Bonjour,\n\nQuelques mots sur votre situation\u00a0:\n\nNom\u00a0:\nÉcole ou structure (le cas échéant)\u00a0:\n",
     "tickets.sticky.buy": "Acheter",
-    "tickets.sticky.opens": "Ouverture le {date}",
-    "tickets.sticky.notify": "Être prévenu(e)",
     "tickets.demo.badge": "Démo",
     "tickets.demo.notice": "Page de démonstration, non publiée.",
     "tickets.demo.settings": "Ouvrir les réglages de la démo",
@@ -959,11 +951,6 @@ export const ui = {
     "tickets.door.code": "I have a code",
     "tickets.offer.ttc": "VAT incl.",
     "tickets.offer.last_seats": "Last seats",
-    "tickets.offer.opening_label": "Opening price",
-    "tickets.offer.opens": "Ticketing opens on {date} at {time}.",
-    "tickets.offer.opens_day": "Ticketing opens on {date}.",
-    "tickets.offer.notify": "Notify me",
-    "tickets.offer.notify_note": "By email, through the CND France newsletter.",
     "tickets.purchase.buy": "Buy my ticket",
     "tickets.new_tab": "(new tab)",
     // "Four" is the config's four tiers; a test pins that count.
@@ -974,7 +961,6 @@ export const ui = {
     "tickets.ladder.sold_out": "Sold out",
     // Screen readers only: on screen, the selected card says it without a word.
     "tickets.ladder.current": "Current price",
-    "tickets.ladder.opening": "Opening price",
     "tickets.team.rates": "Group rates, per seat",
     "tickets.team.rate.4_9": "4 to 9 people",
     "tickets.team.rate.10_plus": "10 people or more",
@@ -1056,8 +1042,6 @@ export const ui = {
     "tickets.inclusion.mail.subject": "Inclusion or student rate request",
     "tickets.inclusion.mail.body": "Hello,\n\nA few words about your situation:\n\nName:\nSchool or organisation (if any):\n",
     "tickets.sticky.buy": "Buy",
-    "tickets.sticky.opens": "Opens on {date}",
-    "tickets.sticky.notify": "Tell me",
     "tickets.demo.badge": "Demo",
     "tickets.demo.notice": "Demonstration page, not published.",
     "tickets.demo.settings": "Open the demo settings",

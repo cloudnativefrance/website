@@ -1,0 +1,17 @@
+---
+/**
+ * The English mirror of /billetterie/demo/[phase]: one URL per phase, never
+ * on a production build (see src/lib/tickets/demo.ts).
+ */
+import TicketsPage from "@/components/tickets/TicketsPage.astro";
+import type { Phase } from "@/config/tickets";
+import { demoStaticPaths, ticketDemosEnabled } from "@/lib/tickets/demo";
+
+export function getStaticPaths() {
+  return ticketDemosEnabled() ? demoStaticPaths() : [];
+}
+
+const { phase } = Astro.props as { phase: Phase };
+---
+
+<TicketsPage lang="en" phase={phase} simulated />

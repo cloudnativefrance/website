@@ -1,32 +1,45 @@
 ---
 /**
- * The ticketing page: the site layout around `TicketsContent`, plus — on demo
- * routes only — the phase switcher and a forced noindex.
+ * The ticketing page, whatever the phase: /billetterie, /en/tickets and every
+ * demo route mount it. `pre_opening` is the "coming soon" page; a tier id is
+ * the ticketing page selling that tier (`TicketsContent`).
+ *
+ * On a non-production build it also carries the demo switcher, on the real
+ * URLs too, so the team can walk the season from /billetterie on staging.
+ * A simulated phase is always noindex, whatever the origin.
  */
 import Layout from "@/layouts/Layout.astro";
 import { TICKETING, type Phase } from "@/config/tickets";
 import { useTranslations } from "@/i18n/utils";
 import type { Locale } from "@/i18n/ui";
+import { ticketDemosEnabled } from "@/lib/tickets/demo";
 import TicketsContent from "./TicketsContent.astro";
+import TicketsComingSoon from "./TicketsComingSoon.astro";
 import DemoBar from "./DemoBar.astro";
 
 interface Props {
   lang: Locale;
   phase: Phase;
-  /** Present on demo routes only: renders the switcher and forces noindex. */
-  demo?: { fromConfig: boolean };
+  /** A demo route's phase rather than the config's own. */
+  simulated?: boolean;
 }
 
-const { lang, phase, demo } = Astro.props;
+const { lang, phase, simulated = false } = Astro.props;
 const t = useTranslations(lang);
+const switcher = ticketDemosEnabled();
 ---
 
-<Layout title={t("tickets.meta.title")} description={t("tickets.meta.description")} lang={lang} newsletter={false} noindex={Boolean(demo)}>
-  {demo && (
-    <DemoBar lang={lang} config={TICKETING} phase={phase} fromConfig={demo.fromConfig} />
-  )}
-  <TicketsContent lang={lang} phase={phase} demo={Boolean(demo)} />
-</Layout>
+{phase === "pre_opening" ? (
+  <Layout title={t("nav.tickets")} description={t("tickets.opening.body")} lang={lang} noindex={simulated}>
+    {switcher && <DemoBar lang={lang} config={TICKETING} phase={phase} fromConfig={!simulated} />}
+    <TicketsComingSoon lang={lang} />
+  </Layout>
+) : (
+  <Layout title={t("tickets.meta.title")} description={t("tickets.meta.description")} lang={lang} newsletter={false} noindex={simulated}>
+    {switcher && <DemoBar lang={lang} config={TICKETING} phase={phase} fromConfig={!simulated} />}
+    <TicketsContent lang={lang} phase={phase} demo={switcher} />
+  </Layout>
+)}
 
 <script>
   import "./tickets-ui.ts";

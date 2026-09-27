@@ -7,10 +7,10 @@ import {
   strategicPrice,
   ticketingConfigProblems,
   tierStates,
+  tierUrgency,
 } from "@/lib/tickets/phase";
 import { alfioHost, codeFallbackAction, codeUrl, listingUrl, onHost, purchaseTarget } from "@/lib/tickets/purchase";
 import { handOffOnce, openInNewTab } from "@/lib/tickets/url";
-import { NEWSLETTER_URL } from "@/lib/event";
 import { buildMailto } from "@/lib/tickets/mailto";
 import {
   demoPath,
@@ -55,19 +55,31 @@ describe("the committed config", () => {
 
   it("ends each tier on the date of the key-dates sheet", () => {
     expect(TICKETING.tiers.map((t) => formatDayMonth(t.endsAt, "fr"))).toEqual([
-      "dimanche 29 novembre",
-      "dimanche 7 février",
-      "dimanche 16 mai",
-      "jeudi 3 juin",
+      "29 novembre",
+      "7 février",
+      "16 mai",
+      "3 juin",
+    ]);
+    // Every tier but the last ends on a Sunday night, as the sheet says.
+    const weekday = new Intl.DateTimeFormat("fr-FR", { weekday: "long", timeZone: "Europe/Paris" });
+    expect(TICKETING.tiers.map((t) => weekday.format(new Date(t.endsAt)))).toEqual([
+      "dimanche",
+      "dimanche",
+      "dimanche",
+      "jeudi",
     ]);
   });
 });
 
 describe("tierStates", () => {
-  it("shows every tier as upcoming before the opening", () => {
-    const states = tierStates(TICKETING, "pre_opening");
-    expect(states.map((s) => s.state.kind)).toEqual(["upcoming", "upcoming", "upcoming", "upcoming"]);
-    expect(offerTier(TICKETING, "pre_opening").id).toBe("seb");
+  it("offers the tier the phase names", () => {
+    expect(offerTier(TICKETING, "seb").id).toBe("seb");
+    expect(tierStates(TICKETING, "seb").map((s) => s.state.kind)).toEqual([
+      "current",
+      "upcoming",
+      "upcoming",
+      "upcoming",
+    ]);
   });
 
   it("puts past, current and upcoming tiers in order", () => {
@@ -88,6 +100,40 @@ describe("tierStates", () => {
       "upcoming",
     ]);
     expect(() => assertTicketingConfig(config)).not.toThrow();
+  });
+
+  it("accepts the coming-soon phase as the config's own, and nothing unknown", () => {
+    expect(ticketingConfigProblems(withPhase({ currentPhase: "pre_opening" }))).toEqual([]);
+    expect(ticketingConfigProblems(withPhase({ currentPhase: "vip" as TierId }))).toContain(
+      'currentPhase "vip" matches no tier',
+    );
+  });
+});
+
+describe("tierUrgency", () => {
+  it("gives the early tiers a date and a limited stock", () => {
+    expect(tierUrgency(TICKETING, tier("seb"))).toEqual({
+      endsAt: "2026-11-29T23:59:59+01:00",
+      limitedStock: true,
+      lastTier: false,
+    });
+    expect(tierUrgency(TICKETING, tier("eb")).limitedStock).toBe(true);
+  });
+
+  it("gives Regular its date alone", () => {
+    expect(tierUrgency(TICKETING, tier("regular"))).toEqual({
+      endsAt: "2027-05-16T23:59:59+02:00",
+      limitedStock: false,
+      lastTier: false,
+    });
+  });
+
+  it("gives the last tier no date — it runs to the event day", () => {
+    expect(tierUrgency(TICKETING, tier("last_chance"))).toEqual({
+      endsAt: undefined,
+      limitedStock: false,
+      lastTier: true,
+    });
   });
 });
 
@@ -137,21 +183,11 @@ describe("formatDiscount", () => {
 });
 
 describe("purchaseTarget", () => {
-  it("sends every buyer to the listing once the ticketing is open", () => {
-    for (const id of ["seb", "eb", "regular", "last_chance"] as const) {
-      expect(purchaseTarget(TICKETING, id)).toEqual({
-        kind: "listing",
-        href: "https://billetterie.cloudnativedays.fr/event/cnd-2027",
-        rel: "noopener",
-      });
-    }
-  });
-
-  it("offers the newsletter, not a purchase, before the opening", () => {
-    expect(purchaseTarget(TICKETING, "pre_opening")).toEqual({
-      kind: "notify",
-      href: NEWSLETTER_URL,
-      rel: "noopener noreferrer",
+  it("sends every buyer to the listing", () => {
+    expect(purchaseTarget(TICKETING)).toEqual({
+      kind: "listing",
+      href: "https://billetterie.cloudnativedays.fr/event/cnd-2027",
+      rel: "noopener",
     });
   });
 
@@ -220,26 +256,26 @@ describe("demo gate", () => {
     expect(ticketDemosEnabled({ env: prod, dev: true })).toBe(true);
   });
 
-  it("emits one page per phase, plus the entry URL", () => {
+  it("emits one page per phase, the coming-soon page included — /billetterie is the config's own", () => {
     const paths = demoStaticPaths();
-    expect(paths.map((p) => p.params.demo)).toEqual([
-      "demo",
-      "demo/avant-ouverture",
-      "demo/super-early-bird",
-      "demo/early-bird",
-      "demo/regular",
-      "demo/last-chance",
+    expect(paths.map((p) => p.params.phase)).toEqual([
+      "avant-ouverture",
+      "super-early-bird",
+      "early-bird",
+      "regular",
+      "last-chance",
     ]);
-    expect(paths[0].props).toEqual({});
-    expect(paths[3].props).toEqual({ phase: "eb" });
-    expect(demoPath()).toBe("/billetterie/demo/");
-    expect(demoPath("pre_opening")).toBe("/billetterie/demo/avant-ouverture/");
+    expect(paths[0].props).toEqual({ phase: "pre_opening" });
+    expect(paths[2].props).toEqual({ phase: "eb" });
   });
 
-  it("keeps every demo URL under /billetterie/demo/, and none of the old variant URLs", () => {
-    for (const p of demoStaticPaths()) {
-      expect(`/billetterie/${p.params.demo}/`).toMatch(/^\/billetterie\/demo\//);
-      expect(p.params.demo).not.toMatch(/^demo-/);
+  it("keeps every demo URL under /billetterie/demo/ and /en/tickets/demo/", () => {
+    expect(demoPath("pre_opening", "fr")).toBe("/billetterie/demo/avant-ouverture/");
+    expect(demoPath("eb", "fr")).toBe("/billetterie/demo/early-bird/");
+    expect(demoPath("eb", "en")).toBe("/en/tickets/demo/early-bird/");
+    for (const { props } of demoStaticPaths()) {
+      expect(demoPath(props.phase, "fr")).toMatch(/^\/billetterie\/demo\/[a-z-]+\/$/);
+      expect(demoPath(props.phase, "en")).toMatch(/^\/en\/tickets\/demo\/[a-z-]+\/$/);
     }
   });
 });
@@ -287,11 +323,11 @@ describe("drafts", () => {
   it("blocks on a draft wherever it sits, arrays included, and names its path", () => {
     const config = {
       ...decided,
-      opening: { ...decided.opening, time: tbd("Heure d'ouverture", "10:00") },
+      alfio: { ...decided.alfio, eventSlug: tbd("Slug de l'événement", "cnd-2027") },
       tiers: decided.tiers.map((t, i) => (i === 0 ? { ...t, name: tbd("Nom public", t.name) } : t)),
     } as unknown as TicketingConfig;
     expect(shippingProblems(config)).toEqual([
-      { path: "opening.time", note: "Heure d'ouverture" },
+      { path: "alfio.eventSlug", note: "Slug de l'événement" },
       { path: "tiers.0.name", note: "Nom public" },
     ]);
   });
@@ -316,7 +352,6 @@ describe("drafts", () => {
 
   it("lists what still blocks a production build of the committed config", () => {
     expect(shippingProblems(TICKETING).map((p) => p.path)).toEqual([
-      "opening.time",
       "tierNames",
       "strategic.name",
       "strategic.networking",
@@ -341,13 +376,13 @@ describe("strategicPrice", () => {
 
   it("shows a fixed price in every phase", () => {
     const fixed = withPrice({ kind: "fixed", amount: 449 });
-    expect(strategicPrice(fixed, "pre_opening")).toBe(449);
+    expect(strategicPrice(fixed, "seb")).toBe(449);
     expect(strategicPrice(fixed, "last_chance")).toBe(449);
   });
 
-  it("follows the tier on offer when priced per tier — the first one before the opening", () => {
+  it("follows the tier on offer when priced per tier", () => {
     const perTier = withPrice({ kind: "per_tier", amounts: { seb: 399, eb: 449, regular: 499, last_chance: 549 } });
-    expect(strategicPrice(perTier, "pre_opening")).toBe(399);
+    expect(strategicPrice(perTier, "seb")).toBe(399);
     expect(strategicPrice(perTier, "eb")).toBe(449);
     expect(strategicPrice(perTier, "regular")).toBe(499);
   });

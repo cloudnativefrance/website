@@ -5,28 +5,32 @@
  * `TicketsPage` wraps it in the layout; kept apart so the demo matrix test can
  * render every phase without a site origin.
  *
- * Everything is derived from `src/config/tickets.ts` and the phase, so the demo
- * routes and a future production route render the same page. Every purchase —
- * door 1, the Strategy & Leadership band, the mobile bar — goes to the alf.io
- * listing through one `purchaseTarget`. An undecided value shows its draft or
- * nothing (`shown`), and a production-origin build refuses the page while a
- * draft is left (`assertShippable`).
+ * Rendered for a selling phase only — before the opening /billetterie is the
+ * "coming soon" page (`TicketsPage`). Everything is derived from
+ * `src/config/tickets.ts` and the tier on sale, so the demo routes and
+ * /billetterie render the same page. Every purchase — door 1, the Strategy &
+ * Leadership band, the mobile bar — goes to the alf.io listing through one
+ * `purchaseTarget`. An undecided value shows its draft or nothing (`shown`),
+ * and a production-origin build refuses the page while a draft is left
+ * (`assertShippable`) — which is why flipping `currentPhase` to the first tier
+ * is also the check that everything is decided.
  */
 import GeoBackground from "@/components/patterns/GeoBackground.astro";
-import { TICKETING, type Phase } from "@/config/tickets";
+import { TICKETING, type TierId } from "@/config/tickets";
 import { useTranslations } from "@/i18n/utils";
 import type { Locale } from "@/i18n/ui";
 import { CONTACT_EMAILS, TARGET_DATE } from "@/lib/event";
 import { buildMailto } from "@/lib/tickets/mailto";
 import { placeholdersAllowed } from "@/lib/tickets/demo";
 import { assertShippable, shown } from "@/lib/tickets/drafts";
-import { fill, formatDayMonth, formatFullDate, formatPrice, formatTime } from "@/lib/tickets/format";
+import { fill, formatFullDate, formatPrice } from "@/lib/tickets/format";
 import {
   assertTicketingConfig,
   cheaperGroupRates,
   offerTier,
   strategicPrice,
   tierStates,
+  tierUrgency,
 } from "@/lib/tickets/phase";
 import { alfioHost, codeFallbackAction, listingUrl, purchaseTarget } from "@/lib/tickets/purchase";
 import OfferDoor from "./OfferDoor.astro";
@@ -41,8 +45,9 @@ import StickyTicketBar from "./StickyTicketBar.astro";
 
 interface Props {
   lang: Locale;
-  phase: Phase;
-  /** Demo routes stripe the mobile bar so no capture passes for the real page. */
+  /** The tier on sale. */
+  phase: TierId;
+  /** Non-production builds stripe the mobile bar so no capture passes for the real page. */
   demo?: boolean;
 }
 
@@ -56,6 +61,7 @@ if (!placeholdersAllowed()) assertShippable(config);
 
 const tier = offerTier(config, phase);
 const ladder = tierStates(config, phase);
+const urgency = tierUrgency(config, tier);
 const rates = cheaperGroupRates(config, tier);
 const host = alfioHost(config);
 const email = CONTACT_EMAILS.tickets;
@@ -63,22 +69,16 @@ const email = CONTACT_EMAILS.tickets;
 const groupMailto = buildMailto(email, t("tickets.team.mail.subject"), t("tickets.team.mail.body"));
 const inclusionMailto = buildMailto(email, t("tickets.inclusion.mail.subject"), t("tickets.inclusion.mail.body"));
 
-// One action for the whole page: the alf.io listing, or before the opening the
-// newsletter. Door 1, the Strategy & Leadership band and the mobile bar share it.
-const target = purchaseTarget(config, phase);
+// One action for the whole page, the alf.io listing: door 1, the Strategy &
+// Leadership band and the mobile bar share it.
+const target = purchaseTarget(config);
 
 // Door 2 is rendered only when a group rate actually beats the price of the
 // moment and fits the tier's order cap; below that it had nothing to sell.
 // Everything else about the first viewport follows from it.
 const showTeam = rates.length > 0;
-const showCode = phase !== "pre_opening";
 const wideOffer = !showTeam;
 
-const openingTime = shown(config.opening.time);
-const opening = {
-  date: config.opening.date,
-  time: openingTime === undefined ? undefined : formatTime(openingTime, lang),
-};
 const programmeWhen = shown(config.programmeAnnouncement)?.[lang];
 
 const eventDate = formatFullDate(TARGET_DATE, lang);
@@ -92,13 +92,9 @@ const when = {
 };
 
 const sticky = {
-  label: phase === "pre_opening" ? fill(t("tickets.sticky.opens"), { date: formatDayMonth(config.opening.date, lang) }) : tier.name[lang],
+  label: tier.name[lang],
   price: formatPrice(tier.price, lang),
-  action: {
-    href: target.href,
-    rel: target.rel,
-    text: t(target.kind === "listing" ? "tickets.sticky.buy" : "tickets.sticky.notify"),
-  },
+  action: { href: target.href, rel: target.rel, text: t("tickets.sticky.buy") },
   analytics: {
     "data-umami-event-billet": "standard",
     "data-umami-event-palier": tier.id,
@@ -132,7 +128,7 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
         {/* `flex flex-col` so door 1 inherits the row height the right column
             sets, rather than sitting short inside a stretched wrapper. */}
         <div class:list={["flex flex-col", wideOffer ? "lg:col-span-12" : "lg:col-span-8"]}>
-          <OfferDoor lang={lang} phase={phase} tier={tier} ladder={ladder} opening={opening}>
+          <OfferDoor lang={lang} tier={tier} ladder={ladder} urgency={urgency}>
             <PurchaseControl
               slot="purchase"
               target={target}
@@ -155,7 +151,7 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
             />
           </div>
         )}
-        {showCode && !showTeam && (
+        {!showTeam && (
           <div class="lg:col-span-12">
             <CodeDoor
               lang={lang}

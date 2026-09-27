@@ -1,22 +1,11 @@
 ---
-import Layout from "@/layouts/Layout.astro";
-import { useTranslations } from "@/i18n/utils";
-
-const lang = "fr";
-const t = useTranslations(lang);
+/**
+ * The ticketing page, in the phase `src/config/tickets.ts` sets: the "coming
+ * soon" page until the opening, then the tier on sale. Changing phase is
+ * changing `currentPhase` and shipping.
+ */
+import TicketsPage from "@/components/tickets/TicketsPage.astro";
+import { TICKETING } from "@/config/tickets";
 ---
 
-<Layout title={t("nav.tickets")} description={t("tickets.opening.body")} lang={lang}>
-  <main class="mx-auto max-w-3xl px-4 md:px-6 py-24 md:py-32 text-center">
-    <span class="inline-flex items-center gap-2 rounded-full bg-accent/15 text-accent px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-      <span aria-hidden="true">🎟️</span>
-      {t("tickets.opening.badge")}
-    </span>
-    <h1 class="mt-5 text-4xl md:text-5xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
-      {t("tickets.opening.title")} <span class="text-primary whitespace-nowrap">{t("tickets.opening.date")}</span>
-    </h1>
-    <p class="mt-6 text-base md:text-lg text-muted-foreground">
-      {t("tickets.opening.body")}
-    </p>
-  </main>
-</Layout>
+<TicketsPage lang="fr" phase={TICKETING.currentPhase} />

@@ -2,7 +2,8 @@
 /**
  * Demo-only phase switcher: each phase is a link to a pre-rendered page —
  * exactly what a production build renders in that phase, with no client
- * re-implementation. Never rendered outside the demo routes.
+ * re-implementation. Rendered on every ticketing page of a non-production
+ * build (/billetterie included), never on a production one.
  *
  * It stays out of the way on purpose: the page must look exactly like the
  * future production page, so the only permanent mark is the striped "DÉMO"
@@ -18,7 +19,7 @@ interface Props {
   lang: Locale;
   config: TicketingConfig;
   phase: Phase;
-  /** True on the entry URL, which shows the config's own phase. */
+  /** True on /billetterie and /en/tickets, which show the config's own phase. */
   fromConfig: boolean;
 }
 
@@ -86,7 +87,7 @@ const active = "bg-foreground text-background";
         <div class="flex flex-wrap gap-1">
           {DEMO_PHASES.map((p) => (
             <a
-              href={demoPath(p)}
+              href={demoPath(p, lang)}
               class:list={[chip, !fromConfig && p === phase ? active : idle]}
               aria-current={!fromConfig && p === phase ? "page" : undefined}
               data-demo-link

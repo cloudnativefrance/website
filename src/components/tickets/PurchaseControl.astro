@@ -1,15 +1,12 @@
 ---
 /**
  * The purchase action, rendered from a `PurchaseTarget` — door 1 and the
- * Strategy & Leadership band render the same one:
- *
- *   listing — one link to the alf.io listing, where the quantity is chosen.
- *   notify  — before the opening: the newsletter, no purchase anywhere.
- *
- * Both open a new tab, and say so to screen readers.
+ * Strategy & Leadership band render the same one: one link to the alf.io
+ * listing, where the quantity is chosen, in a new tab that screen readers hear
+ * about.
  */
 import type { PurchaseTarget } from "@/lib/tickets/purchase";
-import type { Phase } from "@/config/tickets";
+import type { TierId } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Icon from "./Icon.astro";
@@ -17,7 +14,7 @@ import Icon from "./Icon.astro";
 interface Props {
   target: PurchaseTarget;
   lang: Locale;
-  phase: Phase;
+  phase: TierId;
   analytics: { billet: "standard" | "strategique"; palier: string };
 }
 
@@ -34,23 +31,10 @@ const buttonClass =
   "inline-flex h-13 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-primary px-7 text-xl font-bold text-primary-foreground shadow-[var(--shadow-glow-primary)] transition-[background-color,scale] duration-150 ease-out hover:bg-primary/90 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-card";
 ---
 
-{target.kind === "listing" && (
-  <div>
-    <a href={target.href} target="_blank" rel={target.rel} class={buttonClass} data-umami-event="tickets-purchase" {...umami}>
-      {t("tickets.purchase.buy")}
-      <span class="sr-only"> {t("tickets.new_tab")}</span>
-      <Icon name="arrow-right" size={20} />
-    </a>
-  </div>
-)}
-
-{target.kind === "notify" && (
-  <div class="flex flex-col items-start gap-2">
-    <a href={target.href} target="_blank" rel={target.rel} class={buttonClass} data-umami-event="tickets-notify" {...umami}>
-      <Icon name="bell" size={20} />
-      {t("tickets.offer.notify")}
-      <span class="sr-only"> {t("tickets.new_tab")}</span>
-    </a>
-    <p class="text-sm text-muted-foreground">{t("tickets.offer.notify_note")}</p>
-  </div>
-)}
+<div>
+  <a href={target.href} target="_blank" rel={target.rel} class={buttonClass} data-umami-event="tickets-purchase" {...umami}>
+    {t("tickets.purchase.buy")}
+    <span class="sr-only"> {t("tickets.new_tab")}</span>
+    <Icon name="arrow-right" size={20} />
+  </a>
+</div>

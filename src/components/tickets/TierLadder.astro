@@ -9,8 +9,8 @@
  * Only the selected box shows a date: the team may extend or re-quota a
  * future tier live, so no other one may promise a day.
  */
-import type { Phase, TierId } from "@/config/tickets";
-import type { TierWithState } from "@/lib/tickets/phase";
+import type { TierId } from "@/config/tickets";
+import type { TierUrgency, TierWithState } from "@/lib/tickets/phase";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { fill, formatDayMonthShort, formatPrice } from "@/lib/tickets/format";
@@ -18,24 +18,32 @@ import Icon from "./Icon.astro";
 
 interface Props {
   items: TierWithState[];
-  phase: Phase;
+  /** What ends the current tier — the same rule door 1 writes beside the price. */
+  urgency: TierUrgency;
   lang: Locale;
 }
 
-const { items, phase, lang } = Astro.props;
+const { items, urgency, lang } = Astro.props;
 const t = useTranslations(lang);
 
 type Tone = "past" | "selected" | "upcoming";
 
-/**
- * The tier on offer is drawn as selected: the current one while selling, the
- * first one before the ticketing opens — the same tier door 1 shows in full.
- */
-function toneOf(item: TierWithState, index: number): Tone {
+/** The tier on sale is drawn as selected — the same tier door 1 shows in full. */
+function toneOf(item: TierWithState): Tone {
   if (item.state.kind === "past") return "past";
   if (item.state.kind === "current") return "selected";
-  return phase === "pre_opening" && index === 0 ? "selected" : "upcoming";
+  return "upcoming";
 }
+
+// The date that ends the tier on offer, where it belongs: on the timeline, in
+// the box it applies to — abbreviated, the box is narrow. The last tier gets
+// none: it runs to the event day, which the page has already given twice.
+const pill = urgency.limitedStock ? t("tickets.ladder.limited_stock") : undefined;
+const deadline = urgency.endsAt
+  ? fill(t(urgency.limitedStock ? "tickets.ladder.until_or_sold_out" : "tickets.ladder.until"), {
+      date: formatDayMonthShort(urgency.endsAt, lang),
+    })
+  : undefined;
 
 // Three surfaces, not three hues. The selected tier is the only filled card:
 // tinted, thick-edged, lifted. Past is a ghost. Upcoming is an empty outline —
@@ -57,19 +65,9 @@ const tierIds: TierId[] = items.map((i) => i.tier.id);
 
   <ol class="grid grid-cols-1 gap-6 sm:grid-cols-4 sm:items-start sm:gap-7">
     {items.map((item, index) => {
-      const tone = toneOf(item, index);
+      const tone = toneOf(item);
       const isPast = tone === "past";
       const isLast = index === items.length - 1;
-      // The date that ends the tier on offer, where it belongs: on the
-      // timeline, in the box it applies to. The last tier gets none — it runs
-      // to the event day, which the page has already given twice.
-      const pill = item.tier.closesWhenSoldOut ? t("tickets.ladder.limited_stock") : undefined;
-      const deadline = isLast
-        ? undefined
-        : fill(
-            t(item.tier.closesWhenSoldOut ? "tickets.ladder.until_or_sold_out" : "tickets.ladder.until"),
-            { date: formatDayMonthShort(item.tier.endsAt, lang) },
-          );
       return (
         <li
           class:list={[
@@ -87,7 +85,7 @@ const tierIds: TierId[] = items.map((i) => i.tier.id);
                   where shape and colour carry nothing. */}
               {tone === "selected" && (
                 <span class="sr-only">
-                  {" · "}{t(phase === "pre_opening" ? "tickets.ladder.opening" : "tickets.ladder.current")}
+                  {" · "}{t("tickets.ladder.current")}
                 </span>
               )}
             </span>

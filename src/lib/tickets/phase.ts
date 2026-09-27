@@ -7,9 +7,9 @@
  */
 import type {
   GroupRate,
-  Phase,
   TicketingConfig,
   TierDefinition,
+  TierId,
 } from "@/config/tickets";
 import { shown } from "./drafts";
 
@@ -20,16 +20,8 @@ export interface TierWithState {
   state: TierState;
 }
 
-export function isSelling(phase: Phase): boolean {
-  return phase !== "pre_opening";
-}
-
-/**
- * The tier the page offers: the current one while selling, the opening tier
- * before the ticketing opens.
- */
-export function offerTier(config: TicketingConfig, phase: Phase): TierDefinition {
-  if (phase === "pre_opening") return config.tiers[0];
+/** The tier `phase` sells. Every caller renders a selling phase: `pre_opening` is the "coming soon" page. */
+export function offerTier(config: TicketingConfig, phase: TierId): TierDefinition {
   const tier = config.tiers.find((t) => t.id === phase);
   if (!tier) throw new Error(`[tickets] unknown phase "${phase}"`);
   return tier;
@@ -40,18 +32,40 @@ export function offerTier(config: TicketingConfig, phase: Phase): TierDefinition
  * full stop: the page says "Épuisé" for all of them, so nothing here has to
  * know whether it sold out or ran to its date.
  */
-export function tierStates(config: TicketingConfig, phase: Phase): TierWithState[] {
-  const currentIndex =
-    phase === "pre_opening" ? -1 : config.tiers.findIndex((t) => t.id === phase);
-  if (phase !== "pre_opening" && currentIndex === -1) {
-    throw new Error(`[tickets] unknown phase "${phase}"`);
-  }
+export function tierStates(config: TicketingConfig, phase: TierId): TierWithState[] {
+  const currentIndex = config.tiers.findIndex((t) => t.id === phase);
+  if (currentIndex === -1) throw new Error(`[tickets] unknown phase "${phase}"`);
 
   return config.tiers.map((tier, index) => {
     if (index < currentIndex) return { tier, state: { kind: "past" } };
     if (index === currentIndex) return { tier, state: { kind: "current" } };
     return { tier, state: { kind: "upcoming" } };
   });
+}
+
+/** What ends the price of a tier. Never a quota, never a count. */
+export interface TierUrgency {
+  /** ISO end date; undefined on the last tier. */
+  endsAt?: string;
+  /** The tier also closes when its quota runs out: "Stock limité". */
+  limitedStock: boolean;
+  /** Nothing follows it: "Dernières places". */
+  lastTier: boolean;
+}
+
+/**
+ * What ends the price of `tier`, as door 1 and the ladder both say it: the
+ * date — never on the last tier, which runs to the event day the page already
+ * gives — and whether its stock can run out before that. One rule for both, so
+ * the big price and the timeline cannot disagree.
+ */
+export function tierUrgency(config: TicketingConfig, tier: TierDefinition): TierUrgency {
+  const lastTier = config.tiers[config.tiers.length - 1]?.id === tier.id;
+  return {
+    endsAt: lastTier ? undefined : tier.endsAt,
+    limitedStock: tier.closesWhenSoldOut,
+    lastTier,
+  };
 }
 
 /**
@@ -120,11 +134,7 @@ export function ticketingConfigProblems(config: TicketingConfig): string[] {
     }
   }
 
-  const currentIndex =
-    config.currentPhase === "pre_opening"
-      ? -1
-      : tiers.findIndex((t) => t.id === config.currentPhase);
-  if (config.currentPhase !== "pre_opening" && currentIndex === -1) {
+  if (config.currentPhase !== "pre_opening" && !tiers.some((t) => t.id === config.currentPhase)) {
     problems.push(`currentPhase "${config.currentPhase}" matches no tier`);
   }
 
@@ -140,10 +150,10 @@ export function assertTicketingConfig(config: TicketingConfig): void {
 
 /**
  * The Strategy & Leadership price to show in `phase`: a fixed amount, or the
- * amount of the tier on offer (the first one before the opening). Undefined
- * while the price is undecided — its row is then not rendered.
+ * amount of the tier on offer. Undefined while the price is undecided — its row
+ * is then not rendered.
  */
-export function strategicPrice(config: TicketingConfig, phase: Phase): number | undefined {
+export function strategicPrice(config: TicketingConfig, phase: TierId): number | undefined {
   const price = shown(config.strategic.price);
   if (price === undefined) return undefined;
   return price.kind === "fixed" ? price.amount : price.amounts[offerTier(config, phase).id];

@@ -1,0 +1,21 @@
+---
+/**
+ * Hidden demo of the ticketing page, one URL per phase, for the team to walk
+ * the whole season on staging: /billetterie/demo/early-bird/.
+ *
+ * `getStaticPaths` returns nothing on a build for the production origin, so
+ * these URLs never exist on cloudnativedays.fr (see src/lib/tickets/demo.ts).
+ * /billetterie itself shows the config's own phase.
+ */
+import TicketsPage from "@/components/tickets/TicketsPage.astro";
+import type { Phase } from "@/config/tickets";
+import { demoStaticPaths, ticketDemosEnabled } from "@/lib/tickets/demo";
+
+export function getStaticPaths() {
+  return ticketDemosEnabled() ? demoStaticPaths() : [];
+}
+
+const { phase } = Astro.props as { phase: Phase };
+---
+
+<TicketsPage lang="fr" phase={phase} simulated />

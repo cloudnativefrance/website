@@ -46,10 +46,9 @@ export function formatTime(hhmm: string, lang: Locale): string {
   return m && m !== "00" ? `${Number(h)}\u00a0h\u00a0${m}` : `${Number(h)}\u00a0h`;
 }
 
-/** "dimanche 29 novembre" / "Sunday 29 November". */
+/** "29 novembre" / "29 November". Under door 1's price, where there is room for the month. */
 export function formatDayMonth(iso: string, lang: Locale): string {
   return new Intl.DateTimeFormat(LOCALE_TAG[lang], {
-    weekday: "long",
     day: "numeric",
     month: "long",
     timeZone: "Europe/Paris",

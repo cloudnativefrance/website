@@ -1,31 +1,40 @@
 ---
 /**
  * Door 1, "I'm taking my seat": the dominant door. The price of the moment at
- * monumental scale, the purchase action, and the whole season's ladder
- * underneath — the ladder is the offer, not a second section repeating it,
- * and it is where the date that ends this price is written.
+ * monumental scale, what ends it right beside it — the pink pill by the name,
+ * the date under the price — the purchase action, and the whole season's
+ * ladder underneath, which repeats the date in the box it applies to.
  */
-import type { Phase, TierDefinition } from "@/config/tickets";
-import type { TierWithState } from "@/lib/tickets/phase";
+import type { TierDefinition } from "@/config/tickets";
+import type { TierUrgency, TierWithState } from "@/lib/tickets/phase";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { fill, formatDayMonth, priceParts } from "@/lib/tickets/format";
+import Icon from "./Icon.astro";
 import TierLadder from "./TierLadder.astro";
 
 interface Props {
   lang: Locale;
-  phase: Phase;
   tier: TierDefinition;
   ladder: TierWithState[];
-  /** Opening day and, once decided, time — shown before the ticketing opens. */
-  opening: { date: string; time?: string };
+  urgency: TierUrgency;
 }
 
-const { lang, phase, tier, ladder, opening } = Astro.props;
+const { lang, tier, ladder, urgency } = Astro.props;
 const t = useTranslations(lang);
 const price = priceParts(tier.price, lang);
-// Derived rather than passed: the ladder already knows the order of the tiers.
-const isLastTier = ladder[ladder.length - 1]?.tier.id === tier.id;
+// One pink pill, by the name: "Dernières places" on the last tier, "Stock
+// limité" on a tier that can sell out before its date. Never a quota, never a count.
+const pill = urgency.lastTier
+  ? t("tickets.offer.last_seats")
+  : urgency.limitedStock
+    ? t("tickets.ladder.limited_stock")
+    : undefined;
+const deadline = urgency.endsAt
+  ? fill(t(urgency.limitedStock ? "tickets.ladder.until_or_sold_out" : "tickets.ladder.until"), {
+      date: formatDayMonth(urgency.endsAt, lang),
+    })
+  : undefined;
 ---
 
 <article
@@ -40,15 +49,11 @@ const isLastTier = ladder[ladder.length - 1]?.tier.id === tier.id;
 
   <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-10">
     <div class="flex flex-col justify-center gap-3">
-      {/* The name, and on the last tier the section's one pink: nothing
-          follows it, so the ladder box below has no date to carry and the
-          pill would be alone there — and too wide for one line. Never a
-          quota, never a count. */}
       <p class="flex flex-wrap items-center gap-x-3 gap-y-2 text-lg font-semibold text-foreground">
-        <span>{phase === "pre_opening" ? `${t("tickets.offer.opening_label")} · ${tier.name[lang]}` : tier.name[lang]}</span>
-        {isLastTier && (
-          <span class="inline-flex items-center rounded-full bg-accent px-2.5 py-1 text-xs font-bold uppercase leading-none tracking-[0.06em] text-accent-foreground">
-            {t("tickets.offer.last_seats")}
+        <span>{tier.name[lang]}</span>
+        {pill && (
+          <span class="inline-flex items-center rounded-full bg-accent px-2.5 py-1 text-xs font-bold uppercase leading-none tracking-[0.06em] text-accent-foreground" data-offer-pill>
+            {pill}
           </span>
         )}
       </p>
@@ -60,19 +65,19 @@ const isLastTier = ladder[ladder.length - 1]?.tier.id === tier.id;
         </span>
         <span class="text-base font-medium text-muted-foreground">{t("tickets.offer.ttc")}</span>
       </p>
+      {/* The price's own caption: the day it ends, where the eye already is.
+          None on the last tier, which runs to the event day. */}
+      {deadline && (
+        <p class="flex items-center gap-2 text-base font-semibold text-foreground text-pretty" data-offer-deadline>
+          <Icon name="clock" size={18} class="shrink-0" />
+          <span>{deadline}</span>
+        </p>
+      )}
     </div>
 
     {/* The action column — the mobile bar watches it (tickets-ui.ts) and takes
-        over as soon as it leaves the screen. Before the opening it carries the
-        opening day and time next to the notification, not a lone button. */}
+        over as soon as it leaves the screen. */}
     <div class="flex flex-col justify-center gap-4" data-offer-action>
-      {phase === "pre_opening" && (
-        <p class="text-lg font-semibold text-foreground text-pretty">
-          {opening.time
-            ? fill(t("tickets.offer.opens"), { date: formatDayMonth(opening.date, lang), time: opening.time })
-            : fill(t("tickets.offer.opens_day"), { date: formatDayMonth(opening.date, lang) })}
-        </p>
-      )}
       <slot name="purchase" />
     </div>
   </div>
@@ -82,6 +87,6 @@ const isLastTier = ladder[ladder.length - 1]?.tier.id === tier.id;
       the ladder then sits flush with the bottom of the card and the two
       columns end on the same line. */}
   <div class="border-t border-border pt-7 lg:mt-auto">
-    <TierLadder items={ladder} phase={phase} lang={lang} />
+    <TierLadder items={ladder} urgency={urgency} lang={lang} />
   </div>
 </article>

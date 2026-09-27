@@ -5,8 +5,7 @@
  * decision-makers find it without it outshining the standard ticket.
  *
  * Always displayed and always on sale: its action is the page's own — the
- * alf.io listing, or the newsletter before the opening — passed in the
- * `purchase` slot. Its quota is never shown, like every other.
+ * alf.io listing — passed in the `purchase` slot. Its quota is never shown, like every other.
  */
 import type { StrategicTicket } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
@@ -75,9 +74,7 @@ const topics = [1, 2, 3, 4, 5, 6].map((n) => t(`tickets.strategic.topic.${n}` as
         </dl>
       )}
 
-      <div class="strategic-purchase">
-        <slot name="purchase" />
-      </div>
+      <slot name="purchase" />
 
       {teamHref && (
         <a href={teamHref} class="inline-flex items-center gap-1.5 self-start text-sm font-medium text-primary-foreground underline-offset-4 hover:underline">
@@ -88,11 +85,3 @@ const topics = [1, 2, 3, 4, 5, 6].map((n) => t(`tickets.strategic.topic.${n}` as
     </div>
   </div>
 </section>
-
-<style>
-  /* The shared purchase control is drawn for light cards; on the purple band
-     its note takes the band's own ink. */
-  .strategic-purchase :global(.text-muted-foreground) {
-    color: var(--color-chart-4);
-  }
-</style>

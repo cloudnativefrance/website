@@ -2,10 +2,13 @@
 /**
  * The group rates of the moment, as a price list in door 2.
  *
- * Each row carries the discount against the current tier in the section's pink,
- * the same pill as "Stock limité": the percentage is what a manager reads first,
- * the price per seat is what they check second. Nothing is clickable — door 2's
- * own call to action is the way to ask for a rate.
+ * Read as information, not as options to pick (27/09/2026): no box around a
+ * row, no hover — one line per rate between hairlines, the group size on the
+ * left, the price per seat on the right with its discount against the current
+ * tier stuck to it as a price tag, in the section's pink (the "Stock limité"
+ * family, a size smaller). Pink text alone would not pass contrast on a white
+ * card; the tag's dark ink does. Nothing is clickable: door 2's own call to
+ * action is the way to ask for a rate.
  */
 import type { GroupRate, TierDefinition } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
@@ -24,18 +27,22 @@ const { lang, tier, rates, class: className } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-<ul class:list={["flex flex-col divide-y divide-border overflow-hidden rounded-lg border border-border", className]}>
+{/* One grid for the whole list, each row a subgrid: the prices share a column,
+    so they start on the same line whatever the width of the tag after them
+    ("−15 %" is narrower than "−25 %"). */}
+<dl class:list={["grid grid-cols-[1fr_auto_auto] gap-x-2 divide-y divide-border border-y border-border", className]}>
   {rates.map((rate) => (
-    <li class="flex flex-col gap-1 px-4 py-3" data-group-rate={rate.id}>
-      <span class="flex items-center justify-between gap-3">
-        <span class="text-sm text-muted-foreground">{t(`tickets.team.rate.${rate.id}`)}</span>
-        <span class="inline-flex items-center rounded-full bg-accent px-2 py-1 text-xs font-bold leading-none tabular-nums tracking-[0.02em] text-accent-foreground">
-          {formatDiscount(tier.price, rate.price, lang)}
-        </span>
-      </span>
-      <span class="text-xl font-bold tabular-nums tracking-[-0.02em] text-foreground">
+    <div class="col-span-3 grid grid-cols-subgrid items-baseline py-2.5" data-group-rate={rate.id}>
+      <dt class="pr-2 text-sm text-muted-foreground">{t(`tickets.team.rate.${rate.id}`)}</dt>
+      <dd class="whitespace-nowrap text-lg font-semibold tabular-nums tracking-[-0.01em] text-foreground">
         {formatPrice(rate.price, lang)}
-      </span>
-    </li>
+      </dd>
+      <dd
+        class="self-center justify-self-start whitespace-nowrap rounded-full bg-accent px-1.5 py-0.5 text-xs font-bold leading-none tabular-nums text-accent-foreground"
+        data-group-discount
+      >
+        {formatDiscount(tier.price, rate.price, lang)}
+      </dd>
+    </div>
   ))}
-</ul>
+</dl>

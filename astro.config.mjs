@@ -88,7 +88,8 @@ export default defineConfig({
       filter: (page) =>
         !/\/replays\/?$/.test(page) &&
         !/\/en\/replays\/?$/.test(page) &&
-        !/\/billetterie\/demo(\/|$)/.test(page),
+        !/\/billetterie\/demo(\/|$)/.test(page) &&
+        !/\/en\/tickets\/demo(\/|$)/.test(page),
       i18n: {
         defaultLocale: "fr",
         locales: { fr: "fr-FR", en: "en-US" },

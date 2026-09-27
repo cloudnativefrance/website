@@ -14,7 +14,7 @@
  * refuses an empty code with a message.
  * The hand-off to the ticketing host is announced before the click.
  */
-import type { Phase } from "@/config/tickets";
+import type { TierId } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { fill } from "@/lib/tickets/format";
@@ -22,7 +22,7 @@ import Icon from "./Icon.astro";
 
 interface Props {
   lang: Locale;
-  phase: Phase;
+  phase: TierId;
   listingUrl: string;
   fallback: { action: string; param: "code" };
   host: string;

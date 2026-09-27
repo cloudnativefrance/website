@@ -12,8 +12,9 @@
  * live in alf.io.
  *
  * **Changing phase is changing `currentPhase` and shipping.** There is no date
- * logic: when a tier ends — early or on its date — set `currentPhase` to the
- * next tier. Every tier behind the current one reads "Épuisé" on the page.
+ * logic. `pre_opening` serves the "coming soon" page at /billetterie; on the
+ * opening day set it to the first tier, and when a tier ends — early or on its
+ * date — to the next one. Every tier behind the current one reads "Épuisé".
  *
  * **Unknowns are `tbd()`, never a plausible guess.** A `tbd` renders nothing
  * of its own: the page shows its draft when it has one — as the copy it will
@@ -44,6 +45,7 @@ export type Maybe<T> = T | Tbd<T>;
 export type Localized = { fr: string; en: string };
 
 export type TierId = "seb" | "eb" | "regular" | "last_chance";
+/** `pre_opening` is the "coming soon" page; a tier id is the ticketing page selling it. */
 export type Phase = "pre_opening" | TierId;
 
 export interface TierDefinition {
@@ -89,7 +91,6 @@ export interface StrategicTicket {
 
 export interface TicketingConfig {
   alfio: { baseUrl: string; eventSlug: string };
-  opening: { date: string; time: Maybe<string> };
   currentPhase: Phase;
   tiers: readonly TierDefinition[];
   /** Public tier names are still the working names of the pricing sheet: `true` once final. */
@@ -117,10 +118,9 @@ export const TICKETING: TicketingConfig = {
     baseUrl: "https://billetterie.cloudnativedays.fr",
     eventSlug: "cnd-2027",
   },
-  opening: {
-    date: "2026-10-13",
-    time: tbd("Heure d'ouverture des ventes", "10:00"),
-  },
+  // Ticketing opens on 13 October 2026: until then /billetterie is the "coming
+  // soon" page. Opening day is this line set to "seb" — a production build then
+  // refuses the page until every tbd() below is decided (`assertShippable`).
   currentPhase: "pre_opening",
   tiers: [
     {

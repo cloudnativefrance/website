@@ -1,9 +1,11 @@
 /**
  * Hidden demo routes for the ticketing page, and the gate on unfinished values.
  *
- * The demo exists so the ticketing team can walk the page through every phase
- * on staging before it replaces /billetterie. It must never reach a production
- * build: the gate reads the build's origin, the same fail-closed rule as
+ * /billetterie and /en/tickets serve the config's own phase everywhere. The
+ * demo adds one page per phase under /billetterie/demo/ and /en/tickets/demo/
+ * so the ticketing team can walk the whole season on staging, and a switcher
+ * on every ticketing page. Neither may reach a production build: the gate
+ * reads the build's origin, the same fail-closed rule as
  * `src/lib/preview-fixture.ts` — an unset or empty PUBLIC_SITE_URL means
  * production, so a misconfigured pipeline hides the demo rather than
  * publishing it. `astro dev` always has it.
@@ -12,6 +14,8 @@
  * refuses the page while the config still holds one (`assertShippable`).
  */
 import type { Phase } from "@/config/tickets";
+import type { Locale } from "@/i18n/ui";
+import { getLocalePath } from "@/i18n/utils";
 import { isProductionOrigin, resolveSiteOrigin } from "@/lib/site-env";
 
 interface GateInput {
@@ -38,21 +42,12 @@ export const PHASE_SLUGS: Record<Phase, string> = {
   last_chance: "last-chance",
 };
 
-const DEMO_BASE = "/billetterie/demo";
-
-export interface DemoState {
-  /** Undefined on the entry URL: the page then shows the config's own phase. */
-  phase?: Phase;
+/** The URL of one simulated phase: /billetterie/demo/early-bird/, /en/tickets/demo/early-bird/. */
+export function demoPath(phase: Phase, lang: Locale): string {
+  return `${getLocalePath(lang, "/tickets/demo")}/${PHASE_SLUGS[phase]}/`;
 }
 
-export function demoPath(phase?: Phase): string {
-  return phase ? `${DEMO_BASE}/${PHASE_SLUGS[phase]}/` : `${DEMO_BASE}/`;
-}
-
-/** Every demo URL as `[...demo]` route params, the entry URL first. */
-export function demoStaticPaths(): Array<{ params: { demo: string }; props: DemoState }> {
-  return [
-    { params: { demo: "demo" }, props: {} },
-    ...DEMO_PHASES.map((phase) => ({ params: { demo: `demo/${PHASE_SLUGS[phase]}` }, props: { phase } })),
-  ];
+/** Every demo phase as `demo/[phase]` route params — the same slugs in both languages. */
+export function demoStaticPaths(): Array<{ params: { phase: string }; props: { phase: Phase } }> {
+  return DEMO_PHASES.map((phase) => ({ params: { phase: PHASE_SLUGS[phase] }, props: { phase } }));
 }
