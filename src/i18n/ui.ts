@@ -431,8 +431,9 @@ export const ui = {
     "tickets.when_evening": "soirée comprise",
     "tickets.lead":
       "Une journée de conférences et de retours d'expérience cloud native, en français, par et pour la communauté.",
-    "tickets.door.offer": "Je prends ma place",
     "tickets.door.code": "J'ai un code",
+    // {name} is the config's public ticket name: Conférence, Executive.
+    "tickets.offer.ticket": "Billet {name}",
     "tickets.offer.ttc": "TTC",
     "tickets.offer.last_seats": "Dernières places",
     "tickets.purchase.buy": "Acheter mon billet",
@@ -445,7 +446,8 @@ export const ui = {
     "tickets.ladder.sold_out": "Épuisé",
     // Screen readers only: on screen, the selected card says it without a word.
     "tickets.ladder.current": "Tarif en cours",
-    "tickets.team.rates": "Tarifs de groupe, par place",
+    // Names the ticket the rates apply to, now that door 1 sells two.
+    "tickets.team.rates": "Billet {name}, par place",
     "tickets.team.rate.4_9": "De 4 à 9 personnes",
     "tickets.team.rate.10_plus": "10 personnes et plus",
     "tickets.team.cta.group": "Demander mon tarif de groupe",
@@ -467,24 +469,10 @@ export const ui = {
     "tickets.code.submit": "Utiliser mon code",
     "tickets.code.handoff": "Le code s'applique sur {host}, où vous finalisez votre commande.",
     "tickets.code.empty": "Saisissez votre code pour continuer.",
-    "tickets.strategic.lead":
-      "Nouveau en 2027\u00a0: un billet pour celles et ceux qui portent les décisions technologiques. CTO, DSI, VP Engineering, Head of Platform, responsables d'équipes techniques.",
-    "tickets.strategic.body":
-      "Une salle dédiée et des talks exclusifs\u00a0: des retours d'expérience stratégiques et des échanges entre pairs sur ce qui dépasse le code.",
-    "tickets.strategic.topics": "Les sujets",
-    "tickets.strategic.topic.1": "Souveraineté numérique",
-    "tickets.strategic.topic.2": "Maîtrise des coûts cloud",
-    "tickets.strategic.topic.3": "Platform engineering",
-    "tickets.strategic.topic.4": "Passage à l'échelle des organisations",
-    "tickets.strategic.topic.5": "Conformité",
-    "tickets.strategic.topic.6": "IA",
-    "tickets.strategic.no_pitch": "Des témoignages d'utilisateurs finaux, sans discours commercial.",
-    "tickets.strategic.fact.price": "Prix",
-    "tickets.strategic.fact.includes": "Ce qu'il comprend du billet standard",
-    "tickets.strategic.fact.programme": "Programme et intervenant(e)s",
-    "tickets.strategic.fact.networking": "Espace d'échange",
-    "tickets.strategic.fact.access": "Conditions d'accès",
-    "tickets.strategic.team": "Et pour votre équipe\u00a0: les tarifs de groupe",
+    // The track is open to every ticket: this one adds priority and the space.
+    "tickets.strategic.perks":
+      "Tout le billet {standard}, plus un accès prioritaire à la salle Stratégie & Leadership et un espace d'échange réservé.",
+    "tickets.strategic.track": "Découvrir le parcours Stratégie & Leadership",
     "tickets.included.title": "Ce que comprend votre billet",
     "tickets.included.talks": "Toutes les conférences et les retours d'expérience de la journée",
     "tickets.included.village": "Le village partenaires",
@@ -502,6 +490,9 @@ export const ui = {
     "tickets.faq.change.q": "Quand le prix change-t-il\u202f?",
     "tickets.faq.change.a":
       "Le tarif en cours s'arrête à la date affichée, ou plus tôt si ses places partent avant. Le suivant prend le relais aussitôt\u00a0: la billetterie ne ferme jamais entre deux tarifs.",
+    "tickets.faq.strategic.q": "Le parcours Stratégie & Leadership est-il réservé au billet {name}\u202f?",
+    "tickets.faq.strategic.a":
+      "Non. Ses talks sont ouverts à tous les billets, dans la limite des places de la salle. Le billet {name} y donne un accès prioritaire, et ouvre un espace d'échange qui lui est réservé.",
     "tickets.faq.per_order.q": "Combien de places par commande\u202f?",
     "tickets.faq.per_order.a": "Jusqu'à {early} aux deux premiers tarifs, jusqu'à {later} ensuite. Au-delà, écrivez-nous.",
     "tickets.faq.invoice.q": "Puis-je avoir une facture au nom de ma société\u202f?",
@@ -947,8 +938,8 @@ export const ui = {
     "tickets.when": "{date} · {venue}, Paris · one day",
     "tickets.when_evening": "evening included",
     "tickets.lead": "A day of cloud native talks and experience reports, in French, by and for the community.",
-    "tickets.door.offer": "I'm taking my seat",
     "tickets.door.code": "I have a code",
+    "tickets.offer.ticket": "{name} ticket",
     "tickets.offer.ttc": "VAT incl.",
     "tickets.offer.last_seats": "Last seats",
     "tickets.purchase.buy": "Buy my ticket",
@@ -961,7 +952,7 @@ export const ui = {
     "tickets.ladder.sold_out": "Sold out",
     // Screen readers only: on screen, the selected card says it without a word.
     "tickets.ladder.current": "Current price",
-    "tickets.team.rates": "Group rates, per seat",
+    "tickets.team.rates": "{name} ticket, per seat",
     "tickets.team.rate.4_9": "4 to 9 people",
     "tickets.team.rate.10_plus": "10 people or more",
     "tickets.team.cta.group": "Ask for my group rate",
@@ -983,24 +974,10 @@ export const ui = {
     "tickets.code.submit": "Use my code",
     "tickets.code.handoff": "The code applies on {host}, where you complete your order.",
     "tickets.code.empty": "Enter your code to continue.",
-    "tickets.strategic.lead":
-      "New in 2027: a ticket for the people who make technology decisions. CTOs, CIOs, VPs of Engineering, Heads of Platform, engineering managers.",
-    "tickets.strategic.body":
-      "A dedicated room and exclusive talks: strategic experience reports and peer conversations about what goes beyond the code.",
-    "tickets.strategic.topics": "The topics",
-    "tickets.strategic.topic.1": "Digital sovereignty",
-    "tickets.strategic.topic.2": "Keeping cloud costs in check",
-    "tickets.strategic.topic.3": "Platform engineering",
-    "tickets.strategic.topic.4": "Scaling organisations",
-    "tickets.strategic.topic.5": "Compliance",
-    "tickets.strategic.topic.6": "AI",
-    "tickets.strategic.no_pitch": "End-user stories, no sales pitch.",
-    "tickets.strategic.fact.price": "Price",
-    "tickets.strategic.fact.includes": "What it includes from the standard ticket",
-    "tickets.strategic.fact.programme": "Programme and speakers",
-    "tickets.strategic.fact.networking": "Networking area",
-    "tickets.strategic.fact.access": "Access conditions",
-    "tickets.strategic.team": "And for your team: the group rates",
+    // The track is open to every ticket: this one adds priority and the area.
+    "tickets.strategic.perks":
+      "Everything in the {standard} ticket, plus priority access to the Strategy & Leadership room and a reserved networking area.",
+    "tickets.strategic.track": "About the Strategy & Leadership track",
     "tickets.included.title": "What your ticket includes",
     "tickets.included.talks": "Every talk and experience report of the day",
     "tickets.included.village": "The partner village",
@@ -1018,6 +995,9 @@ export const ui = {
     "tickets.faq.change.q": "When does the price change?",
     "tickets.faq.change.a":
       "The current price ends on the date shown, or sooner if its seats go before then. The next one takes over at once: ticketing never closes between two prices.",
+    "tickets.faq.strategic.q": "Is the Strategy & Leadership track reserved for the {name} ticket?",
+    "tickets.faq.strategic.a":
+      "No. Its talks are open to every ticket, as long as the room has seats. The {name} ticket gives priority access to it and opens a networking area reserved for its holders.",
     "tickets.faq.per_order.q": "How many seats per order?",
     "tickets.faq.per_order.a": "Up to {early} at the first two prices, up to {later} after that. Beyond, write to us.",
     "tickets.faq.invoice.q": "Can I get an invoice in my company's name?",

@@ -4,7 +4,6 @@ import {
   assertTicketingConfig,
   cheaperGroupRates,
   offerTier,
-  strategicPrice,
   ticketingConfigProblems,
   tierStates,
   tierUrgency,
@@ -336,9 +335,22 @@ describe("drafts", () => {
     expect(shippingProblems({ ...decided, vatRate: tbd("Taux de TVA") })).toEqual([]);
   });
 
-  it("still requires the Strategy & Leadership price, which has no draft to show", () => {
-    const config = { ...decided, strategic: { ...decided.strategic, price: tbd("Prix") } };
-    expect(shippingProblems(config)).toEqual([{ path: "strategic.price", note: "Prix" }]);
+  it("still requires the two ticket names and the Strategy & Leadership price, even with no draft", () => {
+    const config = {
+      ...decided,
+      standardName: tbd("Nom du billet"),
+      strategic: { ...decided.strategic, name: tbd("Nom"), price: tbd("Prix") },
+    };
+    expect(shippingProblems(config)).toEqual([
+      { path: "standardName", note: "Nom du billet" },
+      { path: "strategic.name", note: "Nom" },
+      { path: "strategic.price", note: "Prix" },
+    ]);
+  });
+
+  it("lets the track page stay undecided — the link is simply not rendered", () => {
+    const config = { ...decided, strategic: { ...decided.strategic, trackUrl: tbd("Page du parcours") } };
+    expect(shippingProblems(config)).toEqual([]);
   });
 
   it("names every problem at once when it refuses", () => {
@@ -352,39 +364,16 @@ describe("drafts", () => {
 
   it("lists what still blocks a production build of the committed config", () => {
     expect(shippingProblems(TICKETING).map((p) => p.path)).toEqual([
+      "standardName",
       "tierNames",
       "strategic.name",
-      "strategic.networking",
+      "strategic.price",
+      "strategic.trackUrl",
       "contents",
       "eveningIncluded",
       "managerKitUrl",
       "programmeAnnouncement",
-      "strategic.price",
     ]);
-  });
-});
-
-describe("strategicPrice", () => {
-  const withPrice = (price: TicketingConfig["strategic"]["price"]): TicketingConfig => ({
-    ...TICKETING,
-    strategic: { ...TICKETING.strategic, price },
-  });
-
-  it("shows nothing while the price is undecided", () => {
-    expect(strategicPrice(withPrice(tbd("Prix")), "regular")).toBeUndefined();
-  });
-
-  it("shows a fixed price in every phase", () => {
-    const fixed = withPrice({ kind: "fixed", amount: 449 });
-    expect(strategicPrice(fixed, "seb")).toBe(449);
-    expect(strategicPrice(fixed, "last_chance")).toBe(449);
-  });
-
-  it("follows the tier on offer when priced per tier", () => {
-    const perTier = withPrice({ kind: "per_tier", amounts: { seb: 399, eb: 449, regular: 499, last_chance: 549 } });
-    expect(strategicPrice(perTier, "seb")).toBe(399);
-    expect(strategicPrice(perTier, "eb")).toBe(449);
-    expect(strategicPrice(perTier, "regular")).toBe(499);
   });
 });
 

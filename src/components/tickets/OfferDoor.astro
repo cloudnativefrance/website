@@ -1,9 +1,11 @@
 ---
 /**
- * Door 1, "I'm taking my seat": the dominant door. The price of the moment at
- * monumental scale, what ends it right beside it — the pink pill by the name,
- * the date under the price — the purchase action, and the whole season's
- * ladder underneath, which repeats the date in the box it applies to.
+ * The standard ticket — the dominant card, and the only elevated one. Its
+ * name is the heading (27/09/2026: no door title above it), then the price of
+ * the moment at monumental scale, what ends it right beside it — the pink pill
+ * by the tier, the date under the price — the purchase action, and the
+ * season's timeline underneath. No rule between price and timeline: they are
+ * one ticket, and the card's edge is what separates it from the next one.
  */
 import type { TierDefinition } from "@/config/tickets";
 import type { TierUrgency, TierWithState } from "@/lib/tickets/phase";
@@ -15,15 +17,17 @@ import TierLadder from "./TierLadder.astro";
 
 interface Props {
   lang: Locale;
+  /** The standard ticket's public name. */
+  ticketName: string;
   tier: TierDefinition;
   ladder: TierWithState[];
   urgency: TierUrgency;
 }
 
-const { lang, tier, ladder, urgency } = Astro.props;
+const { lang, ticketName, tier, ladder, urgency } = Astro.props;
 const t = useTranslations(lang);
 const price = priceParts(tier.price, lang);
-// One pink pill, by the name: "Dernières places" on the last tier, "Stock
+// One pink pill, by the tier: "Dernières places" on the last tier, "Stock
 // limité" on a tier that can sell out before its date. Never a quota, never a count.
 const pill = urgency.lastTier
   ? t("tickets.offer.last_seats")
@@ -43,20 +47,21 @@ const deadline = urgency.endsAt
   aria-labelledby="door-offer-title"
   style="--door-index: 0"
 >
-  <h2 id="door-offer-title" class="text-2xl font-semibold tracking-[-0.01em] text-foreground">
-    {t("tickets.door.offer")}
-  </h2>
-
-  <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-10">
-    <div class="flex flex-col justify-center gap-3">
-      <p class="flex flex-wrap items-center gap-x-3 gap-y-2 text-lg font-semibold text-foreground">
-        <span>{tier.name[lang]}</span>
-        {pill && (
-          <span class="inline-flex items-center rounded-full bg-accent px-2.5 py-1 text-xs font-bold uppercase leading-none tracking-[0.06em] text-accent-foreground" data-offer-pill>
-            {pill}
-          </span>
-        )}
-      </p>
+  <div class="grid gap-6 lg:grid-cols-[minmax(0,26rem)_auto] lg:gap-10">
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-1.5">
+        <h2 id="door-offer-title" class="text-2xl font-semibold tracking-[-0.01em] text-foreground" data-ticket-name="standard">
+          {fill(t("tickets.offer.ticket"), { name: ticketName })}
+        </h2>
+        <p class="flex flex-wrap items-center gap-x-3 gap-y-2 text-base font-semibold text-muted-foreground">
+          <span>{tier.name[lang]}</span>
+          {pill && (
+            <span class="inline-flex items-center rounded-full bg-accent px-2.5 py-1 text-xs font-bold uppercase leading-none tracking-[0.06em] text-accent-foreground" data-offer-pill>
+              {pill}
+            </span>
+          )}
+        </p>
+      </div>
       <p class="flex items-baseline gap-3 text-foreground" data-offer-price={tier.price}>
         <span class="font-bold tabular-nums leading-none tracking-[-0.035em] text-[clamp(3.5rem,11vw,5.5rem)]">
           {price.before && <span class="mr-1 align-top text-[0.45em] font-semibold tracking-normal">{price.before}</span>}
@@ -76,17 +81,15 @@ const deadline = urgency.endsAt
     </div>
 
     {/* The action column — the mobile bar watches it (tickets-ui.ts) and takes
-        over as soon as it leaves the screen. */}
+        over once it and the Stratégie & Leadership ticket's have both left the screen. */}
     <div class="flex flex-col justify-center gap-4" data-offer-action>
       <slot name="purchase" />
     </div>
   </div>
 
-  {/* `lg:mt-auto`: when the right column is taller than door 1, the slack lands
-      here, between the offer and the timeline, rather than around the price —
-      the ladder then sits flush with the bottom of the card and the two
-      columns end on the same line. */}
-  <div class="border-t border-border pt-7 lg:mt-auto">
-    <TierLadder items={ladder} urgency={urgency} lang={lang} />
+  {/* `mt-auto`: when "Venir en équipe" beside it is the taller card, the slack
+      lands between the offer and the timeline rather than around the price. */}
+  <div class="mt-auto">
+    <TierLadder items={ladder} lang={lang} />
   </div>
 </article>

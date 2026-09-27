@@ -2,68 +2,55 @@
 /**
  * The season's four prices as a timeline, read in one sweep and without a
  * legend: four boxes chained by chevrons, the tier on offer drawn as a
- * selected card carrying the date that ends it, the ones behind it struck
- * through and "Épuisé", the ones ahead held back — outlined, muted, clearly
- * not open yet.
+ * selected card, the ones behind it struck through and "Épuisé", the ones
+ * ahead held back — outlined, muted, clearly not open yet.
  *
- * Only the selected box shows a date: the team may extend or re-quota a
- * future tier live, so no other one may promise a day.
+ * Part of the standard ticket's card, under its price (27/09/2026): compact,
+ * one height for every box, and no date or pill of its own — both sit a few
+ * lines up, beside the big price, in the same card. No box shows a date: the
+ * team may extend or re-quota a tier live.
  */
 import type { TierId } from "@/config/tickets";
-import type { TierUrgency, TierWithState } from "@/lib/tickets/phase";
+import type { TierWithState } from "@/lib/tickets/phase";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
-import { fill, formatDayMonthShort, formatPrice } from "@/lib/tickets/format";
+import { formatPrice } from "@/lib/tickets/format";
 import Icon from "./Icon.astro";
 
 interface Props {
   items: TierWithState[];
-  /** What ends the current tier — the same rule door 1 writes beside the price. */
-  urgency: TierUrgency;
   lang: Locale;
 }
 
-const { items, urgency, lang } = Astro.props;
+const { items, lang } = Astro.props;
 const t = useTranslations(lang);
 
 type Tone = "past" | "selected" | "upcoming";
 
-/** The tier on sale is drawn as selected — the same tier door 1 shows in full. */
+/** The tier on sale is drawn as selected — the same tier the card prices in full. */
 function toneOf(item: TierWithState): Tone {
   if (item.state.kind === "past") return "past";
   if (item.state.kind === "current") return "selected";
   return "upcoming";
 }
 
-// The date that ends the tier on offer, where it belongs: on the timeline, in
-// the box it applies to — abbreviated, the box is narrow. The last tier gets
-// none: it runs to the event day, which the page has already given twice.
-const pill = urgency.limitedStock ? t("tickets.ladder.limited_stock") : undefined;
-const deadline = urgency.endsAt
-  ? fill(t(urgency.limitedStock ? "tickets.ladder.until_or_sold_out" : "tickets.ladder.until"), {
-      date: formatDayMonthShort(urgency.endsAt, lang),
-    })
-  : undefined;
-
-// Three surfaces, not three hues. The selected tier is the only filled card:
+// Three surfaces, not three hues. The selected tier is the only filled box:
 // tinted, thick-edged, lifted. Past is a ghost. Upcoming is an empty outline —
 // present, priced, but visibly not open.
 const toneClass: Record<Tone, string> = {
-  past: "border-dashed border-input/60 bg-muted/40 text-muted-foreground sm:self-stretch",
+  past: "border-dashed border-input/60 bg-muted/40 text-muted-foreground",
   selected:
-    "border-2 border-primary-strong bg-primary/6 text-foreground ring-4 ring-primary/15 shadow-[0_10px_24px_-14px_oklch(48%_0.18_259.9/0.5)] sm:self-stretch",
-  // The only boxes that shrink to their content: what is behind us and what is
-  // open share one height, what is not open yet sits visibly lower.
+    "border-2 border-primary-strong bg-primary/6 text-foreground ring-4 ring-primary/15 shadow-[0_8px_20px_-14px_oklch(48%_0.18_259.9/0.5)]",
   upcoming: "border-border bg-transparent text-muted-foreground",
 };
 
 const tierIds: TierId[] = items.map((i) => i.tier.id);
 ---
 
-<div class="flex flex-col gap-4" data-tier-ladder={tierIds.join(" ")}>
-  <h3 class="text-lg font-semibold tracking-[-0.01em] text-foreground">{t("tickets.ladder.title")}</h3>
+<div class="flex flex-col gap-3" data-tier-ladder={tierIds.join(" ")}>
+  <h3 class="text-sm font-semibold text-muted-foreground">{t("tickets.ladder.title")}</h3>
 
-  <ol class="grid grid-cols-1 gap-6 sm:grid-cols-4 sm:items-start sm:gap-7">
+  <ol class="grid grid-cols-1 gap-5 sm:grid-cols-4 sm:gap-7">
     {items.map((item, index) => {
       const tone = toneOf(item);
       const isPast = tone === "past";
@@ -71,71 +58,47 @@ const tierIds: TierId[] = items.map((i) => i.tier.id);
       return (
         <li
           class:list={[
-            "relative flex items-center justify-between gap-3 rounded-lg border px-4 py-3 sm:flex-col sm:items-start sm:justify-start sm:gap-1 sm:px-3.5 sm:pb-3.5 sm:pt-4",
+            "relative flex items-center justify-between gap-3 rounded-lg border px-4 py-2.5 sm:flex-col sm:items-start sm:justify-center sm:gap-0.5 sm:px-3.5",
             toneClass[tone],
           ]}
           aria-current={item.state.kind === "current" ? "step" : undefined}
           data-tier={item.tier.id}
           data-tier-state={item.state.kind}
         >
-          <span class="flex flex-col gap-1 sm:contents">
-            <span class:list={["text-sm font-semibold sm:order-1", tone === "selected" && "text-primary-strong"]}>
-              {item.tier.name[lang]}
-              {/* The state word the box no longer needs: kept for screen readers,
-                  where shape and colour carry nothing. */}
-              {tone === "selected" && (
-                <span class="sr-only">
-                  {" · "}{t("tickets.ladder.current")}
-                </span>
-              )}
-            </span>
-            {isPast && (
-              <span class="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground sm:order-3 sm:mt-1">
-                <Icon name="ban" size={13} />
-                {t("tickets.ladder.sold_out")}
-              </span>
-            )}
-            {/* What ends this price, on the timeline rather than in a sentence
-                under the big number: the date, and — when the tier can go
-                before it — the section's one pink. */}
-            {tone === "selected" && (deadline || pill) && (
-              <span
-                class="flex flex-col items-start gap-1.5 sm:order-4 sm:mt-2.5 sm:w-full sm:border-t sm:border-primary/25 sm:pt-2.5"
-                data-tier-deadline
-              >
-                {deadline && (
-                  <span class="inline-flex items-start gap-1.5 text-xs font-semibold text-foreground">
-                    <Icon name="clock" size={13} class="mt-px" />
-                    {/* Balanced so "ou épuisement" falls whole onto the second
-                        line instead of leaving "ou" hanging off the first. */}
-                    <span class="text-balance">{deadline}</span>
-                  </span>
-                )}
-                {pill && (
-                  <span class="inline-flex items-center rounded-full bg-accent px-2 py-1 text-xs font-bold uppercase leading-none tracking-[0.06em] text-accent-foreground">
-                    {pill}
-                  </span>
-                )}
+          <span class:list={["text-sm font-semibold", tone === "selected" && "text-primary-strong"]}>
+            {item.tier.name[lang]}
+            {/* The state word the box does not need: kept for screen readers,
+                where shape and colour carry nothing. */}
+            {tone === "selected" && (
+              <span class="sr-only">
+                {" · "}{t("tickets.ladder.current")}
               </span>
             )}
           </span>
-          <span
-            class:list={[
-              "text-xl font-bold tabular-nums tracking-[-0.02em] sm:order-2 sm:text-2xl",
-              isPast && "line-through decoration-muted-foreground/50 decoration-[1.5px]",
-            ]}
-          >
-            {formatPrice(item.tier.price, lang)}
+          <span class="flex flex-wrap items-baseline justify-end gap-x-2 gap-y-0.5 sm:justify-start">
+            <span
+              class:list={[
+                "text-lg font-bold tabular-nums tracking-[-0.02em]",
+                isPast && "line-through decoration-muted-foreground/50 decoration-[1.5px]",
+              ]}
+            >
+              {formatPrice(item.tier.price, lang)}
+            </span>
+            {isPast && (
+              <span class="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
+                <Icon name="ban" size={12} />
+                {t("tickets.ladder.sold_out")}
+              </span>
+            )}
           </span>
 
           {/* The climb, drawn: down the stack on mobile, along the row from sm.
               Sits in the gutter, outside the box, and says nothing to a reader.
-              From sm it is pinned to the price line rather than to the box's
-              middle — the boxes have different heights, the prices do not. */}
+              Every box has the same height, so the chevron sits at mid-height. */}
           {!isLast && (
             <span
               aria-hidden="true"
-              class="pointer-events-none absolute left-1/2 top-full -translate-x-1/2 translate-y-1 text-muted-foreground/60 sm:left-full sm:top-14 sm:-translate-y-1/2 sm:translate-x-1.5"
+              class="pointer-events-none absolute left-1/2 top-full -translate-x-1/2 translate-y-0.5 text-muted-foreground/60 sm:left-full sm:top-1/2 sm:-translate-y-1/2 sm:translate-x-1.5"
             >
               <Icon name="chevron-right" size={16} class="rotate-90 sm:rotate-0" />
             </span>

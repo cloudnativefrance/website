@@ -11,25 +11,27 @@
 import type { GroupRate, TierDefinition } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
+import { fill } from "@/lib/tickets/format";
 import GroupRates from "./GroupRates.astro";
 import Icon from "./Icon.astro";
 
 interface Props {
   lang: Locale;
+  /** The standard ticket's public name: door 1 sells two, the rates apply to this one. */
+  ticketName: string;
   tier: TierDefinition;
   rates: GroupRate[];
   groupMailto: string;
 }
 
-const { lang, tier, rates, groupMailto } = Astro.props;
+const { lang, ticketName, tier, rates, groupMailto } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-{/* `id="equipe"`: the group rates live here and nowhere else, so the Strategy
-    & Leadership band points at this card. */}
+{/* `id="equipe"`: the group rates live here and nowhere else. */}
 <article
   id="equipe"
-  class="door flex grow flex-col gap-5 rounded-xl border border-border bg-card p-5 sm:p-6"
+  class="door flex grow flex-col gap-5 rounded-xl border border-border bg-card p-5 sm:p-8"
   aria-labelledby="door-team-title"
   style="--door-index: 1"
 >
@@ -38,7 +40,7 @@ const t = useTranslations(lang);
   </h2>
 
   <div class="flex flex-col gap-2">
-    <p class="text-sm font-medium text-muted-foreground">{t("tickets.team.rates")}</p>
+    <p class="text-sm font-medium text-muted-foreground">{fill(t("tickets.team.rates"), { name: ticketName })}</p>
     <GroupRates lang={lang} tier={tier} rates={rates} />
   </div>
 

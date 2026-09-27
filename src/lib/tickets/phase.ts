@@ -11,7 +11,6 @@ import type {
   TierDefinition,
   TierId,
 } from "@/config/tickets";
-import { shown } from "./drafts";
 
 export type TierState = { kind: "past" } | { kind: "current" } | { kind: "upcoming" };
 
@@ -146,15 +145,4 @@ export function assertTicketingConfig(config: TicketingConfig): void {
   if (problems.length > 0) {
     throw new Error(`[tickets] src/config/tickets.ts is inconsistent:\n- ${problems.join("\n- ")}`);
   }
-}
-
-/**
- * The Strategy & Leadership price to show in `phase`: a fixed amount, or the
- * amount of the tier on offer. Undefined while the price is undecided — its row
- * is then not rendered.
- */
-export function strategicPrice(config: TicketingConfig, phase: TierId): number | undefined {
-  const price = shown(config.strategic.price);
-  if (price === undefined) return undefined;
-  return price.kind === "fixed" ? price.amount : price.amounts[offerTier(config, phase).id];
 }

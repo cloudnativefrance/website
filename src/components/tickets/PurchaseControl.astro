@@ -1,9 +1,8 @@
 ---
 /**
- * The purchase action, rendered from a `PurchaseTarget` — door 1 and the
- * Strategy & Leadership band render the same one: one link to the alf.io
- * listing, where the quantity is chosen, in a new tab that screen readers hear
- * about.
+ * The purchase action, rendered from a `PurchaseTarget` — both tickets render
+ * the same one: one link to the alf.io listing, where the quantity is chosen,
+ * in a new tab that screen readers hear about.
  */
 import type { PurchaseTarget } from "@/lib/tickets/purchase";
 import type { TierId } from "@/config/tickets";
@@ -27,6 +26,7 @@ const umami = {
   "data-umami-event-phase": phase,
 };
 
+// White on --primary is only allowed this large and bold (3.6:1).
 const buttonClass =
   "inline-flex h-13 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-primary px-7 text-xl font-bold text-primary-foreground shadow-[var(--shadow-glow-primary)] transition-[background-color,scale] duration-150 ease-out hover:bg-primary/90 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-card";
 ---

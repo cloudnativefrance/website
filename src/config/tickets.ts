@@ -73,25 +73,26 @@ export interface GroupRate {
   price: number;
 }
 
-export type StrategicPrice =
-  | { kind: "fixed"; amount: number }
-  | { kind: "per_tier"; amounts: Record<TierId, number> };
-
-/** Always displayed and always on sale (22/09/2026): every fact is due for the opening. */
+/**
+ * The dearer ticket, second in door 1 (27/09/2026): the standard ticket plus
+ * priority access to the Strategy & Leadership room and a reserved networking
+ * area — the track itself is open to every ticket. Always displayed and always
+ * on sale; one price for the whole season, so no tier and no timeline.
+ */
 export interface StrategicTicket {
+  /** The ticket's public name — the track's own, "Stratégie & Leadership" (27/09/2026). */
   name: Maybe<Localized>;
-  price: Maybe<StrategicPrice>;
-  /** What it includes from the standard ticket (talks, evening…). */
-  includesStandard: Maybe<Localized>;
-  programme: Maybe<Localized>;
-  /** Idea under study: dedicated networking area with catering. */
-  networking: Maybe<Localized>;
-  accessConditions: Maybe<Localized>;
+  /** Euros, VAT included. */
+  price: Maybe<number>;
+  /** The page describing the Strategy & Leadership track. */
+  trackUrl: Maybe<Localized>;
 }
 
 export interface TicketingConfig {
   alfio: { baseUrl: string; eventSlug: string };
   currentPhase: Phase;
+  /** Public name of the ticket the tiers price, beside the Strategy & Leadership one. */
+  standardName: Maybe<Localized>;
   tiers: readonly TierDefinition[];
   /** Public tier names are still the working names of the pricing sheet: `true` once final. */
   tierNames: Maybe<true>;
@@ -122,6 +123,7 @@ export const TICKETING: TicketingConfig = {
   // soon" page. Opening day is this line set to "seb" — a production build then
   // refuses the page until every tbd() below is decided (`assertShippable`).
   currentPhase: "pre_opening",
+  standardName: tbd("Nom public du billet standard", { fr: "standard", en: "Standard" }),
   tiers: [
     {
       id: "seb",
@@ -166,18 +168,15 @@ export const TICKETING: TicketingConfig = {
     { id: "10_plus", min: 10, price: 149 },
   ],
   strategic: {
-    name: tbd("Nom public (« Stratégie & Leadership » est le nom de travail)", {
+    name: tbd("Nom public du billet", {
       fr: "Stratégie & Leadership",
       en: "Strategy & Leadership",
     }),
-    price: tbd("Prix : fixe, ou décliné par palier ?"),
-    includesStandard: tbd("Ce qu'il inclut du billet standard (conférences, soirée)"),
-    programme: tbd("Programme et intervenant(e)s de la salle dédiée"),
-    networking: tbd("Piste non actée : espace d'échange dédié avec restauration", {
-      fr: "Un espace d'échange dédié, avec restauration",
-      en: "A dedicated networking area, with catering",
+    price: tbd("Prix fixe du billet", 299),
+    trackUrl: tbd("Page du parcours Stratégie & Leadership, à créer", {
+      fr: "/track-strategie-leadership",
+      en: "/en/track-strategy-leadership",
     }),
-    accessConditions: tbd("Conditions d'accès éventuelles"),
   },
   contents: tbd("Contenu exact du billet standard", true),
   eveningIncluded: tbd("Soirée ouverte à tous les participants, sans option (pôle soirée)", true),

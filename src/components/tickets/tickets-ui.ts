@@ -43,24 +43,31 @@ for (const form of document.querySelectorAll<HTMLFormElement>("[data-tickets-cod
   });
 }
 
-// ── Mobile bar: shown whenever door 1's action is off screen ───────────────────
-// It watches the action column itself, not the whole door: the ladder below the
-// button must not keep the bar away while the button is already out of sight,
-// and a short phone that opens with the button below the fold gets the bar too.
+// ── Mobile bar: shown whenever both tickets' actions are off screen ───────────
+// It watches the action columns themselves, not the whole cards: the ladder
+// below the button must not keep the bar away while the button is already out
+// of sight, and a short phone that opens with the button below the fold gets
+// the bar too. The Stratégie & Leadership ticket's action counts as well, so the bar never
+// sits under a button for the other ticket.
 const bar = document.querySelector<HTMLElement>("[data-sticky-bar]");
-const offerAction = document.querySelector<HTMLElement>("#offre [data-offer-action]");
-if (bar && offerAction && "IntersectionObserver" in window) {
+const offerActions = [...document.querySelectorAll<HTMLElement>("[data-offer-action]")];
+if (bar && offerActions.length > 0 && "IntersectionObserver" in window) {
   const action = bar.querySelector<HTMLAnchorElement>("[data-sticky-action]");
+  const onScreen = new Set<Element>();
   const observer = new IntersectionObserver(
-    ([entry]) => {
-      const show = !entry.isIntersecting;
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) onScreen.add(entry.target);
+        else onScreen.delete(entry.target);
+      }
+      const show = onScreen.size === 0;
       bar.dataset.visible = String(show);
       bar.setAttribute("aria-hidden", String(!show));
       if (action) action.tabIndex = show ? 0 : -1;
     },
     { threshold: 0.5 },
   );
-  observer.observe(offerAction);
+  for (const offerAction of offerActions) observer.observe(offerAction);
 }
 
 // ── Demo switcher: keep the reading position and the open panel across switches ─

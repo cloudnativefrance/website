@@ -32,9 +32,9 @@ const t = useTranslations(lang);
     ("−15 %" is narrower than "−25 %"). */}
 <dl class:list={["grid grid-cols-[1fr_auto_auto] gap-x-2 divide-y divide-border border-y border-border", className]}>
   {rates.map((rate) => (
-    <div class="col-span-3 grid grid-cols-subgrid items-baseline py-2.5" data-group-rate={rate.id}>
+    <div class="col-span-3 grid grid-cols-subgrid items-baseline py-3.5" data-group-rate={rate.id}>
       <dt class="pr-2 text-sm text-muted-foreground">{t(`tickets.team.rate.${rate.id}`)}</dt>
-      <dd class="whitespace-nowrap text-lg font-semibold tabular-nums tracking-[-0.01em] text-foreground">
+      <dd class="whitespace-nowrap text-xl font-semibold tabular-nums tracking-[-0.01em] text-foreground">
         {formatPrice(rate.price, lang)}
       </dd>
       <dd

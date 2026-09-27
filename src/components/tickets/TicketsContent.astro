@@ -1,16 +1,16 @@
 ---
 /**
- * The ticketing page's content, composed around the three ways people arrive —
- * take my seat, come as a team, I have a code — weighted by importance.
+ * The ticketing page's content, composed around the ways people arrive — the
+ * standard ticket, as a team, the Stratégie & Leadership ticket, with a code —
+ * weighted by importance.
  * `TicketsPage` wraps it in the layout; kept apart so the demo matrix test can
  * render every phase without a site origin.
  *
  * Rendered for a selling phase only — before the opening /billetterie is the
  * "coming soon" page (`TicketsPage`). Everything is derived from
  * `src/config/tickets.ts` and the tier on sale, so the demo routes and
- * /billetterie render the same page. Every purchase — door 1, the Strategy &
- * Leadership band, the mobile bar — goes to the alf.io listing through one
- * `purchaseTarget`. An undecided value shows its draft or nothing (`shown`),
+ * /billetterie render the same page. Every purchase — both tickets of door 1,
+ * the mobile bar — goes to the alf.io listing through one `purchaseTarget`. An undecided value shows its draft or nothing (`shown`),
  * and a production-origin build refuses the page while a draft is left
  * (`assertShippable`) — which is why flipping `currentPhase` to the first tier
  * is also the check that everything is decided.
@@ -28,7 +28,6 @@ import {
   assertTicketingConfig,
   cheaperGroupRates,
   offerTier,
-  strategicPrice,
   tierStates,
   tierUrgency,
 } from "@/lib/tickets/phase";
@@ -69,15 +68,24 @@ const email = CONTACT_EMAILS.tickets;
 const groupMailto = buildMailto(email, t("tickets.team.mail.subject"), t("tickets.team.mail.body"));
 const inclusionMailto = buildMailto(email, t("tickets.inclusion.mail.subject"), t("tickets.inclusion.mail.body"));
 
-// One action for the whole page, the alf.io listing: door 1, the Strategy &
-// Leadership band and the mobile bar share it.
+// One action for the whole page, the alf.io listing: both tickets of door 1 and
+// the mobile bar share it.
 const target = purchaseTarget(config);
+
+// Two tickets, both in door 1: the standard one the tiers price, and the
+// Strategy & Leadership one at a single price. Their names are required values
+// (`assertShippable`), so production never renders them empty.
+const standardName = shown(config.standardName)?.[lang] ?? "";
+const strategic = {
+  name: shown(config.strategic.name)?.[lang] ?? "",
+  price: shown(config.strategic.price),
+  trackUrl: shown(config.strategic.trackUrl)?.[lang],
+};
 
 // Door 2 is rendered only when a group rate actually beats the price of the
 // moment and fits the tier's order cap; below that it had nothing to sell.
 // Everything else about the first viewport follows from it.
 const showTeam = rates.length > 0;
-const wideOffer = !showTeam;
 
 const programmeWhen = shown(config.programmeAnnouncement)?.[lang];
 
@@ -91,8 +99,9 @@ const when = {
   after: whenAfter,
 };
 
+// "standard" is lower-case in French prose; the bar's label opens on it.
 const sticky = {
-  label: tier.name[lang],
+  label: `${standardName.charAt(0).toUpperCase()}${standardName.slice(1)} · ${tier.name[lang]}`,
   price: formatPrice(tier.price, lang),
   action: { href: target.href, rel: target.rel, text: t("tickets.sticky.buy") },
   analytics: {
@@ -121,14 +130,17 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
         <p class="max-w-[58ch] text-base text-muted-foreground text-pretty sm:text-lg">{t("tickets.lead")}</p>
       </header>
 
-      {/* Door 1 spans the grid whenever door 2 has nothing to sell: a lone short
-          card beside it would leave the right column hollow. "J'ai un code"
-          then becomes a slim band underneath rather than that lone card. */}
+      {/* Three rows, one per way in (27/09/2026). The standard ticket leads;
+          "Venir en équipe" — its group rates, the same ticket bought several
+          at a time — sits beside it at the same height whenever a rate
+          applies, and it takes the whole row otherwise. The Stratégie &
+          Leadership ticket is its own row underneath, the code entry a band at the foot, in
+          every phase. */}
       <div class="grid gap-5 lg:grid-cols-12 lg:gap-6">
-        {/* `flex flex-col` so door 1 inherits the row height the right column
-            sets, rather than sitting short inside a stretched wrapper. */}
-        <div class:list={["flex flex-col", wideOffer ? "lg:col-span-12" : "lg:col-span-8"]}>
-          <OfferDoor lang={lang} tier={tier} ladder={ladder} urgency={urgency}>
+        {/* `flex flex-col` so each card fills the row height the grid gives
+            its wrapper: the two cards of the first row end on the same line. */}
+        <div class:list={["flex flex-col", showTeam ? "lg:col-span-8" : "lg:col-span-12"]}>
+          <OfferDoor lang={lang} ticketName={standardName} tier={tier} ladder={ladder} urgency={urgency}>
             <PurchaseControl
               slot="purchase"
               target={target}
@@ -139,53 +151,42 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
           </OfferDoor>
         </div>
         {showTeam && (
-          <div class="flex flex-col gap-5 lg:col-span-4 lg:gap-6">
-            <TeamDoor lang={lang} tier={tier} rates={rates} groupMailto={groupMailto} />
-            <CodeDoor
-              lang={lang}
-              phase={phase}
-              listingUrl={listingUrl(config)}
-              fallback={codeFallbackAction(config)}
-              host={host}
-              layout="card"
-            />
+          <div class="flex flex-col lg:col-span-4">
+            <TeamDoor lang={lang} ticketName={standardName} tier={tier} rates={rates} groupMailto={groupMailto} />
           </div>
         )}
-        {!showTeam && (
-          <div class="lg:col-span-12">
-            <CodeDoor
+        {/* Always displayed, always on sale: the same action. */}
+        <div class="lg:col-span-12" style={`--door-index: ${showTeam ? 2 : 1}`}>
+          <StrategicOffer
+            lang={lang}
+            name={strategic.name}
+            standardName={standardName}
+            price={strategic.price}
+            trackUrl={strategic.trackUrl}
+          >
+            <PurchaseControl
+              slot="purchase"
+              target={target}
               lang={lang}
               phase={phase}
-              listingUrl={listingUrl(config)}
-              fallback={codeFallbackAction(config)}
-              host={host}
-              layout="band"
+              analytics={{ billet: "strategique", palier: "strategique" }}
             />
-          </div>
-        )}
+          </StrategicOffer>
+        </div>
+        <div class="lg:col-span-12" style={`--door-index: ${showTeam ? 3 : 2}`}>
+          <CodeDoor
+            lang={lang}
+            phase={phase}
+            listingUrl={listingUrl(config)}
+            fallback={codeFallbackAction(config)}
+            host={host}
+          />
+        </div>
       </div>
     </div>
   </section>
 
-  {/* Always displayed, always on sale: the same action as door 1. */}
-  <div class="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
-    <StrategicOffer
-      lang={lang}
-      ticket={config.strategic}
-      price={strategicPrice(config, phase)}
-      teamHref={showTeam ? "#equipe" : undefined}
-    >
-      <PurchaseControl
-        slot="purchase"
-        target={target}
-        lang={lang}
-        phase={phase}
-        analytics={{ billet: "strategique", palier: "strategique" }}
-      />
-    </StrategicOffer>
-  </div>
-
-  <div class="mx-auto max-w-7xl px-4 pb-20 pt-24 md:px-6 md:pb-24 md:pt-28 lg:px-8">
+  <div class="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-24 lg:px-8">
     <IncludedInTicket lang={lang} eveningDetails={shown(config.eveningDetails)?.[lang]} />
   </div>
 
@@ -200,6 +201,7 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
       email={email}
       inclusionMailto={inclusionMailto}
       perOrder={perOrder}
+      strategicName={strategic.name}
       programmeWhen={programmeWhen}
       vatRate={shown(config.vatRate)}
       invoice={shown(config.invoice)?.[lang]}

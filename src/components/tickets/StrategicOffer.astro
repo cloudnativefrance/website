@@ -1,87 +1,78 @@
 ---
 /**
- * The Strategy & Leadership ticket: another product, not a fifth tier. It sits
- * under the three doors in its own material (the deep brand purple) so
- * decision-makers find it without it outshining the standard ticket.
+ * The Stratégie & Leadership ticket, in its own card under the standard one
+ * (27/09/2026). The track of the same name is open to every ticket; this one
+ * adds priority access to its room and a reserved networking area — which is
+ * all it says, with a link to the track's own page for the rest.
  *
- * Always displayed and always on sale: its action is the page's own — the
- * alf.io listing — passed in the `purchase` slot. Its quota is never shown, like every other.
+ * The standard card's anatomy and type — name, monumental price, one line, the
+ * same filled button in a column that lines up with the standard one. Only the
+ * standard card's shadow sets the two apart. One price for the whole season,
+ * so no tier, no date, no pill, no timeline. Always on sale, with the page's
+ * own action in the `purchase` slot; its quota is never shown.
  */
-import type { StrategicTicket } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
-import { shown } from "@/lib/tickets/drafts";
-import { formatPrice } from "@/lib/tickets/format";
+import { fill, priceParts } from "@/lib/tickets/format";
 import Icon from "./Icon.astro";
 
 interface Props {
   lang: Locale;
-  ticket: StrategicTicket;
-  /** Euros, VAT included, in the phase on screen (`strategicPrice`); undefined while undecided. */
+  name: string;
+  /** The standard ticket's name, which this one includes. */
+  standardName: string;
+  /** Euros, VAT included; undefined while undecided — the price line is then left out. */
   price?: number;
-  /** Door 2's anchor, set only while a group rate applies — there is nowhere
-   *  else on the page to send a reader looking for one. */
-  teamHref?: string;
+  /** The track's page, once it exists. */
+  trackUrl?: string;
 }
 
-const { lang, ticket, price, teamHref } = Astro.props;
+const { lang, name, standardName, price, trackUrl } = Astro.props;
 const t = useTranslations(lang);
-
-const name = shown(ticket.name)?.[lang] ?? "";
-
-// A fact with no value yet has no row: never a label pointing at nothing.
-const facts = [
-  { label: t("tickets.strategic.fact.price"), value: price === undefined ? undefined : formatPrice(price, lang) },
-  { label: t("tickets.strategic.fact.includes"), value: shown(ticket.includesStandard)?.[lang] },
-  { label: t("tickets.strategic.fact.programme"), value: shown(ticket.programme)?.[lang] },
-  { label: t("tickets.strategic.fact.networking"), value: shown(ticket.networking)?.[lang] },
-  { label: t("tickets.strategic.fact.access"), value: shown(ticket.accessConditions)?.[lang] },
-].filter((fact): fact is { label: string; value: string } => fact.value !== undefined);
-
-const topics = [1, 2, 3, 4, 5, 6].map((n) => t(`tickets.strategic.topic.${n}` as Parameters<typeof t>[0]));
+const parts = price === undefined ? undefined : priceParts(price, lang);
 ---
 
-<section
+<article
   id="strategie-leadership"
-  class="strategic relative overflow-hidden rounded-xl bg-chart-5 text-primary-foreground dark:bg-secondary dark:ring-1 dark:ring-accent/30"
+  class="door grid gap-6 rounded-xl border border-primary/35 bg-card p-5 sm:p-8 lg:grid-cols-[minmax(0,26rem)_auto] lg:gap-10"
   aria-labelledby="strategic-title"
+  data-strategic-ticket
 >
-  <div class="grid gap-10 p-6 sm:p-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-14">
-    <div class="flex flex-col gap-5">
-      <h2 id="strategic-title" class="text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl">{name}</h2>
-      <p class="max-w-[60ch] text-lg text-pretty">{t("tickets.strategic.lead")}</p>
-      <p class="max-w-[60ch] text-base text-chart-4 text-pretty">{t("tickets.strategic.body")}</p>
-      <div class="flex flex-col gap-3">
-        <p class="text-sm font-medium text-chart-4">{t("tickets.strategic.topics")}</p>
-        <ul class="flex flex-wrap gap-2">
-          {topics.map((topic) => (
-            <li class="rounded-full border border-primary-foreground/25 px-3 py-1 text-sm font-medium">{topic}</li>
-          ))}
-        </ul>
-      </div>
-      <p class="text-base font-medium text-accent">{t("tickets.strategic.no_pitch")}</p>
-    </div>
-
-    <div class="flex flex-col gap-6">
-      {facts.length > 0 && (
-        <dl class="divide-y divide-primary-foreground/15 border-y border-primary-foreground/15">
-          {facts.map((fact) => (
-            <div class="flex flex-col gap-1 py-3 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:gap-x-4">
-              <dt class="text-sm text-chart-4">{fact.label}</dt>
-              <dd class="text-base font-semibold tabular-nums sm:text-right">{fact.value}</dd>
-            </div>
-          ))}
-        </dl>
-      )}
-
-      <slot name="purchase" />
-
-      {teamHref && (
-        <a href={teamHref} class="inline-flex items-center gap-1.5 self-start text-sm font-medium text-primary-foreground underline-offset-4 hover:underline">
-          {t("tickets.strategic.team")}
-          <Icon name="arrow-right" size={14} />
+  <div class="flex flex-col gap-3">
+    <h2 id="strategic-title" class="text-2xl font-semibold tracking-[-0.01em] text-foreground" data-ticket-name="strategic">
+      {fill(t("tickets.offer.ticket"), { name })}
+    </h2>
+    {parts && (
+      <p class="flex items-baseline gap-3 text-foreground" data-strategic-price={price}>
+        <span class="font-bold tabular-nums leading-none tracking-[-0.035em] text-[clamp(3.5rem,11vw,5.5rem)]">
+          {parts.before && <span class="mr-1 align-top text-[0.45em] font-semibold tracking-normal">{parts.before}</span>}
+          {parts.amount}
+          {parts.after && <span class="ml-1.5 text-[0.45em] font-semibold tracking-normal">{parts.after}</span>}
+        </span>
+        <span class="text-base font-medium text-muted-foreground">{t("tickets.offer.ttc")}</span>
+      </p>
+    )}
+    <p class="max-w-[52ch] text-base text-muted-foreground text-pretty">
+      {fill(t("tickets.strategic.perks"), { standard: standardName })}
+    </p>
+    {/* Inline, not flex: when the line wraps, the arrow follows the last word
+        instead of standing apart at the far edge. */}
+    {trackUrl && (
+      <p class="text-base font-semibold text-pretty">
+        <a
+          href={trackUrl}
+          class="text-primary-strong underline-offset-4 hover:underline"
+          data-umami-event="tickets-strategic-track"
+        >
+          {t("tickets.strategic.track")}<Icon name="arrow-right" size={16} class="ml-1.5 inline-block align-[-0.125em]" />
         </a>
-      )}
-    </div>
+      </p>
+    )}
   </div>
-</section>
+
+  {/* An action column like the standard card's: the mobile bar stays away
+      while it is on screen, so it never sits under a button for the other ticket. */}
+  <div class="flex flex-col justify-center gap-4" data-offer-action>
+    <slot name="purchase" />
+  </div>
+</article>

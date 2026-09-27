@@ -1,8 +1,9 @@
 // The page in each of its 4 selling phases, rendered through the real
 // component, asserting the rules of the spec that a screenshot review would
 // only catch by luck: no internal abbreviations, only the current tier's date,
-// "Épuisé" on a past tier, every purchase sent to the alf.io listing, and group
-// rates only when they beat the current price. Before the opening /billetterie
+// "Épuisé" on a past tier, every purchase sent to the alf.io listing, group
+// rates only when they beat the current price, and the Strategy & Leadership
+// ticket beside the standard one with no timeline of its own. Before the opening /billetterie
 // is the "coming soon" page, checked at the end.
 import { describe, it, expect, beforeAll } from "vitest";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
@@ -46,9 +47,10 @@ function mainOf(html: string): string {
 const LISTING_LINK =
   /<a\b[^>]*href="https:\/\/billetterie\.cloudnativedays\.fr\/event\/cnd-2027"[^>]*data-umami-event="tickets-purchase"[^>]*>/g;
 
-// Door 1 writes the month in full under the price; the ladder's box is narrow,
-// so it abbreviates. The last tier is absent on purpose — it runs to the event
-// day and shows no date of its own.
+// The standard card writes the month in full under the price; the ladder
+// shows no date at all since 27/09/2026 (the short form is how it used to).
+// The last tier is absent on purpose — it runs to the event day and shows no
+// date of its own.
 const TIER_END_DATES: Record<Exclude<TierId, "last_chance">, { door: string; ladder: string }> = {
   seb: { door: "29 novembre", ladder: "29 nov." },
   eb: { door: "7 février", ladder: "7 févr." },
@@ -76,12 +78,14 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
     expect(text).not.toMatch(/\b(SEB|EB|LC)\b/);
   });
 
-  it("shows the date of the current tier and of no other", () => {
-    for (const [tier, { door, ladder }] of Object.entries(TIER_END_DATES)) {
-      for (const date of [door, ladder]) {
-        if (tier === phase) expect(text).toContain(date);
-        else expect(text, `${tier}'s date leaked`).not.toContain(date);
-      }
+  it("shows the date of the current tier and of no other, and not in the ladder", () => {
+    const start = main.indexOf("data-tier-ladder");
+    const ladder = visibleText(main.slice(start, main.indexOf("</ol>", start)));
+    for (const [tier, { door, ladder: short }] of Object.entries(TIER_END_DATES)) {
+      if (tier === phase) expect(text).toContain(door);
+      else expect(text, `${tier}'s date leaked`).not.toContain(door);
+      expect(ladder, "the ladder repeats a date").not.toContain(short);
+      expect(ladder, "the ladder repeats a date").not.toContain(door);
     }
   });
 
@@ -97,10 +101,11 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
     expect(text).not.toContain("Terminé");
   });
 
-  it("writes what ends the tier on offer under the big price, and again in its ladder box", () => {
+  it("writes what ends the tier on offer under the big price, and nowhere else", () => {
     const expected = phase === "last_chance" ? 0 : 1;
     expect([...main.matchAll(/data-offer-deadline/g)]).toHaveLength(expected);
-    expect([...main.matchAll(/data-tier-deadline/g)]).toHaveLength(expected);
+    // The ladder sits in the same card, a few lines down: it does not repeat it.
+    expect(main).not.toContain("data-tier-deadline");
     if (expected) {
       const door = main.match(/<p\b[^>]*data-offer-deadline[\s\S]*?<\/p>/)![0];
       expect(visibleText(door)).toContain(TIER_END_DATES[phase as keyof typeof TIER_END_DATES].door);
@@ -110,12 +115,12 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
     expect(text).not.toContain("Vous payez par carte");
   });
 
-  it("gives the tier on offer its pink label by the name, and the ladder its own", () => {
+  it("gives the tier on offer its pink label by the name, and only there", () => {
     const early = phase === "seb" || phase === "eb";
     const pill = main.match(/<span\b[^>]*data-offer-pill[^>]*>([\s\S]*?)<\/span>/)?.[1].trim();
     expect(pill).toBe(early ? "Stock limité" : phase === "last_chance" ? "Dernières places" : undefined);
-    const ladder = main.slice(main.indexOf("data-tier-ladder"));
-    expect(visibleText(ladder).includes("Stock limité")).toBe(early);
+    const ladder = main.slice(main.indexOf("data-tier-ladder"), main.indexOf("</ol>", main.indexOf("data-tier-ladder")));
+    expect(visibleText(ladder)).not.toContain("Stock limité");
     expect(ladder).not.toContain("Dernières places");
     expect(text.includes("ou épuisement")).toBe(early);
   });
@@ -128,7 +133,7 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
     }
   });
 
-  it("sends every purchase to the alf.io listing — door 1 and Strategy & Leadership", () => {
+  it("sends every purchase to the alf.io listing — both tickets of door 1", () => {
     expect([...main.matchAll(LISTING_LINK)]).toHaveLength(2);
     expect(main).not.toContain("tickets-notify");
     // Variant A is gone for good: no quantity is chosen on the site.
@@ -150,9 +155,16 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
     expect(unique).toEqual(selling ? ["10_plus", "4_9"] : []);
   });
 
-  it("opens door 2 only when it has something to sell", () => {
+  it("opens door 2 only when it has something to sell, beside the standard ticket", () => {
     expect(main.includes('id="door-team-title"')).toBe(selling);
-    expect(main).toContain(selling ? "lg:col-span-8" : "lg:col-span-12");
+    // The standard card takes the whole row when door 2 is absent.
+    const span = main.match(/<div class="flex flex-col lg:col-span-(\d+)"[^>]*>\s*<article\b[^>]*id="offre"/)?.[1];
+    expect(span).toBe(selling ? "8" : "12");
+    if (selling) {
+      // Door 2 is the row's other card: right after the standard one.
+      const afterOffer = main.slice(main.indexOf("</article>", main.indexOf('id="offre"')));
+      expect(afterOffer.match(/<article\b[^>]*id="([^"]+)"/)?.[1]).toBe("equipe");
+    }
   });
 
   it("prices each group rate against the price of the moment, the discount tagged in pink", () => {
@@ -187,6 +199,8 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
     expect(text).not.toContain("Contacter la billetterie");
     expect(text).not.toContain("Choisir ce tarif");
     expect(text.includes("Demander mon tarif de groupe")).toBe(selling);
+    // Door 1 sells two tickets: the rates name the one they apply to.
+    expect(text.includes("Billet standard, par place")).toBe(selling);
   });
 
   it("leaves the manager kit as the whole bottom section, in every phase", () => {
@@ -196,16 +210,68 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
     expect(text).not.toContain("Vous commandez en ligne");
   });
 
-  it("always shows the Strategy & Leadership ticket, apart from the tiers", () => {
-    expect(main).toContain('id="strategie-leadership"');
-    expect(main).not.toMatch(/data-tier="strategi/);
-    expect(main).not.toContain("data-strategic-state");
-    expect(text).not.toContain("Mise en vente");
+  it("sells two tickets, each in its own card and named by its heading, the standard one first", () => {
+    const names = [...main.matchAll(/<h2\b[^>]*data-ticket-name="([^"]+)"[^>]*>([\s\S]*?)<\/h2>/g)];
+    expect(names.map((m) => [m[1], m[2].trim()])).toEqual([
+      ["standard", "Billet standard"],
+      ["strategic", "Billet Stratégie &amp; Leadership"],
+    ]);
+    // No door title above them any more, and no purple band.
+    expect(text).not.toContain("Je prends ma place");
+    expect(main).not.toContain("bg-chart-5");
+    // Two cards: the Stratégie & Leadership one is not inside the standard one.
+    const offer = main.slice(main.indexOf('id="offre"'), main.indexOf("</article>", main.indexOf('id="offre"')));
+    expect(offer).not.toContain("data-strategic-ticket");
+    expect(offer).toContain("data-tier-ladder");
   });
 
-  it("sends the Strategy & Leadership reader to the group rates only where they exist", () => {
-    expect([...main.matchAll(/href="#equipe"/g)]).toHaveLength(selling ? 1 : 0);
-    expect(main.includes('id="equipe"')).toBe(selling);
+  it("orders the ways in: standard, the team rates, Stratégie & Leadership, then the code band", () => {
+    const at = (marker: string) => main.indexOf(marker);
+    expect(at('id="offre"')).toBeGreaterThan(-1);
+    if (selling) expect(at('id="equipe"')).toBeGreaterThan(at('id="offre"'));
+    expect(at('id="strategie-leadership"')).toBeGreaterThan(Math.max(at('id="offre"'), at('id="equipe"')));
+    expect(at("data-tickets-code")).toBeGreaterThan(at('id="strategie-leadership"'));
+  });
+
+  it("gives the Strategy & Leadership ticket one price, no timeline, and says what it adds", () => {
+    const start = main.indexOf('id="strategie-leadership"');
+    const ticket = main.slice(start, main.indexOf("</article>", start));
+    expect(ticket).toContain('data-strategic-price="299"');
+    expect(ticket).not.toMatch(/data-tier|data-offer-pill|data-offer-deadline/);
+    expect(visibleText(ticket)).not.toMatch(/Stock limité|Dernières places|Épuisé/);
+    expect(visibleText(ticket)).toContain("Tout le billet standard, plus un accès prioritaire");
+    expect(ticket).toMatch(/<a\b[^>]*href="\/track-strategie-leadership"/);
+    // The page's own action, and the very same button as the standard ticket's.
+    const buy = ticket.match(LISTING_LINK);
+    expect(buy).toHaveLength(1);
+    expect(buy![0]).toContain('data-umami-event-billet="strategique"');
+    const standardBuy = main.slice(main.indexOf('id="offre"')).match(LISTING_LINK)![0];
+    const classOf = (tag: string) => tag.match(/class="([^"]+)"/)![1];
+    expect(classOf(buy![0])).toBe(classOf(standardBuy));
+  });
+
+  it("draws both tickets alike, but for the standard card's shadow", () => {
+    const card = (id: string) => main.match(new RegExp(`<article\\b[^>]*id="${id}"[^>]*>`))![0];
+    const [standard, strategic] = [card("offre"), card("strategie-leadership")];
+    for (const tag of [standard, strategic]) expect(tag).toContain("border-primary/35");
+    expect(standard).toContain("shadow-[");
+    expect(strategic).not.toContain("shadow-[");
+    // Same monumental price scale on both.
+    const scale = "text-[clamp(3.5rem,11vw,5.5rem)]";
+    const start = main.indexOf('id="strategie-leadership"');
+    expect(main.slice(main.indexOf('id="offre"'), start)).toContain(scale);
+    expect(main.slice(start, main.indexOf("</article>", start))).toContain(scale);
+  });
+
+  it("answers in the FAQ that the track is open to every ticket", () => {
+    expect(text).toMatch(/Le parcours Stratégie (&amp;|&) Leadership est-il réservé au billet Stratégie (&amp;|&) Leadership/);
+    expect(text).toContain("Ses talks sont ouverts à tous les billets");
+  });
+
+  it("names the standard ticket and its tier in the mobile bar", () => {
+    const bar = html.slice(html.indexOf("data-sticky-bar"));
+    const tier = TICKETING.tiers.find((t) => t.id === phase)!.name.fr;
+    expect(visibleText(bar)).toContain(`Standard · ${tier}`);
   });
 
   it("renders no placeholder: a draft reads as copy, an undecided line is absent", () => {
@@ -220,10 +286,11 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
     expect(main).not.toMatch(/<(dd|dt)\b[^>]*>\s*<\/\1>/);
     // Drafts show as the copy they will become (Astro escapes `&` and `'`).
     expect(main).toMatch(/Stratégie (&amp;|&) Leadership/);
+    expect(text).toContain("Billet standard");
+    expect(text).toMatch(/Billet Stratégie (&amp;|&) Leadership/);
     expect(text).toContain("en mars 2027");
     expect(text).toContain("soirée comprise");
     // What is left is still the page, not a shell.
-    expect(text).toContain("Je prends ma place");
     expect(text).toContain("Ce que comprend votre billet");
     expect(text).toContain("Questions fréquentes");
   });
@@ -231,16 +298,6 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
   it("keeps the manager kit box, linked to its draft URL", () => {
     expect(text).toContain("Un kit pour convaincre votre manager");
     expect(main).toMatch(/<a\b[^>]*href="#convaincre"[^>]*data-umami-event="tickets-manager-kit"/);
-  });
-
-  it("lists only the Strategy & Leadership facts that have a value", () => {
-    const start = main.indexOf('id="strategie-leadership"');
-    const band = main.slice(start, main.indexOf("</section>", start));
-    const terms = [...band.matchAll(/<dt\b[^>]*>([\s\S]*?)<\/dt>/g)].map((m) => m[1]);
-    // Only the networking area has a draft today; price, contents, programme
-    // and access have no row until they are decided.
-    expect(terms).toHaveLength(1);
-    expect(terms[0]).toMatch(/Espace d(&#39;|')échange/);
   });
 
   it("carries no proof section and no inclusion footer — the FAQ answers that", () => {

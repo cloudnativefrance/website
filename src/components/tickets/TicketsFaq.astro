@@ -17,6 +17,8 @@ interface Props {
   email: string;
   inclusionMailto: string;
   perOrder: { early: number; later: number };
+  /** The Strategy & Leadership ticket's public name: its question says the track is open to every ticket. */
+  strategicName: string;
   /** When the programme is announced; its question is left out while undecided. */
   programmeWhen?: string;
   vatRate?: string;
@@ -26,7 +28,8 @@ interface Props {
   termsUrl?: string;
 }
 
-const { lang, host, email, inclusionMailto, perOrder, programmeWhen, vatRate, invoice, transfer, termsUrl } = Astro.props;
+const { lang, host, email, inclusionMailto, perOrder, strategicName, programmeWhen, vatRate, invoice, transfer, termsUrl } =
+  Astro.props;
 const t = useTranslations(lang);
 const practicalPath = `${getLocalePath(lang, "/informations-utiles")}#accessibilite`;
 const cocPath = getLocalePath(lang, "/code-of-conduct");
@@ -48,6 +51,10 @@ const link = "font-medium text-primary-strong underline underline-offset-4 decor
     <details class="faq group">
       <summary>{t("tickets.faq.change.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
       <p>{t("tickets.faq.change.a")}</p>
+    </details>
+    <details class="faq group" data-faq="strategic">
+      <summary>{fill(t("tickets.faq.strategic.q"), { name: strategicName })}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <p>{fill(t("tickets.faq.strategic.a"), { name: strategicName })}</p>
     </details>
     <details class="faq group">
       <summary>{t("tickets.faq.ttc.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>

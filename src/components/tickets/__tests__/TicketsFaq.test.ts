@@ -11,6 +11,7 @@ const base = {
   email: "billetterie@cloudnativedays.fr",
   inclusionMailto: "mailto:billetterie@cloudnativedays.fr",
   perOrder: { early: 5, later: 20 },
+  strategicName: "Stratégie & Leadership",
 };
 
 let container: AstroContainer;
@@ -23,6 +24,14 @@ const render = (props: Record<string, unknown>) =>
   container.renderToString(TicketsFaq, { props: { ...base, ...props } });
 
 describe("TicketsFaq", () => {
+  it("says the Strategy & Leadership track is open to every ticket, under the ticket's own name", async () => {
+    const html = await render({ strategicName: "Nom décidé" });
+    const item = html.match(/<details\b[^>]*data-faq="strategic"[\s\S]*?<\/details>/)?.[0];
+    expect(item).toMatch(/Le parcours Stratégie (&amp;|&) Leadership est-il réservé au billet Nom décidé/);
+    expect(item).toContain("Ses talks sont ouverts à tous les billets");
+    expect(item).toContain("Le billet Nom décidé y donne un accès prioritaire");
+  });
+
   it("leaves an undecided answer out, or on its waiting copy", async () => {
     const html = await render({});
     expect(html).not.toContain("Taux de TVA");

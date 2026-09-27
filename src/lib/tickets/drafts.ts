@@ -29,6 +29,8 @@ export interface ShippingProblem {
  * would simply disappear, and the page is not worth shipping without them.
  */
 const REQUIRED: ReadonlyArray<{ path: string; read: (config: TicketingConfig) => unknown }> = [
+  { path: "standardName", read: (config) => config.standardName },
+  { path: "strategic.name", read: (config) => config.strategic.name },
   { path: "strategic.price", read: (config) => config.strategic.price },
 ];
 
