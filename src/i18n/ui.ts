@@ -500,12 +500,6 @@ export const ui = {
     "tickets.included.evening.title": "La soirée, pour tout le monde",
     "tickets.included.evening.body": "Nouveauté 2027\u00a0: la soirée est comprise dans le billet, sans option à ajouter.",
     "tickets.included.evening.details": "Le détail de la soirée",
-    "tickets.proof.title": "2026, en vrai",
-    "tickets.proof.lead": "Le 3 février 2026, plus de 1\u202f700 personnes au CENTQUATRE-PARIS.",
-    "tickets.proof.rex": "{n} retours d'expérience, portés par",
-    "tickets.proof.replays": "Tous les talks sont en replay",
-    "tickets.proof.photos": "Voir les photos",
-    "tickets.proof.programme": "Le programme 2027 arrive {when}. D'ici là, 2026 parle pour nous.",
     "tickets.faq.title": "Questions fréquentes",
     "tickets.faq.payment.q": "Comment se passe le paiement\u202f?",
     "tickets.faq.payment.a":
@@ -537,9 +531,6 @@ export const ui = {
     "tickets.faq.coc.link": "Lire le code de conduite",
     "tickets.faq.programme.q": "Quand le programme sera-t-il publié\u202f?",
     "tickets.faq.programme.a": "Le programme 2027 sera publié {when}.",
-    "tickets.inclusion.text":
-      "Le prix ne doit empêcher personne de venir. Étudiant(e), ou le budget coince\u202f? Écrivez-nous, nous regardons chaque demande avec attention.",
-    "tickets.inclusion.cta": "Écrire à la billetterie",
     "tickets.inclusion.mail.subject": "Demande de tarif inclusion ou étudiant",
     "tickets.inclusion.mail.body":
       "Bonjour,\n\nQuelques mots sur votre situation\u00a0:\n\nNom\u00a0:\nÉcole ou structure (le cas échéant)\u00a0:\n",
@@ -1035,12 +1026,6 @@ export const ui = {
     "tickets.included.evening.title": "The evening, for everyone",
     "tickets.included.evening.body": "New in 2027: the evening is part of the ticket, with no add-on to buy.",
     "tickets.included.evening.details": "What the evening holds",
-    "tickets.proof.title": "2026, for real",
-    "tickets.proof.lead": "On 3 February 2026, more than 1,700 people at CENTQUATRE-PARIS.",
-    "tickets.proof.rex": "{n} experience reports, given by",
-    "tickets.proof.replays": "Every talk is on replay",
-    "tickets.proof.photos": "See the photos",
-    "tickets.proof.programme": "The 2027 programme arrives {when}. Until then, 2026 speaks for us.",
     "tickets.faq.title": "Frequently asked questions",
     "tickets.faq.payment.q": "How does payment work?",
     "tickets.faq.payment.a":
@@ -1072,9 +1057,6 @@ export const ui = {
     "tickets.faq.coc.link": "Read the code of conduct",
     "tickets.faq.programme.q": "When will the programme be published?",
     "tickets.faq.programme.a": "The 2027 programme will be published {when}.",
-    "tickets.inclusion.text":
-      "Price should stop no one from coming. A student, or the budget is tight? Write to us, we read every request carefully.",
-    "tickets.inclusion.cta": "Write to the ticketing team",
     "tickets.inclusion.mail.subject": "Inclusion or student rate request",
     "tickets.inclusion.mail.body": "Hello,\n\nA few words about your situation:\n\nName:\nSchool or organisation (if any):\n",
     "tickets.sticky.buy": "Buy",

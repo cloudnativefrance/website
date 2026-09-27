@@ -14,22 +14,12 @@
 import TicketsPage from "@/components/tickets/TicketsPage.astro";
 import { TICKETING } from "@/config/tickets";
 import { demoStaticPaths, ticketDemosEnabled, type DemoState } from "@/lib/tickets/demo";
-import { loadSessions } from "@/lib/schedule";
-import { assertEditionPublishable } from "@/lib/edition-visibility";
-import { rexSummary } from "@/lib/tickets/rex";
 
 export function getStaticPaths() {
   return ticketDemosEnabled() ? demoStaticPaths() : [];
 }
 
 const { phase } = Astro.props as DemoState;
-
-// The proof section quotes the last edition's experience reports, and that
-// edition only: the page has no coming-soon state, so it refuses any edition
-// that is not public rather than reading it.
-const PROOF_EDITION = 2026;
-assertEditionPublishable(PROOF_EDITION, "billetterie");
-const rex = rexSummary(await loadSessions(PROOF_EDITION));
 ---
 
-<TicketsPage lang="fr" phase={phase ?? TICKETING.currentPhase} rex={rex} demo={{ fromConfig: !phase }} />
+<TicketsPage lang="fr" phase={phase ?? TICKETING.currentPhase} demo={{ fromConfig: !phase }} />

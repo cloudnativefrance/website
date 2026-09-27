@@ -24,29 +24,25 @@ import {
   tierStates,
 } from "@/lib/tickets/phase";
 import { alfioHost, codeFallbackAction, listingUrl, purchaseTarget } from "@/lib/tickets/purchase";
-import type { RexSummary } from "@/lib/tickets/rex";
 import OfferDoor from "./OfferDoor.astro";
 import TeamDoor from "./TeamDoor.astro";
 import CodeDoor from "./CodeDoor.astro";
 import PurchaseControl from "./PurchaseControl.astro";
 import StrategicOffer from "./StrategicOffer.astro";
 import IncludedInTicket from "./IncludedInTicket.astro";
-import EditionProof from "./EditionProof.astro";
 import TeamOffer from "./TeamOffer.astro";
 import TicketsFaq from "./TicketsFaq.astro";
-import InclusionNote from "./InclusionNote.astro";
 import StickyTicketBar from "./StickyTicketBar.astro";
 import Tbd from "./Tbd.astro";
 
 interface Props {
   lang: Locale;
   phase: Phase;
-  rex: RexSummary;
   /** Demo routes stripe the mobile bar so no capture passes for the real page. */
   demo?: boolean;
 }
 
-const { lang, phase, rex, demo } = Astro.props;
+const { lang, phase, demo } = Astro.props;
 const t = useTranslations(lang);
 const config = TICKETING;
 assertTicketingConfig(config);
@@ -204,11 +200,7 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
     />
   </div>
 
-  <div class="border-y border-border bg-card/60 py-20 md:py-24">
-    <EditionProof lang={lang} rex={rex} programmeWhen={programmeWhen} programmeNote={programmeNote} />
-  </div>
-
-  <div class="mx-auto max-w-7xl px-4 pb-20 pt-24 md:px-6 md:pb-24 md:pt-28 lg:px-8">
+  <div class="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-24 lg:px-8">
     <TeamOffer
       lang={lang}
       programmeWhen={programmeWhen}
@@ -218,7 +210,7 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
     />
   </div>
 
-  <div class="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-24 lg:px-8">
+  <div class="mx-auto max-w-7xl px-4 pb-28 md:px-6 md:pb-24 lg:px-8">
     <TicketsFaq
       lang={lang}
       host={host}
@@ -234,10 +226,6 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
         programme: programmeNote,
       }}
     />
-  </div>
-
-  <div class="mx-auto max-w-7xl px-4 pb-28 md:px-6 md:pb-24 lg:px-8">
-    <InclusionNote lang={lang} inclusionMailto={inclusionMailto} />
   </div>
 </main>
 

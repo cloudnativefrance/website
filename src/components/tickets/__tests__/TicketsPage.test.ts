@@ -11,7 +11,6 @@ import TicketsContent from "../TicketsContent.astro";
 import { DEMO_PHASES } from "@/lib/tickets/demo";
 import type { Phase } from "@/config/tickets";
 
-const rex = { sessions: 17, organisations: ["SNCF", "Mistral AI"] };
 let container: AstroContainer;
 
 beforeAll(async () => {
@@ -22,7 +21,7 @@ beforeAll(async () => {
 // not provide, and the page wrapper is covered by the source checks below.
 async function render(phase: Phase) {
   return container.renderToString(TicketsContent, {
-    props: { lang: "fr", phase, rex, demo: true },
+    props: { lang: "fr", phase, demo: true },
   });
 }
 
@@ -246,6 +245,13 @@ describe.each(DEMO_PHASES)("phase %s", (phase) => {
     expect(left).toContain("Je prends ma place");
     expect(left).toContain("Ce que comprend votre billet");
     expect(left).toContain("Questions fréquentes");
+  });
+
+  it("carries no proof section and no inclusion footer — the FAQ answers that", () => {
+    expect(text).not.toContain("2026, en vrai");
+    expect(main).not.toContain('id="proof-title"');
+    expect(text).not.toContain("Le prix ne doit empêcher personne");
+    expect(text).toContain("Existe-t-il un tarif étudiant ou solidaire");
   });
 
   it("stripes the mobile bar as a demo", () => {

@@ -17,8 +17,6 @@ import {
   ticketDemosEnabled,
 } from "@/lib/tickets/demo";
 import { fill, formatDayMonth, formatDiscount, formatPrice } from "@/lib/tickets/format";
-import { rexSummary } from "@/lib/tickets/rex";
-import type { SessionRow } from "@/lib/schedule";
 import { assertShippable, shippingProblems, shown } from "@/lib/tickets/drafts";
 
 const tier = (id: TierId) => TICKETING.tiers.find((t) => t.id === id)!;
@@ -258,21 +256,6 @@ describe("format", () => {
   it("fills named tokens and leaves unknown ones", () => {
     expect(fill("{n} billets à {price}", { n: 3, price: "129 €" })).toBe("3 billets à 129 €");
     expect(fill("{missing}", {})).toBe("{missing}");
-  });
-});
-
-describe("rexSummary", () => {
-  const row = (title: string) => ({ title }) as SessionRow;
-
-  it("lists distinct organisations from REX titles and counts the sessions", () => {
-    const summary = rexSummary([
-      row("REX SNCF - Kube managé"),
-      row("Keynote d'ouverture"),
-      row("REX Air France-KLM - Vers le cloud"),
-      row("REX SNCF - Des rails aux nuages"),
-      row("REX bpifrance - FinOps en action – la suite"),
-    ]);
-    expect(summary).toEqual({ sessions: 4, organisations: ["SNCF", "Air France-KLM", "bpifrance"] });
   });
 });
 

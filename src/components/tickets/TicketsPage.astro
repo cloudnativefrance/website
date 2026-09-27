@@ -7,19 +7,17 @@ import Layout from "@/layouts/Layout.astro";
 import { TICKETING, type Phase } from "@/config/tickets";
 import { useTranslations } from "@/i18n/utils";
 import type { Locale } from "@/i18n/ui";
-import type { RexSummary } from "@/lib/tickets/rex";
 import TicketsContent from "./TicketsContent.astro";
 import DemoBar from "./DemoBar.astro";
 
 interface Props {
   lang: Locale;
   phase: Phase;
-  rex: RexSummary;
   /** Present on demo routes only: renders the switcher and forces noindex. */
   demo?: { fromConfig: boolean };
 }
 
-const { lang, phase, rex, demo } = Astro.props;
+const { lang, phase, demo } = Astro.props;
 const t = useTranslations(lang);
 ---
 
@@ -27,7 +25,7 @@ const t = useTranslations(lang);
   {demo && (
     <DemoBar lang={lang} config={TICKETING} phase={phase} fromConfig={demo.fromConfig} />
   )}
-  <TicketsContent lang={lang} phase={phase} rex={rex} demo={Boolean(demo)} />
+  <TicketsContent lang={lang} phase={phase} demo={Boolean(demo)} />
 </Layout>
 
 <script>
