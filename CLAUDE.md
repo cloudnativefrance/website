@@ -36,7 +36,7 @@ Schema changes that span the CSV pipeline (Sheet column → parser → Zod schem
   Sponsors and team remain Google Sheet CSVs via `src/lib/remote-csv.ts`.
   Env: `PRETALX_BASE_URL`, `PRETALX_API_TOKEN` or `PRETALX_API_TOKEN_FILE`,
   `PRETALX_TOKEN_REQUIRED=1` to make a missing or rejected token fatal (the image
-  build sets it). A *transient* Pretalx failure is retried and then, still under
+  build sets it). A _transient_ Pretalx failure is retried and then, still under
   that flag, fails with a message naming `PRETALX_ALLOW_DEGRADED=1` — the
   deliberate "Pretalx is down and I need this deploy out" override, which ships
   the build with no speaker affiliations and no level chips.
@@ -53,4 +53,5 @@ Schema changes that span the CSV pipeline (Sheet column → parser → Zod schem
 
 - Bilingual routes: French at `/`, English mirrored at `/en/`. Keep i18n keys in sync.
 - Commit style: Conventional commits (`feat:`, `fix:`, `chore:`, `ci:`). Short subject, "why" in body.
+- Formatting: Prettier, as editors like VS Code apply it on save (`.prettierrc`: `prettier-plugin-astro`, and `prettier-plugin-tailwindcss`, which sorts class lists). Run `pnpm exec prettier --write <file>` on every file you create, before calling the work done. Much of the existing code predates Prettier: in a file that already exists, format only the lines you add or change, never the whole file, so the diff stays yours. Source-shape tests (regexes over `.astro` source) must tolerate Prettier's wrapping (`\s*`, optional parentheses).
 - See `DESIGN.md` for visual/UX decisions log and `STITCH_WORKFLOW.md` for the Stitch process.

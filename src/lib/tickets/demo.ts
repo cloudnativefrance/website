@@ -50,7 +50,13 @@ export function placeholdersAllowed(input: GateInput = {}): boolean {
   return ticketDemosEnabled(input);
 }
 
-export const DEMO_PHASES: readonly Phase[] = ["pre_opening", "seb", "eb", "regular", "last_chance"];
+export const DEMO_PHASES: readonly Phase[] = [
+  "pre_opening",
+  "seb",
+  "eb",
+  "regular",
+  "last_chance",
+];
 
 /** URL segments. The demo is internal, but tier ids are never shown to visitors. */
 export const PHASE_SLUGS: Record<Phase, string> = {
@@ -67,6 +73,12 @@ export function demoPath(phase: Phase, lang: Locale): string {
 }
 
 /** Every demo phase as `demo/[phase]` route params — the same slugs in both languages. */
-export function demoStaticPaths(): Array<{ params: { phase: string }; props: { phase: Phase } }> {
-  return DEMO_PHASES.map((phase) => ({ params: { phase: PHASE_SLUGS[phase] }, props: { phase } }));
+export function demoStaticPaths(): Array<{
+  params: { phase: string };
+  props: { phase: Phase };
+}> {
+  return DEMO_PHASES.map((phase) => ({
+    params: { phase: PHASE_SLUGS[phase] },
+    props: { phase },
+  }));
 }

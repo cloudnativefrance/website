@@ -86,7 +86,8 @@ const indexable = isProductionOrigin(Astro.site?.origin);
 // A separate const rather than reusing `indexable`: the two share a condition
 // today but mean different things. Never under `astro dev`, whose origin is
 // production by default: local page views are not visits.
-const analyticsEnabled = !import.meta.env.DEV && isProductionOrigin(Astro.site?.origin);
+const analyticsEnabled =
+  !import.meta.env.DEV && isProductionOrigin(Astro.site?.origin);
 ---
 <html lang={resolvedLang}>
   <head>
@@ -102,7 +103,11 @@ const analyticsEnabled = !import.meta.env.DEV && isProductionOrigin(Astro.site?.
     <title>{title}</title>
     <meta name="description" content={metaDescription} />
 
-    {(!indexable || noindex) && <meta name="robots" content="noindex, nofollow" />}
+    {
+      (!indexable || noindex) && (
+        <meta name="robots" content="noindex, nofollow" />
+      )
+    }
 
     {/* Self-hosted Umami. Cookieless, no personal data, DNT honoured. Served
         from /cnd.js rather than the default /script.js because ad-blocker

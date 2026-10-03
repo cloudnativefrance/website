@@ -132,7 +132,11 @@ export default defineConfig({
       // src/lib/tickets/demo.ts). Unset, it is on under `astro dev` and off in
       // any build; the staging image sets it to true. A production-origin build
       // refuses true.
-      TICKETS_DEMO: envField.boolean({ context: "server", access: "public", optional: true }),
+      TICKETS_DEMO: envField.boolean({
+        context: "server",
+        access: "public",
+        optional: true,
+      }),
     },
   },
 });

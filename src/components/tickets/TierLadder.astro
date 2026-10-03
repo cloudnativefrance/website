@@ -48,63 +48,78 @@ const tierIds: TierId[] = items.map((i) => i.tier.id);
 ---
 
 <div class="flex flex-col gap-3" data-tier-ladder={tierIds.join(" ")}>
-  <h3 class="text-sm font-semibold text-muted-foreground">{t("tickets.ladder.title")}</h3>
+  <h3 class="text-muted-foreground text-sm font-semibold">
+    {t("tickets.ladder.title")}
+  </h3>
 
   <ol class="grid grid-cols-1 gap-5 sm:grid-cols-4 sm:gap-7">
-    {items.map((item, index) => {
-      const tone = toneOf(item);
-      const isPast = tone === "past";
-      const isLast = index === items.length - 1;
-      return (
-        <li
-          class:list={[
-            "relative flex items-center justify-between gap-3 rounded-lg border px-4 py-2.5 sm:flex-col sm:items-start sm:justify-center sm:gap-0.5 sm:px-3.5",
-            toneClass[tone],
-          ]}
-          aria-current={item.state.kind === "current" ? "step" : undefined}
-          data-tier={item.tier.id}
-          data-tier-state={item.state.kind}
-        >
-          <span class:list={["text-sm font-semibold", tone === "selected" && "text-primary-strong"]}>
-            {item.tier.name[lang]}
-            {/* The state word the box does not need: kept for screen readers,
-                where shape and colour carry nothing. */}
-            {tone === "selected" && (
-              <span class="sr-only">
-                {" · "}{t("tickets.ladder.current")}
-              </span>
-            )}
-          </span>
-          <span class="flex flex-wrap items-baseline justify-end gap-x-2 gap-y-0.5 sm:justify-start">
+    {
+      items.map((item, index) => {
+        const tone = toneOf(item);
+        const isPast = tone === "past";
+        const isLast = index === items.length - 1;
+        return (
+          <li
+            class:list={[
+              "relative flex items-center justify-between gap-3 rounded-lg border px-4 py-2.5 sm:flex-col sm:items-start sm:justify-center sm:gap-0.5 sm:px-3.5",
+              toneClass[tone],
+            ]}
+            aria-current={item.state.kind === "current" ? "step" : undefined}
+            data-tier={item.tier.id}
+            data-tier-state={item.state.kind}
+          >
             <span
               class:list={[
-                "text-lg font-bold tabular-nums tracking-[-0.02em]",
-                isPast && "line-through decoration-muted-foreground/50 decoration-[1.5px]",
+                "text-sm font-semibold",
+                tone === "selected" && "text-primary-strong",
               ]}
             >
-              {formatPrice(item.tier.price, lang)}
+              {item.tier.name[lang]}
+              {/* The state word the box does not need: kept for screen readers,
+                where shape and colour carry nothing. */}
+              {tone === "selected" && (
+                <span class="sr-only">
+                  {" · "}
+                  {t("tickets.ladder.current")}
+                </span>
+              )}
             </span>
-            {isPast && (
-              <span class="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
-                <Icon name="ban" size={12} />
-                {t("tickets.ladder.sold_out")}
+            <span class="flex flex-wrap items-baseline justify-end gap-x-2 gap-y-0.5 sm:justify-start">
+              <span
+                class:list={[
+                  "text-lg font-bold tracking-[-0.02em] tabular-nums",
+                  isPast &&
+                    "decoration-muted-foreground/50 line-through decoration-[1.5px]",
+                ]}
+              >
+                {formatPrice(item.tier.price, lang)}
               </span>
-            )}
-          </span>
+              {isPast && (
+                <span class="text-muted-foreground inline-flex items-center gap-1 text-xs font-semibold tracking-[0.05em] uppercase">
+                  <Icon name="ban" size={12} />
+                  {t("tickets.ladder.sold_out")}
+                </span>
+              )}
+            </span>
 
-          {/* The climb, drawn: down the stack on mobile, along the row from sm.
+            {/* The climb, drawn: down the stack on mobile, along the row from sm.
               Sits in the gutter, outside the box, and says nothing to a reader.
               Every box has the same height, so the chevron sits at mid-height. */}
-          {!isLast && (
-            <span
-              aria-hidden="true"
-              class="pointer-events-none absolute left-1/2 top-full -translate-x-1/2 translate-y-0.5 text-muted-foreground/60 sm:left-full sm:top-1/2 sm:-translate-y-1/2 sm:translate-x-1.5"
-            >
-              <Icon name="chevron-right" size={16} class="rotate-90 sm:rotate-0" />
-            </span>
-          )}
-        </li>
-      );
-    })}
+            {!isLast && (
+              <span
+                aria-hidden="true"
+                class="text-muted-foreground/60 pointer-events-none absolute top-full left-1/2 -translate-x-1/2 translate-y-0.5 sm:top-1/2 sm:left-full sm:translate-x-1.5 sm:-translate-y-1/2"
+              >
+                <Icon
+                  name="chevron-right"
+                  size={16}
+                  class="rotate-90 sm:rotate-0"
+                />
+              </span>
+            )}
+          </li>
+        );
+      })
+    }
   </ol>
 </div>

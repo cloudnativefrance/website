@@ -34,44 +34,74 @@ const parts = price === undefined ? undefined : priceParts(price, lang);
 
 <article
   id="strategie-leadership"
-  class="door grid gap-6 rounded-xl border border-primary/35 bg-card p-5 sm:p-8 lg:grid-cols-[minmax(0,26rem)_auto] lg:gap-10"
+  class="door border-primary/35 bg-card grid gap-6 rounded-xl border p-5 sm:p-8 lg:grid-cols-[minmax(0,26rem)_auto] lg:gap-10"
   aria-labelledby="strategic-title"
   data-strategic-ticket
 >
   <div class="flex flex-col gap-3">
-    <h2 id="strategic-title" class="text-2xl font-semibold tracking-[-0.01em] text-foreground" data-ticket-name="strategic">
+    <h2
+      id="strategic-title"
+      class="text-foreground text-2xl font-semibold tracking-[-0.01em]"
+      data-ticket-name="strategic"
+    >
       {fill(t("tickets.offer.ticket"), { name })}
     </h2>
-    {parts && (
-      <p class="flex items-baseline gap-3 text-foreground" data-strategic-price={price}>
-        <span class="font-bold tabular-nums leading-none tracking-[-0.035em] text-[clamp(3.5rem,11vw,5.5rem)]">
-          {parts.before && <span class="mr-1 align-top text-[0.45em] font-semibold tracking-normal">{parts.before}</span>}
-          {parts.amount}
-          {parts.after && <span class="ml-1.5 text-[0.45em] font-semibold tracking-normal">{parts.after}</span>}
-        </span>
-        <span class="text-base font-medium text-muted-foreground">{t("tickets.offer.ttc")}</span>
-      </p>
-    )}
-    <p class="max-w-[52ch] text-base text-muted-foreground text-pretty">
+    {
+      parts && (
+        <p
+          class="text-foreground flex items-baseline gap-3"
+          data-strategic-price={price}
+        >
+          <span class="text-[clamp(3.5rem,11vw,5.5rem)] leading-none font-bold tracking-[-0.035em] tabular-nums">
+            {parts.before && (
+              <span class="mr-1 align-top text-[0.45em] font-semibold tracking-normal">
+                {parts.before}
+              </span>
+            )}
+            {parts.amount}
+            {parts.after && (
+              <span class="ml-1.5 text-[0.45em] font-semibold tracking-normal">
+                {parts.after}
+              </span>
+            )}
+          </span>
+          <span class="text-muted-foreground text-base font-medium">
+            {t("tickets.offer.ttc")}
+          </span>
+        </p>
+      )
+    }
+    <p class="text-muted-foreground max-w-[52ch] text-base text-pretty">
       {fill(t("tickets.strategic.perks"), { standard: standardName })}
     </p>
-    {/* Inline, not flex: when the line wraps, the arrow follows the last word
-        instead of standing apart at the far edge. */}
-    {trackUrl && (
-      <p class="text-base font-semibold text-pretty">
-        <a
-          href={trackUrl}
-          class="text-primary-strong underline-offset-4 hover:underline"
-          data-umami-event="tickets-strategic-track"
-        >
-          {t("tickets.strategic.track")}<Icon name="arrow-right" size={16} class="ml-1.5 inline-block align-[-0.125em]" />
-        </a>
-      </p>
-    )}
+    {
+      /* Inline, not flex: when the line wraps, the arrow follows the last word
+        instead of standing apart at the far edge. */
+    }
+    {
+      trackUrl && (
+        <p class="text-base font-semibold text-pretty">
+          <a
+            href={trackUrl}
+            class="text-primary-strong underline-offset-4 hover:underline"
+            data-umami-event="tickets-strategic-track"
+          >
+            {t("tickets.strategic.track")}
+            <Icon
+              name="arrow-right"
+              size={16}
+              class="ml-1.5 inline-block align-[-0.125em]"
+            />
+          </a>
+        </p>
+      )
+    }
   </div>
 
-  {/* An action column like the standard card's: the mobile bar stays away
-      while it is on screen, so it never sits under a button for the other ticket. */}
+  {
+    /* An action column like the standard card's: the mobile bar stays away
+      while it is on screen, so it never sits under a button for the other ticket. */
+  }
   <div class="flex flex-col justify-center gap-4" data-offer-action>
     <slot name="purchase" />
   </div>

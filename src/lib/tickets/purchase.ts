@@ -61,7 +61,10 @@ export function codeUrl(config: TicketingConfig, raw: string): CodeResult {
  * alf.io's support for it is still to be confirmed with JC; the script
  * upgrades the form to `/code/<CODE>`.
  */
-export function codeFallbackAction(config: TicketingConfig): { action: string; param: "code" } {
+export function codeFallbackAction(config: TicketingConfig): {
+  action: string;
+  param: "code";
+} {
   return { action: listingUrl(config), param: "code" };
 }
 

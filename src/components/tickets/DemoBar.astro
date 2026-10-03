@@ -22,7 +22,20 @@ import type { Phase, TicketingConfig } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { DEMO_PHASES, demoPath } from "@/lib/tickets/demo";
 
-const COPY: Record<Locale, Record<"badge" | "notice" | "settings" | "close" | "phase" | "pre_opening" | "scenario" | "config", string>> = {
+const COPY: Record<
+  Locale,
+  Record<
+    | "badge"
+    | "notice"
+    | "settings"
+    | "close"
+    | "phase"
+    | "pre_opening"
+    | "scenario"
+    | "config",
+    string
+  >
+> = {
   fr: {
     badge: "Démo",
     notice: "Page de démonstration, non publiée.",
@@ -30,7 +43,8 @@ const COPY: Record<Locale, Record<"badge" | "notice" | "settings" | "close" | "p
     close: "Fermer les réglages",
     phase: "Phase",
     pre_opening: "Avant ouverture",
-    scenario: "Scénario simulé : les tarifs précédents sont affichés comme épuisés.",
+    scenario:
+      "Scénario simulé : les tarifs précédents sont affichés comme épuisés.",
     config: "État de la config",
   },
   en: {
@@ -57,9 +71,12 @@ const { lang, config, phase, fromConfig } = Astro.props;
 const copy = COPY[lang];
 
 const phaseLabel = (p: Phase) =>
-  p === "pre_opening" ? copy.pre_opening : config.tiers.find((tier) => tier.id === p)!.name[lang];
+  p === "pre_opening"
+    ? copy.pre_opening
+    : config.tiers.find((tier) => tier.id === p)!.name[lang];
 
-const legend = "text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-muted-foreground";
+const legend =
+  "text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-muted-foreground";
 const chip =
   "inline-flex min-h-8 items-center rounded-md px-2.5 text-[0.8125rem] font-medium transition-[background-color,color] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 const idle = "text-foreground hover:bg-muted";
@@ -70,11 +87,24 @@ const active = "bg-foreground text-background";
   <button
     type="button"
     popovertarget="demo-panel"
-    class="demo-trigger fixed left-4 z-50 inline-flex h-8 items-center gap-2 rounded-md px-3 text-xs font-bold uppercase tracking-widest text-destructive-foreground shadow-[0_2px_8px_oklch(0_0_0/0.25)] transition-[scale] duration-150 ease-out active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    class="demo-trigger text-destructive-foreground focus-visible:ring-ring focus-visible:ring-offset-background fixed left-4 z-50 inline-flex h-8 items-center gap-2 rounded-md px-3 text-xs font-bold tracking-widest uppercase shadow-[0_2px_8px_oklch(0_0_0/0.25)] transition-[scale] duration-150 ease-out focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96]"
     aria-label={copy.settings}
   >
     <span>{copy.badge}</span>
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="shrink-0 opacity-80">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.25"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      class="shrink-0 opacity-80"
+    >
       <path d="M4 6h10"></path>
       <path d="M18 6h2"></path>
       <path d="M4 12h4"></path>
@@ -88,47 +118,70 @@ const active = "bg-foreground text-background";
   </button>
 
   <div id="demo-panel" popover class="demo-panel" data-demo-panel>
-    <div class="flex max-h-[min(30rem,calc(100dvh-8rem))] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-y-auto rounded-xl border border-border bg-card shadow-[0_12px_32px_oklch(0_0_0/0.22)]">
+    <div
+      class="border-border bg-card flex max-h-[min(30rem,calc(100dvh-8rem))] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-y-auto rounded-xl border shadow-[0_12px_32px_oklch(0_0_0/0.22)]"
+    >
       <div class="demo-stripe h-1.5 shrink-0" aria-hidden="true"></div>
 
-      <div class="flex items-start justify-between gap-3 px-4 pb-2 pt-3">
+      <div class="flex items-start justify-between gap-3 px-4 pt-3 pb-2">
         <p class="flex flex-col gap-1">
-          <strong class="w-fit rounded-sm bg-destructive px-2 py-0.5 text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-destructive-foreground">
+          <strong
+            class="bg-destructive text-destructive-foreground w-fit rounded-sm px-2 py-0.5 text-[0.6875rem] font-bold tracking-[0.08em] uppercase"
+          >
             {copy.badge}
           </strong>
-          <span class="text-xs text-muted-foreground">{copy.notice}</span>
+          <span class="text-muted-foreground text-xs">{copy.notice}</span>
         </p>
         <button
           type="button"
           popovertarget="demo-panel"
           popovertargetaction="hide"
-          class="-mr-1 -mt-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color] duration-150 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          class="text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring -mt-1 -mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md transition-[background-color,color] duration-150 focus-visible:ring-2 focus-visible:outline-none"
           aria-label={copy.close}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
             <path d="M18 6 6 18"></path>
             <path d="m6 6 12 12"></path>
           </svg>
         </button>
       </div>
 
-      <nav class="flex flex-col gap-1.5 border-t border-border px-4 py-3" aria-label={copy.phase}>
+      <nav
+        class="border-border flex flex-col gap-1.5 border-t px-4 py-3"
+        aria-label={copy.phase}
+      >
         <span class={legend}>{copy.phase}</span>
         <div class="flex flex-wrap gap-1">
-          {DEMO_PHASES.map((p) => (
-            <a
-              href={demoPath(p, lang)}
-              class:list={[chip, !fromConfig && p === phase ? active : idle]}
-              aria-current={!fromConfig && p === phase ? "page" : undefined}
-              data-demo-link
-            >
-              {phaseLabel(p)}
-            </a>
-          ))}
+          {
+            DEMO_PHASES.map((p) => (
+              <a
+                href={demoPath(p, lang)}
+                class:list={[chip, !fromConfig && p === phase ? active : idle]}
+                aria-current={!fromConfig && p === phase ? "page" : undefined}
+                data-demo-link
+              >
+                {phaseLabel(p)}
+              </a>
+            ))
+          }
         </div>
       </nav>
 
-      <p class="border-t border-border px-4 py-3 text-[0.6875rem] leading-relaxed text-muted-foreground">
+      <p
+        class="border-border text-muted-foreground border-t px-4 py-3 text-[0.6875rem] leading-relaxed"
+      >
         {fromConfig ? `${copy.config} · ` : ""}{copy.scenario}
       </p>
     </div>
@@ -143,7 +196,9 @@ const active = "bg-foreground text-background";
   const PANEL_KEY = "cnd-tickets-demo-panel";
   const panel = document.querySelector<HTMLElement>("[data-demo-panel]");
 
-  for (const link of document.querySelectorAll<HTMLAnchorElement>("[data-demo-link]")) {
+  for (const link of document.querySelectorAll<HTMLAnchorElement>(
+    "[data-demo-link]",
+  )) {
     link.addEventListener("click", () => {
       try {
         sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));

@@ -12,7 +12,10 @@ import type {
   TierId,
 } from "@/config/tickets";
 
-export type TierState = { kind: "past" } | { kind: "current" } | { kind: "upcoming" };
+export type TierState =
+  | { kind: "past" }
+  | { kind: "current" }
+  | { kind: "upcoming" };
 
 export interface TierWithState {
   tier: TierDefinition;
@@ -20,7 +23,10 @@ export interface TierWithState {
 }
 
 /** The tier `phase` sells. Every caller renders a selling phase: `pre_opening` is the "coming soon" page. */
-export function offerTier(config: TicketingConfig, phase: TierId): TierDefinition {
+export function offerTier(
+  config: TicketingConfig,
+  phase: TierId,
+): TierDefinition {
   const tier = config.tiers.find((t) => t.id === phase);
   if (!tier) throw new Error(`[tickets] unknown phase "${phase}"`);
   return tier;
@@ -31,9 +37,13 @@ export function offerTier(config: TicketingConfig, phase: TierId): TierDefinitio
  * full stop: the page says "Épuisé" for all of them, so nothing here has to
  * know whether it sold out or ran to its date.
  */
-export function tierStates(config: TicketingConfig, phase: TierId): TierWithState[] {
+export function tierStates(
+  config: TicketingConfig,
+  phase: TierId,
+): TierWithState[] {
   const currentIndex = config.tiers.findIndex((t) => t.id === phase);
-  if (currentIndex === -1) throw new Error(`[tickets] unknown phase "${phase}"`);
+  if (currentIndex === -1)
+    throw new Error(`[tickets] unknown phase "${phase}"`);
 
   return config.tiers.map((tier, index) => {
     if (index < currentIndex) return { tier, state: { kind: "past" } };
@@ -58,7 +68,10 @@ export interface TierUrgency {
  * gives — and whether its stock can run out before that. One rule for both, so
  * the big price and the timeline cannot disagree.
  */
-export function tierUrgency(config: TicketingConfig, tier: TierDefinition): TierUrgency {
+export function tierUrgency(
+  config: TicketingConfig,
+  tier: TierDefinition,
+): TierUrgency {
   const lastTier = config.tiers[config.tiers.length - 1]?.id === tier.id;
   return {
     endsAt: lastTier ? undefined : tier.endsAt,
@@ -96,15 +109,21 @@ export function ticketingConfigProblems(config: TicketingConfig): string[] {
 
   for (let i = 1; i < tiers.length; i++) {
     if (tiers[i].price <= tiers[i - 1].price) {
-      problems.push(`tier "${tiers[i].id}" is not dearer than "${tiers[i - 1].id}"`);
+      problems.push(
+        `tier "${tiers[i].id}" is not dearer than "${tiers[i - 1].id}"`,
+      );
     }
     if (Date.parse(tiers[i].endsAt) <= Date.parse(tiers[i - 1].endsAt)) {
-      problems.push(`tier "${tiers[i].id}" does not end after "${tiers[i - 1].id}"`);
+      problems.push(
+        `tier "${tiers[i].id}" does not end after "${tiers[i - 1].id}"`,
+      );
     }
   }
   for (const tier of tiers) {
     if (Number.isNaN(Date.parse(tier.endsAt))) {
-      problems.push(`tier "${tier.id}" has an unparseable endsAt "${tier.endsAt}"`);
+      problems.push(
+        `tier "${tier.id}" has an unparseable endsAt "${tier.endsAt}"`,
+      );
     }
     if (!Number.isInteger(tier.maxPerOrder) || tier.maxPerOrder < 1) {
       problems.push(`tier "${tier.id}" has an invalid maxPerOrder`);
@@ -115,7 +134,8 @@ export function ticketingConfigProblems(config: TicketingConfig): string[] {
   // into a price-per-quantity table, which only reads if the ranges climb.
   const rates = config.groupRates;
   for (const rate of rates) {
-    if (rate.min < 2) problems.push(`group rate "${rate.id}" starts below 2 people`);
+    if (rate.min < 2)
+      problems.push(`group rate "${rate.id}" starts below 2 people`);
     if (rate.max !== undefined && rate.max < rate.min) {
       problems.push(`group rate "${rate.id}" ends before it starts`);
     }
@@ -123,17 +143,24 @@ export function ticketingConfigProblems(config: TicketingConfig): string[] {
   for (let i = 1; i < rates.length; i++) {
     const previous = rates[i - 1];
     if (rates[i].min <= previous.min) {
-      problems.push(`group rate "${rates[i].id}" does not start above "${previous.id}"`);
+      problems.push(
+        `group rate "${rates[i].id}" does not start above "${previous.id}"`,
+      );
     }
     if (previous.max !== undefined && rates[i].min <= previous.max) {
       problems.push(`group rate "${rates[i].id}" overlaps "${previous.id}"`);
     }
     if (rates[i].price >= previous.price) {
-      problems.push(`group rate "${rates[i].id}" is not cheaper than "${previous.id}"`);
+      problems.push(
+        `group rate "${rates[i].id}" is not cheaper than "${previous.id}"`,
+      );
     }
   }
 
-  if (config.currentPhase !== "pre_opening" && !tiers.some((t) => t.id === config.currentPhase)) {
+  if (
+    config.currentPhase !== "pre_opening" &&
+    !tiers.some((t) => t.id === config.currentPhase)
+  ) {
     problems.push(`currentPhase "${config.currentPhase}" matches no tier`);
   }
 
@@ -143,6 +170,8 @@ export function ticketingConfigProblems(config: TicketingConfig): string[] {
 export function assertTicketingConfig(config: TicketingConfig): void {
   const problems = ticketingConfigProblems(config);
   if (problems.length > 0) {
-    throw new Error(`[tickets] src/config/tickets.ts is inconsistent:\n- ${problems.join("\n- ")}`);
+    throw new Error(
+      `[tickets] src/config/tickets.ts is inconsistent:\n- ${problems.join("\n- ")}`,
+    );
   }
 }

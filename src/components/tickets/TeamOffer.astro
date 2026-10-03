@@ -27,29 +27,48 @@ const { lang, programmeWhen, kitUrl } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-<section id="convaincre" class="flex max-w-3xl flex-col gap-5" aria-labelledby="team-title">
-  <h2 id="team-title" class="text-3xl font-bold tracking-[-0.02em] text-balance text-foreground sm:text-4xl">
+<section
+  id="convaincre"
+  class="flex max-w-3xl flex-col gap-5"
+  aria-labelledby="team-title"
+>
+  <h2
+    id="team-title"
+    class="text-foreground text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl"
+  >
     {t("tickets.team.convince.title")}
   </h2>
-  <p class="max-w-[46ch] text-lg text-foreground text-pretty">{t("tickets.team.convince.lead")}</p>
-  {programmeWhen && (
-    <p class="max-w-[52ch] text-base text-muted-foreground text-pretty">
-      {fill(t("tickets.team.programme"), { when: programmeWhen })}
-    </p>
-  )}
+  <p class="text-foreground max-w-[46ch] text-lg text-pretty">
+    {t("tickets.team.convince.lead")}
+  </p>
+  {
+    programmeWhen && (
+      <p class="text-muted-foreground max-w-[52ch] text-base text-pretty">
+        {fill(t("tickets.team.programme"), { when: programmeWhen })}
+      </p>
+    )
+  }
 
-  <div class="mt-2 flex flex-col items-start gap-2 rounded-lg border border-dashed border-input p-5">
-    <p class="text-base font-semibold text-foreground">{t("tickets.team.kit.title")}</p>
-    <p class="text-sm text-muted-foreground text-pretty">{t("tickets.team.kit.body")}</p>
-    {kitUrl && (
-      <a
-        href={kitUrl}
-        class="inline-flex items-center gap-1.5 text-sm font-medium text-primary-strong underline-offset-4 hover:underline"
-        data-umami-event="tickets-manager-kit"
-      >
-        {t("tickets.team.kit.cta")}
-        <Icon name="arrow-right" size={14} />
-      </a>
-    )}
+  <div
+    class="border-input mt-2 flex flex-col items-start gap-2 rounded-lg border border-dashed p-5"
+  >
+    <p class="text-foreground text-base font-semibold">
+      {t("tickets.team.kit.title")}
+    </p>
+    <p class="text-muted-foreground text-sm text-pretty">
+      {t("tickets.team.kit.body")}
+    </p>
+    {
+      kitUrl && (
+        <a
+          href={kitUrl}
+          class="text-primary-strong inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 hover:underline"
+          data-umami-event="tickets-manager-kit"
+        >
+          {t("tickets.team.kit.cta")}
+          <Icon name="arrow-right" size={14} />
+        </a>
+      )
+    }
   </div>
 </section>

@@ -27,22 +27,36 @@ const { lang, tier, rates, class: className } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-{/* One grid for the whole list, each row a subgrid: the prices share a column,
+{
+  /* One grid for the whole list, each row a subgrid: the prices share a column,
     so they start on the same line whatever the width of the tag after them
-    ("−15 %" is narrower than "−25 %"). */}
-<dl class:list={["grid grid-cols-[1fr_auto_auto] gap-x-2 divide-y divide-border border-y border-border", className]}>
-  {rates.map((rate) => (
-    <div class="col-span-3 grid grid-cols-subgrid items-baseline py-3.5" data-group-rate={rate.id}>
-      <dt class="pr-2 text-sm text-muted-foreground">{t(`tickets.team.rate.${rate.id}`)}</dt>
-      <dd class="whitespace-nowrap text-xl font-semibold tabular-nums tracking-[-0.01em] text-foreground">
-        {formatPrice(rate.price, lang)}
-      </dd>
-      <dd
-        class="self-center justify-self-start whitespace-nowrap rounded-full bg-accent px-1.5 py-0.5 text-xs font-bold leading-none tabular-nums text-accent-foreground"
-        data-group-discount
+    ("−15 %" is narrower than "−25 %"). */
+}
+<dl
+  class:list={[
+    "divide-border border-border grid grid-cols-[1fr_auto_auto] gap-x-2 divide-y border-y",
+    className,
+  ]}
+>
+  {
+    rates.map((rate) => (
+      <div
+        class="col-span-3 grid grid-cols-subgrid items-baseline py-3.5"
+        data-group-rate={rate.id}
       >
-        {formatDiscount(tier.price, rate.price, lang)}
-      </dd>
-    </div>
-  ))}
+        <dt class="text-muted-foreground pr-2 text-sm">
+          {t(`tickets.team.rate.${rate.id}`)}
+        </dt>
+        <dd class="text-foreground text-xl font-semibold tracking-[-0.01em] whitespace-nowrap tabular-nums">
+          {formatPrice(rate.price, lang)}
+        </dd>
+        <dd
+          class="bg-accent text-accent-foreground self-center justify-self-start rounded-full px-1.5 py-0.5 text-xs leading-none font-bold whitespace-nowrap tabular-nums"
+          data-group-discount
+        >
+          {formatDiscount(tier.price, rate.price, lang)}
+        </dd>
+      </div>
+    ))
+  }
 </dl>

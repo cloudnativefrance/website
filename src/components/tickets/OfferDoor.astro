@@ -35,60 +35,108 @@ const pill = urgency.lastTier
     ? t("tickets.ladder.limited_stock")
     : undefined;
 const deadline = urgency.endsAt
-  ? fill(t(urgency.limitedStock ? "tickets.ladder.until_or_sold_out" : "tickets.ladder.until"), {
-      date: formatDayMonth(urgency.endsAt, lang),
-    })
+  ? fill(
+      t(
+        urgency.limitedStock
+          ? "tickets.ladder.until_or_sold_out"
+          : "tickets.ladder.until",
+      ),
+      {
+        date: formatDayMonth(urgency.endsAt, lang),
+      },
+    )
   : undefined;
 ---
 
 <article
   id="offre"
-  class="door relative flex grow flex-col gap-8 rounded-xl border border-primary/35 bg-card p-5 shadow-[0_1px_2px_oklch(15.5%_0.04_268/0.05),0_12px_32px_-12px_oklch(15.5%_0.04_268/0.18)] sm:p-8 dark:shadow-[0_0_0_1px_oklch(62.5%_0.162_259.9/0.25),var(--shadow-glow-primary)]"
+  class="door border-primary/35 bg-card relative flex grow flex-col gap-8 rounded-xl border p-5 shadow-[0_1px_2px_oklch(15.5%_0.04_268/0.05),0_12px_32px_-12px_oklch(15.5%_0.04_268/0.18)] sm:p-8 dark:shadow-[0_0_0_1px_oklch(62.5%_0.162_259.9/0.25),var(--shadow-glow-primary)]"
   aria-labelledby="door-offer-title"
   style="--door-index: 0"
 >
   <div class="grid gap-6 lg:grid-cols-[minmax(0,26rem)_auto] lg:gap-10">
     <div class="flex flex-col gap-3">
       <div class="flex flex-col gap-1.5">
-        <h2 id="door-offer-title" class="text-2xl font-semibold tracking-[-0.01em] text-foreground" data-ticket-name="standard">
+        <h2
+          id="door-offer-title"
+          class="text-foreground text-2xl font-semibold tracking-[-0.01em]"
+          data-ticket-name="standard"
+        >
           {fill(t("tickets.offer.ticket"), { name: ticketName })}
         </h2>
-        <p class="flex flex-wrap items-center gap-x-3 gap-y-2 text-base font-semibold text-muted-foreground">
+        <p
+          class="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-2 text-base font-semibold"
+        >
           <span>{tier.name[lang]}</span>
-          {pill && (
-            <span class="inline-flex items-center rounded-full bg-accent px-2.5 py-1 text-xs font-bold uppercase leading-none tracking-[0.06em] text-accent-foreground" data-offer-pill>
-              {pill}
-            </span>
-          )}
+          {
+            pill && (
+              <span
+                class="bg-accent text-accent-foreground inline-flex items-center rounded-full px-2.5 py-1 text-xs leading-none font-bold tracking-[0.06em] uppercase"
+                data-offer-pill
+              >
+                {pill}
+              </span>
+            )
+          }
         </p>
       </div>
-      <p class="flex items-baseline gap-3 text-foreground" data-offer-price={tier.price}>
-        <span class="font-bold tabular-nums leading-none tracking-[-0.035em] text-[clamp(3.5rem,11vw,5.5rem)]">
-          {price.before && <span class="mr-1 align-top text-[0.45em] font-semibold tracking-normal">{price.before}</span>}
+      <p
+        class="text-foreground flex items-baseline gap-3"
+        data-offer-price={tier.price}
+      >
+        <span
+          class="text-[clamp(3.5rem,11vw,5.5rem)] leading-none font-bold tracking-[-0.035em] tabular-nums"
+        >
+          {
+            price.before && (
+              <span class="mr-1 align-top text-[0.45em] font-semibold tracking-normal">
+                {price.before}
+              </span>
+            )
+          }
           {price.amount}
-          {price.after && <span class="ml-1.5 text-[0.45em] font-semibold tracking-normal">{price.after}</span>}
+          {
+            price.after && (
+              <span class="ml-1.5 text-[0.45em] font-semibold tracking-normal">
+                {price.after}
+              </span>
+            )
+          }
         </span>
-        <span class="text-base font-medium text-muted-foreground">{t("tickets.offer.ttc")}</span>
+        <span class="text-muted-foreground text-base font-medium"
+          >{t("tickets.offer.ttc")}</span
+        >
       </p>
-      {/* The price's own caption: the day it ends, where the eye already is.
-          None on the last tier, which runs to the event day. */}
-      {deadline && (
-        <p class="flex items-center gap-2 text-base font-semibold text-foreground text-pretty" data-offer-deadline>
-          <Icon name="clock" size={18} class="shrink-0" />
-          <span>{deadline}</span>
-        </p>
-      )}
+      {
+        /* The price's own caption: the day it ends, where the eye already is.
+          None on the last tier, which runs to the event day. */
+      }
+      {
+        deadline && (
+          <p
+            class="text-foreground flex items-center gap-2 text-base font-semibold text-pretty"
+            data-offer-deadline
+          >
+            <Icon name="clock" size={18} class="shrink-0" />
+            <span>{deadline}</span>
+          </p>
+        )
+      }
     </div>
 
-    {/* The action column — the mobile bar watches it (tickets-ui.ts) and takes
-        over once it and the Stratégie & Leadership ticket's have both left the screen. */}
+    {
+      /* The action column — the mobile bar watches it (tickets-ui.ts) and takes
+        over once it and the Stratégie & Leadership ticket's have both left the screen. */
+    }
     <div class="flex flex-col justify-center gap-4" data-offer-action>
       <slot name="purchase" />
     </div>
   </div>
 
-  {/* `mt-auto`: when "Venir en équipe" beside it is the taller card, the slack
-      lands between the offer and the timeline rather than around the price. */}
+  {
+    /* `mt-auto`: when "Venir en équipe" beside it is the taller card, the slack
+      lands between the offer and the timeline rather than around the price. */
+  }
   <div class="mt-auto">
     <TierLadder items={ladder} lang={lang} />
   </div>

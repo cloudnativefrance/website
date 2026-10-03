@@ -28,95 +28,195 @@ interface Props {
   termsUrl?: string;
 }
 
-const { lang, host, email, inclusionMailto, perOrder, strategicName, programmeWhen, vatRate, invoice, transfer, termsUrl } =
-  Astro.props;
+const {
+  lang,
+  host,
+  email,
+  inclusionMailto,
+  perOrder,
+  strategicName,
+  programmeWhen,
+  vatRate,
+  invoice,
+  transfer,
+  termsUrl,
+} = Astro.props;
 const t = useTranslations(lang);
 const practicalPath = `${getLocalePath(lang, "/informations-utiles")}#accessibilite`;
 const cocPath = getLocalePath(lang, "/code-of-conduct");
 // Terms of sale hosted on alf.io open in a new tab, like every hand-off there.
 const termsNewTab = termsUrl !== undefined && onHost(termsUrl, host);
-const link = "font-medium text-primary-strong underline underline-offset-4 decoration-primary-strong/40 hover:decoration-primary-strong";
+const link =
+  "font-medium text-primary-strong underline underline-offset-4 decoration-primary-strong/40 hover:decoration-primary-strong";
 ---
 
-<section class="grid gap-8 lg:grid-cols-[minmax(0,0.6fr)_minmax(0,1.4fr)] lg:gap-16" aria-labelledby="faq-title">
-  <h2 id="faq-title" class="text-3xl font-bold tracking-[-0.02em] text-balance text-foreground sm:text-4xl">
+<section
+  class="grid gap-8 lg:grid-cols-[minmax(0,0.6fr)_minmax(0,1.4fr)] lg:gap-16"
+  aria-labelledby="faq-title"
+>
+  <h2
+    id="faq-title"
+    class="text-foreground text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl"
+  >
     {t("tickets.faq.title")}
   </h2>
 
-  <div class="divide-y divide-border border-y border-border">
+  <div class="divide-border border-border divide-y border-y">
     <details class="faq group">
-      <summary>{t("tickets.faq.payment.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <summary
+        >{t("tickets.faq.payment.q")}<Icon
+          name="plus"
+          size={18}
+          class="faq-icon"
+        /></summary
+      >
       <p>{fill(t("tickets.faq.payment.a"), { host })}</p>
     </details>
     <details class="faq group">
-      <summary>{t("tickets.faq.change.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <summary
+        >{t("tickets.faq.change.q")}<Icon
+          name="plus"
+          size={18}
+          class="faq-icon"
+        /></summary
+      >
       <p>{t("tickets.faq.change.a")}</p>
     </details>
     <details class="faq group" data-faq="strategic">
-      <summary>{fill(t("tickets.faq.strategic.q"), { name: strategicName })}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <summary
+        >{fill(t("tickets.faq.strategic.q"), { name: strategicName })}<Icon
+          name="plus"
+          size={18}
+          class="faq-icon"
+        /></summary
+      >
       <p>{fill(t("tickets.faq.strategic.a"), { name: strategicName })}</p>
     </details>
     <details class="faq group">
-      <summary>{t("tickets.faq.ttc.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <summary
+        >{t("tickets.faq.ttc.q")}<Icon
+          name="plus"
+          size={18}
+          class="faq-icon"
+        /></summary
+      >
       <p>
         {t("tickets.faq.ttc.a")}
         {vatRate && ` ${fill(t("tickets.faq.ttc.rate"), { rate: vatRate })}`}
       </p>
     </details>
     <details class="faq group">
-      <summary>{t("tickets.faq.per_order.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <summary
+        >{t("tickets.faq.per_order.q")}<Icon
+          name="plus"
+          size={18}
+          class="faq-icon"
+        /></summary
+      >
       <p>{fill(t("tickets.faq.per_order.a"), perOrder)}</p>
     </details>
     <details class="faq group">
-      <summary>{t("tickets.faq.invoice.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <summary
+        >{t("tickets.faq.invoice.q")}<Icon
+          name="plus"
+          size={18}
+          class="faq-icon"
+        /></summary
+      >
       <p>{fill(invoice ?? t("tickets.faq.invoice.a"), { email })}</p>
     </details>
     <details class="faq group">
-      <summary>{t("tickets.faq.transfer.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <summary
+        >{t("tickets.faq.transfer.q")}<Icon
+          name="plus"
+          size={18}
+          class="faq-icon"
+        /></summary
+      >
       <p>{transfer ?? t("tickets.faq.transfer.a")}</p>
-      {termsUrl && (
-        <p>
-          <a
-            href={termsUrl}
-            target={termsNewTab ? "_blank" : undefined}
-            rel={termsNewTab ? "noopener" : undefined}
-            class={link}
-          >
-            {t("tickets.faq.transfer.terms")}
-            {termsNewTab && <span class="sr-only"> {t("tickets.new_tab")}</span>}
-          </a>
-        </p>
-      )}
+      {
+        termsUrl && (
+          <p>
+            <a
+              href={termsUrl}
+              target={termsNewTab ? "_blank" : undefined}
+              rel={termsNewTab ? "noopener" : undefined}
+              class={link}
+            >
+              {t("tickets.faq.transfer.terms")}
+              {termsNewTab && (
+                <span class="sr-only"> {t("tickets.new_tab")}</span>
+              )}
+            </a>
+          </p>
+        )
+      }
     </details>
     <details class="faq group">
-      <summary>{t("tickets.faq.code.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <summary
+        >{t("tickets.faq.code.q")}<Icon
+          name="plus"
+          size={18}
+          class="faq-icon"
+        /></summary
+      >
       <p>{t("tickets.faq.code.a")}</p>
     </details>
     <details class="faq group">
-      <summary>{t("tickets.faq.inclusion.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <summary
+        >{t("tickets.faq.inclusion.q")}<Icon
+          name="plus"
+          size={18}
+          class="faq-icon"
+        /></summary
+      >
       <p>
         {t("tickets.faq.inclusion.a")}{" "}
-        <a href={inclusionMailto} class={link} data-umami-event="tickets-inclusion-contact" data-umami-event-source="faq">{email}</a>
+        <a
+          href={inclusionMailto}
+          class={link}
+          data-umami-event="tickets-inclusion-contact"
+          data-umami-event-source="faq">{email}</a
+        >
       </p>
     </details>
     <details class="faq group">
-      <summary>{t("tickets.faq.access.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <summary
+        >{t("tickets.faq.access.q")}<Icon
+          name="plus"
+          size={18}
+          class="faq-icon"
+        /></summary
+      >
       <p>
-        {t("tickets.faq.access.a")} <a href={practicalPath} class={link}>{t("tickets.faq.access.link")}</a>
+        {t("tickets.faq.access.a")}
+        <a href={practicalPath} class={link}>{t("tickets.faq.access.link")}</a>
       </p>
     </details>
     <details class="faq group">
-      <summary>{t("tickets.faq.coc.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
+      <summary
+        >{t("tickets.faq.coc.q")}<Icon
+          name="plus"
+          size={18}
+          class="faq-icon"
+        /></summary
+      >
       <p>
-        {t("tickets.faq.coc.a")} <a href={cocPath} class={link}>{t("tickets.faq.coc.link")}</a>
+        {t("tickets.faq.coc.a")}
+        <a href={cocPath} class={link}>{t("tickets.faq.coc.link")}</a>
       </p>
     </details>
-    {programmeWhen && (
-      <details class="faq group">
-        <summary>{t("tickets.faq.programme.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
-        <p>{fill(t("tickets.faq.programme.a"), { when: programmeWhen })}</p>
-      </details>
-    )}
+    {
+      programmeWhen && (
+        <details class="faq group">
+          <summary>
+            {t("tickets.faq.programme.q")}
+            <Icon name="plus" size={18} class="faq-icon" />
+          </summary>
+          <p>{fill(t("tickets.faq.programme.a"), { when: programmeWhen })}</p>
+        </details>
+      )
+    }
   </div>
 </section>
 

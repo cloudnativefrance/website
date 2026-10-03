@@ -10,7 +10,9 @@ import { codeUrlFrom, handOffOnce, openInNewTab } from "@/lib/tickets/url";
 const HANDOFF_COOLDOWN_MS = 3_000;
 
 // ── "I have a code": strip spaces, refuse empty, hand over to alf.io ────────────
-for (const form of document.querySelectorAll<HTMLFormElement>("[data-tickets-code]")) {
+for (const form of document.querySelectorAll<HTMLFormElement>(
+  "[data-tickets-code]",
+)) {
   const input = form.querySelector<HTMLInputElement>("[data-code-input]");
   const error = form.querySelector<HTMLElement>("[data-code-error]");
   const listing = form.dataset.listing;
@@ -30,7 +32,10 @@ for (const form of document.querySelectorAll<HTMLFormElement>("[data-tickets-cod
     if (!result.ok) {
       error.hidden = false;
       input.setAttribute("aria-invalid", "true");
-      input.setAttribute("aria-describedby", `${error.id} ${describedBy}`.trim());
+      input.setAttribute(
+        "aria-describedby",
+        `${error.id} ${describedBy}`.trim(),
+      );
       input.focus();
       return;
     }
@@ -50,7 +55,9 @@ for (const form of document.querySelectorAll<HTMLFormElement>("[data-tickets-cod
 // the bar too. The Stratégie & Leadership ticket's action counts as well, so the bar never
 // sits under a button for the other ticket.
 const bar = document.querySelector<HTMLElement>("[data-sticky-bar]");
-const offerActions = [...document.querySelectorAll<HTMLElement>("[data-offer-action]")];
+const offerActions = [
+  ...document.querySelectorAll<HTMLElement>("[data-offer-action]"),
+];
 if (bar && offerActions.length > 0 && "IntersectionObserver" in window) {
   const action = bar.querySelector<HTMLAnchorElement>("[data-sticky-action]");
   const onScreen = new Set<Element>();

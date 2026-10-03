@@ -26,8 +26,12 @@ const render = (props: Record<string, unknown>) =>
 describe("TicketsFaq", () => {
   it("says the Strategy & Leadership track is open to every ticket, under the ticket's own name", async () => {
     const html = await render({ strategicName: "Nom décidé" });
-    const item = html.match(/<details\b[^>]*data-faq="strategic"[\s\S]*?<\/details>/)?.[0];
-    expect(item).toMatch(/Le parcours Stratégie (&amp;|&) Leadership est-il réservé au billet Nom décidé/);
+    const item = html.match(
+      /<details\b[^>]*data-faq="strategic"[\s\S]*?<\/details>/,
+    )?.[0];
+    expect(item).toMatch(
+      /Le parcours Stratégie (&amp;|&) Leadership est-il réservé au billet Nom décidé/,
+    );
     expect(item).toContain("Ses talks sont ouverts à tous les billets");
     expect(item).toContain("Le billet Nom décidé y donne un accès prioritaire");
   });
@@ -50,16 +54,22 @@ describe("TicketsFaq", () => {
       programmeWhen: "en mars 2027",
     });
     expect(html).toContain("Taux de TVA : 10 %.");
-    expect(html).toContain("Oui, la facture est émise au nom de votre société.");
+    expect(html).toContain(
+      "Oui, la facture est émise au nom de votre société.",
+    );
     expect(html).not.toContain("Nous le vérifions");
     expect(html).toContain("Le changement de nom est gratuit.");
     expect(html).not.toContain("en cours de validation");
-    expect(html).toMatch(/<a\b[^>]*href="https:\/\/cloudnativedays\.fr\/cgv"[^>]*>\s*Conditions générales de vente/);
+    expect(html).toMatch(
+      /<a\b[^>]*href="https:\/\/cloudnativedays\.fr\/cgv"[^>]*>\s*Conditions générales de vente/,
+    );
     expect(html).toContain("Le programme 2027 sera publié en mars 2027.");
   });
 
   it("opens the terms of sale in a new tab when they live on alf.io", async () => {
-    const onAlfio = await render({ termsUrl: "https://billetterie.cloudnativedays.fr/terms" });
+    const onAlfio = await render({
+      termsUrl: "https://billetterie.cloudnativedays.fr/terms",
+    });
     expect(onAlfio).toMatch(
       /<a\b[^>]*href="https:\/\/billetterie\.cloudnativedays\.fr\/terms"[^>]*target="_blank"[^>]*rel="noopener"/,
     );

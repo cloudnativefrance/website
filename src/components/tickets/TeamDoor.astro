@@ -31,23 +31,28 @@ const t = useTranslations(lang);
 {/* `id="equipe"`: the group rates live here and nowhere else. */}
 <article
   id="equipe"
-  class="door flex grow flex-col gap-5 rounded-xl border border-border bg-card p-5 sm:p-8"
+  class="door border-border bg-card flex grow flex-col gap-5 rounded-xl border p-5 sm:p-8"
   aria-labelledby="door-team-title"
   style="--door-index: 1"
 >
-  <h2 id="door-team-title" class="text-2xl font-semibold tracking-[-0.01em] text-foreground">
+  <h2
+    id="door-team-title"
+    class="text-foreground text-2xl font-semibold tracking-[-0.01em]"
+  >
     {t("tickets.team.title")}
   </h2>
 
   <div class="flex flex-col gap-2">
-    <p class="text-sm font-medium text-muted-foreground">{fill(t("tickets.team.rates"), { name: ticketName })}</p>
+    <p class="text-muted-foreground text-sm font-medium">
+      {fill(t("tickets.team.rates"), { name: ticketName })}
+    </p>
     <GroupRates lang={lang} tier={tier} rates={rates} />
   </div>
 
   <div class="mt-auto">
     <a
       href={groupMailto}
-      class="inline-flex h-11 items-center gap-2 rounded-lg border border-input bg-card px-4 text-base font-semibold text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-muted active:scale-[0.96] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+      class="border-input bg-card text-foreground hover:bg-muted focus-visible:ring-ring/50 inline-flex h-11 items-center gap-2 rounded-lg border px-4 text-base font-semibold transition-[background-color,scale] duration-150 ease-out focus-visible:ring-3 focus-visible:outline-none active:scale-[0.96]"
       data-umami-event="tickets-group-contact"
       data-umami-event-source="door"
     >

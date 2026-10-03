@@ -39,29 +39,31 @@
 
 ## File map (end state)
 
-| File | Responsibility |
-|---|---|
-| `src/lib/tickets/drafts.ts` (new) | `shown`, `shippingProblems`, `assertShippable` |
-| `src/lib/tickets/purchase.ts` | `purchaseTarget` (listing / notify, with `rel`), `listingUrl`, `alfioHost`, `onHost`, `codeUrl`, `codeFallbackAction` |
-| `src/lib/tickets/url.ts` | `codeUrlFrom`, `openInNewTab` (client-safe) |
-| `src/lib/tickets/phase.ts` | + `strategicPrice` |
-| `src/lib/tickets/demo.ts` | gate + 6 demo URLs |
-| `src/lib/tickets/pricing.ts`, `rex.ts` | deleted |
-| `src/config/tickets.ts` | A-only and S&L-state fields removed; flags as drafts |
-| `src/components/tickets/*` | as described per task; `EditionProof`, `InclusionNote`, `Tbd` deleted |
-| `src/pages/billetterie/[...demo].astro` | phase-only demo route |
-| `astro.config.mjs` | sitemap filter |
-| `src/i18n/ui.ts` | keys removed / added |
+| File                                    | Responsibility                                                                                                        |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/tickets/drafts.ts` (new)       | `shown`, `shippingProblems`, `assertShippable`                                                                        |
+| `src/lib/tickets/purchase.ts`           | `purchaseTarget` (listing / notify, with `rel`), `listingUrl`, `alfioHost`, `onHost`, `codeUrl`, `codeFallbackAction` |
+| `src/lib/tickets/url.ts`                | `codeUrlFrom`, `openInNewTab` (client-safe)                                                                           |
+| `src/lib/tickets/phase.ts`              | + `strategicPrice`                                                                                                    |
+| `src/lib/tickets/demo.ts`               | gate + 6 demo URLs                                                                                                    |
+| `src/lib/tickets/pricing.ts`, `rex.ts`  | deleted                                                                                                               |
+| `src/config/tickets.ts`                 | A-only and S&L-state fields removed; flags as drafts                                                                  |
+| `src/components/tickets/*`              | as described per task; `EditionProof`, `InclusionNote`, `Tbd` deleted                                                 |
+| `src/pages/billetterie/[...demo].astro` | phase-only demo route                                                                                                 |
+| `astro.config.mjs`                      | sitemap filter                                                                                                        |
+| `src/i18n/ui.ts`                        | keys removed / added                                                                                                  |
 
 ---
 
 ### Task 1: The drafts module
 
 **Files:**
+
 - Create: `src/lib/tickets/drafts.ts`
 - Test: `src/lib/__tests__/tickets.test.ts`
 
 **Interfaces:**
+
 - Consumes: `isTbd`, `Tbd`, `Maybe`, `TicketingConfig` from `@/config/tickets`.
 - Produces:
   - `shown<T>(value: Maybe<T>): T | undefined`
@@ -102,7 +104,9 @@ describe("drafts", () => {
     const config = {
       ...decided,
       opening: { ...decided.opening, time: tbd("Heure d'ouverture", "10:00") },
-      tiers: decided.tiers.map((t, i) => (i === 0 ? { ...t, name: tbd("Nom public", t.name) } : t)),
+      tiers: decided.tiers.map((t, i) =>
+        i === 0 ? { ...t, name: tbd("Nom public", t.name) } : t,
+      ),
     } as unknown as TicketingConfig;
     expect(shippingProblems(config)).toEqual([
       { path: "opening.time", note: "Heure d'ouverture" },
@@ -111,12 +115,19 @@ describe("drafts", () => {
   });
 
   it("lets an undecided value with no draft ship — its line is simply not rendered", () => {
-    expect(shippingProblems({ ...decided, vatRate: tbd("Taux de TVA") })).toEqual([]);
+    expect(
+      shippingProblems({ ...decided, vatRate: tbd("Taux de TVA") }),
+    ).toEqual([]);
   });
 
   it("still requires the Strategy & Leadership price, which has no draft to show", () => {
-    const config = { ...decided, strategic: { ...decided.strategic, price: tbd("Prix") } };
-    expect(shippingProblems(config)).toEqual([{ path: "strategic.price", note: "Prix" }]);
+    const config = {
+      ...decided,
+      strategic: { ...decided.strategic, price: tbd("Prix") },
+    };
+    expect(shippingProblems(config)).toEqual([
+      { path: "strategic.price", note: "Prix" },
+    ]);
   });
 
   it("names every problem at once when it refuses", () => {
@@ -125,7 +136,9 @@ describe("drafts", () => {
       vatRate: tbd("Taux de TVA", "10 %"),
       strategic: { ...decided.strategic, price: tbd("Prix") },
     };
-    expect(() => assertShippable(config)).toThrow(/vatRate — Taux de TVA[\s\S]*strategic\.price — Prix/);
+    expect(() => assertShippable(config)).toThrow(
+      /vatRate — Taux de TVA[\s\S]*strategic\.price — Prix/,
+    );
   });
 });
 ```
@@ -152,7 +165,12 @@ Create `src/lib/tickets/drafts.ts`:
  *
  * Pure: no environment read. The caller decides when to assert.
  */
-import { isTbd, type Maybe, type Tbd, type TicketingConfig } from "@/config/tickets";
+import {
+  isTbd,
+  type Maybe,
+  type Tbd,
+  type TicketingConfig,
+} from "@/config/tickets";
 
 /** The decided value, else the draft, else undefined — the line is then not rendered. */
 export function shown<T>(value: Maybe<T>): T | undefined {
@@ -170,9 +188,10 @@ export interface ShippingProblem {
  * Values an undecided `tbd()` cannot leave out: without a draft their line
  * would simply disappear, and the page is not worth shipping without them.
  */
-const REQUIRED: ReadonlyArray<{ path: string; read: (config: TicketingConfig) => unknown }> = [
-  { path: "strategic.price", read: (config) => config.strategic.price },
-];
+const REQUIRED: ReadonlyArray<{
+  path: string;
+  read: (config: TicketingConfig) => unknown;
+}> = [{ path: "strategic.price", read: (config) => config.strategic.price }];
 
 /** Every draft left anywhere in the config, then every required value still undecided. */
 export function shippingProblems(config: TicketingConfig): ShippingProblem[] {
@@ -182,7 +201,8 @@ export function shippingProblems(config: TicketingConfig): ShippingProblem[] {
   });
   for (const { path, read } of REQUIRED) {
     const value = read(config);
-    if (isTbd(value) && value.draft === undefined) problems.push({ path, note: value.note });
+    if (isTbd(value) && value.draft === undefined)
+      problems.push({ path, note: value.note });
   }
   return problems;
 }
@@ -197,7 +217,11 @@ export function assertShippable(config: TicketingConfig): void {
   );
 }
 
-function walk(node: unknown, path: string, visit: (path: string, value: Tbd<unknown>) => void): void {
+function walk(
+  node: unknown,
+  path: string,
+  visit: (path: string, value: Tbd<unknown>) => void,
+): void {
   if (isTbd(node)) {
     visit(path, node);
     return;
@@ -233,12 +257,14 @@ Claude-Session: https://claude.ai/code/session_01Azzq3C71c3RsForMreHpyG"
 ### Task 2: Collapse the demo to phases — variant B only, S&L always on sale
 
 **Files:**
+
 - Create: `.superpowers/drop-i18n-keys.mjs` (git-ignored helper, reused in Tasks 3–4)
 - Modify: `src/config/tickets.ts`, `src/lib/tickets/purchase.ts`, `src/lib/tickets/url.ts`, `src/lib/tickets/demo.ts`, `src/lib/tickets/mailto.ts`, `src/lib/event.ts`, `src/pages/billetterie/[...demo].astro`, `astro.config.mjs`, `src/components/tickets/{TicketsPage,TicketsContent,PurchaseControl,StickyTicketBar,TeamDoor,GroupRates,CodeDoor,StrategicOffer,DemoBar,Icon}.astro`, `src/components/tickets/tickets-ui.ts`, `src/i18n/ui.ts`
 - Delete: `src/lib/tickets/pricing.ts`
 - Test: `src/components/tickets/__tests__/TicketsPage.test.ts`, `src/lib/__tests__/tickets.test.ts`
 
 **Interfaces:**
+
 - Consumes: nothing from Task 1 yet.
 - Produces:
   - `purchaseTarget(config: TicketingConfig, phase: Phase): PurchaseTarget` with `PurchaseTarget = { kind: "listing"; href: string } | { kind: "notify"; href: string }` (Task 5 adds `rel`)
@@ -297,12 +323,17 @@ function visibleText(html: string): string {
  */
 function withoutPlaceholders(html: string): string {
   let out = html;
-  for (const pattern of [/<span\b[^>]*\bclass="tbd-chip/, /<(\w+)\b[^>]*\bdata-tbd-only\b/]) {
+  for (const pattern of [
+    /<span\b[^>]*\bclass="tbd-chip/,
+    /<(\w+)\b[^>]*\bdata-tbd-only\b/,
+  ]) {
     for (let guard = 0; guard < 200; guard += 1) {
       const match = pattern.exec(out);
       if (!match) break;
       const tag = match[1] ?? "span";
-      out = out.slice(0, match.index) + out.slice(endOfElement(out, match.index, tag));
+      out =
+        out.slice(0, match.index) +
+        out.slice(endOfElement(out, match.index, tag));
     }
   }
   return out;
@@ -334,7 +365,10 @@ const LISTING_LINK =
 // As the ladder writes them: the box is narrow, so the month is abbreviated.
 // The last tier is absent on purpose — it runs to the event day and shows no
 // date of its own.
-const TIER_END_DATES: Record<Exclude<Phase, "pre_opening" | "last_chance">, string> = {
+const TIER_END_DATES: Record<
+  Exclude<Phase, "pre_opening" | "last_chance">,
+  string
+> = {
   seb: "29 nov.",
   eb: "7 févr.",
   regular: "16 mai",
@@ -368,8 +402,16 @@ describe.each(DEMO_PHASES)("phase %s", (phase) => {
   });
 
   it("marks every past tier as sold out, with no action", () => {
-    const pastItems = [...main.matchAll(/<li[^>]*data-tier-state="past"[\s\S]*?<\/li>/g)];
-    const expectedPast = { pre_opening: 0, seb: 0, eb: 1, regular: 2, last_chance: 3 }[phase];
+    const pastItems = [
+      ...main.matchAll(/<li[^>]*data-tier-state="past"[\s\S]*?<\/li>/g),
+    ];
+    const expectedPast = {
+      pre_opening: 0,
+      seb: 0,
+      eb: 1,
+      regular: 2,
+      last_chance: 3,
+    }[phase];
     expect(pastItems).toHaveLength(expectedPast);
     for (const [item] of pastItems) {
       expect(item).toContain("Épuisé");
@@ -380,7 +422,9 @@ describe.each(DEMO_PHASES)("phase %s", (phase) => {
   });
 
   it("writes what ends the tier on offer inside its ladder box, not above it", () => {
-    expect([...main.matchAll(/data-tier-deadline/g)]).toHaveLength(phase === "last_chance" ? 0 : 1);
+    expect([...main.matchAll(/data-tier-deadline/g)]).toHaveLength(
+      phase === "last_chance" ? 0 : 1,
+    );
     expect(text).not.toContain("dans la limite des places disponibles");
     expect(text).not.toContain("limité en nombre de places");
     expect(text).not.toContain("Vous payez par carte");
@@ -435,7 +479,9 @@ describe.each(DEMO_PHASES)("phase %s", (phase) => {
   }
 
   it("shows group rates only when they beat the current price and fit the order cap", () => {
-    const shown = [...main.matchAll(/data-group-rate="([^"]+)"/g)].map((m) => m[1]);
+    const shown = [...main.matchAll(/data-group-rate="([^"]+)"/g)].map(
+      (m) => m[1],
+    );
     const unique = [...new Set(shown)].sort();
     expect(unique).toEqual(selling ? ["10_plus", "4_9"] : []);
   });
@@ -447,8 +493,16 @@ describe.each(DEMO_PHASES)("phase %s", (phase) => {
   });
 
   it("prices each group rate against the price of the moment, in the section's pink", () => {
-    const tierPrice = { pre_opening: 129, seb: 129, eb: 159, regular: 199, last_chance: 229 }[phase];
-    const rows = [...main.matchAll(/data-group-rate="([^"]+)"[\s\S]*?(?=<li|<\/ul>)/g)];
+    const tierPrice = {
+      pre_opening: 129,
+      seb: 129,
+      eb: 159,
+      regular: 199,
+      last_chance: 229,
+    }[phase];
+    const rows = [
+      ...main.matchAll(/data-group-rate="([^"]+)"[\s\S]*?(?=<li|<\/ul>)/g),
+    ];
     expect(rows).toHaveLength(selling ? 2 : 0);
     for (const [row, id] of rows) {
       const price = { "4_9": 169, "10_plus": 149 }[id as "4_9" | "10_plus"];
@@ -492,7 +546,11 @@ describe.each(DEMO_PHASES)("phase %s", (phase) => {
 
   it("still reads as finished copy once the placeholders are hidden", () => {
     const left = visibleText(withoutPlaceholders(main));
-    for (const dangling of ["Taux de TVA", "Conditions générales de vente", "Le détail de la soirée"]) {
+    for (const dangling of [
+      "Taux de TVA",
+      "Conditions générales de vente",
+      "Le détail de la soirée",
+    ]) {
       expect(left).not.toContain(dangling);
     }
     expect(left).not.toContain("À confirmer");
@@ -509,7 +567,10 @@ describe.each(DEMO_PHASES)("phase %s", (phase) => {
 });
 
 describe("the page wrapper", () => {
-  const source = readFileSync(resolve(import.meta.dirname, "../TicketsPage.astro"), "utf-8");
+  const source = readFileSync(
+    resolve(import.meta.dirname, "../TicketsPage.astro"),
+    "utf-8",
+  );
 
   it("forces noindex whenever it renders a demo", () => {
     expect(source).toMatch(/noindex=\{Boolean\(demo\)\}/);
@@ -544,7 +605,13 @@ import {
 with:
 
 ```ts
-import { alfioHost, codeFallbackAction, codeUrl, listingUrl, purchaseTarget } from "@/lib/tickets/purchase";
+import {
+  alfioHost,
+  codeFallbackAction,
+  codeUrl,
+  listingUrl,
+  purchaseTarget,
+} from "@/lib/tickets/purchase";
 import { NEWSLETTER_URL } from "@/lib/event";
 ```
 
@@ -571,14 +638,20 @@ describe("purchaseTarget", () => {
   });
 
   it("offers the newsletter, not a purchase, before the opening", () => {
-    expect(purchaseTarget(TICKETING, "pre_opening")).toEqual({ kind: "notify", href: NEWSLETTER_URL });
+    expect(purchaseTarget(TICKETING, "pre_opening")).toEqual({
+      kind: "notify",
+      href: NEWSLETTER_URL,
+    });
   });
 
   it("names the alf.io host buyers land on", () => {
     expect(alfioHost(TICKETING)).toBe("billetterie.cloudnativedays.fr");
-    expect(listingUrl({ ...TICKETING, alfio: { baseUrl: "https://x.test/", eventSlug: "e" } })).toBe(
-      "https://x.test/event/e",
-    );
+    expect(
+      listingUrl({
+        ...TICKETING,
+        alfio: { baseUrl: "https://x.test/", eventSlug: "e" },
+      }),
+    ).toBe("https://x.test/event/e");
   });
 });
 ```
@@ -586,28 +659,28 @@ describe("purchaseTarget", () => {
 (e) In `describe("demo gate", …)`, replace the last two tests (`"emits both variants × 5 phases …"` and `"keeps every demo URL under /billetterie/demo-"`) with:
 
 ```ts
-  it("emits one page per phase, plus the entry URL", () => {
-    const paths = demoStaticPaths();
-    expect(paths.map((p) => p.params.demo)).toEqual([
-      "demo",
-      "demo/avant-ouverture",
-      "demo/super-early-bird",
-      "demo/early-bird",
-      "demo/regular",
-      "demo/last-chance",
-    ]);
-    expect(paths[0].props).toEqual({});
-    expect(paths[3].props).toEqual({ phase: "eb" });
-    expect(demoPath()).toBe("/billetterie/demo/");
-    expect(demoPath("pre_opening")).toBe("/billetterie/demo/avant-ouverture/");
-  });
+it("emits one page per phase, plus the entry URL", () => {
+  const paths = demoStaticPaths();
+  expect(paths.map((p) => p.params.demo)).toEqual([
+    "demo",
+    "demo/avant-ouverture",
+    "demo/super-early-bird",
+    "demo/early-bird",
+    "demo/regular",
+    "demo/last-chance",
+  ]);
+  expect(paths[0].props).toEqual({});
+  expect(paths[3].props).toEqual({ phase: "eb" });
+  expect(demoPath()).toBe("/billetterie/demo/");
+  expect(demoPath("pre_opening")).toBe("/billetterie/demo/avant-ouverture/");
+});
 
-  it("keeps every demo URL under /billetterie/demo/, and none of the old variant URLs", () => {
-    for (const p of demoStaticPaths()) {
-      expect(`/billetterie/${p.params.demo}/`).toMatch(/^\/billetterie\/demo\//);
-      expect(p.params.demo).not.toMatch(/^demo-/);
-    }
-  });
+it("keeps every demo URL under /billetterie/demo/, and none of the old variant URLs", () => {
+  for (const p of demoStaticPaths()) {
+    expect(`/billetterie/${p.params.demo}/`).toMatch(/^\/billetterie\/demo\//);
+    expect(p.params.demo).not.toMatch(/^demo-/);
+  }
+});
 ```
 
 - [ ] **Step 3: Run the tests to verify they fail**
@@ -631,10 +704,15 @@ let src = readFileSync(file, "utf8");
 for (const key of process.argv.slice(2)) {
   const prefix = key.endsWith(".*");
   const name = prefix ? esc(key.slice(0, -1)) + String.raw`[^"]+` : esc(key);
-  const entry = new RegExp(String.raw`^[ \t]*"${name}":(?:[ \t]*${value}|\n[ \t]*${value}),\n`, "gm");
+  const entry = new RegExp(
+    String.raw`^[ \t]*"${name}":(?:[ \t]*${value}|\n[ \t]*${value}),\n`,
+    "gm",
+  );
   const found = src.match(entry)?.length ?? 0;
   if (found === 0 || (!prefix && found !== 2) || (prefix && found % 2 !== 0)) {
-    console.error(`${key}: ${found} entries found — expected ${prefix ? "an even number" : "2 (fr and en)"}; nothing written`);
+    console.error(
+      `${key}: ${found} entries found — expected ${prefix ? "an even number" : "2 (fr and en)"}; nothing written`,
+    );
     process.exit(1);
   }
   src = src.replace(entry, "");
@@ -650,17 +728,17 @@ In `src/config/tickets.ts`:
 1. Run: `sed -i '' '/alfioCategoryCode: tbd("Code de catégorie alf.io (JC)", "DEMO-/d' src/config/tickets.ts` — removes the four tier lines and the S&L one. Check with `grep -c alfioCategoryCode src/config/tickets.ts` → `2` (the two type declarations, removed next).
 2. In `interface TierDefinition`, delete:
    ```ts
-     /** alf.io category code behind the variant-A reservation link (created by JC). */
-     alfioCategoryCode: Maybe<string>;
+   /** alf.io category code behind the variant-A reservation link (created by JC). */
+   alfioCategoryCode: Maybe<string>;
    ```
 3. In `interface GroupRate`, delete:
    ```ts
-     /**
-      * The alf.io code that carries the rate — a promo code or a category,
-      * depending on which of the three mechanisms under study lands (see
-      * `src/lib/tickets/purchase.ts`). Deliberately not named "category".
-      */
-     alfioCode: Maybe<string>;
+   /**
+    * The alf.io code that carries the rate — a promo code or a category,
+    * depending on which of the three mechanisms under study lands (see
+    * `src/lib/tickets/purchase.ts`). Deliberately not named "category".
+    */
+   alfioCode: Maybe<string>;
    ```
 4. Delete the line `export type StrategicState = "hidden" | "announced" | "on_sale";`.
 5. Replace `export interface StrategicTicket { … }` with:
@@ -726,7 +804,9 @@ import { codeUrlFrom, type CodeResult } from "./url";
 
 export type { CodeResult };
 
-export type PurchaseTarget = { kind: "listing"; href: string } | { kind: "notify"; href: string };
+export type PurchaseTarget =
+  | { kind: "listing"; href: string }
+  | { kind: "notify"; href: string };
 
 export function listingUrl(config: TicketingConfig): string {
   return `${trimSlash(config.alfio.baseUrl)}/event/${encodeURIComponent(config.alfio.eventSlug)}`;
@@ -738,7 +818,10 @@ export function alfioHost(config: TicketingConfig): string {
 }
 
 /** Before the opening: the newsletter. Once selling: the alf.io listing. */
-export function purchaseTarget(config: TicketingConfig, phase: Phase): PurchaseTarget {
+export function purchaseTarget(
+  config: TicketingConfig,
+  phase: Phase,
+): PurchaseTarget {
   if (phase === "pre_opening") return { kind: "notify", href: NEWSLETTER_URL };
   return { kind: "listing", href: listingUrl(config) };
 }
@@ -753,7 +836,10 @@ export function codeUrl(config: TicketingConfig, raw: string): CodeResult {
  * alf.io's support for it is still to be confirmed with JC; the script
  * upgrades the form to `/code/<CODE>`.
  */
-export function codeFallbackAction(config: TicketingConfig): { action: string; param: "code" } {
+export function codeFallbackAction(config: TicketingConfig): {
+  action: string;
+  param: "code";
+} {
   return { action: listingUrl(config), param: "code" };
 }
 
@@ -771,7 +857,9 @@ Replace the whole of `src/lib/tickets/url.ts` with:
  * anything it imports ships in the client bundle.
  */
 
-export type CodeResult = { ok: true; code: string; url: string } | { ok: false; reason: "empty" };
+export type CodeResult =
+  | { ok: true; code: string; url: string }
+  | { ok: false; reason: "empty" };
 
 /**
  * "I have a code": the site validates nothing and prices nothing — alf.io
@@ -782,7 +870,11 @@ export type CodeResult = { ok: true; code: string; url: string } | { ok: false; 
 export function codeUrlFrom(listingUrl: string, raw: string): CodeResult {
   const code = raw.replace(/\s+/g, "");
   if (!code) return { ok: false, reason: "empty" };
-  return { ok: true, code, url: `${listingUrl}/code/${encodeURIComponent(code)}` };
+  return {
+    ok: true,
+    code,
+    url: `${listingUrl}/code/${encodeURIComponent(code)}`,
+  };
 }
 ```
 
@@ -814,7 +906,10 @@ interface GateInput {
   dev?: boolean;
 }
 
-export function ticketDemosEnabled({ env = process.env, dev = import.meta.env.DEV }: GateInput = {}): boolean {
+export function ticketDemosEnabled({
+  env = process.env,
+  dev = import.meta.env.DEV,
+}: GateInput = {}): boolean {
   return dev || !isProductionOrigin(resolveSiteOrigin(env));
 }
 
@@ -822,7 +917,13 @@ export function placeholdersAllowed(input: GateInput = {}): boolean {
   return ticketDemosEnabled(input);
 }
 
-export const DEMO_PHASES: readonly Phase[] = ["pre_opening", "seb", "eb", "regular", "last_chance"];
+export const DEMO_PHASES: readonly Phase[] = [
+  "pre_opening",
+  "seb",
+  "eb",
+  "regular",
+  "last_chance",
+];
 
 /** URL segments. The demo is internal, but tier ids are never shown to visitors. */
 export const PHASE_SLUGS: Record<Phase, string> = {
@@ -845,10 +946,16 @@ export function demoPath(phase?: Phase): string {
 }
 
 /** Every demo URL as `[...demo]` route params, the entry URL first. */
-export function demoStaticPaths(): Array<{ params: { demo: string }; props: DemoState }> {
+export function demoStaticPaths(): Array<{
+  params: { demo: string };
+  props: DemoState;
+}> {
   return [
     { params: { demo: "demo" }, props: {} },
-    ...DEMO_PHASES.map((phase) => ({ params: { demo: `demo/${PHASE_SLUGS[phase]}` }, props: { phase } })),
+    ...DEMO_PHASES.map((phase) => ({
+      params: { demo: `demo/${PHASE_SLUGS[phase]}` },
+      props: { phase },
+    })),
   ];
 }
 ```
@@ -873,7 +980,11 @@ Replace the whole of `src/pages/billetterie/[...demo].astro` with:
  */
 import TicketsPage from "@/components/tickets/TicketsPage.astro";
 import { TICKETING } from "@/config/tickets";
-import { demoStaticPaths, ticketDemosEnabled, type DemoState } from "@/lib/tickets/demo";
+import {
+  demoStaticPaths,
+  ticketDemosEnabled,
+  type DemoState,
+} from "@/lib/tickets/demo";
 import { loadSessions } from "@/lib/schedule";
 import { assertEditionPublishable } from "@/lib/edition-visibility";
 import { rexSummary } from "@/lib/tickets/rex";
@@ -892,7 +1003,12 @@ assertEditionPublishable(PROOF_EDITION, "billetterie");
 const rex = rexSummary(await loadSessions(PROOF_EDITION));
 ---
 
-<TicketsPage lang="fr" phase={phase ?? TICKETING.currentPhase} rex={rex} demo={{ fromConfig: !phase }} />
+<TicketsPage
+  lang="fr"
+  phase={phase ?? TICKETING.currentPhase}
+  rex={rex}
+  demo={{ fromConfig: !phase }}
+/>
 ```
 
 Replace the whole of `src/components/tickets/TicketsPage.astro` with:
@@ -923,10 +1039,23 @@ const { lang, phase, rex, demo } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-<Layout title={t("tickets.meta.title")} description={t("tickets.meta.description")} lang={lang} newsletter={false} noindex={Boolean(demo)}>
-  {demo && (
-    <DemoBar lang={lang} config={TICKETING} phase={phase} fromConfig={demo.fromConfig} />
-  )}
+<Layout
+  title={t("tickets.meta.title")}
+  description={t("tickets.meta.description")}
+  lang={lang}
+  newsletter={false}
+  noindex={Boolean(demo)}
+>
+  {
+    demo && (
+      <DemoBar
+        lang={lang}
+        config={TICKETING}
+        phase={phase}
+        fromConfig={demo.fromConfig}
+      />
+    )
+  }
   <TicketsContent lang={lang} phase={phase} rex={rex} demo={Boolean(demo)} />
 </Layout>
 
@@ -996,24 +1125,42 @@ const buttonClass =
   "inline-flex h-13 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-primary px-7 text-xl font-bold text-primary-foreground shadow-[var(--shadow-glow-primary)] transition-[background-color,scale] duration-150 ease-out hover:bg-primary/90 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-card";
 ---
 
-{target.kind === "listing" && (
-  <div>
-    <a href={target.href} class={buttonClass} data-umami-event="tickets-purchase" {...umami}>
-      {t("tickets.purchase.buy")}
-      <Icon name="arrow-right" size={20} />
-    </a>
-  </div>
-)}
+{
+  target.kind === "listing" && (
+    <div>
+      <a
+        href={target.href}
+        class={buttonClass}
+        data-umami-event="tickets-purchase"
+        {...umami}
+      >
+        {t("tickets.purchase.buy")}
+        <Icon name="arrow-right" size={20} />
+      </a>
+    </div>
+  )
+}
 
-{target.kind === "notify" && (
-  <div class="flex flex-col items-start gap-2">
-    <a href={target.href} target="_blank" rel="noopener noreferrer" class={buttonClass} data-umami-event="tickets-notify" {...umami}>
-      <Icon name="bell" size={20} />
-      {t("tickets.offer.notify")}
-    </a>
-    <p class="text-sm text-muted-foreground">{t("tickets.offer.notify_note")}</p>
-  </div>
-)}
+{
+  target.kind === "notify" && (
+    <div class="flex flex-col items-start gap-2">
+      <a
+        href={target.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        class={buttonClass}
+        data-umami-event="tickets-notify"
+        {...umami}
+      >
+        <Icon name="bell" size={20} />
+        {t("tickets.offer.notify")}
+      </a>
+      <p class="text-muted-foreground text-sm">
+        {t("tickets.offer.notify_note")}
+      </p>
+    </div>
+  )
+}
 ```
 
 Replace the whole of `src/components/tickets/StickyTicketBar.astro` with:
@@ -1048,16 +1195,21 @@ const { label, price, action, analytics, demo = false } = Astro.props;
   aria-hidden="true"
 >
   {demo && <div class="demo-stripe h-1.5" aria-hidden="true" />}
-  <div class="flex items-center justify-between gap-4 border-t border-border bg-background/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md">
+  <div
+    class="border-border bg-background/95 flex items-center justify-between gap-4 border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md"
+  >
     <p class="flex min-w-0 flex-col leading-tight">
-      <span class="truncate text-sm text-muted-foreground">{label}</span>
-      <span class="text-xl font-bold tabular-nums tracking-[-0.02em] text-foreground">{price}</span>
+      <span class="text-muted-foreground truncate text-sm">{label}</span>
+      <span
+        class="text-foreground text-xl font-bold tracking-[-0.02em] tabular-nums"
+        >{price}</span
+      >
     </p>
     <a
       href={action.href}
       target={action.external ? "_blank" : undefined}
       rel={action.external ? "noopener noreferrer" : undefined}
-      class="inline-flex h-12 shrink-0 items-center gap-2 rounded-lg bg-primary px-5 text-xl font-bold text-primary-foreground transition-[background-color,scale] duration-150 ease-out active:scale-[0.96] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+      class="bg-primary text-primary-foreground focus-visible:ring-ring/50 inline-flex h-12 shrink-0 items-center gap-2 rounded-lg px-5 text-xl font-bold transition-[background-color,scale] duration-150 ease-out focus-visible:ring-3 focus-visible:outline-none active:scale-[0.96]"
       tabindex="-1"
       data-sticky-action
       data-umami-event="tickets-sticky"
@@ -1120,27 +1272,34 @@ const { lang, tier, rates, groupMailto } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-{/* `id="equipe"`: the group rates live here and nowhere else, so the Strategy
-    & Leadership band points at this card. */}
+{
+  /* `id="equipe"`: the group rates live here and nowhere else, so the Strategy
+    & Leadership band points at this card. */
+}
 <article
   id="equipe"
-  class="door flex grow flex-col gap-5 rounded-xl border border-border bg-card p-5 sm:p-6"
+  class="door border-border bg-card flex grow flex-col gap-5 rounded-xl border p-5 sm:p-6"
   aria-labelledby="door-team-title"
   style="--door-index: 1"
 >
-  <h2 id="door-team-title" class="text-2xl font-semibold tracking-[-0.01em] text-foreground">
+  <h2
+    id="door-team-title"
+    class="text-foreground text-2xl font-semibold tracking-[-0.01em]"
+  >
     {t("tickets.team.title")}
   </h2>
 
   <div class="flex flex-col gap-2">
-    <p class="text-sm font-medium text-muted-foreground">{t("tickets.team.rates")}</p>
+    <p class="text-muted-foreground text-sm font-medium">
+      {t("tickets.team.rates")}
+    </p>
     <GroupRates lang={lang} tier={tier} rates={rates} />
   </div>
 
   <div class="mt-auto">
     <a
       href={groupMailto}
-      class="inline-flex h-11 items-center gap-2 rounded-lg border border-input bg-card px-4 text-base font-semibold text-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-muted active:scale-[0.96] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+      class="border-input bg-card text-foreground hover:bg-muted focus-visible:ring-ring/50 inline-flex h-11 items-center gap-2 rounded-lg border px-4 text-base font-semibold transition-[background-color,scale] duration-150 ease-out focus-visible:ring-3 focus-visible:outline-none active:scale-[0.96]"
       data-umami-event="tickets-group-contact"
       data-umami-event-source="door"
     >
@@ -1180,20 +1339,29 @@ const { lang, tier, rates, class: className } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-<ul class:list={["flex flex-col divide-y divide-border overflow-hidden rounded-lg border border-border", className]}>
-  {rates.map((rate) => (
-    <li class="flex flex-col gap-1 px-4 py-3" data-group-rate={rate.id}>
-      <span class="flex items-center justify-between gap-3">
-        <span class="text-sm text-muted-foreground">{t(`tickets.team.rate.${rate.id}`)}</span>
-        <span class="inline-flex items-center rounded-full bg-accent px-2 py-1 text-xs font-bold leading-none tabular-nums tracking-[0.02em] text-accent-foreground">
-          {formatDiscount(tier.price, rate.price, lang)}
+<ul
+  class:list={[
+    "divide-border border-border flex flex-col divide-y overflow-hidden rounded-lg border",
+    className,
+  ]}
+>
+  {
+    rates.map((rate) => (
+      <li class="flex flex-col gap-1 px-4 py-3" data-group-rate={rate.id}>
+        <span class="flex items-center justify-between gap-3">
+          <span class="text-muted-foreground text-sm">
+            {t(`tickets.team.rate.${rate.id}`)}
+          </span>
+          <span class="bg-accent text-accent-foreground inline-flex items-center rounded-full px-2 py-1 text-xs leading-none font-bold tracking-[0.02em] tabular-nums">
+            {formatDiscount(tier.price, rate.price, lang)}
+          </span>
         </span>
-      </span>
-      <span class="text-xl font-bold tabular-nums tracking-[-0.02em] text-foreground">
-        {formatPrice(rate.price, lang)}
-      </span>
-    </li>
-  ))}
+        <span class="text-foreground text-xl font-bold tracking-[-0.02em] tabular-nums">
+          {formatPrice(rate.price, lang)}
+        </span>
+      </li>
+    ))
+  }
 </ul>
 ```
 
@@ -1232,7 +1400,9 @@ interface Props {
 const { lang, ticket, teamHref } = Astro.props;
 const t = useTranslations(lang);
 
-const name = isTbd(ticket.name) ? ticket.name.draft?.[lang] ?? "" : ticket.name[lang];
+const name = isTbd(ticket.name)
+  ? (ticket.name.draft?.[lang] ?? "")
+  : ticket.name[lang];
 
 function text(value: Maybe<{ fr: string; en: string }>): string | undefined {
   if (isTbd(value)) return value.draft?.[lang];
@@ -1246,66 +1416,124 @@ const priceText = isTbd(ticket.price)
     : undefined;
 
 const facts: Array<{ label: string; value?: string; tbd?: string }> = [
-  { label: t("tickets.strategic.fact.price"), value: priceText, tbd: isTbd(ticket.price) ? ticket.price.note : undefined },
-  { label: t("tickets.strategic.fact.includes"), value: text(ticket.includesStandard), tbd: isTbd(ticket.includesStandard) ? ticket.includesStandard.note : undefined },
-  { label: t("tickets.strategic.fact.programme"), value: text(ticket.programme), tbd: isTbd(ticket.programme) ? ticket.programme.note : undefined },
-  { label: t("tickets.strategic.fact.networking"), value: text(ticket.networking), tbd: isTbd(ticket.networking) ? ticket.networking.note : undefined },
-  { label: t("tickets.strategic.fact.access"), value: text(ticket.accessConditions), tbd: isTbd(ticket.accessConditions) ? ticket.accessConditions.note : undefined },
+  {
+    label: t("tickets.strategic.fact.price"),
+    value: priceText,
+    tbd: isTbd(ticket.price) ? ticket.price.note : undefined,
+  },
+  {
+    label: t("tickets.strategic.fact.includes"),
+    value: text(ticket.includesStandard),
+    tbd: isTbd(ticket.includesStandard)
+      ? ticket.includesStandard.note
+      : undefined,
+  },
+  {
+    label: t("tickets.strategic.fact.programme"),
+    value: text(ticket.programme),
+    tbd: isTbd(ticket.programme) ? ticket.programme.note : undefined,
+  },
+  {
+    label: t("tickets.strategic.fact.networking"),
+    value: text(ticket.networking),
+    tbd: isTbd(ticket.networking) ? ticket.networking.note : undefined,
+  },
+  {
+    label: t("tickets.strategic.fact.access"),
+    value: text(ticket.accessConditions),
+    tbd: isTbd(ticket.accessConditions)
+      ? ticket.accessConditions.note
+      : undefined,
+  },
 ];
 
-const topics = [1, 2, 3, 4, 5, 6].map((n) => t(`tickets.strategic.topic.${n}` as Parameters<typeof t>[0]));
+const topics = [1, 2, 3, 4, 5, 6].map((n) =>
+  t(`tickets.strategic.topic.${n}` as Parameters<typeof t>[0]),
+);
 ---
 
 <section
   id="strategie-leadership"
-  class="strategic relative overflow-hidden rounded-xl bg-chart-5 text-primary-foreground dark:bg-secondary dark:ring-1 dark:ring-accent/30"
+  class="strategic bg-chart-5 text-primary-foreground dark:bg-secondary dark:ring-accent/30 relative overflow-hidden rounded-xl dark:ring-1"
   aria-labelledby="strategic-title"
 >
-  <div class="grid gap-10 p-6 sm:p-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-14">
+  <div
+    class="grid gap-10 p-6 sm:p-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-14"
+  >
     <div class="flex flex-col gap-5">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <h2 id="strategic-title" class="text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl">{name}</h2>
-        {isTbd(ticket.name) && <Tbd note={ticket.name.note} lang={lang} tone="inverse" />}
+        <h2
+          id="strategic-title"
+          class="text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl"
+        >
+          {name}
+        </h2>
+        {
+          isTbd(ticket.name) && (
+            <Tbd note={ticket.name.note} lang={lang} tone="inverse" />
+          )
+        }
       </div>
-      <p class="max-w-[60ch] text-lg text-pretty">{t("tickets.strategic.lead")}</p>
-      <p class="max-w-[60ch] text-base text-chart-4 text-pretty">{t("tickets.strategic.body")}</p>
+      <p class="max-w-[60ch] text-lg text-pretty">
+        {t("tickets.strategic.lead")}
+      </p>
+      <p class="text-chart-4 max-w-[60ch] text-base text-pretty">
+        {t("tickets.strategic.body")}
+      </p>
       <div class="flex flex-col gap-3">
-        <p class="text-sm font-medium text-chart-4">{t("tickets.strategic.topics")}</p>
+        <p class="text-chart-4 text-sm font-medium">
+          {t("tickets.strategic.topics")}
+        </p>
         <ul class="flex flex-wrap gap-2">
-          {topics.map((topic) => (
-            <li class="rounded-full border border-primary-foreground/25 px-3 py-1 text-sm font-medium">{topic}</li>
-          ))}
+          {
+            topics.map((topic) => (
+              <li class="border-primary-foreground/25 rounded-full border px-3 py-1 text-sm font-medium">
+                {topic}
+              </li>
+            ))
+          }
         </ul>
       </div>
-      <p class="text-base font-medium text-accent">{t("tickets.strategic.no_pitch")}</p>
+      <p class="text-accent text-base font-medium">
+        {t("tickets.strategic.no_pitch")}
+      </p>
     </div>
 
     <div class="flex flex-col gap-6">
-      <dl class="divide-y divide-primary-foreground/15 border-y border-primary-foreground/15">
-        {facts.map((fact) => (
-          <div
-            class="flex flex-col gap-1 py-3 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:gap-x-4"
-            data-tbd-only={fact.value ? undefined : true}
-          >
-            <dt class="text-sm text-chart-4">{fact.label}</dt>
-            <dd class="flex flex-wrap items-center gap-2 text-base font-semibold sm:justify-end sm:text-right">
-              {fact.value && <span class="tabular-nums">{fact.value}</span>}
-              {fact.tbd && <Tbd note={fact.tbd} lang={lang} tone="inverse" />}
-            </dd>
-          </div>
-        ))}
+      <dl
+        class="divide-primary-foreground/15 border-primary-foreground/15 divide-y border-y"
+      >
+        {
+          facts.map((fact) => (
+            <div
+              class="flex flex-col gap-1 py-3 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:gap-x-4"
+              data-tbd-only={fact.value ? undefined : true}
+            >
+              <dt class="text-chart-4 text-sm">{fact.label}</dt>
+              <dd class="flex flex-wrap items-center gap-2 text-base font-semibold sm:justify-end sm:text-right">
+                {fact.value && <span class="tabular-nums">{fact.value}</span>}
+                {fact.tbd && <Tbd note={fact.tbd} lang={lang} tone="inverse" />}
+              </dd>
+            </div>
+          ))
+        }
       </dl>
 
       <div class="strategic-purchase">
         <slot name="purchase" />
       </div>
 
-      {teamHref && (
-        <a href={teamHref} class="inline-flex items-center gap-1.5 self-start text-sm font-medium text-primary-foreground underline-offset-4 hover:underline">
-          {t("tickets.strategic.team")}
-          <Icon name="arrow-right" size={14} />
-        </a>
-      )}
+      {
+        teamHref && (
+          <a
+            href={teamHref}
+            class="text-primary-foreground inline-flex items-center gap-1.5 self-start text-sm font-medium underline-offset-4 hover:underline"
+          >
+            {t("tickets.strategic.team")}
+            <Icon name="arrow-right" size={14} />
+          </a>
+        )
+      }
     </div>
   </div>
 </section>
@@ -1342,14 +1570,25 @@ import { useTranslations } from "@/i18n/utils";
 import type { Locale } from "@/i18n/ui";
 import { CONTACT_EMAILS, TARGET_DATE } from "@/lib/event";
 import { buildMailto } from "@/lib/tickets/mailto";
-import { fill, formatDayMonth, formatFullDate, formatPrice, formatTime } from "@/lib/tickets/format";
+import {
+  fill,
+  formatDayMonth,
+  formatFullDate,
+  formatPrice,
+  formatTime,
+} from "@/lib/tickets/format";
 import {
   assertTicketingConfig,
   cheaperGroupRates,
   offerTier,
   tierStates,
 } from "@/lib/tickets/phase";
-import { alfioHost, codeFallbackAction, listingUrl, purchaseTarget } from "@/lib/tickets/purchase";
+import {
+  alfioHost,
+  codeFallbackAction,
+  listingUrl,
+  purchaseTarget,
+} from "@/lib/tickets/purchase";
 import type { RexSummary } from "@/lib/tickets/rex";
 import OfferDoor from "./OfferDoor.astro";
 import TeamDoor from "./TeamDoor.astro";
@@ -1388,8 +1627,16 @@ const rates = cheaperGroupRates(config, tier);
 const host = alfioHost(config);
 const email = CONTACT_EMAILS.tickets;
 
-const groupMailto = buildMailto(email, t("tickets.team.mail.subject"), t("tickets.team.mail.body"));
-const inclusionMailto = buildMailto(email, t("tickets.inclusion.mail.subject"), t("tickets.inclusion.mail.body"));
+const groupMailto = buildMailto(
+  email,
+  t("tickets.team.mail.subject"),
+  t("tickets.team.mail.body"),
+);
+const inclusionMailto = buildMailto(
+  email,
+  t("tickets.inclusion.mail.subject"),
+  t("tickets.inclusion.mail.body"),
+);
 
 // One action for the whole page: the alf.io listing, or before the opening the
 // newsletter. Door 1, the Strategy & Leadership band and the mobile bar share it.
@@ -1402,7 +1649,9 @@ const showTeam = rates.length > 0;
 const showCode = phase !== "pre_opening";
 const wideOffer = !showTeam;
 
-const openingTime = isTbd(config.opening.time) ? (config.opening.time.draft ?? "") : config.opening.time;
+const openingTime = isTbd(config.opening.time)
+  ? (config.opening.time.draft ?? "")
+  : config.opening.time;
 const opening = {
   date: config.opening.date,
   time: formatTime(openingTime, lang),
@@ -1416,13 +1665,20 @@ const eventDate = formatFullDate(TARGET_DATE, lang);
 // must never break at its hyphen on a narrow screen.
 const [whenBefore, whenAfter = ""] = t("tickets.when").split("{venue}");
 const when = {
-  before: fill(whenBefore, { date: eventDate.charAt(0).toUpperCase() + eventDate.slice(1) }),
+  before: fill(whenBefore, {
+    date: eventDate.charAt(0).toUpperCase() + eventDate.slice(1),
+  }),
   venue: t("hero.venue"),
   after: whenAfter,
 };
 
 const sticky = {
-  label: phase === "pre_opening" ? fill(t("tickets.sticky.opens"), { date: formatDayMonth(config.opening.date, lang) }) : tier.name[lang],
+  label:
+    phase === "pre_opening"
+      ? fill(t("tickets.sticky.opens"), {
+          date: formatDayMonth(config.opening.date, lang),
+        })
+      : tier.name[lang],
   price: formatPrice(tier.price, lang),
   action:
     target.kind === "listing"
@@ -1435,33 +1691,64 @@ const sticky = {
   },
 };
 
-const early = config.tiers.filter((x) => x.closesWhenSoldOut).map((x) => x.maxPerOrder);
-const later = config.tiers.filter((x) => !x.closesWhenSoldOut).map((x) => x.maxPerOrder);
+const early = config.tiers
+  .filter((x) => x.closesWhenSoldOut)
+  .map((x) => x.maxPerOrder);
+const later = config.tiers
+  .filter((x) => !x.closesWhenSoldOut)
+  .map((x) => x.maxPerOrder);
 const perOrder = { early: Math.max(...early), later: Math.max(...later) };
 ---
 
 <main class="tickets-page" data-phase={phase}>
   <section class="relative isolate overflow-hidden">
     <GeoBackground class="tickets-mesh absolute inset-0 -z-10" />
-    <div class="mx-auto flex max-w-7xl flex-col gap-8 px-4 pb-16 pt-8 md:px-6 md:pb-20 md:pt-12 lg:px-8">
+    <div
+      class="mx-auto flex max-w-7xl flex-col gap-8 px-4 pt-8 pb-16 md:px-6 md:pt-12 md:pb-20 lg:px-8"
+    >
       <header class="flex max-w-4xl flex-col gap-3">
-        <h1 class="text-4xl font-bold leading-[1.05] tracking-[-0.025em] text-balance text-foreground sm:text-5xl">
+        <h1
+          class="text-foreground text-4xl leading-[1.05] font-bold tracking-[-0.025em] text-balance sm:text-5xl"
+        >
           {t("tickets.h1")}
         </h1>
-        <p class="text-lg font-semibold text-foreground text-pretty sm:text-xl">
-          {when.before}<span class="whitespace-nowrap">{when.venue}</span>{when.after}, {t("tickets.when_evening")}
-          {note(config.eveningIncluded) && <Tbd note={note(config.eveningIncluded)!} lang={lang} class="ml-1.5 align-[0.15em]" />}
+        <p class="text-foreground text-lg font-semibold text-pretty sm:text-xl">
+          {when.before}<span class="whitespace-nowrap">{when.venue}</span>{
+            when.after
+          }, {t("tickets.when_evening")}
+          {
+            note(config.eveningIncluded) && (
+              <Tbd
+                note={note(config.eveningIncluded)!}
+                lang={lang}
+                class="ml-1.5 align-[0.15em]"
+              />
+            )
+          }
         </p>
-        <p class="max-w-[58ch] text-base text-muted-foreground text-pretty sm:text-lg">{t("tickets.lead")}</p>
+        <p
+          class="text-muted-foreground max-w-[58ch] text-base text-pretty sm:text-lg"
+        >
+          {t("tickets.lead")}
+        </p>
       </header>
 
-      {/* Door 1 spans the grid whenever door 2 has nothing to sell: a lone short
+      {
+        /* Door 1 spans the grid whenever door 2 has nothing to sell: a lone short
           card beside it would leave the right column hollow. "J'ai un code"
-          then becomes a slim band underneath rather than that lone card. */}
+          then becomes a slim band underneath rather than that lone card. */
+      }
       <div class="grid gap-5 lg:grid-cols-12 lg:gap-6">
-        {/* `flex flex-col` so door 1 inherits the row height the right column
-            sets, rather than sitting short inside a stretched wrapper. */}
-        <div class:list={["flex flex-col", wideOffer ? "lg:col-span-12" : "lg:col-span-8"]}>
+        {
+          /* `flex flex-col` so door 1 inherits the row height the right column
+            sets, rather than sitting short inside a stretched wrapper. */
+        }
+        <div
+          class:list={[
+            "flex flex-col",
+            wideOffer ? "lg:col-span-12" : "lg:col-span-8",
+          ]}
+        >
           <OfferDoor
             lang={lang}
             phase={phase}
@@ -1479,38 +1766,51 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
             />
           </OfferDoor>
         </div>
-        {showTeam && (
-          <div class="flex flex-col gap-5 lg:col-span-4 lg:gap-6">
-            <TeamDoor lang={lang} tier={tier} rates={rates} groupMailto={groupMailto} />
-            <CodeDoor
-              lang={lang}
-              phase={phase}
-              listingUrl={listingUrl(config)}
-              fallback={codeFallbackAction(config)}
-              host={host}
-              layout="card"
-            />
-          </div>
-        )}
-        {showCode && !showTeam && (
-          <div class="lg:col-span-12">
-            <CodeDoor
-              lang={lang}
-              phase={phase}
-              listingUrl={listingUrl(config)}
-              fallback={codeFallbackAction(config)}
-              host={host}
-              layout="band"
-            />
-          </div>
-        )}
+        {
+          showTeam && (
+            <div class="flex flex-col gap-5 lg:col-span-4 lg:gap-6">
+              <TeamDoor
+                lang={lang}
+                tier={tier}
+                rates={rates}
+                groupMailto={groupMailto}
+              />
+              <CodeDoor
+                lang={lang}
+                phase={phase}
+                listingUrl={listingUrl(config)}
+                fallback={codeFallbackAction(config)}
+                host={host}
+                layout="card"
+              />
+            </div>
+          )
+        }
+        {
+          showCode && !showTeam && (
+            <div class="lg:col-span-12">
+              <CodeDoor
+                lang={lang}
+                phase={phase}
+                listingUrl={listingUrl(config)}
+                fallback={codeFallbackAction(config)}
+                host={host}
+                layout="band"
+              />
+            </div>
+          )
+        }
       </div>
     </div>
   </section>
 
   {/* Always displayed, always on sale: the same action as door 1. */}
   <div class="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
-    <StrategicOffer lang={lang} ticket={config.strategic} teamHref={showTeam ? "#equipe" : undefined}>
+    <StrategicOffer
+      lang={lang}
+      ticket={config.strategic}
+      teamHref={showTeam ? "#equipe" : undefined}
+    >
       <PurchaseControl
         slot="purchase"
         target={target}
@@ -1521,7 +1821,9 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
     </StrategicOffer>
   </div>
 
-  <div class="mx-auto max-w-7xl px-4 pb-20 pt-24 md:px-6 md:pb-24 md:pt-28 lg:px-8">
+  <div
+    class="mx-auto max-w-7xl px-4 pt-24 pb-20 md:px-6 md:pt-28 md:pb-24 lg:px-8"
+  >
     <IncludedInTicket
       lang={lang}
       contentsNote={note(config.contents)}
@@ -1530,11 +1832,18 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
     />
   </div>
 
-  <div class="border-y border-border bg-card/60 py-20 md:py-24">
-    <EditionProof lang={lang} rex={rex} programmeWhen={programmeWhen} programmeNote={programmeNote} />
+  <div class="border-border bg-card/60 border-y py-20 md:py-24">
+    <EditionProof
+      lang={lang}
+      rex={rex}
+      programmeWhen={programmeWhen}
+      programmeNote={programmeNote}
+    />
   </div>
 
-  <div class="mx-auto max-w-7xl px-4 pb-20 pt-24 md:px-6 md:pb-24 md:pt-28 lg:px-8">
+  <div
+    class="mx-auto max-w-7xl px-4 pt-24 pb-20 md:px-6 md:pt-28 md:pb-24 lg:px-8"
+  >
     <TeamOffer
       lang={lang}
       programmeWhen={programmeWhen}
@@ -1582,7 +1891,12 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
     color: var(--color-foreground);
   }
   .tickets-page :global(.tickets-mesh) {
-    mask-image: linear-gradient(to bottom, black 0%, black 35%, transparent 85%);
+    mask-image: linear-gradient(
+      to bottom,
+      black 0%,
+      black 35%,
+      transparent 85%
+    );
     opacity: 0.9;
   }
 
@@ -1637,9 +1951,12 @@ const { lang, config, phase, fromConfig } = Astro.props;
 const t = useTranslations(lang);
 
 const phaseLabel = (p: Phase) =>
-  p === "pre_opening" ? t("tickets.demo.pre_opening") : config.tiers.find((tier) => tier.id === p)!.name[lang];
+  p === "pre_opening"
+    ? t("tickets.demo.pre_opening")
+    : config.tiers.find((tier) => tier.id === p)!.name[lang];
 
-const legend = "text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-muted-foreground";
+const legend =
+  "text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-muted-foreground";
 const chip =
   "inline-flex min-h-8 items-center rounded-md px-2.5 text-[0.8125rem] font-medium transition-[background-color,color] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 const idle = "text-foreground hover:bg-muted";
@@ -1650,11 +1967,24 @@ const active = "bg-foreground text-background";
   <button
     type="button"
     popovertarget="demo-panel"
-    class="demo-trigger fixed left-4 z-50 inline-flex h-8 items-center gap-2 rounded-md px-3 text-xs font-bold uppercase tracking-widest text-destructive-foreground shadow-[0_2px_8px_oklch(0_0_0/0.25)] transition-[scale] duration-150 ease-out active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    class="demo-trigger text-destructive-foreground focus-visible:ring-ring focus-visible:ring-offset-background fixed left-4 z-50 inline-flex h-8 items-center gap-2 rounded-md px-3 text-xs font-bold tracking-widest uppercase shadow-[0_2px_8px_oklch(0_0_0/0.25)] transition-[scale] duration-150 ease-out focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96]"
     aria-label={t("tickets.demo.settings")}
   >
     <span>{t("tickets.demo.badge")}</span>
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="shrink-0 opacity-80">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.25"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      class="shrink-0 opacity-80"
+    >
       <path d="M4 6h10"></path>
       <path d="M18 6h2"></path>
       <path d="M4 12h4"></path>
@@ -1668,48 +1998,75 @@ const active = "bg-foreground text-background";
   </button>
 
   <div id="demo-panel" popover class="demo-panel" data-demo-panel>
-    <div class="flex max-h-[min(30rem,calc(100dvh-8rem))] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-y-auto rounded-xl border border-border bg-card shadow-[0_12px_32px_oklch(0_0_0/0.22)]">
+    <div
+      class="border-border bg-card flex max-h-[min(30rem,calc(100dvh-8rem))] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-y-auto rounded-xl border shadow-[0_12px_32px_oklch(0_0_0/0.22)]"
+    >
       <div class="demo-stripe h-1.5 shrink-0" aria-hidden="true"></div>
 
-      <div class="flex items-start justify-between gap-3 px-4 pb-2 pt-3">
+      <div class="flex items-start justify-between gap-3 px-4 pt-3 pb-2">
         <p class="flex flex-col gap-1">
-          <strong class="w-fit rounded-sm bg-destructive px-2 py-0.5 text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-destructive-foreground">
+          <strong
+            class="bg-destructive text-destructive-foreground w-fit rounded-sm px-2 py-0.5 text-[0.6875rem] font-bold tracking-[0.08em] uppercase"
+          >
             {t("tickets.demo.badge")}
           </strong>
-          <span class="text-xs text-muted-foreground">{t("tickets.demo.notice")}</span>
+          <span class="text-muted-foreground text-xs"
+            >{t("tickets.demo.notice")}</span
+          >
         </p>
         <button
           type="button"
           popovertarget="demo-panel"
           popovertargetaction="hide"
-          class="-mr-1 -mt-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color] duration-150 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          class="text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring -mt-1 -mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md transition-[background-color,color] duration-150 focus-visible:ring-2 focus-visible:outline-none"
           aria-label={t("tickets.demo.close")}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
             <path d="M18 6 6 18"></path>
             <path d="m6 6 12 12"></path>
           </svg>
         </button>
       </div>
 
-      <nav class="flex flex-col gap-1.5 border-t border-border px-4 py-3" aria-label={t("tickets.demo.phase")}>
+      <nav
+        class="border-border flex flex-col gap-1.5 border-t px-4 py-3"
+        aria-label={t("tickets.demo.phase")}
+      >
         <span class={legend}>{t("tickets.demo.phase")}</span>
         <div class="flex flex-wrap gap-1">
-          {DEMO_PHASES.map((p) => (
-            <a
-              href={demoPath(p)}
-              class:list={[chip, !fromConfig && p === phase ? active : idle]}
-              aria-current={!fromConfig && p === phase ? "page" : undefined}
-              data-demo-link
-            >
-              {phaseLabel(p)}
-            </a>
-          ))}
+          {
+            DEMO_PHASES.map((p) => (
+              <a
+                href={demoPath(p)}
+                class:list={[chip, !fromConfig && p === phase ? active : idle]}
+                aria-current={!fromConfig && p === phase ? "page" : undefined}
+                data-demo-link
+              >
+                {phaseLabel(p)}
+              </a>
+            ))
+          }
         </div>
       </nav>
 
-      <p class="border-t border-border px-4 py-3 text-[0.6875rem] leading-relaxed text-muted-foreground">
-        {fromConfig ? `${t("tickets.demo.config")} · ` : ""}{t("tickets.demo.scenario")}
+      <p
+        class="border-border text-muted-foreground border-t px-4 py-3 text-[0.6875rem] leading-relaxed"
+      >
+        {fromConfig ? `${t("tickets.demo.config")} · ` : ""}{
+          t("tickets.demo.scenario")
+        }
       </p>
     </div>
   </div>
@@ -1792,7 +2149,9 @@ Replace the whole of `src/components/tickets/tickets-ui.ts` with:
 import { codeUrlFrom } from "@/lib/tickets/url";
 
 // ── "I have a code": strip spaces, refuse empty, hand over to alf.io ────────────
-for (const form of document.querySelectorAll<HTMLFormElement>("[data-tickets-code]")) {
+for (const form of document.querySelectorAll<HTMLFormElement>(
+  "[data-tickets-code]",
+)) {
   const input = form.querySelector<HTMLInputElement>("[data-code-input]");
   const error = form.querySelector<HTMLElement>("[data-code-error]");
   const listing = form.dataset.listing;
@@ -1811,7 +2170,10 @@ for (const form of document.querySelectorAll<HTMLFormElement>("[data-tickets-cod
     if (!result.ok) {
       error.hidden = false;
       input.setAttribute("aria-invalid", "true");
-      input.setAttribute("aria-describedby", `${error.id} ${describedBy}`.trim());
+      input.setAttribute(
+        "aria-describedby",
+        `${error.id} ${describedBy}`.trim(),
+      );
       input.focus();
       return;
     }
@@ -1829,7 +2191,9 @@ for (const form of document.querySelectorAll<HTMLFormElement>("[data-tickets-cod
 // button must not keep the bar away while the button is already out of sight,
 // and a short phone that opens with the button below the fold gets the bar too.
 const bar = document.querySelector<HTMLElement>("[data-sticky-bar]");
-const offerAction = document.querySelector<HTMLElement>("#offre [data-offer-action]");
+const offerAction = document.querySelector<HTMLElement>(
+  "#offre [data-offer-action]",
+);
 if (bar && offerAction && "IntersectionObserver" in window) {
   const action = bar.querySelector<HTMLAnchorElement>("[data-sticky-action]");
   const observer = new IntersectionObserver(
@@ -1852,7 +2216,9 @@ const SCROLL_KEY = "cnd-tickets-demo-scroll";
 const PANEL_KEY = "cnd-tickets-demo-panel";
 const panel = document.querySelector<HTMLElement>("[data-demo-panel]");
 
-for (const link of document.querySelectorAll<HTMLAnchorElement>("[data-demo-link]")) {
+for (const link of document.querySelectorAll<HTMLAnchorElement>(
+  "[data-demo-link]",
+)) {
   link.addEventListener("click", () => {
     try {
       sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
@@ -1950,11 +2316,13 @@ Claude-Session: https://claude.ai/code/session_01Azzq3C71c3RsForMreHpyG"
 ### Task 3: Remove the proof section and the inclusion footer
 
 **Files:**
+
 - Modify: `src/components/tickets/TicketsContent.astro`, `src/components/tickets/TicketsPage.astro`, `src/pages/billetterie/[...demo].astro`, `src/components/tickets/Icon.astro`, `src/i18n/ui.ts`
 - Delete: `src/components/tickets/EditionProof.astro`, `src/components/tickets/InclusionNote.astro`, `src/lib/tickets/rex.ts`
 - Test: `src/components/tickets/__tests__/TicketsPage.test.ts`, `src/lib/__tests__/tickets.test.ts`
 
 **Interfaces:**
+
 - Consumes: Task 2's `TicketsContent` / `TicketsPage`.
 - Produces: `TicketsContent` / `TicketsPage` props `{ lang: Locale; phase: Phase; demo?: … }` (no `rex`).
 
@@ -1963,12 +2331,12 @@ Claude-Session: https://claude.ai/code/session_01Azzq3C71c3RsForMreHpyG"
 In `src/components/tickets/__tests__/TicketsPage.test.ts`: delete the line `const rex = { sessions: 17, organisations: ["SNCF", "Mistral AI"] };`, change the render props to `props: { lang: "fr", phase, demo: true },`, and add inside `describe.each`:
 
 ```ts
-  it("carries no proof section and no inclusion footer — the FAQ answers that", () => {
-    expect(text).not.toContain("2026, en vrai");
-    expect(main).not.toContain('id="proof-title"');
-    expect(text).not.toContain("Le prix ne doit empêcher personne");
-    expect(text).toContain("Existe-t-il un tarif étudiant ou solidaire");
-  });
+it("carries no proof section and no inclusion footer — the FAQ answers that", () => {
+  expect(text).not.toContain("2026, en vrai");
+  expect(main).not.toContain('id="proof-title"');
+  expect(text).not.toContain("Le prix ne doit empêcher personne");
+  expect(text).toContain("Existe-t-il un tarif étudiant ou solidaire");
+});
 ```
 
 In `src/lib/__tests__/tickets.test.ts`: delete the imports `import { rexSummary } from "@/lib/tickets/rex";` and `import type { SessionRow } from "@/lib/schedule";`, and delete the whole `describe("rexSummary", …)` block.
@@ -1986,16 +2354,21 @@ In `src/components/tickets/TicketsContent.astro`:
 2. In `Props`, delete `  rex: RexSummary;`; change the destructuring to `const { lang, phase, demo } = Astro.props;`.
 3. Delete the proof block:
    ```astro
-     <div class="border-y border-border bg-card/60 py-20 md:py-24">
-       <EditionProof lang={lang} rex={rex} programmeWhen={programmeWhen} programmeNote={programmeNote} />
-     </div>
+   <div class="border-border bg-card/60 border-y py-20 md:py-24">
+     <EditionProof
+       lang={lang}
+       rex={rex}
+       programmeWhen={programmeWhen}
+       programmeNote={programmeNote}
+     />
+   </div>
    ```
 4. The manager section now follows "what the ticket includes" directly, so it takes the page's section rhythm (the previous section's bottom padding) rather than a second top padding: change its wrapper from `class="mx-auto max-w-7xl px-4 pb-20 pt-24 md:px-6 md:pb-24 md:pt-28 lg:px-8"` (the one around `<TeamOffer`) to `class="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-24 lg:px-8"`.
 5. Delete the inclusion block:
    ```astro
-     <div class="mx-auto max-w-7xl px-4 pb-28 md:px-6 md:pb-24 lg:px-8">
-       <InclusionNote lang={lang} inclusionMailto={inclusionMailto} />
-     </div>
+   <div class="mx-auto max-w-7xl px-4 pb-28 md:px-6 md:pb-24 lg:px-8">
+     <InclusionNote lang={lang} inclusionMailto={inclusionMailto} />
+   </div>
    ```
 6. The FAQ is now the last block, so it carries the clearance the mobile sticky bar needs: change the wrapper around `<TicketsFaq` from `class="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-24 lg:px-8"` to `class="mx-auto max-w-7xl px-4 pb-28 md:px-6 md:pb-24 lg:px-8"`.
 
@@ -2004,7 +2377,11 @@ In `src/components/tickets/TicketsPage.astro`: delete `import type { RexSummary 
 In `src/pages/billetterie/[...demo].astro`: delete the three imports `loadSessions`, `assertEditionPublishable`, `rexSummary`, delete the block from `// The proof section quotes …` to `const rex = rexSummary(await loadSessions(PROOF_EDITION));`, and change the page line to:
 
 ```astro
-<TicketsPage lang="fr" phase={phase ?? TICKETING.currentPhase} demo={{ fromConfig: !phase }} />
+<TicketsPage
+  lang="fr"
+  phase={phase ?? TICKETING.currentPhase}
+  demo={{ fromConfig: !phase }}
+/>
 ```
 
 Delete the files: `git rm src/components/tickets/EditionProof.astro src/components/tickets/InclusionNote.astro src/lib/tickets/rex.ts`
@@ -2051,11 +2428,13 @@ Claude-Session: https://claude.ai/code/session_01Azzq3C71c3RsForMreHpyG"
 ### Task 4: No placeholder on the page, a guard on production
 
 **Files:**
+
 - Modify: `src/config/tickets.ts`, `src/lib/tickets/phase.ts`, `src/components/tickets/{TicketsContent,OfferDoor,TierLadder,StrategicOffer,IncludedInTicket,TeamOffer,TicketsFaq,Icon}.astro`, `src/i18n/ui.ts`
 - Delete: `src/components/tickets/Tbd.astro`
 - Test: `src/components/tickets/__tests__/TicketsPage.test.ts`, create `src/components/tickets/__tests__/TicketsFaq.test.ts`, `src/lib/__tests__/tickets.test.ts`
 
 **Interfaces:**
+
 - Consumes: `shown`, `shippingProblems`, `assertShippable` (Task 1); `placeholdersAllowed` (`demo.ts`).
 - Produces:
   - `strategicPrice(config: TicketingConfig, phase: Phase): number | undefined` in `phase.ts`
@@ -2070,26 +2449,28 @@ Claude-Session: https://claude.ai/code/session_01Azzq3C71c3RsForMreHpyG"
 In `src/lib/__tests__/tickets.test.ts`, add `strategicPrice` to the `@/lib/tickets/phase` import, then append inside `describe("drafts", …)`:
 
 ```ts
-  it("lists what still blocks a production build of the committed config", () => {
-    expect(shippingProblems(TICKETING).map((p) => p.path)).toEqual([
-      "opening.time",
-      "tierNames",
-      "strategic.name",
-      "strategic.networking",
-      "contents",
-      "eveningIncluded",
-      "managerKitUrl",
-      "programmeAnnouncement",
-      "strategic.price",
-    ]);
-  });
+it("lists what still blocks a production build of the committed config", () => {
+  expect(shippingProblems(TICKETING).map((p) => p.path)).toEqual([
+    "opening.time",
+    "tierNames",
+    "strategic.name",
+    "strategic.networking",
+    "contents",
+    "eveningIncluded",
+    "managerKitUrl",
+    "programmeAnnouncement",
+    "strategic.price",
+  ]);
+});
 ```
 
 and append a new block at the end of the file:
 
 ```ts
 describe("strategicPrice", () => {
-  const withPrice = (price: TicketingConfig["strategic"]["price"]): TicketingConfig => ({
+  const withPrice = (
+    price: TicketingConfig["strategic"]["price"],
+  ): TicketingConfig => ({
     ...TICKETING,
     strategic: { ...TICKETING.strategic, price },
   });
@@ -2105,7 +2486,10 @@ describe("strategicPrice", () => {
   });
 
   it("follows the tier on offer when priced per tier — the first one before the opening", () => {
-    const perTier = withPrice({ kind: "per_tier", amounts: { seb: 399, eb: 449, regular: 499, last_chance: 549 } });
+    const perTier = withPrice({
+      kind: "per_tier",
+      amounts: { seb: 399, eb: 449, regular: 499, last_chance: 549 },
+    });
     expect(strategicPrice(perTier, "pre_opening")).toBe(399);
     expect(strategicPrice(perTier, "eb")).toBe(449);
     expect(strategicPrice(perTier, "regular")).toBe(499);
@@ -2161,11 +2545,15 @@ describe("TicketsFaq", () => {
       programmeWhen: "en mars 2027",
     });
     expect(html).toContain("Taux de TVA : 10 %.");
-    expect(html).toContain("Oui, la facture est émise au nom de votre société.");
+    expect(html).toContain(
+      "Oui, la facture est émise au nom de votre société.",
+    );
     expect(html).not.toContain("Nous le vérifions");
     expect(html).toContain("Le changement de nom est gratuit.");
     expect(html).not.toContain("en cours de validation");
-    expect(html).toMatch(/<a\b[^>]*href="https:\/\/cloudnativedays\.fr\/cgv"[^>]*>\s*Conditions générales de vente/);
+    expect(html).toMatch(
+      /<a\b[^>]*href="https:\/\/cloudnativedays\.fr\/cgv"[^>]*>\s*Conditions générales de vente/,
+    );
     expect(html).toContain("Le programme 2027 sera publié en mars 2027.");
   });
 });
@@ -2177,40 +2565,48 @@ In `src/components/tickets/__tests__/TicketsPage.test.ts`:
 2. Replace the two tests `"marks every placeholder as such"` and `"still reads as finished copy once the placeholders are hidden"` with:
 
 ```ts
-  it("renders no placeholder: a draft reads as copy, an undecided line is absent", () => {
-    expect(main).not.toContain("data-tbd");
-    expect(main).not.toContain("tbd-chip");
-    expect(text).not.toMatch(/à confirmer/i);
-    // Undecided with no draft: the whole line is gone, its label included.
-    for (const absent of ["Taux de TVA", "Conditions générales de vente", "Le détail de la soirée"]) {
-      expect(text).not.toContain(absent);
-    }
-    // No label left pointing at nothing.
-    expect(main).not.toMatch(/<(dd|dt)\b[^>]*>\s*<\/\1>/);
-    // Drafts show as the copy they will become (Astro escapes `&` and `'`).
-    expect(main).toMatch(/Stratégie (&amp;|&) Leadership/);
-    expect(text).toContain("en mars 2027");
-    expect(text).toContain("soirée comprise");
-    // What is left is still the page, not a shell.
-    expect(text).toContain("Je prends ma place");
-    expect(text).toContain("Ce que comprend votre billet");
-    expect(text).toContain("Questions fréquentes");
-  });
+it("renders no placeholder: a draft reads as copy, an undecided line is absent", () => {
+  expect(main).not.toContain("data-tbd");
+  expect(main).not.toContain("tbd-chip");
+  expect(text).not.toMatch(/à confirmer/i);
+  // Undecided with no draft: the whole line is gone, its label included.
+  for (const absent of [
+    "Taux de TVA",
+    "Conditions générales de vente",
+    "Le détail de la soirée",
+  ]) {
+    expect(text).not.toContain(absent);
+  }
+  // No label left pointing at nothing.
+  expect(main).not.toMatch(/<(dd|dt)\b[^>]*>\s*<\/\1>/);
+  // Drafts show as the copy they will become (Astro escapes `&` and `'`).
+  expect(main).toMatch(/Stratégie (&amp;|&) Leadership/);
+  expect(text).toContain("en mars 2027");
+  expect(text).toContain("soirée comprise");
+  // What is left is still the page, not a shell.
+  expect(text).toContain("Je prends ma place");
+  expect(text).toContain("Ce que comprend votre billet");
+  expect(text).toContain("Questions fréquentes");
+});
 
-  it("keeps the manager kit box, linked to its draft URL", () => {
-    expect(text).toContain("Un kit pour convaincre votre manager");
-    expect(main).toMatch(/<a\b[^>]*href="#convaincre"[^>]*data-umami-event="tickets-manager-kit"/);
-  });
+it("keeps the manager kit box, linked to its draft URL", () => {
+  expect(text).toContain("Un kit pour convaincre votre manager");
+  expect(main).toMatch(
+    /<a\b[^>]*href="#convaincre"[^>]*data-umami-event="tickets-manager-kit"/,
+  );
+});
 
-  it("lists only the Strategy & Leadership facts that have a value", () => {
-    const start = main.indexOf('id="strategie-leadership"');
-    const band = main.slice(start, main.indexOf("</section>", start));
-    const terms = [...band.matchAll(/<dt\b[^>]*>([\s\S]*?)<\/dt>/g)].map((m) => m[1]);
-    // Only the networking area has a draft today; price, contents, programme
-    // and access have no row until they are decided.
-    expect(terms).toHaveLength(1);
-    expect(terms[0]).toMatch(/Espace d(&#39;|')échange/);
-  });
+it("lists only the Strategy & Leadership facts that have a value", () => {
+  const start = main.indexOf('id="strategie-leadership"');
+  const band = main.slice(start, main.indexOf("</section>", start));
+  const terms = [...band.matchAll(/<dt\b[^>]*>([\s\S]*?)<\/dt>/g)].map(
+    (m) => m[1],
+  );
+  // Only the networking area has a draft today; price, contents, programme
+  // and access have no row until they are decided.
+  expect(terms).toHaveLength(1);
+  expect(terms[0]).toMatch(/Espace d(&#39;|')échange/);
+});
 ```
 
 - [ ] **Step 3: Run the tests to verify they fail**
@@ -2222,7 +2618,7 @@ Expected: FAIL — `strategicPrice` is not exported, the committed config's bloc
 
 In `src/config/tickets.ts`:
 
-1. In the file header, replace the paragraph starting ` * **Unknowns are \`tbd()\`, never a plausible guess.**` with:
+1. In the file header, replace the paragraph starting ` * **Unknowns are \`tbd()\`, never a plausible guess.\*\*` with:
    ```ts
     * **Unknowns are `tbd()`, never a plausible guess.** A `tbd` renders nothing
     * of its own: the page shows its draft when it has one — as the copy it will
@@ -2232,11 +2628,11 @@ In `src/config/tickets.ts`:
     * everything still open.
     */
    ```
-2. Replace the `Tbd` interface doc comment with `/** A value the organising team has not decided yet. \`draft\` is what the page shows until then — on staging only. */`.
+2. Replace the `Tbd` interface doc comment with `/** A value the organising team has not decided yet. \`draft\` is what the page shows until then — on staging only. \*/`.
 3. In `TicketingConfig`, replace the three doc comments:
-   - above `tierNames`: `/** Public tier names are still the working names of the pricing sheet: \`true\` once final. */`
-   - above `contents`: `/** The contents list on the page, pending the evening team: \`true\` once confirmed. */`
-   - above `eveningIncluded`: `/** "Soirée comprise" on the page — to confirm with the evening team: \`true\` once confirmed. */`
+   - above `tierNames`: `/** Public tier names are still the working names of the pricing sheet: \`true\` once final. \*/`
+   - above `contents`: `/** The contents list on the page, pending the evening team: \`true\` once confirmed. \*/`
+   - above `eveningIncluded`: `/** "Soirée comprise" on the page — to confirm with the evening team: \`true\` once confirmed. \*/`
 4. Change the values:
    ```ts
      tierNames: tbd("Noms publics des paliers en français et en anglais", true),
@@ -2259,10 +2655,15 @@ In `src/lib/tickets/phase.ts`, add `import { shown } from "./drafts";` under the
  * amount of the tier on offer (the first one before the opening). Undefined
  * while the price is undecided — its row is then not rendered.
  */
-export function strategicPrice(config: TicketingConfig, phase: Phase): number | undefined {
+export function strategicPrice(
+  config: TicketingConfig,
+  phase: Phase,
+): number | undefined {
   const price = shown(config.strategic.price);
   if (price === undefined) return undefined;
-  return price.kind === "fixed" ? price.amount : price.amounts[offerTier(config, phase).id];
+  return price.kind === "fixed"
+    ? price.amount
+    : price.amounts[offerTier(config, phase).id];
 }
 ```
 
@@ -2305,59 +2706,106 @@ const name = shown(ticket.name)?.[lang] ?? "";
 
 // A fact with no value yet has no row: never a label pointing at nothing.
 const facts = [
-  { label: t("tickets.strategic.fact.price"), value: price === undefined ? undefined : formatPrice(price, lang) },
-  { label: t("tickets.strategic.fact.includes"), value: shown(ticket.includesStandard)?.[lang] },
-  { label: t("tickets.strategic.fact.programme"), value: shown(ticket.programme)?.[lang] },
-  { label: t("tickets.strategic.fact.networking"), value: shown(ticket.networking)?.[lang] },
-  { label: t("tickets.strategic.fact.access"), value: shown(ticket.accessConditions)?.[lang] },
-].filter((fact): fact is { label: string; value: string } => fact.value !== undefined);
+  {
+    label: t("tickets.strategic.fact.price"),
+    value: price === undefined ? undefined : formatPrice(price, lang),
+  },
+  {
+    label: t("tickets.strategic.fact.includes"),
+    value: shown(ticket.includesStandard)?.[lang],
+  },
+  {
+    label: t("tickets.strategic.fact.programme"),
+    value: shown(ticket.programme)?.[lang],
+  },
+  {
+    label: t("tickets.strategic.fact.networking"),
+    value: shown(ticket.networking)?.[lang],
+  },
+  {
+    label: t("tickets.strategic.fact.access"),
+    value: shown(ticket.accessConditions)?.[lang],
+  },
+].filter(
+  (fact): fact is { label: string; value: string } => fact.value !== undefined,
+);
 
-const topics = [1, 2, 3, 4, 5, 6].map((n) => t(`tickets.strategic.topic.${n}` as Parameters<typeof t>[0]));
+const topics = [1, 2, 3, 4, 5, 6].map((n) =>
+  t(`tickets.strategic.topic.${n}` as Parameters<typeof t>[0]),
+);
 ---
 
 <section
   id="strategie-leadership"
-  class="strategic relative overflow-hidden rounded-xl bg-chart-5 text-primary-foreground dark:bg-secondary dark:ring-1 dark:ring-accent/30"
+  class="strategic bg-chart-5 text-primary-foreground dark:bg-secondary dark:ring-accent/30 relative overflow-hidden rounded-xl dark:ring-1"
   aria-labelledby="strategic-title"
 >
-  <div class="grid gap-10 p-6 sm:p-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-14">
+  <div
+    class="grid gap-10 p-6 sm:p-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-14"
+  >
     <div class="flex flex-col gap-5">
-      <h2 id="strategic-title" class="text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl">{name}</h2>
-      <p class="max-w-[60ch] text-lg text-pretty">{t("tickets.strategic.lead")}</p>
-      <p class="max-w-[60ch] text-base text-chart-4 text-pretty">{t("tickets.strategic.body")}</p>
+      <h2
+        id="strategic-title"
+        class="text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl"
+      >
+        {name}
+      </h2>
+      <p class="max-w-[60ch] text-lg text-pretty">
+        {t("tickets.strategic.lead")}
+      </p>
+      <p class="text-chart-4 max-w-[60ch] text-base text-pretty">
+        {t("tickets.strategic.body")}
+      </p>
       <div class="flex flex-col gap-3">
-        <p class="text-sm font-medium text-chart-4">{t("tickets.strategic.topics")}</p>
+        <p class="text-chart-4 text-sm font-medium">
+          {t("tickets.strategic.topics")}
+        </p>
         <ul class="flex flex-wrap gap-2">
-          {topics.map((topic) => (
-            <li class="rounded-full border border-primary-foreground/25 px-3 py-1 text-sm font-medium">{topic}</li>
-          ))}
+          {
+            topics.map((topic) => (
+              <li class="border-primary-foreground/25 rounded-full border px-3 py-1 text-sm font-medium">
+                {topic}
+              </li>
+            ))
+          }
         </ul>
       </div>
-      <p class="text-base font-medium text-accent">{t("tickets.strategic.no_pitch")}</p>
+      <p class="text-accent text-base font-medium">
+        {t("tickets.strategic.no_pitch")}
+      </p>
     </div>
 
     <div class="flex flex-col gap-6">
-      {facts.length > 0 && (
-        <dl class="divide-y divide-primary-foreground/15 border-y border-primary-foreground/15">
-          {facts.map((fact) => (
-            <div class="flex flex-col gap-1 py-3 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:gap-x-4">
-              <dt class="text-sm text-chart-4">{fact.label}</dt>
-              <dd class="text-base font-semibold tabular-nums sm:text-right">{fact.value}</dd>
-            </div>
-          ))}
-        </dl>
-      )}
+      {
+        facts.length > 0 && (
+          <dl class="divide-primary-foreground/15 border-primary-foreground/15 divide-y border-y">
+            {facts.map((fact) => (
+              <div class="flex flex-col gap-1 py-3 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:gap-x-4">
+                <dt class="text-chart-4 text-sm">{fact.label}</dt>
+                <dd class="text-base font-semibold tabular-nums sm:text-right">
+                  {fact.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )
+      }
 
       <div class="strategic-purchase">
         <slot name="purchase" />
       </div>
 
-      {teamHref && (
-        <a href={teamHref} class="inline-flex items-center gap-1.5 self-start text-sm font-medium text-primary-foreground underline-offset-4 hover:underline">
-          {t("tickets.strategic.team")}
-          <Icon name="arrow-right" size={14} />
-        </a>
-      )}
+      {
+        teamHref && (
+          <a
+            href={teamHref}
+            class="text-primary-foreground inline-flex items-center gap-1.5 self-start text-sm font-medium underline-offset-4 hover:underline"
+          >
+            {t("tickets.strategic.team")}
+            <Icon name="arrow-right" size={14} />
+          </a>
+        )
+      }
     </div>
   </div>
 </section>
@@ -2400,30 +2848,54 @@ const items = [
 ];
 ---
 
-<section class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-16" aria-labelledby="included-title">
+<section
+  class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-16"
+  aria-labelledby="included-title"
+>
   <div class="flex flex-col gap-6">
-    <h2 id="included-title" class="text-3xl font-bold tracking-[-0.02em] text-balance text-foreground sm:text-4xl">
+    <h2
+      id="included-title"
+      class="text-foreground text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl"
+    >
       {t("tickets.included.title")}
     </h2>
     <ul class="flex flex-col gap-3">
-      {items.map((item) => (
-        <li class="flex items-start gap-3 text-lg text-foreground">
-          <span class="mt-1 grid size-6 shrink-0 place-items-center rounded-full bg-primary/10 text-primary-strong">
-            <Icon name="check" size={14} stroke={2} />
-          </span>
-          <span class="text-pretty">{item}</span>
-        </li>
-      ))}
+      {
+        items.map((item) => (
+          <li class="text-foreground flex items-start gap-3 text-lg">
+            <span class="bg-primary/10 text-primary-strong mt-1 grid size-6 shrink-0 place-items-center rounded-full">
+              <Icon name="check" size={14} stroke={2} />
+            </span>
+            <span class="text-pretty">{item}</span>
+          </li>
+        ))
+      }
     </ul>
   </div>
 
-  <div class="relative flex flex-col gap-4 rounded-xl border border-accent/50 bg-accent/10 p-6 sm:p-8 dark:bg-accent/8">
-    <span class="grid size-11 place-items-center rounded-full bg-accent text-accent-foreground">
+  <div
+    class="border-accent/50 bg-accent/10 dark:bg-accent/8 relative flex flex-col gap-4 rounded-xl border p-6 sm:p-8"
+  >
+    <span
+      class="bg-accent text-accent-foreground grid size-11 place-items-center rounded-full"
+    >
       <Icon name="moon" size={22} />
     </span>
-    <h3 class="text-2xl font-semibold tracking-[-0.01em] text-foreground text-balance">{t("tickets.included.evening.title")}</h3>
-    <p class="text-lg text-foreground text-pretty">{t("tickets.included.evening.body")}</p>
-    {eveningDetails && <p class="text-base text-muted-foreground text-pretty">{eveningDetails}</p>}
+    <h3
+      class="text-foreground text-2xl font-semibold tracking-[-0.01em] text-balance"
+    >
+      {t("tickets.included.evening.title")}
+    </h3>
+    <p class="text-foreground text-lg text-pretty">
+      {t("tickets.included.evening.body")}
+    </p>
+    {
+      eveningDetails && (
+        <p class="text-muted-foreground text-base text-pretty">
+          {eveningDetails}
+        </p>
+      )
+    }
   </div>
 </section>
 ```
@@ -2460,30 +2932,49 @@ const { lang, programmeWhen, kitUrl } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-<section id="convaincre" class="flex max-w-3xl flex-col gap-5" aria-labelledby="team-title">
-  <h2 id="team-title" class="text-3xl font-bold tracking-[-0.02em] text-balance text-foreground sm:text-4xl">
+<section
+  id="convaincre"
+  class="flex max-w-3xl flex-col gap-5"
+  aria-labelledby="team-title"
+>
+  <h2
+    id="team-title"
+    class="text-foreground text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl"
+  >
     {t("tickets.team.convince.title")}
   </h2>
-  <p class="max-w-[46ch] text-lg text-foreground text-pretty">{t("tickets.team.convince.lead")}</p>
-  {programmeWhen && (
-    <p class="max-w-[52ch] text-base text-muted-foreground text-pretty">
-      {fill(t("tickets.team.programme"), { when: programmeWhen })}
-    </p>
-  )}
+  <p class="text-foreground max-w-[46ch] text-lg text-pretty">
+    {t("tickets.team.convince.lead")}
+  </p>
+  {
+    programmeWhen && (
+      <p class="text-muted-foreground max-w-[52ch] text-base text-pretty">
+        {fill(t("tickets.team.programme"), { when: programmeWhen })}
+      </p>
+    )
+  }
 
-  <div class="mt-2 flex flex-col items-start gap-2 rounded-lg border border-dashed border-input p-5">
-    <p class="text-base font-semibold text-foreground">{t("tickets.team.kit.title")}</p>
-    <p class="text-sm text-muted-foreground text-pretty">{t("tickets.team.kit.body")}</p>
-    {kitUrl && (
-      <a
-        href={kitUrl}
-        class="inline-flex items-center gap-1.5 text-sm font-medium text-primary-strong underline-offset-4 hover:underline"
-        data-umami-event="tickets-manager-kit"
-      >
-        {t("tickets.team.kit.cta")}
-        <Icon name="arrow-right" size={14} />
-      </a>
-    )}
+  <div
+    class="border-input mt-2 flex flex-col items-start gap-2 rounded-lg border border-dashed p-5"
+  >
+    <p class="text-foreground text-base font-semibold">
+      {t("tickets.team.kit.title")}
+    </p>
+    <p class="text-muted-foreground text-sm text-pretty">
+      {t("tickets.team.kit.body")}
+    </p>
+    {
+      kitUrl && (
+        <a
+          href={kitUrl}
+          class="text-primary-strong inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 hover:underline"
+          data-umami-event="tickets-manager-kit"
+        >
+          {t("tickets.team.kit.cta")}
+          <Icon name="arrow-right" size={14} />
+        </a>
+      )
+    }
   </div>
 </section>
 ```
@@ -2518,85 +3009,134 @@ interface Props {
   termsUrl?: string;
 }
 
-const { lang, host, email, inclusionMailto, perOrder, programmeWhen, vatRate, invoice, transfer, termsUrl } = Astro.props;
+const {
+  lang,
+  host,
+  email,
+  inclusionMailto,
+  perOrder,
+  programmeWhen,
+  vatRate,
+  invoice,
+  transfer,
+  termsUrl,
+} = Astro.props;
 const t = useTranslations(lang);
 const practicalPath = `${getLocalePath(lang, "/informations-utiles")}#accessibilite`;
 const cocPath = getLocalePath(lang, "/code-of-conduct");
-const link = "font-medium text-primary-strong underline underline-offset-4 decoration-primary-strong/40 hover:decoration-primary-strong";
+const link =
+  "font-medium text-primary-strong underline underline-offset-4 decoration-primary-strong/40 hover:decoration-primary-strong";
 ---
 ```
 
 and in its markup make four replacements:
 
 (a) VAT —
+
 ```astro
-      <p>
-        {t("tickets.faq.ttc.a")}
-        {notes.vat && <span class="ml-1 inline-flex items-center gap-2" data-tbd-only>{t("tickets.faq.ttc.rate")} <Tbd note={notes.vat} lang={lang} /></span>}
-      </p>
+<p>
+  {t("tickets.faq.ttc.a")}
+  {
+    notes.vat && (
+      <span class="ml-1 inline-flex items-center gap-2" data-tbd-only>
+        {t("tickets.faq.ttc.rate")} <Tbd note={notes.vat} lang={lang} />
+      </span>
+    )
+  }
+</p>
 ```
+
 becomes
+
 ```astro
-      <p>
-        {t("tickets.faq.ttc.a")}
-        {vatRate && ` ${fill(t("tickets.faq.ttc.rate"), { rate: vatRate })}`}
-      </p>
+<p>
+  {t("tickets.faq.ttc.a")}
+  {vatRate && ` ${fill(t("tickets.faq.ttc.rate"), { rate: vatRate })}`}
+</p>
 ```
 
 (b) Invoice —
+
 ```astro
-      <p>
-        {fill(t("tickets.faq.invoice.a"), { email })}
-        {notes.invoice && <Tbd note={notes.invoice} lang={lang} class="ml-1" />}
-      </p>
+<p>
+  {fill(t("tickets.faq.invoice.a"), { email })}
+  {notes.invoice && <Tbd note={notes.invoice} lang={lang} class="ml-1" />}
+</p>
 ```
+
 becomes
+
 ```astro
-      <p>{fill(invoice ?? t("tickets.faq.invoice.a"), { email })}</p>
+<p>{fill(invoice ?? t("tickets.faq.invoice.a"), { email })}</p>
 ```
 
 (c) Cancellation and terms —
+
 ```astro
-      <p>
-        {t("tickets.faq.transfer.a")}
-        {notes.transfer && <Tbd note={notes.transfer} lang={lang} class="ml-1" />}
-      </p>
-      <p class="flex flex-wrap items-center gap-2" data-tbd-only={notes.terms ? true : undefined}>
-        {t("tickets.faq.transfer.terms")}
-        {notes.terms && <Tbd note={notes.terms} lang={lang} />}
-      </p>
+<p>
+  {t("tickets.faq.transfer.a")}
+  {notes.transfer && <Tbd note={notes.transfer} lang={lang} class="ml-1" />}
+</p>
+<p
+  class="flex flex-wrap items-center gap-2"
+  data-tbd-only={notes.terms ? true : undefined}
+>
+  {t("tickets.faq.transfer.terms")}
+  {notes.terms && <Tbd note={notes.terms} lang={lang} />}
+</p>
 ```
+
 becomes
+
 ```astro
-      <p>{transfer ?? t("tickets.faq.transfer.a")}</p>
-      {termsUrl && (
-        <p>
-          <a href={termsUrl} class={link}>{t("tickets.faq.transfer.terms")}</a>
-        </p>
-      )}
+<p>{transfer ?? t("tickets.faq.transfer.a")}</p>
+{
+  termsUrl && (
+    <p>
+      <a href={termsUrl} class={link}>
+        {t("tickets.faq.transfer.terms")}
+      </a>
+    </p>
+  )
+}
 ```
 
 (d) Programme —
+
 ```astro
-    <details class="faq group">
-      <summary>{t("tickets.faq.programme.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
-      <p>
-        {fill(t("tickets.faq.programme.a"), { when: programmeWhen })}
-        {notes.programme && <Tbd note={notes.programme} lang={lang} class="ml-1" />}
-      </p>
-    </details>
+<details class="faq group">
+  <summary
+    >{t("tickets.faq.programme.q")}<Icon
+      name="plus"
+      size={18}
+      class="faq-icon"
+    /></summary
+  >
+  <p>
+    {fill(t("tickets.faq.programme.a"), { when: programmeWhen })}
+    {notes.programme && <Tbd note={notes.programme} lang={lang} class="ml-1" />}
+  </p>
+</details>
 ```
+
 becomes
+
 ```astro
-    {programmeWhen && (
-      <details class="faq group">
-        <summary>{t("tickets.faq.programme.q")}<Icon name="plus" size={18} class="faq-icon" /></summary>
-        <p>{fill(t("tickets.faq.programme.a"), { when: programmeWhen })}</p>
-      </details>
-    )}
+{
+  programmeWhen && (
+    <details class="faq group">
+      <summary>
+        {t("tickets.faq.programme.q")}
+        <Icon name="plus" size={18} class="faq-icon" />
+      </summary>
+      <p>{fill(t("tickets.faq.programme.a"), { when: programmeWhen })}</p>
+    </details>
+  )
+}
 ```
 
 In `src/components/tickets/OfferDoor.astro`:
+
 1. Delete `import Tbd from "./Tbd.astro";`.
 2. In `Props`, replace the `opening` line and its comment with:
    ```ts
@@ -2607,34 +3147,63 @@ In `src/components/tickets/OfferDoor.astro`:
 3. Destructure `const { lang, phase, tier, ladder, opening } = Astro.props;`.
 4. Replace
    ```astro
-           <p class="text-lg font-semibold text-foreground text-pretty">
-             {fill(t("tickets.offer.opens"), { date: formatDayMonth(opening.date, lang), time: opening.time })}
-             {opening.timeNote && <Tbd note={opening.timeNote} lang={lang} class="ml-1.5" />}
-           </p>
+   <p class="text-foreground text-lg font-semibold text-pretty">
+     {
+       fill(t("tickets.offer.opens"), {
+         date: formatDayMonth(opening.date, lang),
+         time: opening.time,
+       })
+     }
+     {
+       opening.timeNote && (
+         <Tbd note={opening.timeNote} lang={lang} class="ml-1.5" />
+       )
+     }
+   </p>
    ```
    with
    ```astro
-           <p class="text-lg font-semibold text-foreground text-pretty">
-             {opening.time
-               ? fill(t("tickets.offer.opens"), { date: formatDayMonth(opening.date, lang), time: opening.time })
-               : fill(t("tickets.offer.opens_day"), { date: formatDayMonth(opening.date, lang) })}
-           </p>
+   <p class="text-foreground text-lg font-semibold text-pretty">
+     {
+       opening.time
+         ? fill(t("tickets.offer.opens"), {
+             date: formatDayMonth(opening.date, lang),
+             time: opening.time,
+           })
+         : fill(t("tickets.offer.opens_day"), {
+             date: formatDayMonth(opening.date, lang),
+           })
+     }
+   </p>
    ```
 5. Replace `<TierLadder items={ladder} phase={phase} lang={lang} namesNote={namesNote} />` with `<TierLadder items={ladder} phase={phase} lang={lang} />`.
 
 In `src/components/tickets/TierLadder.astro`:
+
 1. Delete `import Tbd from "./Tbd.astro";`.
 2. In `Props`, delete `  /** Set while the public tier names are still working names. */` and `  namesNote?: string;`; destructure `const { items, phase, lang } = Astro.props;`.
 3. Replace
    ```astro
-     <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-       <h3 class="text-lg font-semibold tracking-[-0.01em] text-foreground">{t("tickets.ladder.title")}</h3>
-       {namesNote && <Tbd note={namesNote} label={t("tickets.ladder.names_tbd")} lang={lang} />}
-     </div>
+   <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+     <h3 class="text-foreground text-lg font-semibold tracking-[-0.01em]">
+       {t("tickets.ladder.title")}
+     </h3>
+     {
+       namesNote && (
+         <Tbd
+           note={namesNote}
+           label={t("tickets.ladder.names_tbd")}
+           lang={lang}
+         />
+       )
+     }
+   </div>
    ```
    with
    ```astro
-     <h3 class="text-lg font-semibold tracking-[-0.01em] text-foreground">{t("tickets.ladder.title")}</h3>
+   <h3 class="text-foreground text-lg font-semibold tracking-[-0.01em]">
+     {t("tickets.ladder.title")}
+   </h3>
    ```
 
 In `src/components/tickets/Icon.astro`, delete the `pencil: [ … ],` entry (three lines).
@@ -2668,7 +3237,13 @@ import { CONTACT_EMAILS, TARGET_DATE } from "@/lib/event";
 import { buildMailto } from "@/lib/tickets/mailto";
 import { placeholdersAllowed } from "@/lib/tickets/demo";
 import { assertShippable, shown } from "@/lib/tickets/drafts";
-import { fill, formatDayMonth, formatFullDate, formatPrice, formatTime } from "@/lib/tickets/format";
+import {
+  fill,
+  formatDayMonth,
+  formatFullDate,
+  formatPrice,
+  formatTime,
+} from "@/lib/tickets/format";
 import {
   assertTicketingConfig,
   cheaperGroupRates,
@@ -2676,7 +3251,12 @@ import {
   strategicPrice,
   tierStates,
 } from "@/lib/tickets/phase";
-import { alfioHost, codeFallbackAction, listingUrl, purchaseTarget } from "@/lib/tickets/purchase";
+import {
+  alfioHost,
+  codeFallbackAction,
+  listingUrl,
+  purchaseTarget,
+} from "@/lib/tickets/purchase";
 import OfferDoor from "./OfferDoor.astro";
 import TeamDoor from "./TeamDoor.astro";
 import CodeDoor from "./CodeDoor.astro";
@@ -2708,8 +3288,16 @@ const rates = cheaperGroupRates(config, tier);
 const host = alfioHost(config);
 const email = CONTACT_EMAILS.tickets;
 
-const groupMailto = buildMailto(email, t("tickets.team.mail.subject"), t("tickets.team.mail.body"));
-const inclusionMailto = buildMailto(email, t("tickets.inclusion.mail.subject"), t("tickets.inclusion.mail.body"));
+const groupMailto = buildMailto(
+  email,
+  t("tickets.team.mail.subject"),
+  t("tickets.team.mail.body"),
+);
+const inclusionMailto = buildMailto(
+  email,
+  t("tickets.inclusion.mail.subject"),
+  t("tickets.inclusion.mail.body"),
+);
 
 // One action for the whole page: the alf.io listing, or before the opening the
 // newsletter. Door 1, the Strategy & Leadership band and the mobile bar share it.
@@ -2734,13 +3322,20 @@ const eventDate = formatFullDate(TARGET_DATE, lang);
 // must never break at its hyphen on a narrow screen.
 const [whenBefore, whenAfter = ""] = t("tickets.when").split("{venue}");
 const when = {
-  before: fill(whenBefore, { date: eventDate.charAt(0).toUpperCase() + eventDate.slice(1) }),
+  before: fill(whenBefore, {
+    date: eventDate.charAt(0).toUpperCase() + eventDate.slice(1),
+  }),
   venue: t("hero.venue"),
   after: whenAfter,
 };
 
 const sticky = {
-  label: phase === "pre_opening" ? fill(t("tickets.sticky.opens"), { date: formatDayMonth(config.opening.date, lang) }) : tier.name[lang],
+  label:
+    phase === "pre_opening"
+      ? fill(t("tickets.sticky.opens"), {
+          date: formatDayMonth(config.opening.date, lang),
+        })
+      : tier.name[lang],
   price: formatPrice(tier.price, lang),
   action:
     target.kind === "listing"
@@ -2753,33 +3348,62 @@ const sticky = {
   },
 };
 
-const early = config.tiers.filter((x) => x.closesWhenSoldOut).map((x) => x.maxPerOrder);
-const later = config.tiers.filter((x) => !x.closesWhenSoldOut).map((x) => x.maxPerOrder);
+const early = config.tiers
+  .filter((x) => x.closesWhenSoldOut)
+  .map((x) => x.maxPerOrder);
+const later = config.tiers
+  .filter((x) => !x.closesWhenSoldOut)
+  .map((x) => x.maxPerOrder);
 const perOrder = { early: Math.max(...early), later: Math.max(...later) };
 ---
 
 <main class="tickets-page" data-phase={phase}>
   <section class="relative isolate overflow-hidden">
     <GeoBackground class="tickets-mesh absolute inset-0 -z-10" />
-    <div class="mx-auto flex max-w-7xl flex-col gap-8 px-4 pb-16 pt-8 md:px-6 md:pb-20 md:pt-12 lg:px-8">
+    <div
+      class="mx-auto flex max-w-7xl flex-col gap-8 px-4 pt-8 pb-16 md:px-6 md:pt-12 md:pb-20 lg:px-8"
+    >
       <header class="flex max-w-4xl flex-col gap-3">
-        <h1 class="text-4xl font-bold leading-[1.05] tracking-[-0.025em] text-balance text-foreground sm:text-5xl">
+        <h1
+          class="text-foreground text-4xl leading-[1.05] font-bold tracking-[-0.025em] text-balance sm:text-5xl"
+        >
           {t("tickets.h1")}
         </h1>
-        <p class="text-lg font-semibold text-foreground text-pretty sm:text-xl">
-          {when.before}<span class="whitespace-nowrap">{when.venue}</span>{when.after}, {t("tickets.when_evening")}
+        <p class="text-foreground text-lg font-semibold text-pretty sm:text-xl">
+          {when.before}<span class="whitespace-nowrap">{when.venue}</span>{
+            when.after
+          }, {t("tickets.when_evening")}
         </p>
-        <p class="max-w-[58ch] text-base text-muted-foreground text-pretty sm:text-lg">{t("tickets.lead")}</p>
+        <p
+          class="text-muted-foreground max-w-[58ch] text-base text-pretty sm:text-lg"
+        >
+          {t("tickets.lead")}
+        </p>
       </header>
 
-      {/* Door 1 spans the grid whenever door 2 has nothing to sell: a lone short
+      {
+        /* Door 1 spans the grid whenever door 2 has nothing to sell: a lone short
           card beside it would leave the right column hollow. "J'ai un code"
-          then becomes a slim band underneath rather than that lone card. */}
+          then becomes a slim band underneath rather than that lone card. */
+      }
       <div class="grid gap-5 lg:grid-cols-12 lg:gap-6">
-        {/* `flex flex-col` so door 1 inherits the row height the right column
-            sets, rather than sitting short inside a stretched wrapper. */}
-        <div class:list={["flex flex-col", wideOffer ? "lg:col-span-12" : "lg:col-span-8"]}>
-          <OfferDoor lang={lang} phase={phase} tier={tier} ladder={ladder} opening={opening}>
+        {
+          /* `flex flex-col` so door 1 inherits the row height the right column
+            sets, rather than sitting short inside a stretched wrapper. */
+        }
+        <div
+          class:list={[
+            "flex flex-col",
+            wideOffer ? "lg:col-span-12" : "lg:col-span-8",
+          ]}
+        >
+          <OfferDoor
+            lang={lang}
+            phase={phase}
+            tier={tier}
+            ladder={ladder}
+            opening={opening}
+          >
             <PurchaseControl
               slot="purchase"
               target={target}
@@ -2789,31 +3413,40 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
             />
           </OfferDoor>
         </div>
-        {showTeam && (
-          <div class="flex flex-col gap-5 lg:col-span-4 lg:gap-6">
-            <TeamDoor lang={lang} tier={tier} rates={rates} groupMailto={groupMailto} />
-            <CodeDoor
-              lang={lang}
-              phase={phase}
-              listingUrl={listingUrl(config)}
-              fallback={codeFallbackAction(config)}
-              host={host}
-              layout="card"
-            />
-          </div>
-        )}
-        {showCode && !showTeam && (
-          <div class="lg:col-span-12">
-            <CodeDoor
-              lang={lang}
-              phase={phase}
-              listingUrl={listingUrl(config)}
-              fallback={codeFallbackAction(config)}
-              host={host}
-              layout="band"
-            />
-          </div>
-        )}
+        {
+          showTeam && (
+            <div class="flex flex-col gap-5 lg:col-span-4 lg:gap-6">
+              <TeamDoor
+                lang={lang}
+                tier={tier}
+                rates={rates}
+                groupMailto={groupMailto}
+              />
+              <CodeDoor
+                lang={lang}
+                phase={phase}
+                listingUrl={listingUrl(config)}
+                fallback={codeFallbackAction(config)}
+                host={host}
+                layout="card"
+              />
+            </div>
+          )
+        }
+        {
+          showCode && !showTeam && (
+            <div class="lg:col-span-12">
+              <CodeDoor
+                lang={lang}
+                phase={phase}
+                listingUrl={listingUrl(config)}
+                fallback={codeFallbackAction(config)}
+                host={host}
+                layout="band"
+              />
+            </div>
+          )
+        }
       </div>
     </div>
   </section>
@@ -2836,12 +3469,21 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
     </StrategicOffer>
   </div>
 
-  <div class="mx-auto max-w-7xl px-4 pb-20 pt-24 md:px-6 md:pb-24 md:pt-28 lg:px-8">
-    <IncludedInTicket lang={lang} eveningDetails={shown(config.eveningDetails)?.[lang]} />
+  <div
+    class="mx-auto max-w-7xl px-4 pt-24 pb-20 md:px-6 md:pt-28 md:pb-24 lg:px-8"
+  >
+    <IncludedInTicket
+      lang={lang}
+      eveningDetails={shown(config.eveningDetails)?.[lang]}
+    />
   </div>
 
   <div class="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-24 lg:px-8">
-    <TeamOffer lang={lang} programmeWhen={programmeWhen} kitUrl={shown(config.managerKitUrl)} />
+    <TeamOffer
+      lang={lang}
+      programmeWhen={programmeWhen}
+      kitUrl={shown(config.managerKitUrl)}
+    />
   </div>
 
   <div class="mx-auto max-w-7xl px-4 pb-28 md:px-6 md:pb-24 lg:px-8">
@@ -2875,7 +3517,12 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
     color: var(--color-foreground);
   }
   .tickets-page :global(.tickets-mesh) {
-    mask-image: linear-gradient(to bottom, black 0%, black 35%, transparent 85%);
+    mask-image: linear-gradient(
+      to bottom,
+      black 0%,
+      black 35%,
+      transparent 85%
+    );
     opacity: 0.9;
   }
 
@@ -2908,10 +3555,12 @@ node .superpowers/drop-i18n-keys.mjs 'tickets.tbd' 'tickets.ladder.names_note' '
 Expected: `removed 2` four times.
 
 In `src/i18n/ui.ts` (French block):
+
 - replace `    "tickets.faq.ttc.rate": "Taux de TVA",` with `    "tickets.faq.ttc.rate": "Taux de TVA : {rate}.",`
 - after the line `    "tickets.offer.opens": "La billetterie ouvre le {date} à {time}.",` add `    "tickets.offer.opens_day": "La billetterie ouvre le {date}.",`
 
 In `src/i18n/ui.ts` (English block):
+
 - replace `    "tickets.faq.ttc.rate": "VAT rate",` with `    "tickets.faq.ttc.rate": "VAT rate: {rate}.",`
 - after the line `    "tickets.offer.opens": "Ticketing opens on {date} at {time}.",` add `    "tickets.offer.opens_day": "Ticketing opens on {date}.",`
 
@@ -2950,10 +3599,12 @@ Claude-Session: https://claude.ai/code/session_01Azzq3C71c3RsForMreHpyG"
 ### Task 5: Every hand-off to alf.io in a new tab
 
 **Files:**
+
 - Modify: `src/lib/tickets/purchase.ts`, `src/lib/tickets/url.ts`, `src/components/tickets/{PurchaseControl,StickyTicketBar,CodeDoor,TicketsFaq,TicketsContent}.astro`, `src/components/tickets/tickets-ui.ts`, `src/i18n/ui.ts`
 - Test: `src/lib/__tests__/tickets.test.ts`, `src/components/tickets/__tests__/TicketsPage.test.ts`, `src/components/tickets/__tests__/TicketsFaq.test.ts`
 
 **Interfaces:**
+
 - Consumes: Task 2's `purchaseTarget`, Task 4's `TicketsFaq` props.
 - Produces:
   - `PurchaseTarget = { kind: "listing"; href: string; rel: "noopener" } | { kind: "notify"; href: string; rel: "noopener noreferrer" }`
@@ -2966,19 +3617,19 @@ Claude-Session: https://claude.ai/code/session_01Azzq3C71c3RsForMreHpyG"
 In `src/lib/__tests__/tickets.test.ts`, change the purchase import to `import { alfioHost, codeFallbackAction, codeUrl, listingUrl, onHost, purchaseTarget } from "@/lib/tickets/purchase";`, add `import { openInNewTab } from "@/lib/tickets/url";`, and in `describe("purchaseTarget", …)` replace the two expectations:
 
 ```ts
-      expect(purchaseTarget(TICKETING, id)).toEqual({
-        kind: "listing",
-        href: "https://billetterie.cloudnativedays.fr/event/cnd-2027",
-        rel: "noopener",
-      });
+expect(purchaseTarget(TICKETING, id)).toEqual({
+  kind: "listing",
+  href: "https://billetterie.cloudnativedays.fr/event/cnd-2027",
+  rel: "noopener",
+});
 ```
 
 ```ts
-    expect(purchaseTarget(TICKETING, "pre_opening")).toEqual({
-      kind: "notify",
-      href: NEWSLETTER_URL,
-      rel: "noopener noreferrer",
-    });
+expect(purchaseTarget(TICKETING, "pre_opening")).toEqual({
+  kind: "notify",
+  href: NEWSLETTER_URL,
+  rel: "noopener noreferrer",
+});
 ```
 
 Append at the end of the file:
@@ -2986,8 +3637,18 @@ Append at the end of the file:
 ```ts
 describe("onHost", () => {
   it("recognises a URL on the alf.io host, and nothing else", () => {
-    expect(onHost("https://billetterie.cloudnativedays.fr/terms", "billetterie.cloudnativedays.fr")).toBe(true);
-    expect(onHost("https://cloudnativedays.fr/cgv", "billetterie.cloudnativedays.fr")).toBe(false);
+    expect(
+      onHost(
+        "https://billetterie.cloudnativedays.fr/terms",
+        "billetterie.cloudnativedays.fr",
+      ),
+    ).toBe(true);
+    expect(
+      onHost(
+        "https://cloudnativedays.fr/cgv",
+        "billetterie.cloudnativedays.fr",
+      ),
+    ).toBe(false);
     expect(onHost("#convaincre", "billetterie.cloudnativedays.fr")).toBe(false);
   });
 });
@@ -3025,47 +3686,58 @@ describe("openInNewTab", () => {
 In `src/components/tickets/__tests__/TicketsPage.test.ts`, add inside `describe.each`:
 
 ```ts
-  it("opens every hand-off to alf.io in a new tab, and says so to screen readers", () => {
-    const alfioLinks = [
-      ...main.matchAll(/<a\b[^>]*href="https:\/\/billetterie\.cloudnativedays\.fr[^"]*"[^>]*>[\s\S]*?<\/a>/g),
-    ].map((m) => m[0]);
-    expect(alfioLinks).toHaveLength(phase === "pre_opening" ? 0 : 2);
-    for (const link of alfioLinks) {
-      expect(link).toContain('target="_blank"');
-      expect(link).toContain('rel="noopener"');
-    }
-    // Every link that leaves in a new tab says so, the newsletter included.
-    const newTab = [...main.matchAll(/<a\b[^>]*target="_blank"[^>]*>[\s\S]*?<\/a>/g)].map((m) => m[0]);
-    expect(newTab.length).toBeGreaterThan(0);
-    for (const link of newTab) expect(link).toContain("(nouvel onglet)");
-    // The code form too, with or without JavaScript.
-    const codeForm = main.match(/<form\b[^>]*data-tickets-code[^>]*>/)?.[0];
-    if (phase === "pre_opening") {
-      expect(codeForm).toBeUndefined();
-    } else {
-      expect(codeForm).toContain('target="_blank"');
-      const form = main.slice(main.indexOf(codeForm!), main.indexOf("</form>", main.indexOf(codeForm!)));
-      expect(form).toContain("(nouvel onglet)");
-    }
-    // And the mobile bar, rendered after <main>.
-    const sticky = html.match(/<a\b[^>]*data-sticky-action[^>]*>[\s\S]*?<\/a>/)?.[0];
-    expect(sticky).toContain('target="_blank"');
-    expect(sticky).toContain("(nouvel onglet)");
-  });
+it("opens every hand-off to alf.io in a new tab, and says so to screen readers", () => {
+  const alfioLinks = [
+    ...main.matchAll(
+      /<a\b[^>]*href="https:\/\/billetterie\.cloudnativedays\.fr[^"]*"[^>]*>[\s\S]*?<\/a>/g,
+    ),
+  ].map((m) => m[0]);
+  expect(alfioLinks).toHaveLength(phase === "pre_opening" ? 0 : 2);
+  for (const link of alfioLinks) {
+    expect(link).toContain('target="_blank"');
+    expect(link).toContain('rel="noopener"');
+  }
+  // Every link that leaves in a new tab says so, the newsletter included.
+  const newTab = [
+    ...main.matchAll(/<a\b[^>]*target="_blank"[^>]*>[\s\S]*?<\/a>/g),
+  ].map((m) => m[0]);
+  expect(newTab.length).toBeGreaterThan(0);
+  for (const link of newTab) expect(link).toContain("(nouvel onglet)");
+  // The code form too, with or without JavaScript.
+  const codeForm = main.match(/<form\b[^>]*data-tickets-code[^>]*>/)?.[0];
+  if (phase === "pre_opening") {
+    expect(codeForm).toBeUndefined();
+  } else {
+    expect(codeForm).toContain('target="_blank"');
+    const form = main.slice(
+      main.indexOf(codeForm!),
+      main.indexOf("</form>", main.indexOf(codeForm!)),
+    );
+    expect(form).toContain("(nouvel onglet)");
+  }
+  // And the mobile bar, rendered after <main>.
+  const sticky = html.match(
+    /<a\b[^>]*data-sticky-action[^>]*>[\s\S]*?<\/a>/,
+  )?.[0];
+  expect(sticky).toContain('target="_blank"');
+  expect(sticky).toContain("(nouvel onglet)");
+});
 ```
 
 In `src/components/tickets/__tests__/TicketsFaq.test.ts`, add inside `describe("TicketsFaq", …)`:
 
 ```ts
-  it("opens the terms of sale in a new tab when they live on alf.io", async () => {
-    const onAlfio = await render({ termsUrl: "https://billetterie.cloudnativedays.fr/terms" });
-    expect(onAlfio).toMatch(
-      /<a\b[^>]*href="https:\/\/billetterie\.cloudnativedays\.fr\/terms"[^>]*target="_blank"[^>]*rel="noopener"/,
-    );
-    expect(onAlfio).toContain("(nouvel onglet)");
-    const onSite = await render({ termsUrl: "https://cloudnativedays.fr/cgv" });
-    expect(onSite).not.toContain('target="_blank"');
+it("opens the terms of sale in a new tab when they live on alf.io", async () => {
+  const onAlfio = await render({
+    termsUrl: "https://billetterie.cloudnativedays.fr/terms",
   });
+  expect(onAlfio).toMatch(
+    /<a\b[^>]*href="https:\/\/billetterie\.cloudnativedays\.fr\/terms"[^>]*target="_blank"[^>]*rel="noopener"/,
+  );
+  expect(onAlfio).toContain("(nouvel onglet)");
+  const onSite = await render({ termsUrl: "https://cloudnativedays.fr/cgv" });
+  expect(onSite).not.toContain('target="_blank"');
+});
 ```
 
 - [ ] **Step 3: Run the tests to verify they fail**
@@ -3078,7 +3750,9 @@ Expected: FAIL — no `rel` on targets, `onHost` / `openInNewTab` not exported, 
 In `src/lib/tickets/purchase.ts`, replace
 
 ```ts
-export type PurchaseTarget = { kind: "listing"; href: string } | { kind: "notify"; href: string };
+export type PurchaseTarget =
+  | { kind: "listing"; href: string }
+  | { kind: "notify"; href: string };
 ```
 
 with
@@ -3097,8 +3771,9 @@ export type PurchaseTarget =
 replace the body of `purchaseTarget` with
 
 ```ts
-  if (phase === "pre_opening") return { kind: "notify", href: NEWSLETTER_URL, rel: "noopener noreferrer" };
-  return { kind: "listing", href: listingUrl(config), rel: "noopener" };
+if (phase === "pre_opening")
+  return { kind: "notify", href: NEWSLETTER_URL, rel: "noopener noreferrer" };
+return { kind: "listing", href: listingUrl(config), rel: "noopener" };
 ```
 
 and add after `alfioHost`:
@@ -3141,40 +3816,56 @@ In `src/components/tickets/tickets-ui.ts`, change the import to `import { codeUr
 - [ ] **Step 5: The links**
 
 In `src/i18n/ui.ts`, after `"tickets.purchase.buy"` in each block add:
+
 - French: `    "tickets.new_tab": "(nouvel onglet)",`
 - English: `    "tickets.new_tab": "(new tab)",`
 
 In `src/components/tickets/PurchaseControl.astro`:
+
 - Replace the listing link with:
   ```astro
-      <a href={target.href} target="_blank" rel={target.rel} class={buttonClass} data-umami-event="tickets-purchase" {...umami}>
-        {t("tickets.purchase.buy")}
-        <span class="sr-only"> {t("tickets.new_tab")}</span>
-        <Icon name="arrow-right" size={20} />
-      </a>
+  <a
+    href={target.href}
+    target="_blank"
+    rel={target.rel}
+    class={buttonClass}
+    data-umami-event="tickets-purchase"
+    {...umami}
+  >
+    {t("tickets.purchase.buy")}
+    <span class="sr-only"> {t("tickets.new_tab")}</span>
+    <Icon name="arrow-right" size={20} />
+  </a>
   ```
 - Replace the notify link with:
   ```astro
-      <a href={target.href} target="_blank" rel={target.rel} class={buttonClass} data-umami-event="tickets-notify" {...umami}>
-        <Icon name="bell" size={20} />
-        {t("tickets.offer.notify")}
-        <span class="sr-only"> {t("tickets.new_tab")}</span>
-      </a>
+  <a
+    href={target.href}
+    target="_blank"
+    rel={target.rel}
+    class={buttonClass}
+    data-umami-event="tickets-notify"
+    {...umami}
+  >
+    <Icon name="bell" size={20} />
+    {t("tickets.offer.notify")}
+    <span class="sr-only"> {t("tickets.new_tab")}</span>
+  </a>
   ```
 - Add to the header comment: ` * Both open a new tab, and say so to screen readers.`
 
 In `src/components/tickets/StickyTicketBar.astro`:
+
 - Add `import { useTranslations } from "@/i18n/utils";`.
 - Change the action prop to `  action: { href: string; text: string; rel: string };` and the destructuring to `const { lang, label, price, action, analytics, demo = false } = Astro.props;` followed by `const t = useTranslations(lang);`.
 - Replace the two conditional attributes
   ```astro
-      target={action.external ? "_blank" : undefined}
-      rel={action.external ? "noopener noreferrer" : undefined}
+  target={action.external ? "_blank" : undefined}
+  rel={action.external ? "noopener noreferrer" : undefined}
   ```
   with
   ```astro
-      target="_blank"
-      rel={action.rel}
+  target="_blank" rel={action.rel}
   ```
 - After `{action.text}` add `      <span class="sr-only"> {t("tickets.new_tab")}</span>`.
 
@@ -3189,27 +3880,30 @@ In `src/components/tickets/TicketsContent.astro`, replace the sticky `action:` v
 ```
 
 In `src/components/tickets/CodeDoor.astro`:
+
 - Add `    target="_blank"` right after `    action={fallback.action}` on the `<form>`.
 - After `        {t("tickets.code.submit")}` add `        <span class="sr-only"> {t("tickets.new_tab")}</span>`.
-- In the header comment, replace `Without JavaScript the form is a plain GET to the listing with \`?code=\`` with `Without JavaScript the form is a plain GET to the listing with \`?code=\`, in a new tab` and `upgrades it to \`/code/<CODE>\`,` with `upgrades it to \`/code/<CODE>\` (a new tab too, \`openInNewTab\`),`.
+- In the header comment, replace `Without JavaScript the form is a plain GET to the listing with \`?code=\``with`Without JavaScript the form is a plain GET to the listing with \`?code=\`, in a new tab`and`upgrades it to \`/code/<CODE>\`,`with`upgrades it to \`/code/<CODE>\` (a new tab too, \`openInNewTab\`),`.
 
 In `src/components/tickets/TicketsFaq.astro`:
+
 - Add `import { onHost } from "@/lib/tickets/purchase";` and, after `const link = …`, add:
   ```ts
   // Terms of sale hosted on alf.io open in a new tab, like every hand-off there.
   const termsNewTab = termsUrl !== undefined && onHost(termsUrl, host);
   ```
 - Replace the terms link `<a href={termsUrl} class={link}>{t("tickets.faq.transfer.terms")}</a>` with:
+
   ```astro
-          <a
-            href={termsUrl}
-            target={termsNewTab ? "_blank" : undefined}
-            rel={termsNewTab ? "noopener" : undefined}
-            class={link}
-          >
-            {t("tickets.faq.transfer.terms")}
-            {termsNewTab && <span class="sr-only"> {t("tickets.new_tab")}</span>}
-          </a>
+  <a
+    href={termsUrl}
+    target={termsNewTab ? "_blank" : undefined}
+    rel={termsNewTab ? "noopener" : undefined}
+    class={link}
+  >
+    {t("tickets.faq.transfer.terms")}
+    {termsNewTab && <span class="sr-only"> {t("tickets.new_tab")}</span>}
+  </a>
   ```
 
 - [ ] **Step 6: Run the tests and the type check**
@@ -3240,6 +3934,7 @@ Claude-Session: https://claude.ai/code/session_01Azzq3C71c3RsForMreHpyG"
 ### Task 6: Verification and the page's documentation
 
 **Files:**
+
 - Modify (git-ignored, not committed): `.claude/skills/billetterie-2027/SKILL.md`, `.claude/skills/billetterie-2027/reference/sources.md`, `.claude/skills/billetterie-2027/reference/design.md`
 - Output: `.impeccable/review/v2-*.png` (git-ignored)
 
@@ -3261,12 +3956,14 @@ Expected: `ls` prints `index.html` only; `grep exit 1` (no sitemap file mentions
 - [ ] **Step 3: Staging build — 6 demo pages, noindex, not in the sitemap**
 
 Run:
+
 ```bash
 PUBLIC_SITE_URL=https://staging.cloudnativedays.fr pnpm astro build --outDir dist-staging \
   && find dist-staging/billetterie -name index.html | sort \
   && grep -L 'name="robots" content="noindex' $(find dist-staging/billetterie/demo -name index.html); echo "noindex-missing exit $?" \
   ; grep -l "billetterie/demo" dist-staging/sitemap*.xml; echo "sitemap exit $?"
 ```
+
 Expected: 7 `index.html` (`billetterie/`, `demo/`, `demo/avant-ouverture/`, `demo/super-early-bird/`, `demo/early-bird/`, `demo/regular/`, `demo/last-chance/`), no `demo-a` or `demo-b`; `noindex-missing exit 1`; `sitemap exit 1`. Then `rm -rf dist-staging`.
 
 - [ ] **Step 4: Browser probes**
@@ -3319,7 +4016,7 @@ description: Use when working on the 2027 ticketing page — the /billetterie/de
 
 The 2027 ticketing page is built as **a hidden demo on staging** until it replaces `/billetterie`. It is a **showcase**: every purchase action sends the buyer to the alf.io listing, in a new tab, where the quantity and the category are chosen. Variant A — quantity picked on the site, straight to alf.io's booking step — was abandoned for good at the 22/09/2026 meeting: bypassing the listing is too risky.
 
-Owner: Thomas (lead of the ticketing "pôle"). Ticketing opens **13 October 2026**; the real page ships the evening of 12 October. The locked page structure is **"three doors"**: *je prends ma place* (dominant, holds the price and the tier ladder), *venir en équipe* (the group rates), *j'ai un code* — and a door only appears when it has something to say, see rule 8. Under them: the Strategy & Leadership band, what the ticket includes, "Convaincre votre manager", the FAQ.
+Owner: Thomas (lead of the ticketing "pôle"). Ticketing opens **13 October 2026**; the real page ships the evening of 12 October. The locked page structure is **"three doors"**: _je prends ma place_ (dominant, holds the price and the tier ladder), _venir en équipe_ (the group rates), _j'ai un code_ — and a door only appears when it has something to say, see rule 8. Under them: the Strategy & Leadership band, what the ticket includes, "Convaincre votre manager", the FAQ.
 
 This skill is temporary: delete it once the page has replaced `/billetterie`.
 
@@ -3335,7 +4032,7 @@ pnpm dev     # then open /billetterie/demo/
 
 The only visible demo mark is the striped red **"DÉMO"** pill in the bottom-left corner; clicking it opens a popover holding the phase switch (pre-opening + the 4 tiers). It is hidden by default on purpose: the page must read exactly as the future production page will. **Every phase is a pre-rendered URL** (`/billetterie/demo/early-bird/`), so the demo renders exactly what production would render for that config — there is no client-side state to trust. The 6 pages are emitted only on a non-production build.
 
-The panel is a **native `popover`** (top layer, light-dismiss and Esc for free): it opens with `popovertarget`, no JS. `tickets-ui.ts` only keeps the scroll position *and* the panel open across a switch, since each switch is a full page load.
+The panel is a **native `popover`** (top layer, light-dismiss and Esc for free): it opens with `popovertarget`, no JS. `tickets-ui.ts` only keeps the scroll position _and_ the panel open across a switch, since each switch is a full page load.
 
 ## Hard rules
 
@@ -3360,21 +4057,21 @@ These come from the ticketing team's spec. Breaking one is a bug even when it lo
 
 ## Architecture
 
-| File | Role |
-|---|---|
-| `src/config/tickets.ts` | The single registry: alf.io host and event, opening, `currentPhase`, tiers, group rates, the Strategy & Leadership ticket, and every `tbd()` |
-| `src/lib/tickets/drafts.ts` | `shown` (value, draft or nothing) and the production guard (`shippingProblems`, `assertShippable`) |
-| `src/lib/tickets/phase.ts` | `offerTier`, `tierStates`, `cheaperGroupRates`, `strategicPrice`, config consistency checks |
-| `src/lib/tickets/purchase.ts` | The one place that builds a purchase action (`purchaseTarget`, `listingUrl`, `codeUrl`, `alfioHost`, `onHost`) |
-| `src/lib/tickets/url.ts` | `codeUrlFrom` and `openInNewTab` — the only logic the browser runs, kept dependency-free for the client bundle |
-| `src/lib/tickets/mailto.ts`, `format.ts` | Pre-filled mailto, locale formatting (prices, dates, times) |
-| `src/lib/tickets/demo.ts` | The production gate and the enumeration of the demo URLs |
-| `src/components/tickets/TicketsPage.astro` | Layout + demo bar + `noindex`; **the future production route mounts this** |
-| `src/components/tickets/TicketsContent.astro` | The page itself, and the call to `assertShippable`. Split from `TicketsPage` so the matrix test can render it without a site origin |
-| `src/components/tickets/…` | `OfferDoor`, `TierLadder`, `PurchaseControl` (a link: listing or newsletter), `TeamDoor`, `GroupRates`, `CodeDoor`, `StrategicOffer`, `IncludedInTicket`, `TeamOffer` (the manager's argument kit), `TicketsFaq`, `StickyTicketBar`, `DemoBar` (the corner pill + its popover), `Icon` |
-| `src/components/tickets/tickets-ui.ts` | Progressive enhancement only: code form, sticky bar, demo scroll restore. Every form works without it |
-| `src/pages/billetterie/[...demo].astro` | The demo routes (FR only). `getStaticPaths` returns `[]` on a production build |
-| `src/i18n/ui.ts` | All copy, under `tickets.*` |
+| File                                          | Role                                                                                                                                                                                                                                                                                   |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/config/tickets.ts`                       | The single registry: alf.io host and event, opening, `currentPhase`, tiers, group rates, the Strategy & Leadership ticket, and every `tbd()`                                                                                                                                           |
+| `src/lib/tickets/drafts.ts`                   | `shown` (value, draft or nothing) and the production guard (`shippingProblems`, `assertShippable`)                                                                                                                                                                                     |
+| `src/lib/tickets/phase.ts`                    | `offerTier`, `tierStates`, `cheaperGroupRates`, `strategicPrice`, config consistency checks                                                                                                                                                                                            |
+| `src/lib/tickets/purchase.ts`                 | The one place that builds a purchase action (`purchaseTarget`, `listingUrl`, `codeUrl`, `alfioHost`, `onHost`)                                                                                                                                                                         |
+| `src/lib/tickets/url.ts`                      | `codeUrlFrom` and `openInNewTab` — the only logic the browser runs, kept dependency-free for the client bundle                                                                                                                                                                         |
+| `src/lib/tickets/mailto.ts`, `format.ts`      | Pre-filled mailto, locale formatting (prices, dates, times)                                                                                                                                                                                                                            |
+| `src/lib/tickets/demo.ts`                     | The production gate and the enumeration of the demo URLs                                                                                                                                                                                                                               |
+| `src/components/tickets/TicketsPage.astro`    | Layout + demo bar + `noindex`; **the future production route mounts this**                                                                                                                                                                                                             |
+| `src/components/tickets/TicketsContent.astro` | The page itself, and the call to `assertShippable`. Split from `TicketsPage` so the matrix test can render it without a site origin                                                                                                                                                    |
+| `src/components/tickets/…`                    | `OfferDoor`, `TierLadder`, `PurchaseControl` (a link: listing or newsletter), `TeamDoor`, `GroupRates`, `CodeDoor`, `StrategicOffer`, `IncludedInTicket`, `TeamOffer` (the manager's argument kit), `TicketsFaq`, `StickyTicketBar`, `DemoBar` (the corner pill + its popover), `Icon` |
+| `src/components/tickets/tickets-ui.ts`        | Progressive enhancement only: code form, sticky bar, demo scroll restore. Every form works without it                                                                                                                                                                                  |
+| `src/pages/billetterie/[...demo].astro`       | The demo routes (FR only). `getStaticPaths` returns `[]` on a production build                                                                                                                                                                                                         |
+| `src/i18n/ui.ts`                              | All copy, under `tickets.*`                                                                                                                                                                                                                                                            |
 
 ## Verify before claiming it works
 
@@ -3425,11 +4122,12 @@ In `.claude/skills/billetterie-2027/reference/sources.md`:
    ```
 2. In the bullet `**The group discount applies automatically on the site**`, replace its last sentence (`Whichever lands, only \`src/lib/tickets/purchase.ts\` changes: … \`PurchaseTarget\`.`) with:
    ```markdown
-     Since variant A is gone (27/09/2026) the site carries no alf.io code for the rates: the
-     discount must apply on the alf.io listing, and whether door 2 then stops being a mailto
-     is for the second session.
+   Since variant A is gone (27/09/2026) the site carries no alf.io code for the rates: the
+   discount must apply on the alf.io listing, and whether door 2 then stops being a mailto
+   is for the second session.
    ```
-3. Replace the body of `## Open placeholders (each is a \`tbd()\` in the config)` (everything up to `## What alf.io actually does`) with:
+3. Replace the body of `## Open placeholders (each is a \`tbd()\` in the config)`(everything up to`## What alf.io actually does`) with:
+
    ```markdown
    **Blocking a production build** (a draft, or required): the opening hour; the public
    tier names; the S&L public name, price and networking area; the ticket contents; the
@@ -3448,6 +4146,7 @@ In `.claude/skills/billetterie-2027/reference/sources.md`:
    `grep -n "tbd(" src/config/tickets.ts` lists the config's; `shippingProblems(TICKETING)`
    lists what blocks production (a unit test pins it).
    ```
+
 4. In `## What alf.io actually does`, prefix the `?qty=N` bullet with `(Variant A only — abandoned 22/09/2026.) `.
 5. In `## To flag, not to fix`, replace the Umami bullet with `- Umami only loads on the production origin, so the staging demo measures nothing.`
 

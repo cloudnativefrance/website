@@ -457,9 +457,11 @@ export const ui = {
     "tickets.team.convince.title": "Convaincre votre manager",
     "tickets.team.convince.lead":
       "La personne qui décide n'est pas toujours celle qui vient. De quoi lui donner les arguments, dès maintenant.",
-    "tickets.team.programme": "Le programme 2027 sera publié {when}. Pour convaincre dès maintenant, les replays 2026 sont en ligne.",
+    "tickets.team.programme":
+      "Le programme 2027 sera publié {when}. Pour convaincre dès maintenant, les replays 2026 sont en ligne.",
     "tickets.team.kit.title": "Un kit pour convaincre votre manager",
-    "tickets.team.kit.body": "Programme, arguments et budget, à transférer tel quel.",
+    "tickets.team.kit.body":
+      "Programme, arguments et budget, à transférer tel quel.",
     "tickets.team.kit.cta": "Ouvrir le kit",
     "tickets.team.mail.subject": "Billets de groupe CND France 2027",
     "tickets.team.mail.body":
@@ -467,19 +469,22 @@ export const ui = {
     "tickets.code.intro": "Partenaire, invitation ou code promo.",
     "tickets.code.label": "Votre code",
     "tickets.code.submit": "Utiliser mon code",
-    "tickets.code.handoff": "Le code s'applique sur {host}, où vous finalisez votre commande.",
+    "tickets.code.handoff":
+      "Le code s'applique sur {host}, où vous finalisez votre commande.",
     "tickets.code.empty": "Saisissez votre code pour continuer.",
     // The track is open to every ticket: this one adds priority and the space.
     "tickets.strategic.perks":
       "Tout le billet {standard}, plus un accès prioritaire à la salle Stratégie & Leadership et un espace d'échange réservé.",
     "tickets.strategic.track": "Découvrir le parcours Stratégie & Leadership",
     "tickets.included.title": "Ce que comprend votre billet",
-    "tickets.included.talks": "Toutes les conférences et les retours d'expérience de la journée",
+    "tickets.included.talks":
+      "Toutes les conférences et les retours d'expérience de la journée",
     "tickets.included.village": "Le village partenaires",
     "tickets.included.meals": "Le déjeuner et les pauses",
     "tickets.included.goodies": "Les goodies",
     "tickets.included.evening.title": "La soirée, pour tout le monde",
-    "tickets.included.evening.body": "Nouveauté 2027\u00a0: la soirée est comprise dans le billet, sans option à ajouter.",
+    "tickets.included.evening.body":
+      "Nouveauté 2027\u00a0: la soirée est comprise dans le billet, sans option à ajouter.",
     "tickets.faq.title": "Questions fréquentes",
     "tickets.faq.payment.q": "Comment se passe le paiement\u202f?",
     "tickets.faq.payment.a":
@@ -490,21 +495,30 @@ export const ui = {
     "tickets.faq.change.q": "Quand le prix change-t-il\u202f?",
     "tickets.faq.change.a":
       "Le tarif en cours s'arrête à la date affichée, ou plus tôt si ses places partent avant. Le suivant prend le relais aussitôt\u00a0: la billetterie ne ferme jamais entre deux tarifs.",
-    "tickets.faq.strategic.q": "Le parcours Stratégie & Leadership est-il réservé au billet {name}\u202f?",
+    "tickets.faq.strategic.q":
+      "Le parcours Stratégie & Leadership est-il réservé au billet {name}\u202f?",
     "tickets.faq.strategic.a":
       "Non. Ses talks sont ouverts à tous les billets, dans la limite des places de la salle. Le billet {name} y donne un accès prioritaire, et ouvre un espace d'échange qui lui est réservé.",
     "tickets.faq.per_order.q": "Combien de places par commande\u202f?",
-    "tickets.faq.per_order.a": "Jusqu'à {early} aux deux premiers tarifs, jusqu'à {later} ensuite. Au-delà, écrivez-nous.",
-    "tickets.faq.invoice.q": "Puis-je avoir une facture au nom de ma société\u202f?",
-    "tickets.faq.invoice.a": "Nous le vérifions avec notre billetterie. En attendant, écrivez-nous à {email}.",
-    "tickets.faq.transfer.q": "Puis-je annuler ou transmettre mon billet\u202f?",
-    "tickets.faq.transfer.a": "Les conditions d'annulation et de changement de nom sont en cours de validation.",
+    "tickets.faq.per_order.a":
+      "Jusqu'à {early} aux deux premiers tarifs, jusqu'à {later} ensuite. Au-delà, écrivez-nous.",
+    "tickets.faq.invoice.q":
+      "Puis-je avoir une facture au nom de ma société\u202f?",
+    "tickets.faq.invoice.a":
+      "Nous le vérifions avec notre billetterie. En attendant, écrivez-nous à {email}.",
+    "tickets.faq.transfer.q":
+      "Puis-je annuler ou transmettre mon billet\u202f?",
+    "tickets.faq.transfer.a":
+      "Les conditions d'annulation et de changement de nom sont en cours de validation.",
     "tickets.faq.transfer.terms": "Conditions générales de vente",
-    "tickets.faq.code.q": "J'ai un code partenaire ou une invitation, comment faire\u202f?",
+    "tickets.faq.code.q":
+      "J'ai un code partenaire ou une invitation, comment faire\u202f?",
     "tickets.faq.code.a":
       "Saisissez-le dans «\u00a0J'ai un code\u00a0», en haut de page, ou suivez le lien reçu avec le code\u00a0: il s'applique directement sur la billetterie.",
-    "tickets.faq.inclusion.q": "Existe-t-il un tarif étudiant ou solidaire\u202f?",
-    "tickets.faq.inclusion.a": "Oui, au cas par cas. Écrivez-nous en toute simplicité, nous regardons chaque demande avec attention.",
+    "tickets.faq.inclusion.q":
+      "Existe-t-il un tarif étudiant ou solidaire\u202f?",
+    "tickets.faq.inclusion.a":
+      "Oui, au cas par cas. Écrivez-nous en toute simplicité, nous regardons chaque demande avec attention.",
     "tickets.faq.access.q": "Le lieu est-il accessible\u202f?",
     "tickets.faq.access.a":
       "Oui\u00a0: accès en fauteuil, ascenseurs, toilettes adaptées, chiens guides bienvenus. Pour un besoin particulier, écrivez-nous.",
@@ -928,7 +942,8 @@ export const ui = {
     "tickets.h1": "Your seat at CND France 2027",
     "tickets.when": "{date} · {venue}, Paris · one day",
     "tickets.when_evening": "evening included",
-    "tickets.lead": "A day of cloud native talks and experience reports, in French, by and for the community.",
+    "tickets.lead":
+      "A day of cloud native talks and experience reports, in French, by and for the community.",
     "tickets.door.code": "I have a code",
     "tickets.offer.ticket": "{name} ticket",
     "tickets.offer.ttc": "VAT incl.",
@@ -953,9 +968,11 @@ export const ui = {
     "tickets.team.convince.title": "Convince your manager",
     "tickets.team.convince.lead":
       "The person who decides is not always the one who attends. Here is what to hand them, today.",
-    "tickets.team.programme": "The 2027 programme will be published {when}. To make the case today, the 2026 replays are online.",
+    "tickets.team.programme":
+      "The 2027 programme will be published {when}. To make the case today, the 2026 replays are online.",
     "tickets.team.kit.title": "A kit to convince your manager",
-    "tickets.team.kit.body": "Programme, arguments and budget, ready to forward as is.",
+    "tickets.team.kit.body":
+      "Programme, arguments and budget, ready to forward as is.",
     "tickets.team.kit.cta": "Open the kit",
     "tickets.team.mail.subject": "Group tickets CND France 2027",
     "tickets.team.mail.body":
@@ -963,7 +980,8 @@ export const ui = {
     "tickets.code.intro": "Partner, invitation or promo code.",
     "tickets.code.label": "Your code",
     "tickets.code.submit": "Use my code",
-    "tickets.code.handoff": "The code applies on {host}, where you complete your order.",
+    "tickets.code.handoff":
+      "The code applies on {host}, where you complete your order.",
     "tickets.code.empty": "Enter your code to continue.",
     // The track is open to every ticket: this one adds priority and the area.
     "tickets.strategic.perks":
@@ -975,7 +993,8 @@ export const ui = {
     "tickets.included.meals": "Lunch and breaks",
     "tickets.included.goodies": "The goodies",
     "tickets.included.evening.title": "The evening, for everyone",
-    "tickets.included.evening.body": "New in 2027: the evening is part of the ticket, with no add-on to buy.",
+    "tickets.included.evening.body":
+      "New in 2027: the evening is part of the ticket, with no add-on to buy.",
     "tickets.faq.title": "Frequently asked questions",
     "tickets.faq.payment.q": "How does payment work?",
     "tickets.faq.payment.a":
@@ -986,21 +1005,27 @@ export const ui = {
     "tickets.faq.change.q": "When does the price change?",
     "tickets.faq.change.a":
       "The current price ends on the date shown, or sooner if its seats go before then. The next one takes over at once: ticketing never closes between two prices.",
-    "tickets.faq.strategic.q": "Is the Strategy & Leadership track reserved for the {name} ticket?",
+    "tickets.faq.strategic.q":
+      "Is the Strategy & Leadership track reserved for the {name} ticket?",
     "tickets.faq.strategic.a":
       "No. Its talks are open to every ticket, as long as the room has seats. The {name} ticket gives priority access to it and opens a networking area reserved for its holders.",
     "tickets.faq.per_order.q": "How many seats per order?",
-    "tickets.faq.per_order.a": "Up to {early} at the first two prices, up to {later} after that. Beyond, write to us.",
+    "tickets.faq.per_order.a":
+      "Up to {early} at the first two prices, up to {later} after that. Beyond, write to us.",
     "tickets.faq.invoice.q": "Can I get an invoice in my company's name?",
-    "tickets.faq.invoice.a": "We are checking this with our ticketing platform. Meanwhile, write to us at {email}.",
+    "tickets.faq.invoice.a":
+      "We are checking this with our ticketing platform. Meanwhile, write to us at {email}.",
     "tickets.faq.transfer.q": "Can I cancel or transfer my ticket?",
-    "tickets.faq.transfer.a": "The cancellation and name-change terms are being finalised.",
+    "tickets.faq.transfer.a":
+      "The cancellation and name-change terms are being finalised.",
     "tickets.faq.transfer.terms": "Terms and conditions of sale",
-    "tickets.faq.code.q": "I have a partner code or an invitation. What do I do?",
+    "tickets.faq.code.q":
+      "I have a partner code or an invitation. What do I do?",
     "tickets.faq.code.a":
       "Enter it under “I have a code” at the top of the page, or follow the link you received with it: it applies directly on the ticketing platform.",
     "tickets.faq.inclusion.q": "Is there a student or solidarity rate?",
-    "tickets.faq.inclusion.a": "Yes, case by case. Just write to us, we read every request carefully.",
+    "tickets.faq.inclusion.a":
+      "Yes, case by case. Just write to us, we read every request carefully.",
     "tickets.faq.access.q": "Is the venue accessible?",
     "tickets.faq.access.a":
       "Yes: wheelchair access, lifts, accessible toilets, guide dogs welcome. For any specific need, write to us.",
@@ -1011,7 +1036,8 @@ export const ui = {
     "tickets.faq.programme.q": "When will the programme be published?",
     "tickets.faq.programme.a": "The 2027 programme will be published {when}.",
     "tickets.inclusion.mail.subject": "Inclusion or student rate request",
-    "tickets.inclusion.mail.body": "Hello,\n\nA few words about your situation:\n\nName:\nSchool or organisation (if any):\n",
+    "tickets.inclusion.mail.body":
+      "Hello,\n\nA few words about your situation:\n\nName:\nSchool or organisation (if any):\n",
     "tickets.sticky.buy": "Buy",
   },
 } as const;

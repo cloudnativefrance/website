@@ -31,7 +31,12 @@ import {
   tierStates,
   tierUrgency,
 } from "@/lib/tickets/phase";
-import { alfioHost, codeFallbackAction, listingUrl, purchaseTarget } from "@/lib/tickets/purchase";
+import {
+  alfioHost,
+  codeFallbackAction,
+  listingUrl,
+  purchaseTarget,
+} from "@/lib/tickets/purchase";
 import OfferDoor from "./OfferDoor.astro";
 import TeamDoor from "./TeamDoor.astro";
 import CodeDoor from "./CodeDoor.astro";
@@ -65,8 +70,16 @@ const rates = cheaperGroupRates(config, tier);
 const host = alfioHost(config);
 const email = CONTACT_EMAILS.tickets;
 
-const groupMailto = buildMailto(email, t("tickets.team.mail.subject"), t("tickets.team.mail.body"));
-const inclusionMailto = buildMailto(email, t("tickets.inclusion.mail.subject"), t("tickets.inclusion.mail.body"));
+const groupMailto = buildMailto(
+  email,
+  t("tickets.team.mail.subject"),
+  t("tickets.team.mail.body"),
+);
+const inclusionMailto = buildMailto(
+  email,
+  t("tickets.inclusion.mail.subject"),
+  t("tickets.inclusion.mail.body"),
+);
 
 // One action for the whole page, the alf.io listing: both tickets of door 1 and
 // the mobile bar share it.
@@ -94,7 +107,9 @@ const eventDate = formatFullDate(TARGET_DATE, lang);
 // must never break at its hyphen on a narrow screen.
 const [whenBefore, whenAfter = ""] = t("tickets.when").split("{venue}");
 const when = {
-  before: fill(whenBefore, { date: eventDate.charAt(0).toUpperCase() + eventDate.slice(1) }),
+  before: fill(whenBefore, {
+    date: eventDate.charAt(0).toUpperCase() + eventDate.slice(1),
+  }),
   venue: t("hero.venue"),
   after: whenAfter,
 };
@@ -111,36 +126,65 @@ const sticky = {
   },
 };
 
-const early = config.tiers.filter((x) => x.closesWhenSoldOut).map((x) => x.maxPerOrder);
-const later = config.tiers.filter((x) => !x.closesWhenSoldOut).map((x) => x.maxPerOrder);
+const early = config.tiers
+  .filter((x) => x.closesWhenSoldOut)
+  .map((x) => x.maxPerOrder);
+const later = config.tiers
+  .filter((x) => !x.closesWhenSoldOut)
+  .map((x) => x.maxPerOrder);
 const perOrder = { early: Math.max(...early), later: Math.max(...later) };
 ---
 
 <main class="tickets-page" data-phase={phase}>
   <section class="relative isolate overflow-hidden">
     <GeoBackground class="tickets-mesh absolute inset-0 -z-10" />
-    <div class="mx-auto flex max-w-7xl flex-col gap-8 px-4 pb-16 pt-8 md:px-6 md:pb-20 md:pt-12 lg:px-8">
+    <div
+      class="mx-auto flex max-w-7xl flex-col gap-8 px-4 pt-8 pb-16 md:px-6 md:pt-12 md:pb-20 lg:px-8"
+    >
       <header class="flex max-w-4xl flex-col gap-3">
-        <h1 class="text-4xl font-bold leading-[1.05] tracking-[-0.025em] text-balance text-foreground sm:text-5xl">
+        <h1
+          class="text-foreground text-4xl leading-[1.05] font-bold tracking-[-0.025em] text-balance sm:text-5xl"
+        >
           {t("tickets.h1")}
         </h1>
-        <p class="text-lg font-semibold text-foreground text-pretty sm:text-xl">
-          {when.before}<span class="whitespace-nowrap">{when.venue}</span>{when.after}, {t("tickets.when_evening")}
+        <p class="text-foreground text-lg font-semibold text-pretty sm:text-xl">
+          {when.before}<span class="whitespace-nowrap">{when.venue}</span>{
+            when.after
+          }, {t("tickets.when_evening")}
         </p>
-        <p class="max-w-[58ch] text-base text-muted-foreground text-pretty sm:text-lg">{t("tickets.lead")}</p>
+        <p
+          class="text-muted-foreground max-w-[58ch] text-base text-pretty sm:text-lg"
+        >
+          {t("tickets.lead")}
+        </p>
       </header>
 
-      {/* Three rows, one per way in (27/09/2026). The standard ticket leads;
+      {
+        /* Three rows, one per way in (27/09/2026). The standard ticket leads;
           "Venir en équipe" — its group rates, the same ticket bought several
           at a time — sits beside it at the same height whenever a rate
           applies, and it takes the whole row otherwise. The Stratégie &
           Leadership ticket is its own row underneath, the code entry a band at the foot, in
-          every phase. */}
+          every phase. */
+      }
       <div class="grid gap-5 lg:grid-cols-12 lg:gap-6">
-        {/* `flex flex-col` so each card fills the row height the grid gives
-            its wrapper: the two cards of the first row end on the same line. */}
-        <div class:list={["flex flex-col", showTeam ? "lg:col-span-8" : "lg:col-span-12"]}>
-          <OfferDoor lang={lang} ticketName={standardName} tier={tier} ladder={ladder} urgency={urgency}>
+        {
+          /* `flex flex-col` so each card fills the row height the grid gives
+            its wrapper: the two cards of the first row end on the same line. */
+        }
+        <div
+          class:list={[
+            "flex flex-col",
+            showTeam ? "lg:col-span-8" : "lg:col-span-12",
+          ]}
+        >
+          <OfferDoor
+            lang={lang}
+            ticketName={standardName}
+            tier={tier}
+            ladder={ladder}
+            urgency={urgency}
+          >
             <PurchaseControl
               slot="purchase"
               target={target}
@@ -150,11 +194,19 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
             />
           </OfferDoor>
         </div>
-        {showTeam && (
-          <div class="flex flex-col lg:col-span-4">
-            <TeamDoor lang={lang} ticketName={standardName} tier={tier} rates={rates} groupMailto={groupMailto} />
-          </div>
-        )}
+        {
+          showTeam && (
+            <div class="flex flex-col lg:col-span-4">
+              <TeamDoor
+                lang={lang}
+                ticketName={standardName}
+                tier={tier}
+                rates={rates}
+                groupMailto={groupMailto}
+              />
+            </div>
+          )
+        }
         {/* Always displayed, always on sale: the same action. */}
         <div class="lg:col-span-12" style={`--door-index: ${showTeam ? 2 : 1}`}>
           <StrategicOffer
@@ -187,11 +239,18 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
   </section>
 
   <div class="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-24 lg:px-8">
-    <IncludedInTicket lang={lang} eveningDetails={shown(config.eveningDetails)?.[lang]} />
+    <IncludedInTicket
+      lang={lang}
+      eveningDetails={shown(config.eveningDetails)?.[lang]}
+    />
   </div>
 
   <div class="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-24 lg:px-8">
-    <TeamOffer lang={lang} programmeWhen={programmeWhen} kitUrl={shown(config.managerKitUrl)} />
+    <TeamOffer
+      lang={lang}
+      programmeWhen={programmeWhen}
+      kitUrl={shown(config.managerKitUrl)}
+    />
   </div>
 
   <div class="mx-auto max-w-7xl px-4 pb-28 md:px-6 md:pb-24 lg:px-8">
@@ -226,7 +285,12 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
     color: var(--color-foreground);
   }
   .tickets-page :global(.tickets-mesh) {
-    mask-image: linear-gradient(to bottom, black 0%, black 35%, transparent 85%);
+    mask-image: linear-gradient(
+      to bottom,
+      black 0%,
+      black 35%,
+      transparent 85%
+    );
     opacity: 0.9;
   }
 

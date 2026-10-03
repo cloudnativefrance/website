@@ -20,15 +20,24 @@ export function formatPrice(amount: number, lang: Locale): string {
  * currency small, in the locale's own order: {"", "129", "€"} in French,
  * {"€", "129", ""} in English.
  */
-export function priceParts(amount: number, lang: Locale): { before: string; amount: string; after: string } {
+export function priceParts(
+  amount: number,
+  lang: Locale,
+): { before: string; amount: string; after: string } {
   const parts = new Intl.NumberFormat(LOCALE_TAG[lang], {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: 0,
   }).formatToParts(amount);
   const firstDigit = parts.findIndex((p) => p.type === "integer");
-  const lastDigit = parts.findLastIndex((p) => p.type === "integer" || p.type === "group");
-  const text = (slice: Intl.NumberFormatPart[]) => slice.map((p) => p.value).join("").trim();
+  const lastDigit = parts.findLastIndex(
+    (p) => p.type === "integer" || p.type === "group",
+  );
+  const text = (slice: Intl.NumberFormatPart[]) =>
+    slice
+      .map((p) => p.value)
+      .join("")
+      .trim();
   return {
     before: text(parts.slice(0, firstDigit)),
     amount: text(parts.slice(firstDigit, lastDigit + 1)),
@@ -43,7 +52,9 @@ export function priceParts(amount: number, lang: Locale): { before: string; amou
 export function formatTime(hhmm: string, lang: Locale): string {
   if (lang === "en") return hhmm;
   const [h, m] = hhmm.split(":");
-  return m && m !== "00" ? `${Number(h)}\u00a0h\u00a0${m}` : `${Number(h)}\u00a0h`;
+  return m && m !== "00"
+    ? `${Number(h)}\u00a0h\u00a0${m}`
+    : `${Number(h)}\u00a0h`;
 }
 
 /** "29 novembre" / "29 November". Under door 1's price, where there is room for the month. */
@@ -90,7 +101,10 @@ export function formatDiscount(from: number, to: number, lang: Locale): string {
 }
 
 /** Replace `{name}` tokens in an i18n string. */
-export function fill(template: string, values: Record<string, string | number>): string {
+export function fill(
+  template: string,
+  values: Record<string, string | number>,
+): string {
   return template.replace(/\{(\w+)\}/g, (match, key: string) =>
     key in values ? String(values[key]) : match,
   );

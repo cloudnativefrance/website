@@ -29,22 +29,47 @@ const t = useTranslations(lang);
 const switcher = ticketDemosEnabled();
 ---
 
-{phase === "pre_opening" ? (
-  <Layout title={t("nav.tickets")} description={t("tickets.opening.body")} lang={lang} noindex={simulated}>
-    {switcher && <DemoBar lang={lang} config={TICKETING} phase={phase} fromConfig={!simulated} />}
-    <TicketsComingSoon lang={lang} />
-  </Layout>
-) : (
-  <Layout title={t("tickets.meta.title")} description={t("tickets.meta.description")} lang={lang} newsletter={false} noindex={simulated}>
-    {switcher && <DemoBar lang={lang} config={TICKETING} phase={phase} fromConfig={!simulated} />}
-    <TicketsContent lang={lang} phase={phase} demo={switcher} />
-  </Layout>
-)}
+{
+  phase === "pre_opening" ? (
+    <Layout
+      title={t("nav.tickets")}
+      description={t("tickets.opening.body")}
+      lang={lang}
+      noindex={simulated}
+    >
+      {switcher && (
+        <DemoBar
+          lang={lang}
+          config={TICKETING}
+          phase={phase}
+          fromConfig={!simulated}
+        />
+      )}
+      <TicketsComingSoon lang={lang} />
+    </Layout>
+  ) : (
+    <Layout
+      title={t("tickets.meta.title")}
+      description={t("tickets.meta.description")}
+      lang={lang}
+      newsletter={false}
+      noindex={simulated}
+    >
+      {switcher && (
+        <DemoBar
+          lang={lang}
+          config={TICKETING}
+          phase={phase}
+          fromConfig={!simulated}
+        />
+      )}
+      <TicketsContent lang={lang} phase={phase} demo={switcher} />
+    </Layout>
+  )
+}
 
-{/* Only where it has work: the code form and the mobile bar. The coming-soon
-    page ships no script of its own; the demo switcher carries its own. */}
-{phase !== "pre_opening" && (
-  <script>
-    import "./tickets-ui.ts";
-  </script>
-)}
+{
+  /* Only where it has work: the code form and the mobile bar. The coming-soon
+    page ships no script of its own; the demo switcher carries its own. */
+}
+{phase !== "pre_opening" && <script>import "./tickets-ui.ts";</script>}

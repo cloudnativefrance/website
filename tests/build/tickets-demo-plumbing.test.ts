@@ -13,7 +13,10 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const DOCKERFILE = readFileSync(resolve(import.meta.dirname, "../../Dockerfile"), "utf-8");
+const DOCKERFILE = readFileSync(
+  resolve(import.meta.dirname, "../../Dockerfile"),
+  "utf-8",
+);
 const WORKFLOW = readFileSync(
   resolve(import.meta.dirname, "../../.github/workflows/build-image.yml"),
   "utf-8",

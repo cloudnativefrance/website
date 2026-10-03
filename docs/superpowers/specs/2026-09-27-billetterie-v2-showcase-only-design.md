@@ -114,21 +114,21 @@ Order: header and doors → S&L band → "Ce que comprend votre billet" →
   goes with it; only the notify note's ink remains to repaint.
 - **What each `tbd()` becomes.** No chip anywhere. 🔒 = blocks a production build (§4).
 
-| Where | After |
-|---|---|
-| Under the H1: "soirée comprise" | text 🔒 (`eveningIncluded` becomes a draft `true`) |
-| Door 1 before opening: "… à 10 h" | draft 🔒 |
-| Ladder title: "Noms des tarifs à confirmer" chip | nothing; the names are drafts 🔒 (`tierNames` draft `true`) |
-| "Ce que comprend votre billet" | title 🔒 (`contents` draft `true`) |
-| "Le détail de la soirée" | the config's text once decided, nothing before |
-| Manager: "publié en mars 2027" | draft 🔒 |
-| Manager: "Un kit pour convaincre votre manager" | box always shown, link to the draft URL `#convaincre` 🔒 |
-| FAQ: VAT rate | "Taux de TVA : {rate}" once decided, nothing before |
+| Where                                               | After                                                            |
+| --------------------------------------------------- | ---------------------------------------------------------------- |
+| Under the H1: "soirée comprise"                     | text 🔒 (`eveningIncluded` becomes a draft `true`)               |
+| Door 1 before opening: "… à 10 h"                   | draft 🔒                                                         |
+| Ladder title: "Noms des tarifs à confirmer" chip    | nothing; the names are drafts 🔒 (`tierNames` draft `true`)      |
+| "Ce que comprend votre billet"                      | title 🔒 (`contents` draft `true`)                               |
+| "Le détail de la soirée"                            | the config's text once decided, nothing before                   |
+| Manager: "publié en mars 2027"                      | draft 🔒                                                         |
+| Manager: "Un kit pour convaincre votre manager"     | box always shown, link to the draft URL `#convaincre` 🔒         |
+| FAQ: VAT rate                                       | "Taux de TVA : {rate}" once decided, nothing before              |
 | FAQ: company invoice / cancellation and name change | the waiting answer; the config's answer replaces it once decided |
-| FAQ: terms of sale | a link once the URL is decided, nothing before |
-| S&L: name, networking area | drafts 🔒 |
-| S&L: price | row absent while undecided 🔒 (required, §4) |
-| S&L: includes, programme, access | row absent while undecided |
+| FAQ: terms of sale                                  | a link once the URL is decided, nothing before                   |
+| S&L: name, networking area                          | drafts 🔒                                                        |
+| S&L: price                                          | row absent while undecided 🔒 (required, §4)                     |
+| S&L: includes, programme, access                    | row absent while undecided                                       |
 
 ## 4. Config and the production guard
 
@@ -159,23 +159,23 @@ Blocking list at the time of writing (pinned by a unit test): `opening.time`, `t
 
 ## 5. Files
 
-| File | Change |
-|---|---|
-| `src/config/tickets.ts` | fields removed, flags as drafts, kit draft URL |
-| `src/lib/tickets/drafts.ts` | **new**: `shown`, `shippingProblems`, `assertShippable` |
-| `src/lib/tickets/purchase.ts` | notify / listing only |
-| `src/lib/tickets/url.ts` | `codeUrlFrom` only |
-| `src/lib/tickets/demo.ts` | phases only |
-| `src/lib/tickets/pricing.ts`, `rex.ts` | **deleted** |
-| `src/lib/tickets/mailto.ts`, `src/lib/event.ts` | doc comments: no S&L waiting list any more |
-| `src/pages/billetterie/[...demo].astro` | phase only, no session loading |
-| `src/components/tickets/TicketsPage.astro`, `TicketsContent.astro` | props `lang`, `phase`, `demo?`; sections removed; guard |
-| `PurchaseControl`, `StickyTicketBar`, `CodeDoor`, `TeamDoor`, `GroupRates`, `StrategicOffer`, `OfferDoor`, `TierLadder`, `IncludedInTicket`, `TeamOffer`, `TicketsFaq`, `DemoBar` | as above |
-| `EditionProof.astro`, `InclusionNote.astro`, `Tbd.astro` | **deleted** |
-| `Icon.astro` | icons no longer used (`pencil`, `minus`, …) pruned |
-| `tickets-ui.ts` | stepper and group-apply blocks go; code form opens a new tab |
-| `src/i18n/ui.ts` | keys below, FR and EN |
-| `astro.config.mjs` | sitemap filter |
+| File                                                                                                                                                                              | Change                                                       |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `src/config/tickets.ts`                                                                                                                                                           | fields removed, flags as drafts, kit draft URL               |
+| `src/lib/tickets/drafts.ts`                                                                                                                                                       | **new**: `shown`, `shippingProblems`, `assertShippable`      |
+| `src/lib/tickets/purchase.ts`                                                                                                                                                     | notify / listing only                                        |
+| `src/lib/tickets/url.ts`                                                                                                                                                          | `codeUrlFrom` only                                           |
+| `src/lib/tickets/demo.ts`                                                                                                                                                         | phases only                                                  |
+| `src/lib/tickets/pricing.ts`, `rex.ts`                                                                                                                                            | **deleted**                                                  |
+| `src/lib/tickets/mailto.ts`, `src/lib/event.ts`                                                                                                                                   | doc comments: no S&L waiting list any more                   |
+| `src/pages/billetterie/[...demo].astro`                                                                                                                                           | phase only, no session loading                               |
+| `src/components/tickets/TicketsPage.astro`, `TicketsContent.astro`                                                                                                                | props `lang`, `phase`, `demo?`; sections removed; guard      |
+| `PurchaseControl`, `StickyTicketBar`, `CodeDoor`, `TeamDoor`, `GroupRates`, `StrategicOffer`, `OfferDoor`, `TierLadder`, `IncludedInTicket`, `TeamOffer`, `TicketsFaq`, `DemoBar` | as above                                                     |
+| `EditionProof.astro`, `InclusionNote.astro`, `Tbd.astro`                                                                                                                          | **deleted**                                                  |
+| `Icon.astro`                                                                                                                                                                      | icons no longer used (`pencil`, `minus`, …) pruned           |
+| `tickets-ui.ts`                                                                                                                                                                   | stepper and group-apply blocks go; code form opens a new tab |
+| `src/i18n/ui.ts`                                                                                                                                                                  | keys below, FR and EN                                        |
+| `astro.config.mjs`                                                                                                                                                                | sitemap filter                                               |
 
 i18n keys removed: `tickets.tbd`, `tickets.ladder.names_note`, `tickets.ladder.names_tbd`,
 `tickets.purchase.{qty_label,decrease,increase,total,reserve,cap,cap_link,group_applied,was,saving}`,

@@ -4,7 +4,13 @@ import { describe, it, expect, vi } from "vitest";
 // Astro runtime. Unset here; every gate case passes its own `toggle`.
 vi.mock("astro:env/server", () => ({ TICKETS_DEMO: undefined }));
 
-import { TICKETING, isTbd, tbd, type TicketingConfig, type TierId } from "@/config/tickets";
+import {
+  TICKETING,
+  isTbd,
+  tbd,
+  type TicketingConfig,
+  type TierId,
+} from "@/config/tickets";
 import {
   assertTicketingConfig,
   cheaperGroupRates,
@@ -13,7 +19,14 @@ import {
   tierStates,
   tierUrgency,
 } from "@/lib/tickets/phase";
-import { alfioHost, codeFallbackAction, codeUrl, listingUrl, onHost, purchaseTarget } from "@/lib/tickets/purchase";
+import {
+  alfioHost,
+  codeFallbackAction,
+  codeUrl,
+  listingUrl,
+  onHost,
+  purchaseTarget,
+} from "@/lib/tickets/purchase";
 import { handOffOnce, openInNewTab } from "@/lib/tickets/url";
 import { buildMailto } from "@/lib/tickets/mailto";
 import {
@@ -22,7 +35,12 @@ import {
   placeholdersAllowed,
   ticketDemosEnabled,
 } from "@/lib/tickets/demo";
-import { fill, formatDayMonth, formatDiscount, formatPrice } from "@/lib/tickets/format";
+import {
+  fill,
+  formatDayMonth,
+  formatDiscount,
+  formatPrice,
+} from "@/lib/tickets/format";
 import { assertShippable, shippingProblems, shown } from "@/lib/tickets/drafts";
 
 const tier = (id: TierId) => TICKETING.tiers.find((t) => t.id === id)!;
@@ -65,13 +83,13 @@ describe("the committed config", () => {
       "3 juin",
     ]);
     // Every tier but the last ends on a Sunday night, as the sheet says.
-    const weekday = new Intl.DateTimeFormat("fr-FR", { weekday: "long", timeZone: "Europe/Paris" });
-    expect(TICKETING.tiers.map((t) => weekday.format(new Date(t.endsAt)))).toEqual([
-      "dimanche",
-      "dimanche",
-      "dimanche",
-      "jeudi",
-    ]);
+    const weekday = new Intl.DateTimeFormat("fr-FR", {
+      weekday: "long",
+      timeZone: "Europe/Paris",
+    });
+    expect(
+      TICKETING.tiers.map((t) => weekday.format(new Date(t.endsAt))),
+    ).toEqual(["dimanche", "dimanche", "dimanche", "jeudi"]);
   });
 });
 
@@ -107,10 +125,12 @@ describe("tierStates", () => {
   });
 
   it("accepts the coming-soon phase as the config's own, and nothing unknown", () => {
-    expect(ticketingConfigProblems(withPhase({ currentPhase: "pre_opening" }))).toEqual([]);
-    expect(ticketingConfigProblems(withPhase({ currentPhase: "vip" as TierId }))).toContain(
-      'currentPhase "vip" matches no tier',
-    );
+    expect(
+      ticketingConfigProblems(withPhase({ currentPhase: "pre_opening" })),
+    ).toEqual([]);
+    expect(
+      ticketingConfigProblems(withPhase({ currentPhase: "vip" as TierId })),
+    ).toContain('currentPhase "vip" matches no tier');
   });
 });
 
@@ -142,7 +162,8 @@ describe("tierUrgency", () => {
 });
 
 describe("group rates", () => {
-  const ids = (id: TierId) => cheaperGroupRates(TICKETING, tier(id)).map((r) => r.id);
+  const ids = (id: TierId) =>
+    cheaperGroupRates(TICKETING, tier(id)).map((r) => r.id);
 
   it("offers none on the two quota-protected tiers, both on the later ones", () => {
     // Super Early Bird and Early Bird cap an order at 5 seats — that cap is how
@@ -157,7 +178,9 @@ describe("group rates", () => {
   it("brings the group rate back on Early Bird the day its order cap is lifted", () => {
     // The one change the ticketing team is weighing: no code follows it.
     const openEb = { ...tier("eb"), maxPerOrder: 20 };
-    expect(cheaperGroupRates(TICKETING, openEb).map((r) => r.id)).toEqual(["10_plus"]);
+    expect(cheaperGroupRates(TICKETING, openEb).map((r) => r.id)).toEqual([
+      "10_plus",
+    ]);
   });
 
   it("refuses a rate table that does not climb", () => {
@@ -169,7 +192,9 @@ describe("group rates", () => {
       ],
     });
     expect(problems).toContain('group rate "10_plus" overlaps "4_9"');
-    expect(problems).toContain('group rate "10_plus" is not cheaper than "4_9"');
+    expect(problems).toContain(
+      'group rate "10_plus" is not cheaper than "4_9"',
+    );
   });
 });
 
@@ -197,16 +222,22 @@ describe("purchaseTarget", () => {
 
   it("names the alf.io host buyers land on", () => {
     expect(alfioHost(TICKETING)).toBe("billetterie.cloudnativedays.fr");
-    expect(listingUrl({ ...TICKETING, alfio: { baseUrl: "https://x.test/", eventSlug: "e" } })).toBe(
-      "https://x.test/event/e",
-    );
+    expect(
+      listingUrl({
+        ...TICKETING,
+        alfio: { baseUrl: "https://x.test/", eventSlug: "e" },
+      }),
+    ).toBe("https://x.test/event/e");
   });
 });
 
 describe("codeUrl", () => {
   it("refuses an empty code, whitespace included", () => {
     expect(codeUrl(TICKETING, "")).toEqual({ ok: false, reason: "empty" });
-    expect(codeUrl(TICKETING, "   \t ")).toEqual({ ok: false, reason: "empty" });
+    expect(codeUrl(TICKETING, "   \t ")).toEqual({
+      ok: false,
+      reason: "empty",
+    });
   });
 
   it("drops every space, including inside the code", () => {
@@ -234,7 +265,13 @@ describe("codeUrl", () => {
 
 describe("buildMailto", () => {
   it("encodes spaces as %20 and line breaks as CRLF", () => {
-    expect(buildMailto("billetterie@cloudnativedays.fr", "Billets de groupe", "Société :\nNombre : 12")).toBe(
+    expect(
+      buildMailto(
+        "billetterie@cloudnativedays.fr",
+        "Billets de groupe",
+        "Société :\nNombre : 12",
+      ),
+    ).toBe(
       "mailto:billetterie@cloudnativedays.fr?subject=Billets%20de%20groupe&body=Soci%C3%A9t%C3%A9%20%3A%0D%0ANombre%20%3A%2012",
     );
   });
@@ -258,21 +295,41 @@ describe("demo gate", () => {
 
   it("is open under astro dev unless TICKETS_DEMO=false", () => {
     expect(ticketDemosEnabled({ env: prod, dev: true })).toBe(true);
-    expect(ticketDemosEnabled({ toggle: true, env: prod, dev: true })).toBe(true);
-    expect(ticketDemosEnabled({ toggle: false, env: prod, dev: true })).toBe(false);
-    expect(placeholdersAllowed({ toggle: false, env: prod, dev: true })).toBe(false);
+    expect(ticketDemosEnabled({ toggle: true, env: prod, dev: true })).toBe(
+      true,
+    );
+    expect(ticketDemosEnabled({ toggle: false, env: prod, dev: true })).toBe(
+      false,
+    );
+    expect(placeholdersAllowed({ toggle: false, env: prod, dev: true })).toBe(
+      false,
+    );
   });
 
   it("is open on a non-production build that sets TICKETS_DEMO=true — the staging image", () => {
-    expect(ticketDemosEnabled({ toggle: true, env: staging, dev: false })).toBe(true);
-    expect(placeholdersAllowed({ toggle: true, env: staging, dev: false })).toBe(true);
-    expect(ticketDemosEnabled({ toggle: false, env: staging, dev: false })).toBe(false);
+    expect(ticketDemosEnabled({ toggle: true, env: staging, dev: false })).toBe(
+      true,
+    );
+    expect(
+      placeholdersAllowed({ toggle: true, env: staging, dev: false }),
+    ).toBe(true);
+    expect(
+      ticketDemosEnabled({ toggle: false, env: staging, dev: false }),
+    ).toBe(false);
   });
 
   it("refuses TICKETS_DEMO=true on a production-origin build, including the empty PUBLIC_SITE_URL CI passes", () => {
-    for (const env of [prod, {}, { PUBLIC_SITE_URL: "https://cloudnativedays.fr" }]) {
-      expect(() => ticketDemosEnabled({ toggle: true, env, dev: false })).toThrow(/TICKETS_DEMO/);
-      expect(() => placeholdersAllowed({ toggle: true, env, dev: false })).toThrow(/TICKETS_DEMO/);
+    for (const env of [
+      prod,
+      {},
+      { PUBLIC_SITE_URL: "https://cloudnativedays.fr" },
+    ]) {
+      expect(() =>
+        ticketDemosEnabled({ toggle: true, env, dev: false }),
+      ).toThrow(/TICKETS_DEMO/);
+      expect(() =>
+        placeholdersAllowed({ toggle: true, env, dev: false }),
+      ).toThrow(/TICKETS_DEMO/);
     }
   });
 
@@ -290,12 +347,18 @@ describe("demo gate", () => {
   });
 
   it("keeps every demo URL under /billetterie/demo/ and /en/tickets/demo/", () => {
-    expect(demoPath("pre_opening", "fr")).toBe("/billetterie/demo/avant-ouverture/");
+    expect(demoPath("pre_opening", "fr")).toBe(
+      "/billetterie/demo/avant-ouverture/",
+    );
     expect(demoPath("eb", "fr")).toBe("/billetterie/demo/early-bird/");
     expect(demoPath("eb", "en")).toBe("/en/tickets/demo/early-bird/");
     for (const { props } of demoStaticPaths()) {
-      expect(demoPath(props.phase, "fr")).toMatch(/^\/billetterie\/demo\/[a-z-]+\/$/);
-      expect(demoPath(props.phase, "en")).toMatch(/^\/en\/tickets\/demo\/[a-z-]+\/$/);
+      expect(demoPath(props.phase, "fr")).toMatch(
+        /^\/billetterie\/demo\/[a-z-]+\/$/,
+      );
+      expect(demoPath(props.phase, "en")).toMatch(
+        /^\/en\/tickets\/demo\/[a-z-]+\/$/,
+      );
     }
   });
 });
@@ -317,7 +380,9 @@ describe("format", () => {
   });
 
   it("fills named tokens and leaves unknown ones", () => {
-    expect(fill("{n} billets à {price}", { n: 3, price: "129 €" })).toBe("3 billets à 129 €");
+    expect(fill("{n} billets à {price}", { n: 3, price: "129 €" })).toBe(
+      "3 billets à 129 €",
+    );
     expect(fill("{missing}", {})).toBe("{missing}");
   });
 });
@@ -343,8 +408,13 @@ describe("drafts", () => {
   it("blocks on a draft wherever it sits, arrays included, and names its path", () => {
     const config = {
       ...decided,
-      alfio: { ...decided.alfio, eventSlug: tbd("Slug de l'événement", "cnd-2027") },
-      tiers: decided.tiers.map((t, i) => (i === 0 ? { ...t, name: tbd("Nom public", t.name) } : t)),
+      alfio: {
+        ...decided.alfio,
+        eventSlug: tbd("Slug de l'événement", "cnd-2027"),
+      },
+      tiers: decided.tiers.map((t, i) =>
+        i === 0 ? { ...t, name: tbd("Nom public", t.name) } : t,
+      ),
     } as unknown as TicketingConfig;
     expect(shippingProblems(config)).toEqual([
       { path: "alfio.eventSlug", note: "Slug de l'événement" },
@@ -353,7 +423,9 @@ describe("drafts", () => {
   });
 
   it("lets an undecided value with no draft ship — its line is simply not rendered", () => {
-    expect(shippingProblems({ ...decided, vatRate: tbd("Taux de TVA") })).toEqual([]);
+    expect(
+      shippingProblems({ ...decided, vatRate: tbd("Taux de TVA") }),
+    ).toEqual([]);
   });
 
   it("still requires the two ticket names and the Strategy & Leadership price, even with no draft", () => {
@@ -370,7 +442,10 @@ describe("drafts", () => {
   });
 
   it("lets the track page stay undecided — the link is simply not rendered", () => {
-    const config = { ...decided, strategic: { ...decided.strategic, trackUrl: tbd("Page du parcours") } };
+    const config = {
+      ...decided,
+      strategic: { ...decided.strategic, trackUrl: tbd("Page du parcours") },
+    };
     expect(shippingProblems(config)).toEqual([]);
   });
 
@@ -380,7 +455,9 @@ describe("drafts", () => {
       vatRate: tbd("Taux de TVA", "10 %"),
       strategic: { ...decided.strategic, price: tbd("Prix") },
     };
-    expect(() => assertShippable(config)).toThrow(/vatRate — Taux de TVA[\s\S]*strategic\.price — Prix/);
+    expect(() => assertShippable(config)).toThrow(
+      /vatRate — Taux de TVA[\s\S]*strategic\.price — Prix/,
+    );
   });
 
   it("lists what still blocks a production build of the committed config", () => {
@@ -400,8 +477,18 @@ describe("drafts", () => {
 
 describe("onHost", () => {
   it("recognises a URL on the alf.io host, and nothing else", () => {
-    expect(onHost("https://billetterie.cloudnativedays.fr/terms", "billetterie.cloudnativedays.fr")).toBe(true);
-    expect(onHost("https://cloudnativedays.fr/cgv", "billetterie.cloudnativedays.fr")).toBe(false);
+    expect(
+      onHost(
+        "https://billetterie.cloudnativedays.fr/terms",
+        "billetterie.cloudnativedays.fr",
+      ),
+    ).toBe(true);
+    expect(
+      onHost(
+        "https://cloudnativedays.fr/cgv",
+        "billetterie.cloudnativedays.fr",
+      ),
+    ).toBe(false);
     expect(onHost("#convaincre", "billetterie.cloudnativedays.fr")).toBe(false);
   });
 });

@@ -4,7 +4,9 @@
  * anything it imports ships in the client bundle.
  */
 
-export type CodeResult = { ok: true; code: string; url: string } | { ok: false; reason: "empty" };
+export type CodeResult =
+  | { ok: true; code: string; url: string }
+  | { ok: false; reason: "empty" };
 
 /**
  * "I have a code": the site validates nothing and prices nothing — alf.io
@@ -15,7 +17,11 @@ export type CodeResult = { ok: true; code: string; url: string } | { ok: false; 
 export function codeUrlFrom(listingUrl: string, raw: string): CodeResult {
   const code = raw.replace(/\s+/g, "");
   if (!code) return { ok: false, reason: "empty" };
-  return { ok: true, code, url: `${listingUrl}/code/${encodeURIComponent(code)}` };
+  return {
+    ok: true,
+    code,
+    url: `${listingUrl}/code/${encodeURIComponent(code)}`,
+  };
 }
 
 /** The part of `window` that `openInNewTab` uses — a stand-in in tests. */
@@ -43,7 +49,10 @@ export function openInNewTab(url: string, win: TabOpener): void {
  * and a second hold. Once the window has passed, a new submit is a deliberate
  * one (the buyer closed the tab and came back) and goes through.
  */
-export function handOffOnce(ms: number, now: () => number = Date.now): () => boolean {
+export function handOffOnce(
+  ms: number,
+  now: () => number = Date.now,
+): () => boolean {
   let last = Number.NEGATIVE_INFINITY;
   return () => {
     const t = now();

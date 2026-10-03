@@ -32,7 +32,14 @@ const buttonClass =
 ---
 
 <div>
-  <a href={target.href} target="_blank" rel={target.rel} class={buttonClass} data-umami-event="tickets-purchase" {...umami}>
+  <a
+    href={target.href}
+    target="_blank"
+    rel={target.rel}
+    class={buttonClass}
+    data-umami-event="tickets-purchase"
+    {...umami}
+  >
     {t("tickets.purchase.buy")}
     <span class="sr-only"> {t("tickets.new_tab")}</span>
     <Icon name="arrow-right" size={20} />

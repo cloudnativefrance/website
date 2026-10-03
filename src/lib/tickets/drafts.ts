@@ -10,7 +10,12 @@
  *
  * Pure: no environment read. The caller decides when to assert.
  */
-import { isTbd, type Maybe, type Tbd, type TicketingConfig } from "@/config/tickets";
+import {
+  isTbd,
+  type Maybe,
+  type Tbd,
+  type TicketingConfig,
+} from "@/config/tickets";
 
 /** The decided value, else the draft, else undefined — the line is then not rendered. */
 export function shown<T>(value: Maybe<T>): T | undefined {
@@ -28,7 +33,10 @@ export interface ShippingProblem {
  * Values an undecided `tbd()` cannot leave out: without a draft their line
  * would simply disappear, and the page is not worth shipping without them.
  */
-const REQUIRED: ReadonlyArray<{ path: string; read: (config: TicketingConfig) => unknown }> = [
+const REQUIRED: ReadonlyArray<{
+  path: string;
+  read: (config: TicketingConfig) => unknown;
+}> = [
   { path: "standardName", read: (config) => config.standardName },
   { path: "strategic.name", read: (config) => config.strategic.name },
   { path: "strategic.price", read: (config) => config.strategic.price },
@@ -42,7 +50,8 @@ export function shippingProblems(config: TicketingConfig): ShippingProblem[] {
   });
   for (const { path, read } of REQUIRED) {
     const value = read(config);
-    if (isTbd(value) && value.draft === undefined) problems.push({ path, note: value.note });
+    if (isTbd(value) && value.draft === undefined)
+      problems.push({ path, note: value.note });
   }
   return problems;
 }
@@ -57,7 +66,11 @@ export function assertShippable(config: TicketingConfig): void {
   );
 }
 
-function walk(node: unknown, path: string, visit: (path: string, value: Tbd<unknown>) => void): void {
+function walk(
+  node: unknown,
+  path: string,
+  visit: (path: string, value: Tbd<unknown>) => void,
+): void {
   if (isTbd(node)) {
     visit(path, node);
     return;

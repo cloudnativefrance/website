@@ -37,7 +37,9 @@ export function tbd<T = never>(note: string, draft?: T): Tbd<T> {
 }
 
 export function isTbd(value: unknown): value is Tbd<unknown> {
-  return typeof value === "object" && value !== null && (value as Tbd).tbd === true;
+  return (
+    typeof value === "object" && value !== null && (value as Tbd).tbd === true
+  );
 }
 
 export type Maybe<T> = T | Tbd<T>;
@@ -123,7 +125,10 @@ export const TICKETING: TicketingConfig = {
   // soon" page. Opening day is this line set to "seb" — a production build then
   // refuses the page until every tbd() below is decided (`assertShippable`).
   currentPhase: "pre_opening",
-  standardName: tbd("Nom public du billet standard", { fr: "standard", en: "Standard" }),
+  standardName: tbd("Nom public du billet standard", {
+    fr: "standard",
+    en: "Standard",
+  }),
   tiers: [
     {
       id: "seb",
@@ -179,13 +184,19 @@ export const TICKETING: TicketingConfig = {
     }),
   },
   contents: tbd("Contenu exact du billet standard", true),
-  eveningIncluded: tbd("Soirée ouverte à tous les participants, sans option (pôle soirée)", true),
+  eveningIncluded: tbd(
+    "Soirée ouverte à tous les participants, sans option (pôle soirée)",
+    true,
+  ),
   eveningDetails: tbd("Contenu de la soirée (pôle soirée)"),
   vatRate: tbd("Taux de TVA affiché (10 % aujourd'hui ?)"),
   invoice: tbd("Facture au nom de la société, devis, virement (question à JC)"),
   transferAndRefund: tbd("Annulation et changement de nom"),
   termsUrl: tbd("Lien vers les conditions générales de vente"),
-  managerKitUrl: tbd("Kit « convaincre son manager » (planifié) — URL bidon en attendant", "#convaincre"),
+  managerKitUrl: tbd(
+    "Kit « convaincre son manager » (planifié) — URL bidon en attendant",
+    "#convaincre",
+  ),
   programmeAnnouncement: tbd("Date publique d'annonce du programme", {
     fr: "en mars 2027",
     en: "in March 2027",

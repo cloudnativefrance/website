@@ -6,7 +6,11 @@
  * RFC 6068: every line break in a body is `%0D%0A`, and spaces are `%20`
  * (never `+`, which mail clients print literally).
  */
-export function buildMailto(to: string, subject: string, body?: string): string {
+export function buildMailto(
+  to: string,
+  subject: string,
+  body?: string,
+): string {
   const params = [`subject=${encode(subject)}`];
   if (body) params.push(`body=${encode(body)}`);
   return `mailto:${to}?${params.join("&")}`;
