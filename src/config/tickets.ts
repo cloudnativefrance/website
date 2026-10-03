@@ -18,8 +18,8 @@
  *
  * **Unknowns are `tbd()`, never a plausible guess.** A `tbd` renders nothing
  * of its own: the page shows its draft when it has one — as the copy it will
- * become — and leaves its line out when it has none. A production-origin
- * build refuses the page while a draft is left (`assertShippable` in
+ * become — and leaves its line out when it has none. A build without
+ * the demo (production) refuses the page while a draft is left (`assertShippable` in
  * `src/lib/tickets/drafts.ts`). `grep -n "tbd(" src/config/tickets.ts` lists
  * everything still open.
  */

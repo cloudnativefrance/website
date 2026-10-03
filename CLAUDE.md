@@ -45,6 +45,7 @@ Schema changes that span the CSV pipeline (Sheet column → parser → Zod schem
   `SPONSORS_CSV_URL_{2023,2026,2027}`, `TEAM_CSV_URL`.
   Editions with no Pretalx event read a frozen `src/content/schedule/sessions-{year}.json`.
 - **Site origin**: `PUBLIC_SITE_URL` (build-time only) sets `site` in `astro.config.mjs`, which drives canonical URLs, hreflang, the sitemap, `robots.txt` and the `noindex` meta tag. Falls back to production when unset or empty — the single production-origin literal lives in `src/lib/site-env.ts`. CI sets it to the staging origin for the `staging` branch.
+- **Ticketing demo**: `TICKETS_DEMO`, an `astro:env` boolean (build-time). Unset: on under `pnpm dev`, off in any build; CI sets it to `true` for the `staging` branch; a production-origin build refuses `true`. `pnpm dev:like-prod` hides it. See `src/lib/tickets/demo.ts`.
 - **Testing**: `pnpm test` (Vitest). Component tests may mock `astro:content` via `vi.mock`.
 - **Build/dev**: `pnpm build` / `pnpm dev`. Hosted in Docker + nginx (see `Dockerfile`, `nginx/`).
 

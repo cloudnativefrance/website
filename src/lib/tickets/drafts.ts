@@ -4,7 +4,7 @@
  * A `tbd()` in the config renders nothing of its own: the page shows its draft
  * when it has one — as the copy it will become — and leaves its line out when
  * it has none. What keeps a draft from reaching production is
- * `assertShippable`, which the page calls on a production-origin build: it
+ * `assertShippable`, which the page calls whenever the demo is off: it
  * lists every draft still in the config, plus the values the page cannot ship
  * without.
  *

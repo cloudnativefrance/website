@@ -4,27 +4,46 @@
  * /billetterie and /en/tickets serve the config's own phase everywhere. The
  * demo adds one page per phase under /billetterie/demo/ and /en/tickets/demo/
  * so the ticketing team can walk the whole season on staging, and a switcher
- * on every ticketing page. Neither may reach a production build: the gate
- * reads the build's origin, the same fail-closed rule as
- * `src/lib/preview-fixture.ts` — an unset or empty PUBLIC_SITE_URL means
- * production, so a misconfigured pipeline hides the demo rather than
- * publishing it. `astro dev` always has it.
+ * on every ticketing page.
  *
- * The same rule decides whether a draft value may be shown: a production build
- * refuses the page while the config still holds one (`assertShippable`).
+ * One switch decides: `TICKETS_DEMO`, an `astro:env` boolean (astro.config.mjs).
+ * An explicit value always wins; unset, the demo is on under `astro dev` and
+ * off in any build — so production, which never sets it, has no demo, and the
+ * staging image turns it on with a build-arg (.github/workflows/build-image.yml).
+ * The build's origin only vetoes: a production-origin build refuses the demo,
+ * so `TICKETS_DEMO=true` landing on `main` by mistake is a red build, never a
+ * demo on cloudnativedays.fr.
+ *
+ * The same switch decides whether a draft value may be shown: without the demo
+ * the page refuses a selling phase while the config still holds one
+ * (`assertShippable`).
  */
+import { TICKETS_DEMO } from "astro:env/server";
 import type { Phase } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { getLocalePath } from "@/i18n/utils";
 import { isProductionOrigin, resolveSiteOrigin } from "@/lib/site-env";
 
 interface GateInput {
+  /** `TICKETS_DEMO`; undefined when unset. */
+  toggle?: boolean;
   env?: Record<string, string | undefined>;
   dev?: boolean;
 }
 
-export function ticketDemosEnabled({ env = process.env, dev = import.meta.env.DEV }: GateInput = {}): boolean {
-  return dev || !isProductionOrigin(resolveSiteOrigin(env));
+export function ticketDemosEnabled({
+  toggle = TICKETS_DEMO,
+  env = process.env,
+  dev = import.meta.env.DEV,
+}: GateInput = {}): boolean {
+  const enabled = toggle ?? dev;
+  if (enabled && !dev && isProductionOrigin(resolveSiteOrigin(env))) {
+    throw new Error(
+      "[tickets] TICKETS_DEMO=true on a production-origin build: the demo must never reach " +
+        "cloudnativedays.fr. Unset TICKETS_DEMO, or set PUBLIC_SITE_URL to a non-production origin.",
+    );
+  }
+  return enabled;
 }
 
 export function placeholdersAllowed(input: GateInput = {}): boolean {

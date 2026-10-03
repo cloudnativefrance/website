@@ -4,7 +4,7 @@
  * demo route mount it. `pre_opening` is the "coming soon" page; a tier id is
  * the ticketing page selling that tier (`TicketsContent`).
  *
- * On a non-production build it also carries the demo switcher, on the real
+ * With the demo on (`TICKETS_DEMO`) it also carries the demo switcher, on the real
  * URLs too, so the team can walk the season from /billetterie on staging.
  * A simulated phase is always noindex, whatever the origin.
  */
@@ -41,6 +41,10 @@ const switcher = ticketDemosEnabled();
   </Layout>
 )}
 
-<script>
-  import "./tickets-ui.ts";
-</script>
+{/* Only where it has work: the code form and the mobile bar. The coming-soon
+    page ships no script of its own; the demo switcher carries its own. */}
+{phase !== "pre_opening" && (
+  <script>
+    import "./tickets-ui.ts";
+  </script>
+)}

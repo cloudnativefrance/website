@@ -7,7 +7,7 @@
 // is the "coming soon" page, checked at the end.
 import { describe, it, expect, beforeAll } from "vitest";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import TicketsContent from "../TicketsContent.astro";
 import TicketsComingSoon from "../TicketsComingSoon.astro";
@@ -332,7 +332,7 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
   });
 
   it("stripes the mobile bar as a demo", () => {
-    expect(html).toContain("demo-stripe");
+    expect(html).toContain("data-demo-stripe");
   });
 });
 
@@ -361,9 +361,49 @@ describe("the page wrapper", () => {
     for (const layout of layouts) expect(layout).toContain("noindex={simulated}");
   });
 
-  it("renders the demo switcher only on a non-production build", () => {
+  it("renders the demo switcher only when the demo is on", () => {
     expect(source).toMatch(/const switcher = ticketDemosEnabled\(\);/);
     expect([...source.matchAll(/\{switcher && <DemoBar/g)]).toHaveLength(2);
+  });
+
+  it("loads the ticketing script only on a selling phase — never on the coming-soon page", () => {
+    const scripts = [...source.matchAll(/<script\b/g)];
+    expect(scripts).toHaveLength(1);
+    expect(source).toMatch(/\{phase !== "pre_opening" && \(\s*<script>\s*import "\.\/tickets-ui\.ts";/);
+  });
+});
+
+// Astro bundles a component's <style> into every page that merely imports it,
+// and src/i18n/ui.ts is bundled into the home page's islands: either path would
+// carry the demo to production even though the switcher is never rendered there.
+describe("the demo stays out of what production ships", () => {
+  const dir = resolve(import.meta.dirname, "..");
+  const read = (path: string) => readFileSync(resolve(dir, path), "utf-8");
+  const blocks = (source: string, tag: "style" | "script") =>
+    [...source.matchAll(new RegExp(`<${tag}\\b([^>]*)>([\\s\\S]*?)</${tag}>`, "g"))].map((m) => ({
+      attrs: m[1],
+      body: m[2],
+    }));
+
+  it("keeps the demo copy out of the shared dictionary", () => {
+    expect(readFileSync(resolve(dir, "../../i18n/ui.ts"), "utf-8")).not.toMatch(/tickets\.demo/);
+  });
+
+  it("emits the switcher's styles only where it renders", () => {
+    const styles = blocks(read("DemoBar.astro"), "style");
+    expect(styles.length).toBeGreaterThan(0);
+    for (const style of styles) expect(style.attrs).toContain("is:inline");
+  });
+
+  it("names the demo in no shared style or script", () => {
+    const shared = ["tickets-ui.ts", ...readdirSync(dir).filter((f) => f.endsWith(".astro") && f !== "DemoBar.astro")];
+    for (const file of shared) {
+      const source = read(file);
+      const code = file.endsWith(".ts")
+        ? [source]
+        : [...blocks(source, "style"), ...blocks(source, "script")].map((b) => b.body);
+      for (const body of code) expect(body, file).not.toMatch(/demo/i);
+    }
   });
 });
 

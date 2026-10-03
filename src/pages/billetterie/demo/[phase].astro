@@ -3,7 +3,7 @@
  * Hidden demo of the ticketing page, one URL per phase, for the team to walk
  * the whole season on staging: /billetterie/demo/early-bird/.
  *
- * `getStaticPaths` returns nothing on a build for the production origin, so
+ * `getStaticPaths` returns nothing unless the demo is on (`TICKETS_DEMO`), so
  * these URLs never exist on cloudnativedays.fr (see src/lib/tickets/demo.ts).
  * /billetterie itself shows the config's own phase.
  */

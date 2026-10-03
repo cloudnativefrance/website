@@ -26,6 +26,12 @@ ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
 # An unknown name or a value other than on/off fails the build (src/lib/flags.ts).
 ARG FLAG_OVERRIDES=
 ENV FLAG_OVERRIDES=$FLAG_OVERRIDES
+# The ticketing demo (phase switcher + /billetterie/demo/*), as `true`. Empty
+# by default so an argument-less `docker build` produces the production site
+# with no demo; the staging CI job turns it on. Validated by astro:env (true or
+# false), and refused on a production-origin build (src/lib/tickets/demo.ts).
+ARG TICKETS_DEMO=
+ENV TICKETS_DEMO=$TICKETS_DEMO
 # Pretalx API token, as a BuildKit secret — deliberately NOT a build-arg.
 # Build-args are recorded in image history, so `docker history` on a published
 # image would print the token to anyone who can pull it. A secret mount exists

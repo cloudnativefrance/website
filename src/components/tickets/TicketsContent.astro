@@ -11,7 +11,7 @@
  * `src/config/tickets.ts` and the tier on sale, so the demo routes and
  * /billetterie render the same page. Every purchase — both tickets of door 1,
  * the mobile bar — goes to the alf.io listing through one `purchaseTarget`. An undecided value shows its draft or nothing (`shown`),
- * and a production-origin build refuses the page while a draft is left
+ * and a build without the demo (production) refuses the page while a draft is left
  * (`assertShippable`) — which is why flipping `currentPhase` to the first tier
  * is also the check that everything is decided.
  */
@@ -46,7 +46,7 @@ interface Props {
   lang: Locale;
   /** The tier on sale. */
   phase: TierId;
-  /** Non-production builds stripe the mobile bar so no capture passes for the real page. */
+  /** With the demo on, the mobile bar is striped so no capture passes for the real page. */
   demo?: boolean;
 }
 
@@ -54,8 +54,8 @@ const { lang, phase, demo } = Astro.props;
 const t = useTranslations(lang);
 const config = TICKETING;
 assertTicketingConfig(config);
-// A draft is for staging eyes only: a production-origin build refuses the page
-// while one is left in the config, and names them all.
+// A draft is for demo eyes only: without the demo (production) the page is
+// refused while one is left in the config, and the error names them all.
 if (!placeholdersAllowed()) assertShippable(config);
 
 const tier = offerTier(config, phase);

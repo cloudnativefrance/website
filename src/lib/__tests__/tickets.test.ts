@@ -1,4 +1,9 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+// The demo gate reads TICKETS_DEMO from astro:env, which only exists under the
+// Astro runtime. Unset here; every gate case passes its own `toggle`.
+vi.mock("astro:env/server", () => ({ TICKETS_DEMO: undefined }));
+
 import { TICKETING, isTbd, tbd, type TicketingConfig, type TierId } from "@/config/tickets";
 import {
   assertTicketingConfig,
@@ -243,16 +248,32 @@ describe("demo gate", () => {
   const prod = { PUBLIC_SITE_URL: "" };
   const staging = { PUBLIC_SITE_URL: "https://staging.cloudnativedays.fr" };
 
-  it("is closed on a production build, including the empty PUBLIC_SITE_URL CI passes", () => {
+  it("is closed in any build that does not set TICKETS_DEMO — a non-production origin is not enough", () => {
     expect(ticketDemosEnabled({ env: prod, dev: false })).toBe(false);
     expect(ticketDemosEnabled({ env: {}, dev: false })).toBe(false);
-    expect(ticketDemosEnabled({ env: { PUBLIC_SITE_URL: "https://cloudnativedays.fr" }, dev: false })).toBe(false);
+    expect(ticketDemosEnabled({ env: staging, dev: false })).toBe(false);
     expect(placeholdersAllowed({ env: prod, dev: false })).toBe(false);
+    expect(placeholdersAllowed({ env: staging, dev: false })).toBe(false);
   });
 
-  it("is open on staging and in astro dev", () => {
-    expect(ticketDemosEnabled({ env: staging, dev: false })).toBe(true);
+  it("is open under astro dev unless TICKETS_DEMO=false", () => {
     expect(ticketDemosEnabled({ env: prod, dev: true })).toBe(true);
+    expect(ticketDemosEnabled({ toggle: true, env: prod, dev: true })).toBe(true);
+    expect(ticketDemosEnabled({ toggle: false, env: prod, dev: true })).toBe(false);
+    expect(placeholdersAllowed({ toggle: false, env: prod, dev: true })).toBe(false);
+  });
+
+  it("is open on a non-production build that sets TICKETS_DEMO=true — the staging image", () => {
+    expect(ticketDemosEnabled({ toggle: true, env: staging, dev: false })).toBe(true);
+    expect(placeholdersAllowed({ toggle: true, env: staging, dev: false })).toBe(true);
+    expect(ticketDemosEnabled({ toggle: false, env: staging, dev: false })).toBe(false);
+  });
+
+  it("refuses TICKETS_DEMO=true on a production-origin build, including the empty PUBLIC_SITE_URL CI passes", () => {
+    for (const env of [prod, {}, { PUBLIC_SITE_URL: "https://cloudnativedays.fr" }]) {
+      expect(() => ticketDemosEnabled({ toggle: true, env, dev: false })).toThrow(/TICKETS_DEMO/);
+      expect(() => placeholdersAllowed({ toggle: true, env, dev: false })).toThrow(/TICKETS_DEMO/);
+    }
   });
 
   it("emits one page per phase, the coming-soon page included — /billetterie is the config's own", () => {

@@ -518,15 +518,6 @@ export const ui = {
     "tickets.inclusion.mail.body":
       "Bonjour,\n\nQuelques mots sur votre situation\u00a0:\n\nNom\u00a0:\nÉcole ou structure (le cas échéant)\u00a0:\n",
     "tickets.sticky.buy": "Acheter",
-    "tickets.demo.badge": "Démo",
-    "tickets.demo.notice": "Page de démonstration, non publiée.",
-    "tickets.demo.settings": "Ouvrir les réglages de la démo",
-    "tickets.demo.close": "Fermer les réglages",
-    "tickets.demo.phase": "Phase",
-    "tickets.demo.pre_opening": "Avant ouverture",
-    "tickets.demo.scenario":
-      "Scénario simulé\u00a0: les tarifs précédents sont affichés comme épuisés.",
-    "tickets.demo.config": "État de la config",
   },
   en: {
     "nav.home": "About",
@@ -1022,13 +1013,5 @@ export const ui = {
     "tickets.inclusion.mail.subject": "Inclusion or student rate request",
     "tickets.inclusion.mail.body": "Hello,\n\nA few words about your situation:\n\nName:\nSchool or organisation (if any):\n",
     "tickets.sticky.buy": "Buy",
-    "tickets.demo.badge": "Demo",
-    "tickets.demo.notice": "Demonstration page, not published.",
-    "tickets.demo.settings": "Open the demo settings",
-    "tickets.demo.close": "Close the settings",
-    "tickets.demo.phase": "Phase",
-    "tickets.demo.pre_opening": "Before opening",
-    "tickets.demo.scenario": "Simulated season: every earlier price is shown as sold out.",
-    "tickets.demo.config": "Config state",
   },
 } as const;
