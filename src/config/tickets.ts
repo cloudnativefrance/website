@@ -109,7 +109,6 @@ export interface TicketingConfig {
   invoice: Maybe<Localized>;
   transferAndRefund: Maybe<Localized>;
   termsUrl: Maybe<string>;
-  managerKitUrl: Maybe<string>;
   programmeAnnouncement: Maybe<Localized>;
 }
 
@@ -193,10 +192,6 @@ export const TICKETING: TicketingConfig = {
   invoice: tbd("Facture au nom de la société, devis, virement (question à JC)"),
   transferAndRefund: tbd("Annulation et changement de nom"),
   termsUrl: tbd("Lien vers les conditions générales de vente"),
-  managerKitUrl: tbd(
-    "Kit « convaincre son manager » (planifié) — URL bidon en attendant",
-    "#convaincre",
-  ),
   programmeAnnouncement: tbd("Date publique d'annonce du programme", {
     fr: "en mars 2027",
     en: "in March 2027",

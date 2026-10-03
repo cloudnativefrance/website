@@ -240,9 +240,9 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
     expect(text.includes("Billet standard, par place")).toBe(selling);
   });
 
-  it("leaves the manager kit as the whole bottom section, in every phase", () => {
-    expect(main).toContain('id="convaincre"');
-    expect(text).toContain("Un kit pour convaincre votre manager");
+  it("has no manager section and no second price list down the page", () => {
+    expect(main).not.toContain('id="convaincre"');
+    expect(text).not.toMatch(/convaincre votre manager/i);
     expect(text).not.toContain("Chacun prend sa place");
     expect(text).not.toContain("Vous commandez en ligne");
   });
@@ -357,13 +357,6 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
     // What is left is still the page, not a shell.
     expect(text).toContain("Ce que comprend votre billet");
     expect(text).toContain("Questions fréquentes");
-  });
-
-  it("keeps the manager kit box, linked to its draft URL", () => {
-    expect(text).toContain("Un kit pour convaincre votre manager");
-    expect(main).toMatch(
-      /<a\b[^>]*href="#convaincre"[^>]*data-umami-event="tickets-manager-kit"/,
-    );
   });
 
   it("carries no proof section and no inclusion footer — the FAQ answers that", () => {

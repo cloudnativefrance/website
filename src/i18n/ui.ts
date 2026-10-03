@@ -452,17 +452,6 @@ export const ui = {
     "tickets.team.rate.10_plus": "10 personnes et plus",
     "tickets.team.cta.group": "Demander mon tarif de groupe",
     "tickets.team.title": "Venir en équipe",
-    // The bottom section, in every phase: the group rates live in door 2 alone,
-    // so what is left down the page is the argument kit, and it says so.
-    "tickets.team.convince.title": "Convaincre votre manager",
-    "tickets.team.convince.lead":
-      "La personne qui décide n'est pas toujours celle qui vient. De quoi lui donner les arguments, dès maintenant.",
-    "tickets.team.programme":
-      "Le programme 2027 sera publié {when}. Pour convaincre dès maintenant, les replays 2026 sont en ligne.",
-    "tickets.team.kit.title": "Un kit pour convaincre votre manager",
-    "tickets.team.kit.body":
-      "Programme, arguments et budget, à transférer tel quel.",
-    "tickets.team.kit.cta": "Ouvrir le kit",
     "tickets.team.mail.subject": "Billets de groupe CND France 2027",
     "tickets.team.mail.body":
       "Bonjour,\n\nNous souhaitons venir à plusieurs à CND France 2027.\n\nSociété\u00a0:\nNombre de participant(e)s\u00a0:\nBesoin (devis, facture, virement)\u00a0:\nContact\u00a0:\n",
@@ -963,17 +952,6 @@ export const ui = {
     "tickets.team.rate.10_plus": "10 people or more",
     "tickets.team.cta.group": "Ask for my group rate",
     "tickets.team.title": "Coming as a team",
-    // The bottom section, in every phase: the group rates live in door 2 alone,
-    // so what is left down the page is the argument kit, and it says so.
-    "tickets.team.convince.title": "Convince your manager",
-    "tickets.team.convince.lead":
-      "The person who decides is not always the one who attends. Here is what to hand them, today.",
-    "tickets.team.programme":
-      "The 2027 programme will be published {when}. To make the case today, the 2026 replays are online.",
-    "tickets.team.kit.title": "A kit to convince your manager",
-    "tickets.team.kit.body":
-      "Programme, arguments and budget, ready to forward as is.",
-    "tickets.team.kit.cta": "Open the kit",
     "tickets.team.mail.subject": "Group tickets CND France 2027",
     "tickets.team.mail.body":
       "Hello,\n\nWe would like to come to CND France 2027 as a group.\n\nCompany:\nNumber of attendees:\nNeeds (quote, invoice, bank transfer):\nContact:\n",

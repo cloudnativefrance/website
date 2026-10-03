@@ -43,7 +43,6 @@ import CodeDoor from "./CodeDoor.astro";
 import PurchaseControl from "./PurchaseControl.astro";
 import StrategicOffer from "./StrategicOffer.astro";
 import IncludedInTicket from "./IncludedInTicket.astro";
-import TeamOffer from "./TeamOffer.astro";
 import TicketsFaq from "./TicketsFaq.astro";
 import StickyTicketBar from "./StickyTicketBar.astro";
 
@@ -242,14 +241,6 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
     <IncludedInTicket
       lang={lang}
       eveningDetails={shown(config.eveningDetails)?.[lang]}
-    />
-  </div>
-
-  <div class="mx-auto max-w-7xl px-4 pb-20 md:px-6 md:pb-24 lg:px-8">
-    <TeamOffer
-      lang={lang}
-      programmeWhen={programmeWhen}
-      kitUrl={shown(config.managerKitUrl)}
     />
   </div>
 

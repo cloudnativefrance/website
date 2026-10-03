@@ -469,7 +469,6 @@ describe("drafts", () => {
       "strategic.trackUrl",
       "contents",
       "eveningIncluded",
-      "managerKitUrl",
       "programmeAnnouncement",
     ]);
   });
@@ -489,7 +488,7 @@ describe("onHost", () => {
         "billetterie.cloudnativedays.fr",
       ),
     ).toBe(false);
-    expect(onHost("#convaincre", "billetterie.cloudnativedays.fr")).toBe(false);
+    expect(onHost("#equipe", "billetterie.cloudnativedays.fr")).toBe(false);
   });
 });
 
