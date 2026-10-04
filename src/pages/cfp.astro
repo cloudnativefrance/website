@@ -1,9 +1,12 @@
 ---
+import { Picture } from "astro:assets";
 import Layout from "@/layouts/Layout.astro";
 import { useTranslations } from "@/i18n/utils";
 import { FLAGS } from "@/config/flags";
 import { getFlagState } from "@/lib/flags";
 import { cfpEventUrl, cfpEventLabel } from "@/lib/pretalx";
+import intervenantPhoto from "@/assets/photos/contact/intervenants.jpg";
+import participantPhoto from "@/assets/photos/contact/participant.jpg";
 
 const lang = "fr";
 const t = useTranslations(lang);
@@ -93,27 +96,41 @@ const criteria = [
     )}
     {cfpState === "active" && (
     <>
-    <section class="mx-auto max-w-5xl px-4 md:px-6 pt-16 md:pt-24 pb-10 md:pb-12">
-      <span class="inline-flex items-center rounded-full bg-accent/15 text-accent px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-        CFP 2027 — ouvert
-      </span>
-      <h1 class="mt-5 text-4xl md:text-6xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
-        Proposez une intervention
-      </h1>
-      <p class="mt-4 text-base md:text-lg text-muted-foreground">
-        Une journée. 7 thèmes. 3 formats. Et votre voix.
-      </p>
-      <a
-        href={CFP_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="mt-8 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-base font-semibold px-6 h-12 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      >
-        Soumettre une proposition <span aria-hidden="true">→</span>
-      </a>
-      <p class="mt-4 text-sm text-muted-foreground">
-        3 juin 2027 · CENTQUATRE-PARIS · au cœur de la communauté francophone du Cloud Native
-      </p>
+    <section class="mx-auto max-w-6xl px-4 md:px-6 pt-16 md:pt-24 pb-10 md:pb-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+        <div>
+          <span class="inline-flex items-center rounded-full bg-accent/15 text-accent px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+            CFP 2027 — ouvert
+          </span>
+          <h1 class="mt-5 text-4xl md:text-6xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+            Proposez une intervention
+          </h1>
+          <p class="mt-4 text-base md:text-lg text-muted-foreground">
+            Une journée. 7 thèmes. 3 formats. Et votre voix.
+          </p>
+          <a
+            href={CFP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="mt-8 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-base font-semibold px-6 h-12 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            Soumettre une proposition <span aria-hidden="true">→</span>
+          </a>
+          <p class="mt-4 text-sm text-muted-foreground">
+            3 juin 2027 · CENTQUATRE-PARIS · au cœur de la communauté francophone du Cloud Native
+          </p>
+        </div>
+        <Picture
+          src={intervenantPhoto}
+          alt="Intervenant(e) sur scène à Cloud Native Days France 2026"
+          widths={[400, 600, 800, 1200]}
+          sizes="(min-width: 768px) 45vw, 100vw"
+          formats={["avif", "webp"]}
+          loading="eager"
+          decoding="async"
+          class="w-full aspect-[4/3] object-cover rounded-lg border border-border"
+        />
+      </div>
     </section>
 
     <section class="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
@@ -232,19 +249,31 @@ const criteria = [
     </section>
 
     <section class="mt-8 bg-card border-y border-border">
-      <div class="mx-auto max-w-6xl px-4 md:px-6 py-12 md:py-16">
-        <h2 class="text-2xl md:text-3xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
-          Soumettez votre proposition
-        </h2>
-        <a
-          href={CFP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="mt-8 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-base md:text-lg font-semibold px-8 h-14 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        >
-          Proposer une intervention <span aria-hidden="true">→</span>
-        </a>
-        <p class="mt-4 text-xs text-muted-foreground">{CFP_LABEL}</p>
+      <div class="mx-auto max-w-6xl px-4 md:px-6 py-12 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+        <div>
+          <h2 class="text-2xl md:text-3xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+            Soumettez votre proposition
+          </h2>
+          <a
+            href={CFP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="mt-8 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-base md:text-lg font-semibold px-8 h-14 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            Proposer une intervention <span aria-hidden="true">→</span>
+          </a>
+          <p class="mt-4 text-xs text-muted-foreground">{CFP_LABEL}</p>
+        </div>
+        <Picture
+          src={participantPhoto}
+          alt="Participantes et participants à Cloud Native Days France 2026"
+          widths={[400, 600, 800, 1200]}
+          sizes="(min-width: 768px) 45vw, 100vw"
+          formats={["avif", "webp"]}
+          loading="lazy"
+          decoding="async"
+          class="w-full aspect-[4/3] object-cover rounded-lg border border-border"
+        />
       </div>
     </section>
     </>
