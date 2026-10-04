@@ -200,27 +200,32 @@ const criteria = [
       <p class="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">
         Notre comité de sélection — bénévoles de l'organisation CND France et membres reconnus des communautés cloud native francophones — privilégiera les propositions qui&nbsp;:
       </p>
-      <ul role="list" class="mt-6 grid sm:grid-cols-2 gap-x-8 gap-y-4">
+      <ul role="list" class="mt-6 grid sm:grid-cols-2 gap-x-8 gap-y-5">
         {criteria.map((c) => (
-          <li class="flex items-start gap-3">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="shrink-0 mt-0.5 text-primary"
-              aria-hidden="true"
-            >
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span class="text-base text-muted-foreground leading-relaxed">
-              <span class="font-semibold text-foreground">{c.key}</span> — {c.body}
-            </span>
+          <li>
+            <div class="flex items-start gap-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="shrink-0 mt-0.5 text-primary"
+                aria-hidden="true"
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <p class="text-base md:text-lg font-bold text-foreground tracking-tight">
+                {c.key}
+              </p>
+            </div>
+            <p class="ms-[34px] mt-1 text-sm md:text-base text-muted-foreground leading-relaxed">
+              {c.body}
+            </p>
           </li>
         ))}
       </ul>
