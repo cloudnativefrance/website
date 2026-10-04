@@ -101,7 +101,7 @@ const criteria = [
         Proposez une intervention
       </h1>
       <p class="mt-4 text-base md:text-lg text-muted-foreground">
-        Une journée. 7 parcours. 3 formats. Et votre voix.
+        Une journée. 7 thèmes. 3 formats. Et votre voix.
       </p>
       <a
         href={CFP_URL}
@@ -116,39 +116,39 @@ const criteria = [
       </p>
     </section>
 
-    <section class="mx-auto max-w-7xl px-4 md:px-6 py-10 md:py-12">
+    <section class="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
       <h2 class="text-2xl md:text-3xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
-        Les 7 parcours
+        Les 7 thèmes
       </h2>
       <p class="mt-2 text-sm md:text-base text-muted-foreground">
-        Choisissez le territoire de votre sujet.
+        Choisissez le terrain de votre sujet.
       </p>
       <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {parcours.map((th) => (
-          <article class="flex flex-col rounded-lg border border-border bg-card p-5 transition-colors hover:border-primary/60">
-            <div class="inline-flex items-center justify-center w-10 h-10 rounded-full text-xl bg-primary/10" aria-hidden="true">
-              {th.emoji}
+          <article class="rounded-lg border border-border bg-card p-4 md:p-5 transition-colors hover:border-primary/60">
+            <div class="flex items-center gap-3">
+              <div class="inline-flex items-center justify-center w-9 h-9 rounded-full text-lg bg-primary/10 shrink-0" aria-hidden="true">
+                {th.emoji}
+              </div>
+              <h3 class="text-base md:text-lg font-bold text-foreground tracking-tight">
+                {th.title}
+              </h3>
             </div>
-            <h3 class="mt-3 text-lg md:text-xl font-bold text-foreground tracking-tight">
-              {th.title}
-            </h3>
             <p class="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">
               {th.body}
             </p>
           </article>
         ))}
-        <article class="sm:col-span-2 lg:col-span-3 flex items-start gap-4 rounded-lg border border-accent/60 bg-card p-5 transition-colors hover:border-accent">
-          <div class="inline-flex items-center justify-center w-10 h-10 rounded-full text-xl bg-accent/15 shrink-0" aria-hidden="true">
+        <article class="sm:col-span-2 lg:col-span-3 flex flex-wrap items-center gap-4 rounded-lg border border-accent/60 bg-card p-4 md:p-5 transition-colors hover:border-accent">
+          <div class="inline-flex items-center justify-center w-9 h-9 rounded-full text-lg bg-accent/15 shrink-0" aria-hidden="true">
             {horsPiste.emoji}
           </div>
-          <div>
-            <h3 class="text-lg md:text-xl font-bold text-foreground tracking-tight">
-              {horsPiste.title}
-            </h3>
-            <p class="mt-1 text-sm md:text-base text-muted-foreground leading-relaxed">
-              {horsPiste.body}
-            </p>
-          </div>
+          <h3 class="text-base md:text-lg font-bold text-foreground tracking-tight shrink-0">
+            {horsPiste.title}
+          </h3>
+          <p class="flex-1 min-w-0 text-sm md:text-base text-muted-foreground leading-relaxed">
+            {horsPiste.body}
+          </p>
         </article>
       </div>
     </section>
