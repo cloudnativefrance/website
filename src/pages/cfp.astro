@@ -159,14 +159,19 @@ const criteria = [
           <h3 class="text-xl font-bold text-foreground tracking-tight">
             Les formats
           </h3>
-          <ul role="list" class="mt-5 space-y-4">
+          <ul role="list" class="mt-5 space-y-5">
             {formats.map((f) => (
-              <li class="flex items-start gap-3">
-                <span class="self-start shrink-0 inline-flex items-center rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-bold">
-                  {f.duration}
-                </span>
-                <p class="text-sm md:text-base text-muted-foreground leading-relaxed">
-                  <strong class="font-semibold text-foreground">{f.title}</strong> — {f.body}
+              <li>
+                <div class="flex items-center gap-3">
+                  <span class="shrink-0 inline-flex items-center rounded-full bg-primary/10 text-primary px-3 py-1.5 text-xs md:text-sm font-bold">
+                    {f.duration}
+                  </span>
+                  <h4 class="text-base md:text-lg font-bold text-foreground tracking-tight">
+                    {f.title}
+                  </h4>
+                </div>
+                <p class="mt-1.5 text-sm md:text-base text-muted-foreground leading-relaxed">
+                  {f.body}
                 </p>
               </li>
             ))}
@@ -179,9 +184,6 @@ const criteria = [
           <ul role="list" class="mt-5 space-y-4">
             <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
               <span aria-hidden="true">🇫🇷</span> Toutes les présentations se déroulent <strong class="font-semibold text-foreground">en français</strong> — slides en anglais acceptés si cela facilite votre préparation.
-            </li>
-            <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
-              Des <strong class="font-semibold text-foreground">start-ups</strong> aux <strong class="font-semibold text-foreground">grands groupes</strong> : une audience de pairs qui rencontrent les mêmes défis que vous.
             </li>
             <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
               <strong class="font-semibold text-foreground">Nos valeurs</strong> : <span aria-hidden="true">❤️</span> Communauté · <span aria-hidden="true">🌍</span> Inclusion &amp; diversité · <span aria-hidden="true">🌱</span> Écologie · <span aria-hidden="true">🇫🇷</span> Autonomie numérique

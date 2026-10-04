@@ -167,14 +167,19 @@ const criteria = [
           <h3 class="text-xl font-bold text-foreground tracking-tight">
             The formats
           </h3>
-          <ul role="list" class="mt-5 space-y-4">
+          <ul role="list" class="mt-5 space-y-5">
             {formats.map((f) => (
-              <li class="flex items-start gap-3">
-                <span class="self-start shrink-0 inline-flex items-center rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-bold">
-                  {f.duration}
-                </span>
-                <p class="text-sm md:text-base text-muted-foreground leading-relaxed">
-                  <strong class="font-semibold text-foreground">{f.title}</strong> — {f.body}
+              <li>
+                <div class="flex items-center gap-3">
+                  <span class="shrink-0 inline-flex items-center rounded-full bg-primary/10 text-primary px-3 py-1.5 text-xs md:text-sm font-bold">
+                    {f.duration}
+                  </span>
+                  <h4 class="text-base md:text-lg font-bold text-foreground tracking-tight">
+                    {f.title}
+                  </h4>
+                </div>
+                <p class="mt-1.5 text-sm md:text-base text-muted-foreground leading-relaxed">
+                  {f.body}
                 </p>
               </li>
             ))}
@@ -187,9 +192,6 @@ const criteria = [
           <ul role="list" class="mt-5 space-y-4">
             <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
               <span aria-hidden="true">🇫🇷</span> All talks are <strong class="font-semibold text-foreground">in French</strong> — English slides accepted if that makes prep easier.
-            </li>
-            <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
-              From <strong class="font-semibold text-foreground">start-ups</strong> to <strong class="font-semibold text-foreground">enterprises</strong>: an audience of peers who face the same challenges you do.
             </li>
             <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
               <strong class="font-semibold text-foreground">Our values</strong>: <span aria-hidden="true">❤️</span> Community · <span aria-hidden="true">🌍</span> Inclusion &amp; diversity · <span aria-hidden="true">🌱</span> Ecology · <span aria-hidden="true">🇫🇷</span> Digital sovereignty
