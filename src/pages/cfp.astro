@@ -13,16 +13,17 @@ const CFP_URL = cfpEventUrl();
 const CFP_LABEL = cfpEventLabel();
 
 const audiencePills = [
-  "Developers",
-  "Quality Engineers",
-  "SREs",
-  "Architectes",
-  "Software Engineers",
-  "Cloud Engineers",
   "Platform Engineers",
+  "SREs",
+  "MLOps",
+  "AI Engineers",
+  "Software Engineers",
+  "Architectes",
   "Product Managers",
   "Project Managers",
-  "CTOs",
+  "DSI",
+  "VPs & CTOs",
+  "Tech leaders",
 ];
 
 const formats = [
@@ -45,38 +46,41 @@ const formats = [
 
 const themes = [
   {
-    emoji: "🛠️",
-    title: "Infrastructure & Opérations",
-    body: "Orchestration, automatisation, gestion des coûts, supervision. Mise à l'échelle, résilience et optimisation de l'infrastructure Cloud.",
+    emoji: "🔓",
+    title: "Autonomie numérique et Open Source",
+    body: "Maîtriser sa dépendance : souveraineté des données, alternatives ouvertes, contribution amont, et le coût réel de la réversibilité.",
   },
   {
     emoji: "🎯",
-    title: "Developer Experience",
-    body: "Outils, pratiques innovantes et plateformes internes. Le Platform Engineering pour rendre les équipes plus autonomes.",
-  },
-  {
-    emoji: "🛡️",
-    title: "Réseau & Sécurité",
-    body: "Connectivité, conformité, protection des données dans le cloud. Risques cyber et solutions associées.",
+    title: "DevEx et Platform Engineering",
+    body: "Construire une plateforme que les équipes choisissent d'utiliser : golden paths, self-service, et la mesure de ce qui leur fait réellement gagner du temps.",
   },
   {
     emoji: "🤖",
-    title: "AI & Data",
-    body: "Intégration de l'IA dans nos outils et plateformes. Traitement des données dans les architectures Cloud Native.",
+    title: "L'IA à l'épreuve du réel",
+    body: "Ce que l'IA change vraiment en production : coûts, latence, données, garde-fous. Des retours d'expérience plutôt que des démos.",
+  },
+  {
+    emoji: "🔭",
+    title: "Observabilité et fiabilité",
+    body: "Comprendre un système en production : des signaux utiles plutôt que des tableaux de bord, des SLO tenables, et ce qu'on apprend d'un incident.",
+  },
+  {
+    emoji: "🛡️",
+    title: "Sécurité et confiance",
+    body: "Sécuriser sans bloquer : chaîne d'approvisionnement, secrets, identités et conformité, intégrés au travail des équipes plutôt qu'ajoutés après.",
+  },
+  {
+    emoji: "🧱",
+    title: "Fondations: Infrastructure, données, réseau",
+    body: "Les couches sur lesquelles tout repose : Kubernetes, stockage, réseau, bases de données — leur exploitation au quotidien et à l'échelle.",
   },
   {
     emoji: "🚀",
-    title: "Autres sujets & Crazy Stuff",
-    body: "Une idée hors des sentiers battus ? Une expérimentation audacieuse ? Surprenez-nous !",
+    title: "Hors pistes, sujets divers",
+    body: "Ce qui n'entre nulle part ailleurs et mérite d'être entendu : expérimentations, angles inattendus, et le retour d'expérience qu'on n'ose pas raconter.",
     accent: true,
   },
-];
-
-const values = [
-  { emoji: "❤️", label: "Communautés", body: "Entraide et bienveillance." },
-  { emoji: "🌍", label: "Inclusion & diversité", body: "Toutes les voix comptent." },
-  { emoji: "🌱", label: "Écologie", body: "Pratiques plus durables." },
-  { emoji: "🇫🇷", label: "Autonomie numérique", body: "Open source et souveraineté." },
 ];
 
 const criteria = [
@@ -108,7 +112,7 @@ const criteria = [
         Proposez une intervention
       </h1>
       <p class="mt-5 text-base md:text-lg text-muted-foreground">
-        Une journée. 5 thèmes. 3 formats. Et votre voix.
+        Une journée. 7 parcours. 3 formats. Et votre voix.
       </p>
       <div class="mt-8 flex justify-center">
         <a
@@ -120,16 +124,8 @@ const criteria = [
           Soumettre une proposition <span aria-hidden="true">→</span>
         </a>
       </div>
-    </section>
-
-    <section class="mx-auto max-w-3xl px-4 md:px-6 py-10 md:py-14 text-center">
-      <p class="text-base md:text-lg leading-relaxed text-muted-foreground">
-        Nous sommes ravi(e)s de vous ouvrir les portes de notre <span class="font-semibold text-foreground">CFP</span>
-        pour le <span class="font-semibold text-foreground">Cloud Native Days France 2026</span> ! 🎉
-      </p>
-      <p class="mt-4 text-base md:text-lg leading-relaxed text-muted-foreground">
-        Cet événement est avant tout une célébration de la communauté francophone du <span class="font-semibold text-foreground">Cloud Native</span> —
-        un lieu d'échange et de partage où chacun(e) peut apprendre et s'inspirer.
+      <p class="mt-6 text-sm md:text-base text-muted-foreground">
+        Le CFP du <span class="font-semibold text-foreground">Cloud Native Days France 2027</span> est ouvert — une journée au CENTQUATRE-PARIS, le 3 juin 2027, au cœur de la communauté francophone du Cloud Native.
       </p>
     </section>
 
@@ -150,8 +146,7 @@ const criteria = [
         ))}
       </ul>
       <p class="mt-8 text-base md:text-lg text-muted-foreground text-center max-w-3xl mx-auto leading-relaxed">
-        Des <span class="font-semibold text-foreground">start-ups dynamiques</span> aux <span class="font-semibold text-foreground">grands groupes établis</span>,
-        en passant par les <span class="font-semibold text-foreground">PME innovantes</span> — votre présentation sera entendue par des pairs qui rencontrent des défis similaires et qui sont avides de nouvelles solutions.
+        Des <span class="font-semibold text-foreground">start-ups</span> aux <span class="font-semibold text-foreground">grands groupes</span> — votre présentation sera entendue par des pairs qui rencontrent les mêmes défis que vous.
       </p>
     </section>
 
@@ -177,17 +172,14 @@ const criteria = [
           </article>
         ))}
       </div>
-      <p class="mt-8 text-center text-sm md:text-base text-muted-foreground italic">
-        Quel que soit le format choisi, votre enthousiasme sera contagieux.
-      </p>
     </section>
 
     <section class="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
       <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
-        Thèmes
+        Parcours
       </p>
       <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight text-center" style="letter-spacing:-0.02em;">
-        Cinq territoires
+        Sept parcours
       </h2>
       <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {themes.map((th) => (
@@ -219,25 +211,9 @@ const criteria = [
       </div>
     </section>
 
-    <section class="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
-      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
-        Nos valeurs
-      </p>
-      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight text-center" style="letter-spacing:-0.02em;">
-        Au cœur de l'événement
-      </h2>
-      <ul role="list" class="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        {values.map((v) => (
-          <li class="flex flex-col items-center text-center px-2">
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-2xl" aria-hidden="true">
-              {v.emoji}
-            </div>
-            <p class="mt-3 text-base font-semibold text-foreground">{v.label}</p>
-            <p class="mt-1 text-sm text-muted-foreground leading-snug">{v.body}</p>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <p class="py-10 md:py-14 px-4 md:px-6 text-center text-sm md:text-base text-muted-foreground">
+      <span aria-hidden="true">❤️</span> Communauté · <span aria-hidden="true">🌍</span> Inclusion &amp; diversité · <span aria-hidden="true">🌱</span> Écologie · <span aria-hidden="true">🇫🇷</span> Autonomie numérique
+    </p>
 
     <section class="mx-auto max-w-3xl px-4 md:px-6 py-16 md:py-20">
       <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -247,7 +223,7 @@ const criteria = [
         Nos critères
       </h2>
       <p class="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">
-        Notre comité de sélection — bénévoles de l'organisation CND France et représentant(e)s des communautés francophones de nombreuses régions françaises et du Luxembourg — privilégiera les propositions qui&nbsp;:
+        Notre comité de sélection — bénévoles de l'organisation CND France et membres reconnus des communautés cloud native francophones — privilégiera les propositions qui&nbsp;:
       </p>
       <ul role="list" class="mt-8 space-y-4">
         {criteria.map((c) => (
