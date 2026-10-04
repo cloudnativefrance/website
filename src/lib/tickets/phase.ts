@@ -56,7 +56,7 @@ export function tierStates(
 export interface TierUrgency {
   /** ISO end date; undefined on the last tier. */
   endsAt?: string;
-  /** The tier also closes when its quota runs out: "Stock limité". */
+  /** The tier also closes when its quota runs out: "Places limitées". */
   limitedStock: boolean;
   /** Nothing follows it: "Dernières places". */
   lastTier: boolean;

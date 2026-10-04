@@ -32,16 +32,20 @@ describe("TicketsFaq", () => {
     expect(item).toMatch(
       /Le parcours Stratégie (&amp;|&) Leadership est-il réservé au billet Nom décidé/,
     );
-    expect(item).toContain("Ses talks sont ouverts à tous les billets");
-    expect(item).toContain("Le billet Nom décidé y donne un accès prioritaire");
+    expect(item).toContain("ses talks sont ouverts à tous les participant(e)s");
+    expect(item).toContain(
+      "Le billet Nom décidé y ajoute un accès prioritaire",
+    );
   });
 
   it("leaves an undecided answer out, or on its waiting copy", async () => {
     const html = await render({});
     expect(html).not.toContain("Taux de TVA");
     expect(html).not.toContain("Conditions générales de vente");
-    expect(html).toContain("Nous le vérifions avec notre billetterie");
-    expect(html).toContain("en cours de validation");
+    expect(html).toContain(
+      "On vérifie ce que permet notre outil de billetterie",
+    );
+    expect(html).toContain("On finalise les conditions");
     expect(html).not.toContain("Quand le programme sera-t-il publié");
   });
 
@@ -57,9 +61,9 @@ describe("TicketsFaq", () => {
     expect(html).toContain(
       "Oui, la facture est émise au nom de votre société.",
     );
-    expect(html).not.toContain("Nous le vérifions");
+    expect(html).not.toContain("On vérifie ce que permet");
     expect(html).toContain("Le changement de nom est gratuit.");
-    expect(html).not.toContain("en cours de validation");
+    expect(html).not.toContain("On finalise les conditions");
     expect(html).toMatch(
       /<a\b[^>]*href="https:\/\/cloudnativedays\.fr\/cgv"[^>]*>\s*Conditions générales de vente/,
     );

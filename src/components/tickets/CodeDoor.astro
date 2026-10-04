@@ -11,12 +11,10 @@
  * a new tab (support to confirm with JC); `tickets-ui.ts` upgrades it to
  * `/code/<CODE>` (a new tab too, `openInNewTab`), strips whitespace and
  * refuses an empty code with a message.
- * The hand-off to the ticketing host is announced before the click.
  */
 import type { TierId } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
-import { fill } from "@/lib/tickets/format";
 import Icon from "./Icon.astro";
 
 interface Props {
@@ -24,10 +22,9 @@ interface Props {
   phase: TierId;
   listingUrl: string;
   fallback: { action: string; param: "code" };
-  host: string;
 }
 
-const { lang, phase, listingUrl, fallback, host } = Astro.props;
+const { lang, phase, listingUrl, fallback } = Astro.props;
 const t = useTranslations(lang);
 ---
 
@@ -58,10 +55,7 @@ const t = useTranslations(lang);
       {t("tickets.code.intro")}
       <span class="sr-only">{t("tickets.code.label")}</span>
     </label>
-    {
-      /* A code is short: the field keeps a sensible width and the hand-off
-        note takes the rest of the row rather than trailing under it. */
-    }
+    {/* A code is short: the field keeps a sensible width. */}
     <div class="flex flex-col gap-2 lg:max-w-md lg:min-w-0 lg:flex-1">
       <div class="flex flex-col gap-2 min-[380px]:flex-row">
         <input
@@ -73,7 +67,6 @@ const t = useTranslations(lang);
           spellcheck="false"
           enterkeyhint="go"
           placeholder={t("tickets.code.label")}
-          aria-describedby="ticket-code-handoff"
           class="border-input bg-background text-foreground caret-primary placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/40 aria-invalid:border-destructive-strong aria-invalid:ring-destructive/20 h-11 min-w-0 flex-1 rounded-lg border px-3 text-base transition-[border-color,box-shadow] duration-150 focus-visible:ring-3 focus-visible:outline-none aria-invalid:ring-3"
           data-code-input
         />
@@ -103,11 +96,5 @@ const t = useTranslations(lang);
         {t("tickets.code.empty")}
       </p>
     </div>
-    <p
-      id="ticket-code-handoff"
-      class="text-muted-foreground text-sm text-pretty lg:max-w-[34ch]"
-    >
-      {fill(t("tickets.code.handoff"), { host })}
-    </p>
   </form>
 </article>

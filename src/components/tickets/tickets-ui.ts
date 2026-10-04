@@ -23,7 +23,8 @@ for (const form of document.querySelectorAll<HTMLFormElement>(
   const clearError = () => {
     error.hidden = true;
     input.removeAttribute("aria-invalid");
-    input.setAttribute("aria-describedby", describedBy);
+    if (describedBy) input.setAttribute("aria-describedby", describedBy);
+    else input.removeAttribute("aria-describedby");
   };
 
   form.addEventListener("submit", (event) => {

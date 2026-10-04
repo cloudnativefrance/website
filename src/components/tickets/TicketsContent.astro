@@ -149,7 +149,7 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
         <p class="text-foreground text-lg font-semibold text-pretty sm:text-xl">
           {when.before}<span class="whitespace-nowrap">{when.venue}</span>{
             when.after
-          }, {t("tickets.when_evening")}
+          }
         </p>
         <p
           class="text-muted-foreground max-w-[58ch] text-base text-pretty sm:text-lg"
@@ -230,7 +230,6 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
             phase={phase}
             listingUrl={listingUrl(config)}
             fallback={codeFallbackAction(config)}
-            host={host}
           />
         </div>
       </div>

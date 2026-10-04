@@ -102,7 +102,7 @@ export interface TicketingConfig {
   strategic: StrategicTicket;
   /** The contents list on the page, pending the evening team: `true` once confirmed. */
   contents: Maybe<true>;
-  /** "Soirée comprise" on the page — to confirm with the evening team: `true` once confirmed. */
+  /** "La soirée est comprise", in the ticket contents — to confirm with the evening team: `true` once confirmed. */
   eveningIncluded: Maybe<true>;
   eveningDetails: Maybe<Localized>;
   vatRate: Maybe<string>;

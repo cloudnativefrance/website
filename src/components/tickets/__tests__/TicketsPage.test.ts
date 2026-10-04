@@ -131,7 +131,7 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
       .trim();
     expect(pill).toBe(
       early
-        ? "Stock limité"
+        ? "Places limitées"
         : phase === "last_chance"
           ? "Dernières places"
           : undefined,
@@ -140,7 +140,7 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
       main.indexOf("data-tier-ladder"),
       main.indexOf("</ol>", main.indexOf("data-tier-ladder")),
     );
-    expect(visibleText(ladder)).not.toContain("Stock limité");
+    expect(visibleText(ladder)).not.toContain("Places limitées");
     expect(ladder).not.toContain("Dernières places");
     expect(text.includes("ou épuisement")).toBe(early);
   });
@@ -287,10 +287,10 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
     expect(ticket).toContain('data-strategic-price="299"');
     expect(ticket).not.toMatch(/data-tier|data-offer-pill|data-offer-deadline/);
     expect(visibleText(ticket)).not.toMatch(
-      /Stock limité|Dernières places|Épuisé/,
+      /Places limitées|Dernières places|Épuisé/,
     );
     expect(visibleText(ticket)).toContain(
-      "Tout le billet standard, plus un accès prioritaire",
+      "Tout ce que comprend le billet standard, avec en plus un accès prioritaire",
     );
     expect(ticket).toMatch(/<a\b[^>]*href="\/track-strategie-leadership"/);
     // The page's own action, and the very same button as the standard ticket's.
@@ -325,7 +325,7 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
     expect(text).toMatch(
       /Le parcours Stratégie (&amp;|&) Leadership est-il réservé au billet Stratégie (&amp;|&) Leadership/,
     );
-    expect(text).toContain("Ses talks sont ouverts à tous les billets");
+    expect(text).toContain("ses talks sont ouverts à tous les participant(e)s");
   });
 
   it("names the standard ticket and its tier in the mobile bar", () => {
@@ -353,7 +353,7 @@ describe.each(SELLING_PHASES)("phase %s", (phase) => {
     expect(text).toContain("Billet standard");
     expect(text).toMatch(/Billet Stratégie (&amp;|&) Leadership/);
     expect(text).toContain("en mars 2027");
-    expect(text).toContain("soirée comprise");
+    expect(text).toContain("la soirée est comprise");
     // What is left is still the page, not a shell.
     expect(text).toContain("Ce que comprend votre billet");
     expect(text).toContain("Questions fréquentes");
