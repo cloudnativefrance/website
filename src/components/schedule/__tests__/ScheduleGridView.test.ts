@@ -75,7 +75,7 @@ function cellsByColumn(html: string): Map<number, Cell> {
 async function renderGrid(sessions: SessionRow[]) {
   const container = await AstroContainer.create();
   return container.renderToString(ScheduleGridView, {
-    props: { sessions, lang: "fr", speakerInfo: new Map() },
+    props: { sessions, lang: "fr", speakerInfo: new Map(), year: 2027 as const },
   });
 }
 
@@ -143,5 +143,17 @@ describe("ScheduleGridView — room cell placement", () => {
     // ...and end on strictly increasing ones. Equal spans is the old bug.
     expect(span(2)).toBeLessThan(span(3));
     expect(span(3)).toBeLessThan(span(4));
+  });
+
+  it("labels a designated room under its name, and leaves the others bare", () => {
+    // Editorial, not derived: in an early programme every room holds one
+    // track, so inferring "this room is the X track" from the sessions would
+    // badge all of them. Eiffel is the strategy room whatever is booked into
+    // it, so the note comes from an i18n key an organiser writes.
+    return renderGrid([row({ room: "Eiffel" }), row({ id: "B", room: "Monet" })]).then((html) => {
+      expect(html).toMatch(/grid-view-room-note[^>]*>[^<]*Strat/);
+      const monet = html.slice(html.indexOf('>Monet<') - 400, html.indexOf('>Monet<'));
+      expect(monet, "an ordinary room carries no note").not.toContain("grid-view-room-note");
+    });
   });
 });
