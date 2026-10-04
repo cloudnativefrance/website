@@ -12,20 +12,6 @@ const cfpState = getFlagState(FLAGS.cfp);
 const CFP_URL = cfpEventUrl();
 const CFP_LABEL = cfpEventLabel();
 
-const audiencePills = [
-  "Platform Engineers",
-  "SREs",
-  "MLOps",
-  "AI Engineers",
-  "Software Engineers",
-  "Architectes",
-  "Product Managers",
-  "Project Managers",
-  "DSI",
-  "VPs & CTOs",
-  "Tech leaders",
-];
-
 const formats = [
   {
     duration: "10 min",
@@ -44,7 +30,7 @@ const formats = [
   },
 ];
 
-const themes = [
+const parcours = [
   {
     emoji: "🔓",
     title: "Autonomie numérique et Open Source",
@@ -75,13 +61,13 @@ const themes = [
     title: "Fondations: Infrastructure, données, réseau",
     body: "Les couches sur lesquelles tout repose : Kubernetes, stockage, réseau, bases de données — leur exploitation au quotidien et à l'échelle.",
   },
-  {
-    emoji: "🚀",
-    title: "Hors pistes, sujets divers",
-    body: "Ce qui n'entre nulle part ailleurs et mérite d'être entendu : expérimentations, angles inattendus, et le retour d'expérience qu'on n'ose pas raconter.",
-    accent: true,
-  },
 ];
+
+const horsPiste = {
+  emoji: "🚀",
+  title: "Hors pistes, sujets divers",
+  body: "Ce qui n'entre nulle part ailleurs et mérite d'être entendu : expérimentations, angles inattendus, et le retour d'expérience qu'on n'ose pas raconter.",
+};
 
 const criteria = [
   { key: "Retours d'expérience", body: "concrets sur l'application des technologies Cloud Native." },
@@ -96,7 +82,7 @@ const criteria = [
 <Layout title={cfpState === "active" ? "Appel à conférences (CFP)" : t("cfp.closed_for_now.title")} description="Cloud Native Days France — Call for Papers." lang={lang}>
   <main>
     {cfpState !== "active" && (
-      <section class="mx-auto max-w-2xl px-4 md:px-6 pt-24 md:pt-32 pb-24 md:pb-32 text-center">
+      <section class="mx-auto max-w-2xl px-4 md:px-6 pt-24 md:pt-32 pb-24 md:pb-32">
         <h1 class="text-4xl md:text-5xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
           {t("cfp.closed_for_now.title")}
         </h1>
@@ -107,100 +93,43 @@ const criteria = [
     )}
     {cfpState === "active" && (
     <>
-    <section class="mx-auto max-w-3xl px-4 md:px-6 pt-16 md:pt-24 pb-12 md:pb-16 text-center">
-      <h1 class="text-4xl md:text-6xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+    <section class="mx-auto max-w-5xl px-4 md:px-6 pt-16 md:pt-24 pb-10 md:pb-12">
+      <span class="inline-flex items-center rounded-full bg-accent/15 text-accent px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+        CFP 2027 — ouvert
+      </span>
+      <h1 class="mt-5 text-4xl md:text-6xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
         Proposez une intervention
       </h1>
-      <p class="mt-5 text-base md:text-lg text-muted-foreground">
+      <p class="mt-4 text-base md:text-lg text-muted-foreground">
         Une journée. 7 parcours. 3 formats. Et votre voix.
       </p>
-      <div class="mt-8 flex justify-center">
-        <a
-          href={CFP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-base font-semibold px-6 h-12 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        >
-          Soumettre une proposition <span aria-hidden="true">→</span>
-        </a>
-      </div>
-      <p class="mt-6 text-sm md:text-base text-muted-foreground">
-        Le CFP du <span class="font-semibold text-foreground">Cloud Native Days France 2027</span> est ouvert — une journée au CENTQUATRE-PARIS, le 3 juin 2027, au cœur de la communauté francophone du Cloud Native.
+      <a
+        href={CFP_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mt-8 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-base font-semibold px-6 h-12 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        Soumettre une proposition <span aria-hidden="true">→</span>
+      </a>
+      <p class="mt-4 text-sm text-muted-foreground">
+        3 juin 2027 · CENTQUATRE-PARIS · au cœur de la communauté francophone du Cloud Native
       </p>
     </section>
 
-    <section class="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
-      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
-        Pour qui
-      </p>
-      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight text-center" style="letter-spacing:-0.02em;">
-        Une audience tech variée
+    <section class="mx-auto max-w-7xl px-4 md:px-6 py-10 md:py-12">
+      <h2 class="text-2xl md:text-3xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+        Les 7 parcours
       </h2>
-      <ul role="list" class="mt-8 flex flex-wrap items-center justify-center gap-2 md:gap-3 max-w-4xl mx-auto">
-        {audiencePills.map((label) => (
-          <li>
-            <span class="inline-flex items-center rounded-full bg-secondary text-secondary-foreground px-4 py-2 text-sm font-medium">
-              {label}
-            </span>
-          </li>
-        ))}
-      </ul>
-      <p class="mt-8 text-base md:text-lg text-muted-foreground text-center max-w-3xl mx-auto leading-relaxed">
-        Des <span class="font-semibold text-foreground">start-ups</span> aux <span class="font-semibold text-foreground">grands groupes</span> — votre présentation sera entendue par des pairs qui rencontrent les mêmes défis que vous.
+      <p class="mt-2 text-sm md:text-base text-muted-foreground">
+        Choisissez le territoire de votre sujet.
       </p>
-    </section>
-
-    <section id="formats" class="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
-      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
-        Formats
-      </p>
-      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight text-center" style="letter-spacing:-0.02em;">
-        Choisissez votre format
-      </h2>
-      <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-        {formats.map((f) => (
-          <article class="group flex flex-col rounded-lg border border-border bg-card p-6 md:p-8 transition-colors hover:border-primary/60">
-            <span class="self-start inline-flex items-center rounded-full bg-accent/15 text-accent px-3 py-1 text-xs font-bold uppercase tracking-wider">
-              {f.duration}
-            </span>
-            <h3 class="mt-4 text-xl md:text-2xl font-bold text-foreground tracking-tight">
-              {f.title}
-            </h3>
-            <p class="mt-3 text-base text-muted-foreground leading-relaxed">
-              {f.body}
-            </p>
-          </article>
-        ))}
-      </div>
-    </section>
-
-    <section class="mx-auto max-w-7xl px-4 md:px-6 py-16 md:py-20">
-      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground text-center">
-        Parcours
-      </p>
-      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight text-center" style="letter-spacing:-0.02em;">
-        Sept parcours
-      </h2>
-      <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {themes.map((th) => (
-          <article
-            class:list={[
-              "flex flex-col rounded-lg border bg-card p-6 transition-colors",
-              th.accent
-                ? "border-accent/60 hover:border-accent"
-                : "border-border hover:border-primary/60",
-            ]}
-          >
-            <div
-              class:list={[
-                "inline-flex items-center justify-center w-12 h-12 rounded-full text-2xl",
-                th.accent ? "bg-accent/15" : "bg-primary/10",
-              ]}
-              aria-hidden="true"
-            >
+      <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {parcours.map((th) => (
+          <article class="flex flex-col rounded-lg border border-border bg-card p-5 transition-colors hover:border-primary/60">
+            <div class="inline-flex items-center justify-center w-10 h-10 rounded-full text-xl bg-primary/10" aria-hidden="true">
               {th.emoji}
             </div>
-            <h3 class="mt-4 text-lg md:text-xl font-bold text-foreground tracking-tight">
+            <h3 class="mt-3 text-lg md:text-xl font-bold text-foreground tracking-tight">
               {th.title}
             </h3>
             <p class="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">
@@ -208,24 +137,68 @@ const criteria = [
             </p>
           </article>
         ))}
+        <article class="sm:col-span-2 lg:col-span-3 flex items-start gap-4 rounded-lg border border-accent/60 bg-card p-5 transition-colors hover:border-accent">
+          <div class="inline-flex items-center justify-center w-10 h-10 rounded-full text-xl bg-accent/15 shrink-0" aria-hidden="true">
+            {horsPiste.emoji}
+          </div>
+          <div>
+            <h3 class="text-lg md:text-xl font-bold text-foreground tracking-tight">
+              {horsPiste.title}
+            </h3>
+            <p class="mt-1 text-sm md:text-base text-muted-foreground leading-relaxed">
+              {horsPiste.body}
+            </p>
+          </div>
+        </article>
       </div>
     </section>
 
-    <p class="py-10 md:py-14 px-4 md:px-6 text-center text-sm md:text-base text-muted-foreground">
-      <span aria-hidden="true">❤️</span> Communauté · <span aria-hidden="true">🌍</span> Inclusion &amp; diversité · <span aria-hidden="true">🌱</span> Écologie · <span aria-hidden="true">🇫🇷</span> Autonomie numérique
-    </p>
+    <section id="formats" class="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
+      <div class="grid md:grid-cols-2 gap-8 md:gap-12">
+        <div>
+          <h3 class="text-xl font-bold text-foreground tracking-tight">
+            Les formats
+          </h3>
+          <ul role="list" class="mt-5 space-y-4">
+            {formats.map((f) => (
+              <li class="flex items-start gap-3">
+                <span class="self-start shrink-0 inline-flex items-center rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-bold">
+                  {f.duration}
+                </span>
+                <p class="text-sm md:text-base text-muted-foreground leading-relaxed">
+                  <strong class="font-semibold text-foreground">{f.title}</strong> — {f.body}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-foreground tracking-tight">
+            À savoir
+          </h3>
+          <ul role="list" class="mt-5 space-y-4">
+            <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
+              <span aria-hidden="true">🇫🇷</span> Toutes les présentations se déroulent <strong class="font-semibold text-foreground">en français</strong> — slides en anglais acceptés si cela facilite votre préparation.
+            </li>
+            <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
+              Des <strong class="font-semibold text-foreground">start-ups</strong> aux <strong class="font-semibold text-foreground">grands groupes</strong> : une audience de pairs qui rencontrent les mêmes défis que vous.
+            </li>
+            <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
+              <strong class="font-semibold text-foreground">Nos valeurs</strong> : <span aria-hidden="true">❤️</span> Communauté · <span aria-hidden="true">🌍</span> Inclusion &amp; diversité · <span aria-hidden="true">🌱</span> Écologie · <span aria-hidden="true">🇫🇷</span> Autonomie numérique
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-    <section class="mx-auto max-w-3xl px-4 md:px-6 py-16 md:py-20">
-      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-        Ce que nous recherchons
-      </p>
-      <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
-        Nos critères
+    <section class="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
+      <h2 class="text-2xl md:text-3xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+        Ce que le comité privilégie
       </h2>
       <p class="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">
         Notre comité de sélection — bénévoles de l'organisation CND France et membres reconnus des communautés cloud native francophones — privilégiera les propositions qui&nbsp;:
       </p>
-      <ul role="list" class="mt-8 space-y-4">
+      <ul role="list" class="mt-6 grid sm:grid-cols-2 gap-x-8 gap-y-4">
         {criteria.map((c) => (
           <li class="flex items-start gap-3">
             <svg
@@ -243,27 +216,17 @@ const criteria = [
             >
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span class="text-base md:text-lg text-muted-foreground leading-relaxed">
+            <span class="text-base text-muted-foreground leading-relaxed">
               <span class="font-semibold text-foreground">{c.key}</span> — {c.body}
             </span>
           </li>
         ))}
       </ul>
-      <div class="mt-10 rounded-lg border border-accent/40 bg-accent/10 px-5 py-4 flex items-start gap-3">
-        <span aria-hidden="true" class="text-2xl shrink-0">🇫🇷</span>
-        <p class="text-sm md:text-base text-foreground leading-relaxed">
-          Toutes les présentations se déroulent <span class="font-semibold">en français</span>.
-          Slides en anglais acceptés si cela facilite votre préparation.
-        </p>
-      </div>
     </section>
 
     <section class="mt-8 bg-card border-y border-border">
-      <div class="mx-auto max-w-3xl px-4 md:px-6 py-16 md:py-20 text-center">
-        <p class="text-xs font-semibold uppercase tracking-[0.2em]" style="color: var(--color-primary, #4985e8);">
-          Prêt à partager ?
-        </p>
-        <h2 class="mt-3 text-3xl md:text-4xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+      <div class="mx-auto max-w-6xl px-4 md:px-6 py-12 md:py-16">
+        <h2 class="text-2xl md:text-3xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
           Soumettez votre proposition
         </h2>
         <a
