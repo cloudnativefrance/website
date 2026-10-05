@@ -2,22 +2,23 @@
 /**
  * Reassurance and FAQ, as native <details>: keyboard and screen readers get
  * disclosure for free, and the page works without JavaScript. An answer the
- * ticketing team has not decided keeps its waiting copy or is left out; the
- * config's answer replaces it once decided.
+ * ticketing team has not decided is left out.
  */
 import type { Locale } from "@/i18n/ui";
 import { useTranslations, getLocalePath } from "@/i18n/utils";
 import { fill } from "@/lib/tickets/format";
-import { onHost } from "@/lib/tickets/purchase";
 import Icon from "./Icon.astro";
 
 interface Props {
   lang: Locale;
-  host: string;
   email: string;
-  inclusionMailto: string;
-  /** Paying by bank transfer is a request by mail. */
-  wireMailto: string;
+  /** Pre-filled mails to `email`, one per answer that ends on that address. */
+  mailto: {
+    wire: string;
+    perOrder: string;
+    invoice: string;
+    inclusion: string;
+  };
   perOrder: { early: number; later: number };
   /** The Strategy & Leadership ticket's public name: the track is open to every ticket, its exchange space is not. */
   strategicName: string;
@@ -25,31 +26,13 @@ interface Props {
   programmeWhen?: string;
   /** The VAT rate every price includes, formatted. */
   vatRate: string;
-  /** Decided answers; the waiting copy stands in until then. */
-  invoice?: string;
-  transfer?: string;
-  termsUrl?: string;
 }
 
-const {
-  lang,
-  host,
-  email,
-  inclusionMailto,
-  wireMailto,
-  perOrder,
-  strategicName,
-  programmeWhen,
-  vatRate,
-  invoice,
-  transfer,
-  termsUrl,
-} = Astro.props;
+const { lang, email, mailto, perOrder, strategicName, programmeWhen, vatRate } =
+  Astro.props;
 const t = useTranslations(lang);
 const practicalPath = `${getLocalePath(lang, "/informations-utiles")}#accessibilite`;
 const cocPath = getLocalePath(lang, "/code-of-conduct");
-// Terms of sale hosted on alf.io open in a new tab, like every hand-off there.
-const termsNewTab = termsUrl !== undefined && onHost(termsUrl, host);
 const link =
   "font-medium text-primary-strong underline underline-offset-4 decoration-primary-strong/40 hover:decoration-primary-strong";
 ---
@@ -75,9 +58,9 @@ const link =
         /></summary
       >
       <p>
-        {fill(t("tickets.faq.payment.a"), { host })}{" "}
+        {t("tickets.faq.payment.a")}{" "}
         <a
-          href={wireMailto}
+          href={mailto.wire}
           class={link}
           data-umami-event="tickets-wire-contact"
           data-umami-event-source="faq">{email}</a
@@ -122,7 +105,15 @@ const link =
           class="faq-icon"
         /></summary
       >
-      <p>{fill(t("tickets.faq.per_order.a"), perOrder)}</p>
+      <p>
+        {fill(t("tickets.faq.per_order.a"), perOrder)}{" "}
+        <a
+          href={mailto.perOrder}
+          class={link}
+          data-umami-event="tickets-per-order-contact"
+          data-umami-event-source="faq">{email}</a
+        >.
+      </p>
     </details>
     <details class="faq group">
       <summary
@@ -132,34 +123,15 @@ const link =
           class="faq-icon"
         /></summary
       >
-      <p>{fill(invoice ?? t("tickets.faq.invoice.a"), { email })}</p>
-    </details>
-    <details class="faq group">
-      <summary
-        >{t("tickets.faq.transfer.q")}<Icon
-          name="plus"
-          size={18}
-          class="faq-icon"
-        /></summary
-      >
-      <p>{transfer ?? t("tickets.faq.transfer.a")}</p>
-      {
-        termsUrl && (
-          <p>
-            <a
-              href={termsUrl}
-              target={termsNewTab ? "_blank" : undefined}
-              rel={termsNewTab ? "noopener" : undefined}
-              class={link}
-            >
-              {t("tickets.faq.transfer.terms")}
-              {termsNewTab && (
-                <span class="sr-only"> {t("tickets.new_tab")}</span>
-              )}
-            </a>
-          </p>
-        )
-      }
+      <p>
+        {t("tickets.faq.invoice.a")}{" "}
+        <a
+          href={mailto.invoice}
+          class={link}
+          data-umami-event="tickets-invoice-contact"
+          data-umami-event-source="faq">{email}</a
+        >.
+      </p>
     </details>
     <details class="faq group">
       <summary
@@ -182,7 +154,7 @@ const link =
       <p>
         {t("tickets.faq.inclusion.a")}{" "}
         <a
-          href={inclusionMailto}
+          href={mailto.inclusion}
           class={link}
           data-umami-event="tickets-inclusion-contact"
           data-umami-event-source="faq">{email}</a

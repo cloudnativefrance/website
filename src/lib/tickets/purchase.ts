@@ -37,15 +37,6 @@ export function alfioHost(config: TicketingConfig): string {
   return new URL(config.alfio.baseUrl).host;
 }
 
-/** Whether `href` points at `host` — a relative or unparseable href never does. */
-export function onHost(href: string, host: string): boolean {
-  try {
-    return new URL(href).host === host;
-  } catch {
-    return false;
-  }
-}
-
 /** The alf.io listing, whatever the tier: the quantity and the category are chosen there. */
 export function purchaseTarget(config: TicketingConfig): PurchaseTarget {
   return { kind: "listing", href: listingUrl(config), rel: "noopener" };

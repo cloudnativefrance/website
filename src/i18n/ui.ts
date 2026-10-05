@@ -531,28 +531,22 @@ export const ui = {
     "tickets.faq.title": "Questions fréquentes",
     "tickets.faq.payment.q": "Comment se passe le paiement\u202f?",
     "tickets.faq.payment.a":
-      "Par carte bancaire, via Stripe, sur {host}. Besoin de payer par virement\u202f? Écrivez-nous à",
+      "Par carte bancaire, via Stripe. Besoin de payer par virement\u202f? Écrivez-nous à",
     "tickets.faq.change.q": "Quand le prix change-t-il\u202f?",
     "tickets.faq.change.a":
-      "Le tarif en cours s'arrête à la date affichée, ou plus tôt si ses places partent avant. Le suivant prend le relais aussitôt\u00a0: la billetterie ne ferme jamais entre deux tarifs.",
+      "Le tarif en cours s'arrête à la date affichée, ou plus tôt si le stock de places associé est épuisé. Puis le tarif suivant prend le relais aussitôt.",
     "tickets.faq.strategic.q":
       "Le parcours Stratégie & Leadership est-il ouvert à tous\u202f?",
     "tickets.faq.strategic.a":
-      "Oui\u00a0: ses talks sont ouverts à tous les participant(e)s, quel que soit leur billet, dans la limite des places de la salle. En revanche, l'espace d'échanges est réservé aux titulaires du billet {name}, qui ont aussi un accès prioritaire à la salle.",
+      "Oui, ses conférences sont ouvertes à tous les participant(e)s, quel que soit leur billet, dans la limite des places de la salle. En revanche, l'espace d'échanges est réservé aux titulaires du billet {name}, qui ont aussi un accès prioritaire à la salle.",
     "tickets.faq.ttc.q": "Les prix affichés sont-ils TTC\u202f?",
     "tickets.faq.ttc.a": "Oui, TVA à {rate} comprise.",
     "tickets.faq.per_order.q": "Combien de places par commande\u202f?",
     "tickets.faq.per_order.a":
-      "Jusqu'à {early} pendant les deux premiers tarifs, pour qu'ils profitent au plus grand nombre, puis jusqu'à {later}. Pour plus de places, écrivez-nous.",
+      "Jusqu'à {early} pendant les Super Early Bird et Early Bird, pour qu'ils profitent au plus grand nombre, puis jusqu'à {later}. Pour plus de places, écrivez-nous à",
     "tickets.faq.invoice.q":
       "Puis-je avoir une facture au nom de ma société\u202f?",
-    "tickets.faq.invoice.a":
-      "On vérifie ce que permet notre outil de billetterie. En attendant, écrivez-nous à {email}.",
-    "tickets.faq.transfer.q":
-      "Puis-je annuler ou transmettre mon billet\u202f?",
-    "tickets.faq.transfer.a":
-      "On finalise les conditions d'annulation et de changement de nom\u00a0: elles seront publiées ici.",
-    "tickets.faq.transfer.terms": "Conditions générales de vente",
+    "tickets.faq.invoice.a": "Oui, il suffit de nous écrire à",
     "tickets.faq.code.q":
       "J'ai un code partenaire ou une invitation, comment faire\u202f?",
     "tickets.faq.code.a":
@@ -577,6 +571,14 @@ export const ui = {
     "tickets.wire.mail.subject": "Paiement par virement CND France 2027",
     "tickets.wire.mail.body":
       "Bonjour,\n\nJe souhaite payer par virement mes billets pour CND France 2027.\n\nBillet ({standard} ou {strategic})\u00a0:\nNombre de places\u00a0:\nNom\u00a0:\nSociété (le cas échéant)\u00a0:\n",
+    "tickets.per_order.mail.subject":
+      "Plus de places par commande CND France 2027",
+    "tickets.per_order.mail.body":
+      "Bonjour,\n\nJe souhaite commander pour CND France 2027 plus de places que le maximum par commande.\n\nBillet ({standard} ou {strategic})\u00a0:\nNombre de places\u00a0:\nNom\u00a0:\nSociété (le cas échéant)\u00a0:\n",
+    "tickets.invoice.mail.subject":
+      "Facture au nom de ma société CND France 2027",
+    "tickets.invoice.mail.body":
+      "Bonjour,\n\nJe souhaite une facture au nom de ma société pour mes billets CND France 2027.\n\nRéférence de commande (si elle est déjà passée)\u00a0:\nSociété\u00a0:\nAdresse de facturation\u00a0:\nNuméro de TVA intracommunautaire (le cas échéant)\u00a0:\n",
     "tickets.sticky.buy": "Acheter",
   },
   en: {
@@ -1080,26 +1082,21 @@ export const ui = {
     "tickets.faq.title": "Frequently asked questions",
     "tickets.faq.payment.q": "How does payment work?",
     "tickets.faq.payment.a":
-      "By card, through Stripe, on {host}. Need to pay by bank transfer? Write to us at",
+      "By card, through Stripe. Need to pay by bank transfer? Write to us at",
     "tickets.faq.change.q": "When does the price change?",
     "tickets.faq.change.a":
-      "The current price ends on the date shown, or sooner if its seats go before then. The next one takes over at once: ticketing never closes between two prices.",
+      "The current price ends on the date shown, or sooner if its allocation of seats sells out. Then the next price takes over at once.",
     "tickets.faq.strategic.q":
       "Is the Strategy & Leadership track open to everyone?",
     "tickets.faq.strategic.a":
-      "Yes: its talks are open to every attendee, whatever their ticket, as long as the room has seats. The space to meet your peers, however, is reserved for {name} ticket holders, who also get priority access to the room.",
+      "Yes, its talks are open to every attendee, whatever their ticket, as long as the room has seats. The space to meet your peers, however, is reserved for {name} ticket holders, who also get priority access to the room.",
     "tickets.faq.ttc.q": "Do the prices shown include VAT?",
     "tickets.faq.ttc.a": "Yes, they include VAT at {rate}.",
     "tickets.faq.per_order.q": "How many seats per order?",
     "tickets.faq.per_order.a":
-      "Up to {early} during the first two prices, so they reach as many people as possible, then up to {later}. Need more? Write to us.",
+      "Up to {early} during Super Early Bird and Early Bird, so they reach as many people as possible, then up to {later}. Need more? Write to us at",
     "tickets.faq.invoice.q": "Can I get an invoice in my company's name?",
-    "tickets.faq.invoice.a":
-      "We're checking what our ticketing tool allows. Meanwhile, write to us at {email}.",
-    "tickets.faq.transfer.q": "Can I cancel or transfer my ticket?",
-    "tickets.faq.transfer.a":
-      "We're finalising the cancellation and name-change terms: they'll be published here.",
-    "tickets.faq.transfer.terms": "Terms and conditions of sale",
+    "tickets.faq.invoice.a": "Yes, just write to us at",
     "tickets.faq.code.q":
       "I have a partner code or an invitation. What do I do?",
     "tickets.faq.code.a":
@@ -1122,6 +1119,12 @@ export const ui = {
     "tickets.wire.mail.subject": "Bank transfer payment CND France 2027",
     "tickets.wire.mail.body":
       "Hello,\n\nI'd like to pay for my CND France 2027 tickets by bank transfer.\n\nTicket ({standard} or {strategic}):\nNumber of seats:\nName:\nCompany (if any):\n",
+    "tickets.per_order.mail.subject": "More seats per order CND France 2027",
+    "tickets.per_order.mail.body":
+      "Hello,\n\nI'd like to order more seats for CND France 2027 than the per-order limit.\n\nTicket ({standard} or {strategic}):\nNumber of seats:\nName:\nCompany (if any):\n",
+    "tickets.invoice.mail.subject": "Company invoice CND France 2027",
+    "tickets.invoice.mail.body":
+      "Hello,\n\nI'd like an invoice in my company's name for my CND France 2027 tickets.\n\nOrder reference (if already placed):\nCompany:\nBilling address:\nVAT number (if any):\n",
     "tickets.sticky.buy": "Buy",
   },
 } as const;

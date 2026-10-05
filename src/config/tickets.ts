@@ -107,9 +107,6 @@ export interface TicketingConfig {
   eveningDetails: Maybe<Localized>;
   /** The VAT every price includes, in percent. */
   vatRate: number;
-  invoice: Maybe<Localized>;
-  transferAndRefund: Maybe<Localized>;
-  termsUrl: Maybe<string>;
   programmeAnnouncement: Maybe<Localized>;
 }
 
@@ -191,9 +188,6 @@ export const TICKETING: TicketingConfig = {
   ),
   eveningDetails: tbd("Contenu de la soirée (pôle soirée)"),
   vatRate: 20,
-  invoice: tbd("Facture au nom de la société, devis, virement (question à JC)"),
-  transferAndRefund: tbd("Annulation et changement de nom"),
-  termsUrl: tbd("Lien vers les conditions générales de vente"),
   programmeAnnouncement: tbd("Date publique d'annonce du programme", {
     fr: "en mars 2027",
     en: "in March 2027",

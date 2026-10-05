@@ -11,12 +11,7 @@ import {
   tierStates,
   tierUrgency,
 } from "@/lib/tickets/phase";
-import {
-  codeUrl,
-  listingUrl,
-  onHost,
-  purchaseTarget,
-} from "@/lib/tickets/purchase";
+import { codeUrl, listingUrl, purchaseTarget } from "@/lib/tickets/purchase";
 import { handOffOnce, openInNewTab } from "@/lib/tickets/url";
 import { buildMailto } from "@/lib/tickets/mailto";
 import {
@@ -111,12 +106,6 @@ describe("purchase", () => {
     expect(codeUrl(alfio, "a/b?c#d")).toMatchObject({
       url: "https://x.test/event/e/code/a%2Fb%3Fc%23d",
     });
-  });
-
-  it("recognises a URL on the alf.io host, and nothing else", () => {
-    expect(onHost("https://x.test/terms", "x.test")).toBe(true);
-    expect(onHost("https://cloudnativedays.fr/cgv", "x.test")).toBe(false);
-    expect(onHost("#equipe", "x.test")).toBe(false);
   });
 });
 
@@ -220,13 +209,18 @@ describe("drafts", () => {
 
   it("lets a decided config ship, and an undecided value with no draft — its line is not rendered", () => {
     expect(shippingProblems(decided)).toEqual([]);
-    expect(shippingProblems({ ...decided, termsUrl: tbd("CGV") })).toEqual([]);
+    expect(
+      shippingProblems({ ...decided, eveningDetails: tbd("Soirée") }),
+    ).toEqual([]);
   });
 
   it("blocks on any draft, and on the two ticket names and the S&L price even without one", () => {
     expect(() =>
-      assertShippable({ ...decided, termsUrl: tbd("CGV", "/cgv") }),
-    ).toThrow(/termsUrl/);
+      assertShippable({
+        ...decided,
+        eveningDetails: tbd("Soirée", { fr: "Concert", en: "Concert" }),
+      }),
+    ).toThrow(/eveningDetails/);
     const required = {
       ...decided,
       standardName: tbd("Nom"),

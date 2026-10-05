@@ -38,7 +38,6 @@ import {
   tierUrgency,
 } from "@/lib/tickets/phase";
 import {
-  alfioHost,
   codeFallbackAction,
   listingUrl,
   purchaseTarget,
@@ -72,18 +71,12 @@ const tier = offerTier(config, phase);
 const ladder = tierStates(config, phase);
 const urgency = tierUrgency(config, tier);
 const rates = cheaperGroupRates(config, tier);
-const host = alfioHost(config);
 const email = CONTACT_EMAILS.tickets;
 
 const groupMailto = buildMailto(
   email,
   t("tickets.team.mail.subject"),
   t("tickets.team.mail.body"),
-);
-const inclusionMailto = buildMailto(
-  email,
-  t("tickets.inclusion.mail.subject"),
-  t("tickets.inclusion.mail.body"),
 );
 
 // One action for the whole page, the alf.io listing: both tickets of door 1 and
@@ -99,14 +92,32 @@ const strategic = {
   price: shown(config.strategic.price),
   trackUrl: shown(config.strategic.trackUrl)?.[lang],
 };
-const wireMailto = buildMailto(
-  email,
-  t("tickets.wire.mail.subject"),
-  fill(t("tickets.wire.mail.body"), {
-    standard: standardName,
-    strategic: strategic.name,
-  }),
-);
+
+// The FAQ answers that end on the ticketing address, each with its own
+// pre-filled mail. A body's {standard} and {strategic} are the tickets' names.
+const ticketNames = { standard: standardName, strategic: strategic.name };
+const faqMailto = {
+  wire: buildMailto(
+    email,
+    t("tickets.wire.mail.subject"),
+    fill(t("tickets.wire.mail.body"), ticketNames),
+  ),
+  perOrder: buildMailto(
+    email,
+    t("tickets.per_order.mail.subject"),
+    fill(t("tickets.per_order.mail.body"), ticketNames),
+  ),
+  invoice: buildMailto(
+    email,
+    t("tickets.invoice.mail.subject"),
+    t("tickets.invoice.mail.body"),
+  ),
+  inclusion: buildMailto(
+    email,
+    t("tickets.inclusion.mail.subject"),
+    t("tickets.inclusion.mail.body"),
+  ),
+};
 
 // Door 2 is rendered only when a group rate actually beats the price of the
 // moment and fits the tier's order cap; below that it had nothing to sell.
@@ -255,17 +266,12 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
   <div class="mx-auto max-w-7xl px-4 pb-28 md:px-6 md:pb-24 lg:px-8">
     <TicketsFaq
       lang={lang}
-      host={host}
       email={email}
-      inclusionMailto={inclusionMailto}
-      wireMailto={wireMailto}
+      mailto={faqMailto}
       perOrder={perOrder}
       strategicName={strategic.name}
       programmeWhen={programmeWhen}
       vatRate={formatPercent(config.vatRate, lang)}
-      invoice={shown(config.invoice)?.[lang]}
-      transfer={shown(config.transferAndRefund)?.[lang]}
-      termsUrl={shown(config.termsUrl)}
     />
   </div>
 </main>
