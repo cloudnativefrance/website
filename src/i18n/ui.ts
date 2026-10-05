@@ -526,8 +526,9 @@ export const ui = {
     "tickets.included.meals": "Le déjeuner, le café et de quoi grignoter",
     "tickets.included.goodies": "Des goodies exclusifs",
     "tickets.included.evening.title": "Une soirée pour prolonger la journée",
+    "tickets.included.evening.new": "Nouveauté 2027",
     "tickets.included.evening.body":
-      "Nouveauté 2027\u00a0: la soirée est comprise dans le billet, sans option à ajouter. L'occasion de faire de nouvelles rencontres, d'échanger entre pairs, de revenir sur les conférences de la journée ou, tout simplement, de se détendre.",
+      "La soirée est comprise dans le billet, sans option à ajouter. L'occasion de faire de nouvelles rencontres, d'échanger entre pairs, de revenir sur les conférences de la journée ou, tout simplement, de se détendre.",
     "tickets.faq.title": "Questions fréquentes",
     "tickets.faq.payment.q": "Comment se passe le paiement\u202f?",
     "tickets.faq.payment.a":
@@ -1077,8 +1078,9 @@ export const ui = {
     "tickets.included.meals": "Lunch, coffee and snacks",
     "tickets.included.goodies": "Exclusive goodies",
     "tickets.included.evening.title": "An evening to round off the day",
+    "tickets.included.evening.new": "New in 2027",
     "tickets.included.evening.body":
-      "New in 2027: the evening is part of the ticket, with no add-on to buy. A chance to meet new people, talk with your peers, look back on the day's talks or simply unwind.",
+      "The evening is part of the ticket, with no add-on to buy. A chance to meet new people, talk with your peers, look back on the day's talks or simply unwind.",
     "tickets.faq.title": "Frequently asked questions",
     "tickets.faq.payment.q": "How does payment work?",
     "tickets.faq.payment.a":
