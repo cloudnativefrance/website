@@ -1,88 +1,51 @@
 ---
 /**
- * The Stratégie & Leadership ticket, in its own card under the standard one
- * (27/09/2026). The track of the same name is open to every ticket; this one
- * adds priority access to its room and a reserved networking area — which is
- * all it says, with a link to the track's own page for the rest.
- *
- * The standard card's anatomy and type — name, monumental price, one line, the
- * same filled button in a column that lines up with the standard one. Only the
- * standard card's shadow sets the two apart. One price for the whole season,
- * so no tier, no date, no pill, no timeline. Always on sale, with the page's
- * own action in the `purchase` slot; its quota is never shown.
+ * The Stratégie & Leadership ticket, drawn like the standard one but without
+ * the lift shadow. One price for the season: no tier, no date, no ladder. It
+ * says only what it adds; the track's page says the rest.
  */
+import { TICKETING } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
-import { fill, priceParts } from "@/lib/tickets/format";
+import { fill } from "@/lib/tickets/format";
+import BigPrice from "./BigPrice.astro";
 import Icon from "./Icon.astro";
 
 interface Props {
   lang: Locale;
-  name: string;
-  /** The standard ticket's name, which this one includes. */
-  standardName: string;
-  /** Euros, VAT included. */
-  price: number;
-  /** The track's page. */
-  trackUrl: string;
 }
 
-const { lang, name, standardName, price, trackUrl } = Astro.props;
+const { lang } = Astro.props;
 const t = useTranslations(lang);
-const parts = priceParts(price, lang);
+const { name, price, trackUrl } = TICKETING.strategic;
 ---
 
 <article
   id="strategie-leadership"
   class="door border-primary/35 bg-card grid gap-6 rounded-xl border p-5 sm:p-8 lg:grid-cols-[minmax(0,26rem)_auto] lg:gap-10"
   aria-labelledby="strategic-title"
-  data-strategic-ticket
 >
   <div class="flex flex-col gap-3">
     <h2
       id="strategic-title"
       class="text-foreground text-2xl font-semibold tracking-[-0.01em]"
-      data-ticket-name="strategic"
     >
-      {fill(t("tickets.offer.ticket"), { name })}
+      {fill(t("tickets.offer.ticket"), { name: name[lang] })}
     </h2>
-    <p
-      class="text-foreground flex items-baseline gap-3"
-      data-strategic-price={price}
-    >
-      <span
-        class="text-[clamp(3.5rem,11vw,5.5rem)] leading-none font-bold tracking-[-0.035em] tabular-nums"
-      >
-        {
-          parts.before && (
-            <span class="mr-1 align-top text-[0.45em] font-semibold tracking-normal">
-              {parts.before}
-            </span>
-          )
-        }
-        {parts.amount}
-        {
-          parts.after && (
-            <span class="ml-1.5 text-[0.45em] font-semibold tracking-normal">
-              {parts.after}
-            </span>
-          )
-        }
-      </span>
-      <span class="text-muted-foreground text-base font-medium">
-        {t("tickets.offer.ttc")}
-      </span>
-    </p>
+    <BigPrice amount={price} lang={lang} />
     <p class="text-muted-foreground max-w-[52ch] text-base text-pretty">
-      {fill(t("tickets.strategic.perks"), { standard: standardName })}
+      {
+        fill(t("tickets.strategic.perks"), {
+          standard: TICKETING.standardName[lang],
+        })
+      }
     </p>
     {
-      /* Inline, not flex: when the line wraps, the arrow follows the last word
-        instead of standing apart at the far edge. */
+      /* Inline, not flex: when the line wraps, the arrow follows the last word. */
     }
     <p class="text-base font-semibold text-pretty">
       <a
-        href={trackUrl}
+        href={trackUrl[lang]}
         class="text-primary-strong underline-offset-4 hover:underline"
         data-umami-event="tickets-strategic-track"
       >
@@ -95,11 +58,7 @@ const parts = priceParts(price, lang);
     </p>
   </div>
 
-  {
-    /* An action column like the standard card's: the mobile bar stays away
-      while it is on screen, so it never sits under a button for the other ticket. */
-  }
-  <div class="flex flex-col justify-center gap-4" data-offer-action>
+  <div class="flex flex-col items-start justify-center" data-offer-action>
     <slot name="purchase" />
   </div>
 </article>

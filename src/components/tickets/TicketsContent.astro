@@ -1,41 +1,17 @@
 ---
 /**
- * The ticketing page's content, composed around the ways people arrive — the
- * standard ticket, as a team, the Stratégie & Leadership ticket, with a code —
- * weighted by importance.
- * `TicketsPage` wraps it in the layout; kept apart so the demo matrix test can
- * render every phase without a site origin.
- *
- * Rendered for a selling phase only — before the opening /billetterie is the
- * "coming soon" page (`TicketsPage`). Everything is derived from
- * `src/config/tickets.ts` and the tier on sale, so the demo routes and
- * /billetterie render the same page. Every purchase — both tickets of door 1,
- * the mobile bar — goes to the alf.io listing through one `purchaseTarget`.
+ * The ticketing page for the tier on sale: the standard ticket, with "Venir en
+ * équipe" beside it when a group rate applies, the Stratégie & Leadership
+ * ticket, the code band, then what the ticket includes and the FAQ. Kept apart
+ * from `TicketsPage` so the tests can render it without a layout.
  */
 import GeoBackground from "@/components/patterns/GeoBackground.astro";
 import { TICKETING, type TierId } from "@/config/tickets";
 import { useTranslations } from "@/i18n/utils";
 import type { Locale } from "@/i18n/ui";
-import { CONTACT_EMAILS, TARGET_DATE } from "@/lib/event";
-import { buildMailto } from "@/lib/tickets/mailto";
-import {
-  fill,
-  formatFullDate,
-  formatPercent,
-  formatPrice,
-  upperFirst,
-} from "@/lib/tickets/format";
-import {
-  cheaperGroupRates,
-  offerTier,
-  tierStates,
-  tierUrgency,
-} from "@/lib/tickets/phase";
-import {
-  codeFallbackAction,
-  listingUrl,
-  purchaseTarget,
-} from "@/lib/tickets/purchase";
+import { TARGET_DATE } from "@/lib/event";
+import { fill, formatFullDate, upperFirst } from "@/lib/tickets/format";
+import { cheaperGroupRates, offerTier, tierStates } from "@/lib/tickets/phase";
 import OfferDoor from "./OfferDoor.astro";
 import TeamDoor from "./TeamDoor.astro";
 import CodeDoor from "./CodeDoor.astro";
@@ -47,106 +23,31 @@ import StickyTicketBar from "./StickyTicketBar.astro";
 
 interface Props {
   lang: Locale;
-  /** The tier on sale. */
   phase: TierId;
-  /** With the demo on, the mobile bar is striped so no capture passes for the real page. */
+  /** Stripes the mobile bar, so no capture of the demo passes for the real page. */
   demo?: boolean;
 }
 
-const { lang, phase, demo } = Astro.props;
+const { lang, phase, demo = false } = Astro.props;
 const t = useTranslations(lang);
-const config = TICKETING;
 
-const tier = offerTier(config, phase);
-const ladder = tierStates(config, phase);
-const urgency = tierUrgency(config, tier);
-const rates = cheaperGroupRates(config, tier);
-const email = CONTACT_EMAILS.tickets;
-
-const groupMailto = buildMailto(
-  email,
-  t("tickets.team.mail.subject"),
-  t("tickets.team.mail.body"),
-);
-
-// One action for the whole page, the alf.io listing: both tickets of door 1 and
-// the mobile bar share it.
-const target = purchaseTarget(config);
-
-// Two tickets: the standard one the tiers price, and the Strategy & Leadership
-// one at a single price.
-const standardName = config.standardName[lang];
-const strategic = {
-  name: config.strategic.name[lang],
-  price: config.strategic.price,
-  trackUrl: config.strategic.trackUrl[lang],
-};
-
-// The FAQ answers that end on the ticketing address, each with its own
-// pre-filled mail. A body's {standard} and {strategic} are the tickets' names.
-const ticketNames = { standard: standardName, strategic: strategic.name };
-const faqMailto = {
-  wire: buildMailto(
-    email,
-    t("tickets.wire.mail.subject"),
-    fill(t("tickets.wire.mail.body"), ticketNames),
-  ),
-  perOrder: buildMailto(
-    email,
-    t("tickets.per_order.mail.subject"),
-    fill(t("tickets.per_order.mail.body"), ticketNames),
-  ),
-  invoice: buildMailto(
-    email,
-    t("tickets.invoice.mail.subject"),
-    t("tickets.invoice.mail.body"),
-  ),
-  inclusion: buildMailto(
-    email,
-    t("tickets.inclusion.mail.subject"),
-    t("tickets.inclusion.mail.body"),
-  ),
-};
-
-// Door 2 is rendered only when a group rate actually beats the price of the
-// moment and fits the tier's order cap; below that it had nothing to sell.
-// Everything else about the first viewport follows from it.
+const tier = offerTier(TICKETING, phase);
+const rates = cheaperGroupRates(TICKETING, tier);
 const showTeam = rates.length > 0;
 
-const eventDate = formatFullDate(TARGET_DATE, lang);
-// Split around {venue} so the venue can be set unbreakable: "CENTQUATRE-PARIS"
-// must never break at its hyphen on a narrow screen.
-const [whenBefore, whenAfter = ""] = t("tickets.when").split("{venue}");
-const when = {
-  before: fill(whenBefore, {
-    date: upperFirst(eventDate),
-  }),
-  venue: t("hero.venue"),
-  after: whenAfter,
-};
+// Split around {venue} to keep "CENTQUATRE-PARIS" from breaking at its hyphen.
+const [beforeVenue, afterVenue] = fill(t("tickets.when"), {
+  date: upperFirst(formatFullDate(TARGET_DATE, lang)),
+}).split("{venue}");
 
-// "standard" is lower-case in prose; the bar's label opens on it.
-const sticky = {
-  label: `${upperFirst(standardName)} · ${tier.name[lang]}`,
-  price: formatPrice(tier.price, lang),
-  action: { href: target.href, rel: target.rel, text: t("tickets.sticky.buy") },
-  analytics: {
-    "data-umami-event-billet": "standard",
-    "data-umami-event-palier": tier.id,
-    "data-umami-event-phase": phase,
-  },
-};
-
-const early = config.tiers
-  .filter((x) => x.closesWhenSoldOut)
-  .map((x) => x.maxPerOrder);
-const later = config.tiers
-  .filter((x) => !x.closesWhenSoldOut)
-  .map((x) => x.maxPerOrder);
-const perOrder = { early: Math.max(...early), later: Math.max(...later) };
+const umami = (billet: "standard" | "strategique", palier: string) => ({
+  "data-umami-event-billet": billet,
+  "data-umami-event-palier": palier,
+  "data-umami-event-phase": phase,
+});
 ---
 
-<main class="tickets-page" data-phase={phase}>
+<main class="tickets-page">
   <section class="relative isolate overflow-hidden">
     <GeoBackground class="tickets-mesh absolute inset-0 -z-10" />
     <div
@@ -159,25 +60,16 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
           {t("tickets.h1")}
         </h1>
         <p class="text-foreground text-lg font-semibold text-pretty sm:text-xl">
-          {when.before}<span class="whitespace-nowrap">{when.venue}</span>{
-            when.after
+          {beforeVenue}<span class="whitespace-nowrap">{t("hero.venue")}</span>{
+            afterVenue
           }
         </p>
       </header>
 
       {
-        /* Three rows, one per way in (27/09/2026). The standard ticket leads;
-          "Venir en équipe" — its group rates, the same ticket bought several
-          at a time — sits beside it at the same height whenever a rate
-          applies, and it takes the whole row otherwise. The Stratégie &
-          Leadership ticket is its own row underneath, the code entry a band at the foot, in
-          every phase. */
+        /* Each wrapper is a flex column so the card inside fills its grid row. */
       }
       <div class="grid gap-5 lg:grid-cols-12 lg:gap-6">
-        {
-          /* `flex flex-col` so each card fills the row height the grid gives
-            its wrapper: the two cards of the first row end on the same line. */
-        }
         <div
           class:list={[
             "flex flex-col",
@@ -186,58 +78,34 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
         >
           <OfferDoor
             lang={lang}
-            ticketName={standardName}
             tier={tier}
-            ladder={ladder}
-            urgency={urgency}
+            ladder={tierStates(TICKETING, phase)}
           >
             <PurchaseControl
               slot="purchase"
-              target={target}
               lang={lang}
-              phase={phase}
-              analytics={{ billet: "standard", palier: tier.id }}
+              analytics={umami("standard", phase)}
             />
           </OfferDoor>
         </div>
         {
           showTeam && (
-            <div class="flex flex-col lg:col-span-4">
-              <TeamDoor
-                lang={lang}
-                ticketName={standardName}
-                tier={tier}
-                rates={rates}
-                groupMailto={groupMailto}
-              />
+            <div class="flex flex-col lg:col-span-4" style="--door-index: 1">
+              <TeamDoor lang={lang} tier={tier} rates={rates} />
             </div>
           )
         }
-        {/* Always displayed, always on sale: the same action. */}
         <div class="lg:col-span-12" style={`--door-index: ${showTeam ? 2 : 1}`}>
-          <StrategicOffer
-            lang={lang}
-            name={strategic.name}
-            standardName={standardName}
-            price={strategic.price}
-            trackUrl={strategic.trackUrl}
-          >
+          <StrategicOffer lang={lang}>
             <PurchaseControl
               slot="purchase"
-              target={target}
               lang={lang}
-              phase={phase}
-              analytics={{ billet: "strategique", palier: "strategique" }}
+              analytics={umami("strategique", "strategique")}
             />
           </StrategicOffer>
         </div>
         <div class="lg:col-span-12" style={`--door-index: ${showTeam ? 3 : 2}`}>
-          <CodeDoor
-            lang={lang}
-            phase={phase}
-            listingUrl={listingUrl(config)}
-            fallback={codeFallbackAction(config)}
-          />
+          <CodeDoor lang={lang} phase={phase} />
         </div>
       </div>
     </div>
@@ -248,25 +116,15 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
   </div>
 
   <div class="mx-auto max-w-7xl px-4 pb-28 md:px-6 md:pb-24 lg:px-8">
-    <TicketsFaq
-      lang={lang}
-      email={email}
-      mailto={faqMailto}
-      perOrder={perOrder}
-      strategicName={strategic.name}
-      programmeWhen={config.programmeAnnouncement[lang]}
-      vatRate={formatPercent(config.vatRate, lang)}
-    />
+    <TicketsFaq lang={lang} />
   </div>
 </main>
 
 <StickyTicketBar
   lang={lang}
-  label={sticky.label}
-  price={sticky.price}
-  action={sticky.action}
-  analytics={sticky.analytics}
-  demo={Boolean(demo)}
+  tier={tier}
+  analytics={umami("standard", phase)}
+  demo={demo}
 />
 
 <style>
@@ -284,8 +142,7 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
     opacity: 0.9;
   }
 
-  /* One authored entrance: the three doors settle in sequence, once, from an
-     already-visible default (reduced motion keeps them still, global.css). */
+  /* The cards settle in sequence, once (global.css stills them under reduced motion). */
   @media (prefers-reduced-motion: no-preference) {
     .tickets-page :global(.door) {
       animation: door-in 560ms cubic-bezier(0.16, 1, 0.3, 1) both;

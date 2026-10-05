@@ -21,10 +21,7 @@ interface Props {
    * ComingSoonLayout, which is itself a newsletter appeal and would duplicate it.
    */
   newsletter?: boolean;
-  /**
-   * Force the noindex meta even on a production-origin build. Used by pages
-   * that must never be indexed whatever the origin (the ticketing demos).
-   */
+  /** Never index this page, whatever the origin (the ticketing demos). */
   noindex?: boolean;
 }
 
@@ -84,8 +81,8 @@ const indexable = isProductionOrigin(Astro.site?.origin);
 // Derived from the origin rather than a second environment flag (see
 // src/lib/site-env.ts) and fails closed — an unknown origin yields no analytics.
 // A separate const rather than reusing `indexable`: the two share a condition
-// today but mean different things. Never under `astro dev`, whose origin is
-// production by default: local page views are not visits.
+// today but mean different things. Off under `astro dev`, whose origin is
+// production by default.
 const analyticsEnabled =
   !import.meta.env.DEV && isProductionOrigin(Astro.site?.origin);
 ---

@@ -1,26 +1,17 @@
 /**
- * Ticketing registry — the single place prices, dates and the selling phase live.
+ * Ticketing registry: the only place prices, dates and the selling phase live.
+ * Numbers come from the Drive sheets "Pilotage billetterie 2027" and "Dates
+ * clés CND France 2027" — never quotas or stock, which the team adjusts live
+ * in alf.io.
  *
- * In the spirit of `src/config/flags.ts`: typed, committed, reviewed. Nothing
- * else in the codebase may spell a ticket price, a tier date or an alf.io URL;
- * components read them from here and the purchase action is built from here by
- * `src/lib/tickets/purchase.ts` alone.
- *
- * Source of truth for the numbers is the Drive sheet "Pilotage billetterie
- * 2027" (Simulateur and Params tabs) and "Dates clés CND France 2027". This file
- * is their published subset: never quotas, never stock — the team adjusts those
- * live in alf.io.
- *
- * **Changing phase is changing `currentPhase` and shipping.** There is no date
- * logic. `pre_opening` serves the "coming soon" page at /billetterie; on the
- * opening day set it to the first tier, and when a tier ends — early or on its
- * date — to the next one. Every tier behind the current one reads "Épuisé".
+ * Changing phase is changing `currentPhase` and shipping: `pre_opening` serves
+ * the "coming soon" page, a tier id sells that tier, and every tier before it
+ * reads "Épuisé".
  */
 
 export type Localized = { fr: string; en: string };
 
 export type TierId = "seb" | "eb" | "regular" | "last_chance";
-/** `pre_opening` is the "coming soon" page; a tier id is the ticketing page selling it. */
 export type Phase = "pre_opening" | TierId;
 
 export interface TierDefinition {
@@ -29,66 +20,46 @@ export interface TierDefinition {
   /** Euros, VAT included. */
   price: number;
   /**
-   * Indicative end, ISO-8601 with the Europe/Paris offset. Shown only while the
-   * tier is the current one: future tiers never show a date, because the team
-   * may extend a tier's period or raise its quota live.
+   * Shown only while the tier is on sale: the team may extend a tier or raise
+   * its quota live, so a future tier never shows a date.
    */
   endsAt: string;
-  /** The tier also closes when its alf.io quota runs out, whichever comes first. */
+  /** The tier also closes when its alf.io quota runs out. */
   closesWhenSoldOut: boolean;
-  /** alf.io caps a single order at this many tickets. */
   maxPerOrder: number;
 }
 
 export interface GroupRate {
   id: "4_9" | "10_plus";
   min: number;
-  max?: number;
-  /** Euros per person, VAT included. Fixed for the whole season. */
+  /** Euros per person, VAT included. */
   price: number;
-}
-
-/**
- * The dearer ticket, second in door 1 (27/09/2026): the standard ticket plus
- * priority access to the Strategy & Leadership room and a reserved networking
- * area — the track itself is open to every ticket. Always displayed and always
- * on sale; one price for the whole season, so no tier and no timeline.
- */
-export interface StrategicTicket {
-  /** The ticket's public name — the track's own, "Stratégie & Leadership" (27/09/2026). */
-  name: Localized;
-  /** Euros, VAT included. */
-  price: number;
-  /** The page describing the Strategy & Leadership track. */
-  trackUrl: Localized;
 }
 
 export interface TicketingConfig {
-  alfio: { baseUrl: string; eventSlug: string };
+  /** The alf.io event listing: every purchase lands there. */
+  listingUrl: string;
   currentPhase: Phase;
-  /** Public name of the ticket the tiers price, beside the Strategy & Leadership one. */
   standardName: Localized;
   tiers: readonly TierDefinition[];
   groupRates: readonly GroupRate[];
-  strategic: StrategicTicket;
-  /** The VAT every price includes, in percent. */
+  /**
+   * The standard ticket plus priority access to the Stratégie & Leadership
+   * room and a reserved space, at one price for the whole season.
+   */
+  strategic: { name: Localized; price: number; trackUrl: Localized };
+  /** In percent. */
   vatRate: number;
-  /** When the programme is announced, as the FAQ words it. */
   programmeAnnouncement: Localized;
 }
 
 export const TICKETING: TicketingConfig = {
-  alfio: {
-    // The new alf.io instance (blue/green upgrade, Sept 2026). Whether this
-    // host or tickets.cloudnativedays.fr is the public one after the switch is
-    // still open; every URL and the host named in the copy derive from here.
-    baseUrl: "https://billetterie.cloudnativedays.fr",
-    eventSlug: "cnd-2027",
-  },
-  // Ticketing opens on 13 October 2026: until then /billetterie is the "coming
-  // soon" page. Opening day is this line set to "seb".
+  // The new alf.io instance (Sept 2026). Whether it or tickets.* is the public
+  // host after the switch is still open.
+  listingUrl: "https://billetterie.cloudnativedays.fr/event/cnd-2027",
+  // Ticketing opens on 13 October 2026: set to "seb" that day.
   currentPhase: "pre_opening",
-  // Lower-case, as prose uses it; the card title capitalises it.
+  // Lower-case, as prose uses it; card titles capitalise it.
   standardName: { fr: "standard", en: "standard" },
   tiers: [
     {
@@ -124,12 +95,11 @@ export const TICKETING: TicketingConfig = {
       maxPerOrder: 20,
     },
   ],
-  // Only offered on a tier whose order cap allows a group that size — see
-  // `cheaperGroupRates`. Super Early Bird and Early Bird are quota-protected at
-  // 5 seats per order, so they carry no group rate today (22/09/2026); lifting
-  // that cap is the one change that brings them back.
+  // Offered only where cheaper than the tier and within its order cap
+  // (`cheaperGroupRates`): the 5-seat cap of the two early tiers, which
+  // protects their quota, leaves them without (22/09/2026).
   groupRates: [
-    { id: "4_9", min: 4, max: 9, price: 169 },
+    { id: "4_9", min: 4, price: 169 },
     { id: "10_plus", min: 10, price: 149 },
   ],
   strategic: {

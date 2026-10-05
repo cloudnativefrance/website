@@ -5,13 +5,8 @@ import { describe, it, expect, vi } from "vitest";
 vi.mock("astro:env/server", () => ({ TICKETS_DEMO: undefined }));
 
 import { TICKETING, type TicketingConfig } from "@/config/tickets";
-import {
-  cheaperGroupRates,
-  tierStates,
-  tierUrgency,
-} from "@/lib/tickets/phase";
-import { codeUrl, listingUrl, purchaseTarget } from "@/lib/tickets/purchase";
-import { handOffOnce, openInNewTab } from "@/lib/tickets/url";
+import { cheaperGroupRates, tierStates } from "@/lib/tickets/phase";
+import { codeUrl, handOffOnce, openInNewTab } from "@/lib/tickets/alfio";
 import { buildMailto } from "@/lib/tickets/mailto";
 import {
   demoPath,
@@ -20,29 +15,15 @@ import {
 } from "@/lib/tickets/demo";
 import { formatDiscount } from "@/lib/tickets/format";
 
-const alfio = {
-  ...TICKETING,
-  alfio: { baseUrl: "https://x.test/", eventSlug: "e" },
-};
-
 describe("tiers", () => {
   it("puts past, current and upcoming tiers in order", () => {
     const [, , third] = TICKETING.tiers;
-    expect(tierStates(TICKETING, third.id).map((s) => s.state.kind)).toEqual([
+    expect(tierStates(TICKETING, third.id).map((s) => s.state)).toEqual([
       "past",
       "past",
       "current",
       "upcoming",
     ]);
-  });
-
-  it("dates every tier but the last, and limits the stock of those that close when sold out", () => {
-    const last = TICKETING.tiers.at(-1);
-    for (const t of TICKETING.tiers) {
-      const urgency = tierUrgency(TICKETING, t);
-      expect(urgency.endsAt).toBe(t === last ? undefined : t.endsAt);
-      expect(urgency.limitedStock).toBe(t.closesWhenSoldOut);
-    }
   });
 });
 
@@ -51,7 +32,7 @@ describe("cheaperGroupRates", () => {
   const config: TicketingConfig = {
     ...TICKETING,
     groupRates: [
-      { id: "4_9", min: 4, max: 9, price: 169 },
+      { id: "4_9", min: 4, price: 169 },
       { id: "10_plus", min: 10, price: 149 },
     ],
   };
@@ -75,23 +56,17 @@ describe("formatDiscount", () => {
   });
 });
 
-describe("purchase", () => {
-  it("sends every buyer to the alf.io listing", () => {
-    expect(listingUrl(alfio)).toBe("https://x.test/event/e");
-    expect(purchaseTarget(alfio)).toMatchObject({
-      kind: "listing",
-      href: "https://x.test/event/e",
-    });
-  });
+describe("codeUrl", () => {
+  const listing = "https://x.test/event/e";
 
-  it("builds the code URL: spaces dropped, path characters encoded, empty refused", () => {
-    expect(codeUrl(alfio, " \t ")).toEqual({ ok: false, reason: "empty" });
-    expect(codeUrl(alfio, " PART NER ")).toEqual({
+  it("drops spaces, encodes path characters, refuses an empty code", () => {
+    expect(codeUrl(listing, " \t ")).toEqual({ ok: false });
+    expect(codeUrl(listing, " PART NER ")).toEqual({
       ok: true,
       code: "PARTNER",
       url: "https://x.test/event/e/code/PARTNER",
     });
-    expect(codeUrl(alfio, "a/b?c#d")).toMatchObject({
+    expect(codeUrl(listing, "a/b?c#d")).toMatchObject({
       url: "https://x.test/event/e/code/a%2Fb%3Fc%23d",
     });
   });

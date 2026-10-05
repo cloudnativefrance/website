@@ -1,18 +1,12 @@
 ---
 /**
- * Door 3, "I have a code": partners, invitations, promo codes. The site checks
- * nothing and prices nothing — it hands the code to alf.io, which knows them.
+ * "J'ai un code": partners, invitations, promo codes. The site checks nothing,
+ * alf.io knows the codes.
  *
- * A slim full-width band under the tickets, in every phase (27/09/2026): a
- * short card beside a tall one leaves a hole, a band does not. It is never
- * rendered before the ticketing opens, where a code has nothing to buy.
- *
- * Without JavaScript the form is a plain GET to the listing with `?code=`, in
- * a new tab (support to confirm with JC); `tickets-ui.ts` upgrades it to
- * `/code/<CODE>` (a new tab too, `openInNewTab`), strips whitespace and
- * refuses an empty code with a message.
+ * Without JavaScript the form is a GET to the listing with `?code=` (alf.io's
+ * support to confirm with JC); `tickets-ui.ts` sends it to `/code/<CODE>`.
  */
-import type { TierId } from "@/config/tickets";
+import { TICKETING, type TierId } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import Icon from "./Icon.astro";
@@ -20,11 +14,9 @@ import Icon from "./Icon.astro";
 interface Props {
   lang: Locale;
   phase: TierId;
-  listingUrl: string;
-  fallback: { action: string; param: "code" };
 }
 
-const { lang, phase, listingUrl, fallback } = Astro.props;
+const { lang, phase } = Astro.props;
 const t = useTranslations(lang);
 ---
 
@@ -44,23 +36,21 @@ const t = useTranslations(lang);
 
   <form
     method="get"
-    action={fallback.action}
+    action={TICKETING.listingUrl}
     target="_blank"
     class="flex flex-col gap-2 lg:min-w-0 lg:flex-1 lg:flex-row lg:items-center lg:gap-6"
     novalidate
     data-tickets-code
-    data-listing={listingUrl}
   >
     <label for="ticket-code" class="sr-only">
       {t("tickets.code.intro")}
-      <span class="sr-only">{t("tickets.code.label")}</span>
+      {t("tickets.code.label")}
     </label>
-    {/* A code is short: the field keeps a sensible width. */}
     <div class="flex flex-col gap-2 lg:max-w-md lg:min-w-0 lg:flex-1">
       <div class="flex flex-col gap-2 min-[380px]:flex-row">
         <input
           id="ticket-code"
-          name={fallback.param}
+          name="code"
           type="text"
           autocomplete="off"
           autocapitalize="characters"
@@ -71,9 +61,7 @@ const t = useTranslations(lang);
           data-code-input
         />
         {
-          /* `whitespace-nowrap` from lg only, where the band puts it on one row:
-          on a phone it would make the door's min-content wider than the
-          viewport and push the whole grid column out. */
+          /* No-wrap from lg only: on a phone it would push the grid column past the viewport. */
         }
         <button
           type="submit"

@@ -10,7 +10,8 @@ import { TICKETING } from "@/config/tickets";
 import { ui } from "@/i18n/ui";
 import { formatDayMonth } from "@/lib/tickets/format";
 import { cheaperGroupRates } from "@/lib/tickets/phase";
-import { alfioHost, listingUrl } from "@/lib/tickets/purchase";
+
+const alfioHost = new URL(TICKETING.listingUrl).host;
 
 let container: AstroContainer;
 
@@ -49,7 +50,7 @@ describe.each(TICKETING.tiers)("phase $id", (tier) => {
   });
 
   it("sends both tickets to the alf.io listing, and never to a code URL", () => {
-    expect(main.split(`href="${listingUrl(TICKETING)}"`)).toHaveLength(3);
+    expect(main.split(`href="${TICKETING.listingUrl}"`)).toHaveLength(3);
     expect(main).not.toMatch(/href="[^"]*\/code\//);
   });
 
@@ -66,9 +67,7 @@ describe.each(TICKETING.tiers)("phase $id", (tier) => {
   it("gives the Stratégie & Leadership ticket one price, with no tier, date or pill", () => {
     const start = main.indexOf('id="strategie-leadership"');
     const card = main.slice(start, main.indexOf("</article>", start));
-    expect(card).toContain(
-      `data-strategic-price="${TICKETING.strategic.price}"`,
-    );
+    expect(card).toContain(`data-price="${TICKETING.strategic.price}"`);
     expect(card).not.toMatch(/data-tier|data-offer-pill|data-offer-deadline/);
   });
 
@@ -77,11 +76,9 @@ describe.each(TICKETING.tiers)("phase $id", (tier) => {
     const links = [...html.matchAll(/<a\b[^>]*>[\s\S]*?<\/a>/g)].map(
       (m) => m[0],
     );
-    const alfio = links.filter((a) =>
-      a.includes(`href="${TICKETING.alfio.baseUrl}`),
-    );
-    expect(alfio.length).toBeGreaterThan(0);
-    for (const a of alfio)
+    const handOffs = links.filter((a) => a.includes(alfioHost));
+    expect(handOffs.length).toBeGreaterThan(0);
+    for (const a of handOffs)
       expect(a).toMatch(/target="_blank"[^>]*rel="noopener"/);
     for (const a of links.filter((l) => l.includes('target="_blank"')))
       expect(a).toContain(newTab);
@@ -99,7 +96,7 @@ describe("the coming-soon page", () => {
       const html = await container.renderToString(TicketsComingSoon, {
         props: { lang },
       });
-      expect(html).not.toContain(alfioHost(TICKETING));
+      expect(html).not.toContain(alfioHost);
       expect(html).not.toMatch(/\d\s*€|€\s*\d/);
     }
   });

@@ -36,7 +36,7 @@ Schema changes that span the CSV pipeline (Sheet column → parser → Zod schem
   Sponsors and team remain Google Sheet CSVs via `src/lib/remote-csv.ts`.
   Env: `PRETALX_BASE_URL`, `PRETALX_API_TOKEN` or `PRETALX_API_TOKEN_FILE`,
   `PRETALX_TOKEN_REQUIRED=1` to make a missing or rejected token fatal (the image
-  build sets it). A _transient_ Pretalx failure is retried and then, still under
+  build sets it). A *transient* Pretalx failure is retried and then, still under
   that flag, fails with a message naming `PRETALX_ALLOW_DEGRADED=1` — the
   deliberate "Pretalx is down and I need this deploy out" override, which ships
   the build with no speaker affiliations and no level chips.

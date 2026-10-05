@@ -487,22 +487,20 @@ export const ui = {
     "tickets.h1": "Votre place pour CND France 2027",
     "tickets.when": "{date} · {venue}, Paris 19e",
     "tickets.door.code": "J'ai un code",
-    // {name} is the config's public ticket name: standard, Stratégie & Leadership.
-    // The card title capitalises it ("Billet Standard"); prose keeps it as is.
+    // {name} is the config's ticket name, capitalised by the card title.
     "tickets.offer.ticket": "Billet {name}",
     "tickets.offer.ttc": "TTC",
     "tickets.offer.last_seats": "Dernières places",
     "tickets.purchase.buy": "Acheter mon billet",
     "tickets.new_tab": "(nouvel onglet)",
-    // "Quatre" is the config's four tiers; a test pins that count.
+    // "Quatre" is the config's four tiers.
     "tickets.ladder.title": "Quatre tarifs jusqu'au jour J",
     "tickets.ladder.until": "Jusqu'au {date}",
     "tickets.ladder.until_or_sold_out": "Jusqu'au {date} ou épuisement",
     "tickets.ladder.limited_stock": "Places limitées",
     "tickets.ladder.sold_out": "Épuisé",
-    // Screen readers only: on screen, the selected card says it without a word.
+    // Screen readers only.
     "tickets.ladder.current": "Tarif en cours",
-    // Names the ticket the rates apply to, now that door 1 sells two.
     "tickets.team.per_person": "par personne",
     "tickets.team.per_person.short": "/pers.",
     "tickets.team.only": "Tarifs valables uniquement sur le billet {name}.",
@@ -517,7 +515,6 @@ export const ui = {
     "tickets.code.label": "Votre code",
     "tickets.code.submit": "Utiliser mon code",
     "tickets.code.empty": "Saisissez votre code pour continuer.",
-    // The track is open to every ticket: this one adds priority and the space.
     "tickets.strategic.perks":
       "Tout ce que comprend le billet {standard}, avec en plus un accès prioritaire à la salle Stratégie & Leadership et un espace réservé pour échanger entre pairs.",
     "tickets.strategic.track": "Découvrir le parcours Stratégie & Leadership",
@@ -570,7 +567,6 @@ export const ui = {
     "tickets.inclusion.mail.subject": "Demande de tarif inclusion ou étudiant",
     "tickets.inclusion.mail.body":
       "Bonjour,\n\nJe souhaite venir à CND France 2027 et bénéficier d'un tarif inclusion ou étudiant.\n\nMa situation en quelques mots\u00a0:\n\nNom\u00a0:\nÉcole ou structure (le cas échéant)\u00a0:\n",
-    // {standard} and {strategic} are the config's public ticket names.
     "tickets.wire.mail.subject": "Paiement par virement CND France 2027",
     "tickets.wire.mail.body":
       "Bonjour,\n\nJe souhaite payer par virement mes billets pour CND France 2027.\n\nBillet ({standard} ou {strategic})\u00a0:\nNombre de places\u00a0:\nNom\u00a0:\nSociété (le cas échéant)\u00a0:\n",
@@ -1050,13 +1046,13 @@ export const ui = {
     "tickets.offer.last_seats": "Last seats",
     "tickets.purchase.buy": "Buy my ticket",
     "tickets.new_tab": "(new tab)",
-    // "Four" is the config's four tiers; a test pins that count.
+    // "Four" is the config's four tiers.
     "tickets.ladder.title": "Four prices, up to the day itself",
     "tickets.ladder.until": "Until {date}",
     "tickets.ladder.until_or_sold_out": "Until {date} or sold out",
     "tickets.ladder.limited_stock": "Limited seats",
     "tickets.ladder.sold_out": "Sold out",
-    // Screen readers only: on screen, the selected card says it without a word.
+    // Screen readers only.
     "tickets.ladder.current": "Current price",
     "tickets.team.per_person": "per person",
     "tickets.team.per_person.short": "/person",
@@ -1072,7 +1068,6 @@ export const ui = {
     "tickets.code.label": "Your code",
     "tickets.code.submit": "Use my code",
     "tickets.code.empty": "Enter your code to continue.",
-    // The track is open to every ticket: this one adds priority and the area.
     "tickets.strategic.perks":
       "Everything in the {standard} ticket, plus priority access to the Strategy & Leadership room and a reserved space to meet your peers.",
     "tickets.strategic.track": "About the Strategy & Leadership track",

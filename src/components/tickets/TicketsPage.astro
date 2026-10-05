@@ -1,15 +1,10 @@
 ---
 /**
- * The ticketing page, whatever the phase: /billetterie, /en/tickets and every
- * demo route mount it. `pre_opening` is the "coming soon" page; a tier id is
- * the ticketing page selling that tier (`TicketsContent`).
- *
- * With the demo on (`TICKETS_DEMO`) it also carries the demo switcher, on the real
- * URLs too, so the team can walk the season from /billetterie on staging.
- * A simulated phase is always noindex, whatever the origin.
+ * What /billetterie, /en/tickets and the demo routes mount: the "coming soon"
+ * page before the opening, then the ticketing page for the tier on sale.
  */
 import Layout from "@/layouts/Layout.astro";
-import { TICKETING, type Phase } from "@/config/tickets";
+import type { Phase } from "@/config/tickets";
 import { useTranslations } from "@/i18n/utils";
 import type { Locale } from "@/i18n/ui";
 import { ticketDemosEnabled } from "@/lib/tickets/demo";
@@ -20,56 +15,33 @@ import DemoBar from "./DemoBar.astro";
 interface Props {
   lang: Locale;
   phase: Phase;
-  /** A demo route's phase rather than the config's own. */
+  /** A demo route's phase rather than the config's own: never indexed. */
   simulated?: boolean;
 }
 
 const { lang, phase, simulated = false } = Astro.props;
 const t = useTranslations(lang);
 const switcher = ticketDemosEnabled();
+const comingSoon = phase === "pre_opening";
 ---
 
-{
-  phase === "pre_opening" ? (
-    <Layout
-      title={t("nav.tickets")}
-      description={t("tickets.opening.body")}
-      lang={lang}
-      noindex={simulated}
-    >
-      {switcher && (
-        <DemoBar
-          lang={lang}
-          config={TICKETING}
-          phase={phase}
-          fromConfig={!simulated}
-        />
-      )}
+<Layout
+  title={comingSoon ? t("nav.tickets") : t("tickets.meta.title")}
+  description={comingSoon
+    ? t("tickets.opening.body")
+    : t("tickets.meta.description")}
+  lang={lang}
+  newsletter={comingSoon}
+  noindex={simulated}
+>
+  {switcher && <DemoBar lang={lang} phase={phase} simulated={simulated} />}
+  {
+    phase === "pre_opening" ? (
       <TicketsComingSoon lang={lang} />
-    </Layout>
-  ) : (
-    <Layout
-      title={t("tickets.meta.title")}
-      description={t("tickets.meta.description")}
-      lang={lang}
-      newsletter={false}
-      noindex={simulated}
-    >
-      {switcher && (
-        <DemoBar
-          lang={lang}
-          config={TICKETING}
-          phase={phase}
-          fromConfig={!simulated}
-        />
-      )}
+    ) : (
       <TicketsContent lang={lang} phase={phase} demo={switcher} />
-    </Layout>
-  )
-}
+    )
+  }
+</Layout>
 
-{
-  /* Only where it has work: the code form and the mobile bar. The coming-soon
-    page ships no script of its own; the demo switcher carries its own. */
-}
-{phase !== "pre_opening" && <script>import "./tickets-ui.ts";</script>}
+{!comingSoon && <script>import "./tickets-ui.ts";</script>}

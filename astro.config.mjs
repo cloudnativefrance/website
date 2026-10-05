@@ -83,8 +83,7 @@ export default defineConfig({
       // and don't redeploy post-event just to add routes to the sitemap, so
       // these routes are excluded permanently. Post-event inbound links come
       // from CountdownTimer and the conditional nav entry.
-      // The ticketing demo only exists on non-production builds (see
-      // src/lib/tickets/demo.ts); kept out of the sitemap there too.
+      // The ticketing demo (src/lib/tickets/demo.ts) is never indexed.
       filter: (page) =>
         !/\/replays\/?$/.test(page) &&
         !/\/en\/replays\/?$/.test(page) &&
@@ -128,10 +127,7 @@ export default defineConfig({
           envField.enum(entry),
         ]),
       ),
-      // The ticketing demo: phase switcher and /billetterie/demo/* (see
-      // src/lib/tickets/demo.ts). Unset, it is on under `astro dev` and off in
-      // any build; the staging image sets it to true. A production-origin build
-      // refuses true.
+      // See src/lib/tickets/demo.ts.
       TICKETS_DEMO: envField.boolean({
         context: "server",
         access: "public",

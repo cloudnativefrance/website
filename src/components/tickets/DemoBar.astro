@@ -1,52 +1,33 @@
 ---
 /**
- * Demo-only phase switcher: each phase is a link to a pre-rendered page —
- * exactly what a production build renders in that phase, with no client
- * re-implementation. Rendered on every ticketing page when the demo is on
- * (`TICKETS_DEMO`, src/lib/tickets/demo.ts), /billetterie included; never in
- * production.
+ * The demo's phase switcher: a striped "DÉMO" pill in the corner, opening a
+ * native popover of links to the pre-rendered phases. Hidden by default, so
+ * the page reads exactly as production will.
  *
- * It stays out of the way on purpose: the page must look exactly like the
- * future production page, so the only permanent mark is the striped "DÉMO"
- * pill in the bottom-left corner. Clicking it opens the switcher in a native
- * popover (top layer, light-dismiss and Esc for free, no JS needed to open it).
- *
- * Everything the demo needs lives in this file and is emitted only when it
- * renders, so a production build carries no trace of it: its copy is here
- * rather than in `src/i18n/ui.ts` (that dictionary is bundled into the home
- * page's islands), its styles are `is:inline` (a bundled style block
- * ships with every page that merely imports this component) and its script is
- * its own.
+ * Everything the demo needs lives here and is emitted only when it renders,
+ * so production carries no trace of it: its copy stays out of `src/i18n/ui.ts`
+ * (bundled into the home page's islands), its style is `is:inline` (a bundled
+ * style ships with every page that merely imports the component), and its
+ * script is its own.
  */
-import type { Phase, TicketingConfig } from "@/config/tickets";
+import { TICKETING, type Phase } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { DEMO_PHASES, demoPath } from "@/lib/tickets/demo";
+import { offerTier } from "@/lib/tickets/phase";
 
-const COPY: Record<
-  Locale,
-  Record<
-    | "badge"
-    | "notice"
-    | "settings"
-    | "close"
-    | "phase"
-    | "pre_opening"
-    | "scenario"
-    | "config",
-    string
-  >
-> = {
-  fr: {
-    badge: "Démo",
-    notice: "Page de démonstration, non publiée.",
-    settings: "Ouvrir les réglages de la démo",
-    close: "Fermer les réglages",
-    phase: "Phase",
-    pre_opening: "Avant ouverture",
-    scenario:
-      "Scénario simulé : les tarifs précédents sont affichés comme épuisés.",
-    config: "État de la config",
-  },
+const fr = {
+  badge: "Démo",
+  notice: "Page de démonstration, non publiée.",
+  settings: "Ouvrir les réglages de la démo",
+  close: "Fermer les réglages",
+  phase: "Phase",
+  pre_opening: "Avant ouverture",
+  scenario:
+    "Scénario simulé\u00a0: les tarifs précédents sont affichés comme épuisés.",
+  config: "État de la config",
+};
+const COPY: Record<Locale, typeof fr> = {
+  fr,
   en: {
     badge: "Demo",
     notice: "Demonstration page, not published.",
@@ -61,19 +42,15 @@ const COPY: Record<
 
 interface Props {
   lang: Locale;
-  config: TicketingConfig;
   phase: Phase;
-  /** True on /billetterie and /en/tickets, which show the config's own phase. */
-  fromConfig: boolean;
+  simulated: boolean;
 }
 
-const { lang, config, phase, fromConfig } = Astro.props;
+const { lang, phase, simulated } = Astro.props;
 const copy = COPY[lang];
 
 const phaseLabel = (p: Phase) =>
-  p === "pre_opening"
-    ? copy.pre_opening
-    : config.tiers.find((tier) => tier.id === p)!.name[lang];
+  p === "pre_opening" ? copy.pre_opening : offerTier(TICKETING, p).name[lang];
 
 const legend =
   "text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-muted-foreground";
@@ -83,7 +60,7 @@ const idle = "text-foreground hover:bg-muted";
 const active = "bg-foreground text-background";
 ---
 
-<div class="demo-root" data-demo-bar>
+<div class="demo-root">
   <button
     type="button"
     popovertarget="demo-panel"
@@ -168,8 +145,8 @@ const active = "bg-foreground text-background";
             DEMO_PHASES.map((p) => (
               <a
                 href={demoPath(p, lang)}
-                class:list={[chip, !fromConfig && p === phase ? active : idle]}
-                aria-current={!fromConfig && p === phase ? "page" : undefined}
+                class:list={[chip, simulated && p === phase ? active : idle]}
+                aria-current={simulated && p === phase ? "page" : undefined}
                 data-demo-link
               >
                 {phaseLabel(p)}
@@ -182,16 +159,15 @@ const active = "bg-foreground text-background";
       <p
         class="border-border text-muted-foreground border-t px-4 py-3 text-[0.6875rem] leading-relaxed"
       >
-        {fromConfig ? `${copy.config} · ` : ""}{copy.scenario}
+        {simulated ? "" : `${copy.config} · `}{copy.scenario}
       </p>
     </div>
   </div>
 </div>
 
 <script>
-  // Keep the reading position and the open panel across switches. Each phase
-  // is its own URL, so switching reloads the page; without this the panel
-  // would close and the page jump back to the top on every click.
+  // Each phase is its own page: keep the scroll position and the open panel
+  // across a switch.
   const SCROLL_KEY = "cnd-tickets-demo-scroll";
   const PANEL_KEY = "cnd-tickets-demo-panel";
   const panel = document.querySelector<HTMLElement>("[data-demo-panel]");
@@ -203,9 +179,7 @@ const active = "bg-foreground text-background";
       try {
         sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
         sessionStorage.setItem(PANEL_KEY, "open");
-      } catch {
-        // Storage can be unavailable (private mode); the switch still works.
-      }
+      } catch {}
     });
   }
 
@@ -215,15 +189,11 @@ const active = "bg-foreground text-background";
       sessionStorage.removeItem(SCROLL_KEY);
       window.scrollTo({ top: Number(saved), behavior: "instant" });
     }
-    // Consumed on arrival: the panel reopens after a switch, not on a later
-    // visit where the reader closed it and navigated off the page.
     if (sessionStorage.getItem(PANEL_KEY) === "open") {
       sessionStorage.removeItem(PANEL_KEY);
       panel?.showPopover?.();
     }
-  } catch {
-    // Nothing to restore.
-  }
+  } catch {}
 </script>
 
 <style is:inline>
