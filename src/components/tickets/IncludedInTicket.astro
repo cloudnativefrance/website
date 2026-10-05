@@ -2,8 +2,7 @@
 /**
  * What the standard ticket includes. A plain checklist, not a grid of feature
  * cards; the evening — new in 2027 and the launch's main argument — gets the
- * section's one card, its novelty in a pink pill, and what it holds once the
- * evening team has decided it.
+ * section's one card, its novelty in a pink pill.
  */
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
@@ -11,11 +10,9 @@ import Icon from "./Icon.astro";
 
 interface Props {
   lang: Locale;
-  /** What the evening holds; left out until decided. */
-  eveningDetails?: string;
 }
 
-const { lang, eveningDetails } = Astro.props;
+const { lang } = Astro.props;
 const t = useTranslations(lang);
 const items = [
   t("tickets.included.talks"),
@@ -66,12 +63,5 @@ const items = [
     <p class="text-foreground text-lg text-pretty">
       {t("tickets.included.evening.body")}
     </p>
-    {
-      eveningDetails && (
-        <p class="text-muted-foreground text-base text-pretty">
-          {eveningDetails}
-        </p>
-      )
-    }
   </div>
 </section>

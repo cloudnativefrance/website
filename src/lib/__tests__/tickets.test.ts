@@ -210,7 +210,7 @@ describe("drafts", () => {
   it("lets a decided config ship, and an undecided value with no draft — its line is not rendered", () => {
     expect(shippingProblems(decided)).toEqual([]);
     expect(
-      shippingProblems({ ...decided, eveningDetails: tbd("Soirée") }),
+      shippingProblems({ ...decided, programmeAnnouncement: tbd("Date") }),
     ).toEqual([]);
   });
 
@@ -218,9 +218,9 @@ describe("drafts", () => {
     expect(() =>
       assertShippable({
         ...decided,
-        eveningDetails: tbd("Soirée", { fr: "Concert", en: "Concert" }),
+        programmeAnnouncement: tbd("Date", { fr: "en mars", en: "in March" }),
       }),
-    ).toThrow(/eveningDetails/);
+    ).toThrow(/programmeAnnouncement/);
     const required = {
       ...decided,
       standardName: tbd("Nom"),

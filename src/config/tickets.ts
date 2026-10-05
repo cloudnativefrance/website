@@ -104,7 +104,6 @@ export interface TicketingConfig {
   contents: Maybe<true>;
   /** "La soirée est comprise", in the ticket contents — to confirm with the evening team: `true` once confirmed. */
   eveningIncluded: Maybe<true>;
-  eveningDetails: Maybe<Localized>;
   /** The VAT every price includes, in percent. */
   vatRate: number;
   programmeAnnouncement: Maybe<Localized>;
@@ -186,7 +185,6 @@ export const TICKETING: TicketingConfig = {
     "Soirée ouverte à tous les participants, sans option (pôle soirée)",
     true,
   ),
-  eveningDetails: tbd("Contenu de la soirée (pôle soirée)"),
   vatRate: 20,
   programmeAnnouncement: tbd("Date publique d'annonce du programme", {
     fr: "en mars 2027",
