@@ -503,7 +503,9 @@ export const ui = {
     // Screen readers only: on screen, the selected card says it without a word.
     "tickets.ladder.current": "Tarif en cours",
     // Names the ticket the rates apply to, now that door 1 sells two.
-    "tickets.team.rates": "Billet {name}, par place",
+    "tickets.team.per_person": "par personne",
+    "tickets.team.per_person.short": "/pers.",
+    "tickets.team.only": "Tarifs valables uniquement sur le billet {name}.",
     "tickets.team.rate.4_9": "De 4 à 9 personnes",
     "tickets.team.rate.10_plus": "10 personnes et plus",
     "tickets.team.cta.group": "Demander mon tarif de groupe",
@@ -1056,7 +1058,9 @@ export const ui = {
     "tickets.ladder.sold_out": "Sold out",
     // Screen readers only: on screen, the selected card says it without a word.
     "tickets.ladder.current": "Current price",
-    "tickets.team.rates": "{name} ticket, per seat",
+    "tickets.team.per_person": "per person",
+    "tickets.team.per_person.short": "/person",
+    "tickets.team.only": "Rates apply to the {name} ticket only.",
     "tickets.team.rate.4_9": "4 to 9 people",
     "tickets.team.rate.10_plus": "10 people or more",
     "tickets.team.cta.group": "Ask for my group rate",

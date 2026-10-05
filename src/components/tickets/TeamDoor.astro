@@ -11,7 +11,7 @@
 import type { GroupRate, TierDefinition } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
-import { fill, upperFirst } from "@/lib/tickets/format";
+import { fill } from "@/lib/tickets/format";
 import GroupRates from "./GroupRates.astro";
 import Icon from "./Icon.astro";
 
@@ -42,11 +42,17 @@ const t = useTranslations(lang);
     {t("tickets.team.title")}
   </h2>
 
+  {
+    /* The page sells two tickets: a fine-print footnote, like terms under a
+      price list, says which one the rates apply to. */
+  }
   <div class="flex flex-col gap-2">
-    <p class="text-muted-foreground text-sm font-medium">
-      {upperFirst(fill(t("tickets.team.rates"), { name: ticketName }))}
-    </p>
     <GroupRates lang={lang} tier={tier} rates={rates} />
+    <p class="text-muted-foreground text-right text-xs text-pretty">
+      <span aria-hidden="true">* </span>{
+        fill(t("tickets.team.only"), { name: ticketName })
+      }
+    </p>
   </div>
 
   <div class="mt-auto">
