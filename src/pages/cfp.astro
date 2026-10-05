@@ -156,20 +156,17 @@ const criteria = [
             </p>
           </article>
         ))}
-      </div>
-    </section>
-
-    <section class="w-full bg-accent/10 border-y border-accent/30">
-      <div class="mx-auto max-w-6xl px-4 md:px-6 py-5 md:py-6 flex flex-wrap items-center gap-4">
-        <div class="inline-flex items-center justify-center w-9 h-9 rounded-full text-lg bg-accent/15 shrink-0" aria-hidden="true">
-          {horsPiste.emoji}
-        </div>
-        <h3 class="text-base md:text-lg font-bold text-foreground tracking-tight shrink-0">
-          {horsPiste.title}
-        </h3>
-        <p class="flex-1 min-w-0 text-sm md:text-base text-muted-foreground leading-relaxed">
-          {horsPiste.body}
-        </p>
+        <article class="sm:col-span-2 lg:col-span-3 flex flex-wrap items-center gap-4 rounded-lg border border-border bg-card p-4 md:p-5 transition-colors hover:border-primary/60">
+          <div class="inline-flex items-center justify-center w-9 h-9 rounded-full text-lg bg-primary/10 shrink-0" aria-hidden="true">
+            {horsPiste.emoji}
+          </div>
+          <h3 class="text-base md:text-lg font-bold text-foreground tracking-tight shrink-0">
+            {horsPiste.title}
+          </h3>
+          <p class="flex-1 min-w-0 text-sm md:text-base text-muted-foreground leading-relaxed">
+            {horsPiste.body}
+          </p>
+        </article>
       </div>
     </section>
 
