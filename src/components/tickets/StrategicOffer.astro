@@ -21,15 +21,15 @@ interface Props {
   name: string;
   /** The standard ticket's name, which this one includes. */
   standardName: string;
-  /** Euros, VAT included; undefined while undecided — the price line is then left out. */
-  price?: number;
-  /** The track's page, once it exists. */
-  trackUrl?: string;
+  /** Euros, VAT included. */
+  price: number;
+  /** The track's page. */
+  trackUrl: string;
 }
 
 const { lang, name, standardName, price, trackUrl } = Astro.props;
 const t = useTranslations(lang);
-const parts = price === undefined ? undefined : priceParts(price, lang);
+const parts = priceParts(price, lang);
 ---
 
 <article
@@ -46,31 +46,33 @@ const parts = price === undefined ? undefined : priceParts(price, lang);
     >
       {fill(t("tickets.offer.ticket"), { name })}
     </h2>
-    {
-      parts && (
-        <p
-          class="text-foreground flex items-baseline gap-3"
-          data-strategic-price={price}
-        >
-          <span class="text-[clamp(3.5rem,11vw,5.5rem)] leading-none font-bold tracking-[-0.035em] tabular-nums">
-            {parts.before && (
-              <span class="mr-1 align-top text-[0.45em] font-semibold tracking-normal">
-                {parts.before}
-              </span>
-            )}
-            {parts.amount}
-            {parts.after && (
-              <span class="ml-1.5 text-[0.45em] font-semibold tracking-normal">
-                {parts.after}
-              </span>
-            )}
-          </span>
-          <span class="text-muted-foreground text-base font-medium">
-            {t("tickets.offer.ttc")}
-          </span>
-        </p>
-      )
-    }
+    <p
+      class="text-foreground flex items-baseline gap-3"
+      data-strategic-price={price}
+    >
+      <span
+        class="text-[clamp(3.5rem,11vw,5.5rem)] leading-none font-bold tracking-[-0.035em] tabular-nums"
+      >
+        {
+          parts.before && (
+            <span class="mr-1 align-top text-[0.45em] font-semibold tracking-normal">
+              {parts.before}
+            </span>
+          )
+        }
+        {parts.amount}
+        {
+          parts.after && (
+            <span class="ml-1.5 text-[0.45em] font-semibold tracking-normal">
+              {parts.after}
+            </span>
+          )
+        }
+      </span>
+      <span class="text-muted-foreground text-base font-medium">
+        {t("tickets.offer.ttc")}
+      </span>
+    </p>
     <p class="text-muted-foreground max-w-[52ch] text-base text-pretty">
       {fill(t("tickets.strategic.perks"), { standard: standardName })}
     </p>
@@ -78,24 +80,19 @@ const parts = price === undefined ? undefined : priceParts(price, lang);
       /* Inline, not flex: when the line wraps, the arrow follows the last word
         instead of standing apart at the far edge. */
     }
-    {
-      trackUrl && (
-        <p class="text-base font-semibold text-pretty">
-          <a
-            href={trackUrl}
-            class="text-primary-strong underline-offset-4 hover:underline"
-            data-umami-event="tickets-strategic-track"
-          >
-            {t("tickets.strategic.track")}
-            <Icon
-              name="arrow-right"
-              size={16}
-              class="ml-1.5 inline-block align-[-0.125em]"
-            />
-          </a>
-        </p>
-      )
-    }
+    <p class="text-base font-semibold text-pretty">
+      <a
+        href={trackUrl}
+        class="text-primary-strong underline-offset-4 hover:underline"
+        data-umami-event="tickets-strategic-track"
+      >
+        {t("tickets.strategic.track")}<Icon
+          name="arrow-right"
+          size={16}
+          class="ml-1.5 inline-block align-[-0.125em]"
+        /></a
+      >
+    </p>
   </div>
 
   {

@@ -15,34 +15,7 @@
  * logic. `pre_opening` serves the "coming soon" page at /billetterie; on the
  * opening day set it to the first tier, and when a tier ends — early or on its
  * date — to the next one. Every tier behind the current one reads "Épuisé".
- *
- * **Unknowns are `tbd()`, never a plausible guess.** A `tbd` renders nothing
- * of its own: the page shows its draft when it has one — as the copy it will
- * become — and leaves its line out when it has none. A build without
- * the demo (production) refuses the page while a draft is left (`assertShippable` in
- * `src/lib/tickets/drafts.ts`). `grep -n "tbd(" src/config/tickets.ts` lists
- * everything still open.
  */
-
-/** A value the organising team has not decided yet. `draft` is what the page
- *  shows until then — on staging only. */
-export interface Tbd<T = never> {
-  readonly tbd: true;
-  readonly note: string;
-  readonly draft?: T;
-}
-
-export function tbd<T = never>(note: string, draft?: T): Tbd<T> {
-  return draft === undefined ? { tbd: true, note } : { tbd: true, note, draft };
-}
-
-export function isTbd(value: unknown): value is Tbd<unknown> {
-  return (
-    typeof value === "object" && value !== null && (value as Tbd).tbd === true
-  );
-}
-
-export type Maybe<T> = T | Tbd<T>;
 
 export type Localized = { fr: string; en: string };
 
@@ -83,30 +56,25 @@ export interface GroupRate {
  */
 export interface StrategicTicket {
   /** The ticket's public name — the track's own, "Stratégie & Leadership" (27/09/2026). */
-  name: Maybe<Localized>;
+  name: Localized;
   /** Euros, VAT included. */
-  price: Maybe<number>;
+  price: number;
   /** The page describing the Strategy & Leadership track. */
-  trackUrl: Maybe<Localized>;
+  trackUrl: Localized;
 }
 
 export interface TicketingConfig {
   alfio: { baseUrl: string; eventSlug: string };
   currentPhase: Phase;
   /** Public name of the ticket the tiers price, beside the Strategy & Leadership one. */
-  standardName: Maybe<Localized>;
+  standardName: Localized;
   tiers: readonly TierDefinition[];
-  /** Public tier names are still the working names of the pricing sheet: `true` once final. */
-  tierNames: Maybe<true>;
   groupRates: readonly GroupRate[];
   strategic: StrategicTicket;
-  /** The contents list on the page, pending the evening team: `true` once confirmed. */
-  contents: Maybe<true>;
-  /** "La soirée est comprise", in the ticket contents — to confirm with the evening team: `true` once confirmed. */
-  eveningIncluded: Maybe<true>;
   /** The VAT every price includes, in percent. */
   vatRate: number;
-  programmeAnnouncement: Maybe<Localized>;
+  /** When the programme is announced, as the FAQ words it. */
+  programmeAnnouncement: Localized;
 }
 
 export const TICKETING: TicketingConfig = {
@@ -118,14 +86,10 @@ export const TICKETING: TicketingConfig = {
     eventSlug: "cnd-2027",
   },
   // Ticketing opens on 13 October 2026: until then /billetterie is the "coming
-  // soon" page. Opening day is this line set to "seb" — a production build then
-  // refuses the page until every tbd() below is decided (`assertShippable`).
+  // soon" page. Opening day is this line set to "seb".
   currentPhase: "pre_opening",
   // Lower-case, as prose uses it; the card title capitalises it.
-  standardName: tbd("Nom public du billet standard", {
-    fr: "standard",
-    en: "standard",
-  }),
+  standardName: { fr: "standard", en: "standard" },
   tiers: [
     {
       id: "seb",
@@ -160,7 +124,6 @@ export const TICKETING: TicketingConfig = {
       maxPerOrder: 20,
     },
   ],
-  tierNames: tbd("Noms publics des paliers en français et en anglais", true),
   // Only offered on a tier whose order cap allows a group that size — see
   // `cheaperGroupRates`. Super Early Bird and Early Bird are quota-protected at
   // 5 seats per order, so they carry no group rate today (22/09/2026); lifting
@@ -170,24 +133,13 @@ export const TICKETING: TicketingConfig = {
     { id: "10_plus", min: 10, price: 149 },
   ],
   strategic: {
-    name: tbd("Nom public du billet", {
-      fr: "Stratégie & Leadership",
-      en: "Strategy & Leadership",
-    }),
-    price: tbd("Prix fixe du billet", 299),
-    trackUrl: tbd("Page du parcours Stratégie & Leadership, à créer", {
+    name: { fr: "Stratégie & Leadership", en: "Strategy & Leadership" },
+    price: 299,
+    trackUrl: {
       fr: "/track-strategie-leadership",
       en: "/en/track-strategy-leadership",
-    }),
+    },
   },
-  contents: tbd("Contenu exact du billet standard", true),
-  eveningIncluded: tbd(
-    "Soirée ouverte à tous les participants, sans option (pôle soirée)",
-    true,
-  ),
   vatRate: 20,
-  programmeAnnouncement: tbd("Date publique d'annonce du programme", {
-    fr: "en mars 2027",
-    en: "in March 2027",
-  }),
+  programmeAnnouncement: { fr: "en mars 2027", en: "in March 2027" },
 };

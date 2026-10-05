@@ -1,5 +1,5 @@
 /**
- * Hidden demo routes for the ticketing page, and the gate on unfinished values.
+ * Hidden demo routes for the ticketing page.
  *
  * /billetterie and /en/tickets serve the config's own phase everywhere. The
  * demo adds one page per phase under /billetterie/demo/ and /en/tickets/demo/
@@ -13,10 +13,6 @@
  * The build's origin only vetoes: a production-origin build refuses the demo,
  * so `TICKETS_DEMO=true` landing on `main` by mistake is a red build, never a
  * demo on cloudnativedays.fr.
- *
- * The same switch decides whether a draft value may be shown: without the demo
- * the page refuses a selling phase while the config still holds one
- * (`assertShippable`).
  */
 import { TICKETS_DEMO } from "astro:env/server";
 import type { Phase } from "@/config/tickets";
@@ -44,10 +40,6 @@ export function ticketDemosEnabled({
     );
   }
   return enabled;
-}
-
-export function placeholdersAllowed(input: GateInput = {}): boolean {
-  return ticketDemosEnabled(input);
 }
 
 export const DEMO_PHASES: readonly Phase[] = [

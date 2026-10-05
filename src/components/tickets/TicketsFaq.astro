@@ -1,8 +1,7 @@
 ---
 /**
  * Reassurance and FAQ, as native <details>: keyboard and screen readers get
- * disclosure for free, and the page works without JavaScript. An answer the
- * ticketing team has not decided is left out.
+ * disclosure for free, and the page works without JavaScript.
  */
 import type { Locale } from "@/i18n/ui";
 import { useTranslations, getLocalePath } from "@/i18n/utils";
@@ -22,8 +21,8 @@ interface Props {
   perOrder: { early: number; later: number };
   /** The Strategy & Leadership ticket's public name: the track is open to every ticket, its exchange space is not. */
   strategicName: string;
-  /** When the programme is announced; its question is left out while undecided. */
-  programmeWhen?: string;
+  /** When the programme is announced. */
+  programmeWhen: string;
   /** The VAT rate every price includes, formatted. */
   vatRate: string;
 }
@@ -187,17 +186,13 @@ const link =
         <a href={cocPath} class={link}>{t("tickets.faq.coc.link")}</a>
       </p>
     </details>
-    {
-      programmeWhen && (
-        <details class="faq group">
-          <summary>
-            {t("tickets.faq.programme.q")}
-            <Icon name="plus" size={18} class="faq-icon" />
-          </summary>
-          <p>{fill(t("tickets.faq.programme.a"), { when: programmeWhen })}</p>
-        </details>
-      )
-    }
+    <details class="faq group">
+      <summary>
+        {t("tickets.faq.programme.q")}
+        <Icon name="plus" size={18} class="faq-icon" />
+      </summary>
+      <p>{fill(t("tickets.faq.programme.a"), { when: programmeWhen })}</p>
+    </details>
   </div>
 </section>
 

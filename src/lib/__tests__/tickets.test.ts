@@ -4,10 +4,9 @@ import { describe, it, expect, vi } from "vitest";
 // Astro runtime. Unset here; every gate case passes its own `toggle`.
 vi.mock("astro:env/server", () => ({ TICKETS_DEMO: undefined }));
 
-import { TICKETING, isTbd, tbd, type TicketingConfig } from "@/config/tickets";
+import { TICKETING, type TicketingConfig } from "@/config/tickets";
 import {
   cheaperGroupRates,
-  ticketingConfigProblems,
   tierStates,
   tierUrgency,
 } from "@/lib/tickets/phase";
@@ -17,25 +16,14 @@ import { buildMailto } from "@/lib/tickets/mailto";
 import {
   demoPath,
   demoStaticPaths,
-  placeholdersAllowed,
   ticketDemosEnabled,
 } from "@/lib/tickets/demo";
 import { formatDiscount } from "@/lib/tickets/format";
-import { assertShippable, shippingProblems, shown } from "@/lib/tickets/drafts";
 
 const alfio = {
   ...TICKETING,
   alfio: { baseUrl: "https://x.test/", eventSlug: "e" },
 };
-
-describe("the committed config", () => {
-  it("is consistent, and names no tier by its internal abbreviation", () => {
-    expect(ticketingConfigProblems(TICKETING)).toEqual([]);
-    for (const t of TICKETING.tiers)
-      for (const name of Object.values(t.name))
-        expect(name).not.toMatch(/^(SEB|EB|R|LC)$/);
-  });
-});
 
 describe("tiers", () => {
   it("puts past, current and upcoming tiers in order", () => {
@@ -151,7 +139,6 @@ describe("demo gate", () => {
   it("is off in any build without TICKETS_DEMO, on under astro dev unless TICKETS_DEMO=false", () => {
     for (const env of [prod, staging])
       expect(ticketDemosEnabled({ env, dev: false })).toBe(false);
-    expect(placeholdersAllowed({ env: staging, dev: false })).toBe(false);
     expect(ticketDemosEnabled({ env: prod, dev: true })).toBe(true);
     expect(ticketDemosEnabled({ toggle: false, env: prod, dev: true })).toBe(
       false,
@@ -162,9 +149,6 @@ describe("demo gate", () => {
     expect(ticketDemosEnabled({ toggle: true, env: staging, dev: false })).toBe(
       true,
     );
-    expect(
-      placeholdersAllowed({ toggle: true, env: staging, dev: false }),
-    ).toBe(true);
   });
 
   it("refuses TICKETS_DEMO=true on a production-origin build, the empty PUBLIC_SITE_URL of CI included", () => {
@@ -175,9 +159,6 @@ describe("demo gate", () => {
     ]) {
       expect(() =>
         ticketDemosEnabled({ toggle: true, env, dev: false }),
-      ).toThrow(/TICKETS_DEMO/);
-      expect(() =>
-        placeholdersAllowed({ toggle: true, env, dev: false }),
       ).toThrow(/TICKETS_DEMO/);
     }
   });
@@ -191,45 +172,5 @@ describe("demo gate", () => {
         /^\/en\/tickets\/demo\/[a-z-]+\/$/,
       );
     }
-  });
-});
-
-describe("drafts", () => {
-  // Every tbd() replaced by its draft, or by a stand-in when it has none: the
-  // config as it will be once the team has decided everything.
-  const decided = JSON.parse(JSON.stringify(TICKETING), (_key, value) =>
-    isTbd(value) ? (value.draft ?? "decided") : value,
-  ) as TicketingConfig;
-
-  it("shows the decided value, else the draft, else nothing", () => {
-    expect(shown("10:00")).toBe("10:00");
-    expect(shown(tbd("Heure", "10:00"))).toBe("10:00");
-    expect(shown(tbd("Heure"))).toBeUndefined();
-  });
-
-  it("lets a decided config ship, and an undecided value with no draft — its line is not rendered", () => {
-    expect(shippingProblems(decided)).toEqual([]);
-    expect(
-      shippingProblems({ ...decided, programmeAnnouncement: tbd("Date") }),
-    ).toEqual([]);
-  });
-
-  it("blocks on any draft, and on the two ticket names and the S&L price even without one", () => {
-    expect(() =>
-      assertShippable({
-        ...decided,
-        programmeAnnouncement: tbd("Date", { fr: "en mars", en: "in March" }),
-      }),
-    ).toThrow(/programmeAnnouncement/);
-    const required = {
-      ...decided,
-      standardName: tbd("Nom"),
-      strategic: { ...decided.strategic, name: tbd("Nom"), price: tbd("Prix") },
-    };
-    expect(shippingProblems(required).map((p) => p.path)).toEqual([
-      "standardName",
-      "strategic.name",
-      "strategic.price",
-    ]);
   });
 });

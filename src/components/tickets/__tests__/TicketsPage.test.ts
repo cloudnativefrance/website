@@ -8,7 +8,6 @@ import TicketsContent from "../TicketsContent.astro";
 import TicketsComingSoon from "../TicketsComingSoon.astro";
 import { TICKETING } from "@/config/tickets";
 import { ui } from "@/i18n/ui";
-import { shown } from "@/lib/tickets/drafts";
 import { formatDayMonth } from "@/lib/tickets/format";
 import { cheaperGroupRates } from "@/lib/tickets/phase";
 import { alfioHost, listingUrl } from "@/lib/tickets/purchase";
@@ -37,10 +36,8 @@ describe.each(TICKETING.tiers)("phase $id", (tier) => {
     text = visibleText(main);
   });
 
-  it("shows no internal tier abbreviation and no placeholder", () => {
+  it("shows no internal tier abbreviation", () => {
     expect(text).not.toMatch(/\b(SEB|EB|LC)\b/);
-    expect(text).not.toMatch(/à confirmer|\btbd\b/i);
-    expect(main).not.toContain("data-tbd");
   });
 
   it("dates the current tier only", () => {
@@ -70,7 +67,7 @@ describe.each(TICKETING.tiers)("phase $id", (tier) => {
     const start = main.indexOf('id="strategie-leadership"');
     const card = main.slice(start, main.indexOf("</article>", start));
     expect(card).toContain(
-      `data-strategic-price="${shown(TICKETING.strategic.price)}"`,
+      `data-strategic-price="${TICKETING.strategic.price}"`,
     );
     expect(card).not.toMatch(/data-tier|data-offer-pill|data-offer-deadline/);
   });

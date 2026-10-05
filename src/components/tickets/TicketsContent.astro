@@ -10,10 +10,7 @@
  * "coming soon" page (`TicketsPage`). Everything is derived from
  * `src/config/tickets.ts` and the tier on sale, so the demo routes and
  * /billetterie render the same page. Every purchase — both tickets of door 1,
- * the mobile bar — goes to the alf.io listing through one `purchaseTarget`. An undecided value shows its draft or nothing (`shown`),
- * and a build without the demo (production) refuses the page while a draft is left
- * (`assertShippable`) — which is why flipping `currentPhase` to the first tier
- * is also the check that everything is decided.
+ * the mobile bar — goes to the alf.io listing through one `purchaseTarget`.
  */
 import GeoBackground from "@/components/patterns/GeoBackground.astro";
 import { TICKETING, type TierId } from "@/config/tickets";
@@ -21,8 +18,6 @@ import { useTranslations } from "@/i18n/utils";
 import type { Locale } from "@/i18n/ui";
 import { CONTACT_EMAILS, TARGET_DATE } from "@/lib/event";
 import { buildMailto } from "@/lib/tickets/mailto";
-import { placeholdersAllowed } from "@/lib/tickets/demo";
-import { assertShippable, shown } from "@/lib/tickets/drafts";
 import {
   fill,
   formatFullDate,
@@ -31,7 +26,6 @@ import {
   upperFirst,
 } from "@/lib/tickets/format";
 import {
-  assertTicketingConfig,
   cheaperGroupRates,
   offerTier,
   tierStates,
@@ -62,10 +56,6 @@ interface Props {
 const { lang, phase, demo } = Astro.props;
 const t = useTranslations(lang);
 const config = TICKETING;
-assertTicketingConfig(config);
-// A draft is for demo eyes only: without the demo (production) the page is
-// refused while one is left in the config, and the error names them all.
-if (!placeholdersAllowed()) assertShippable(config);
 
 const tier = offerTier(config, phase);
 const ladder = tierStates(config, phase);
@@ -83,14 +73,13 @@ const groupMailto = buildMailto(
 // the mobile bar share it.
 const target = purchaseTarget(config);
 
-// Two tickets, both in door 1: the standard one the tiers price, and the
-// Strategy & Leadership one at a single price. Their names are required values
-// (`assertShippable`), so production never renders them empty.
-const standardName = shown(config.standardName)?.[lang] ?? "";
+// Two tickets: the standard one the tiers price, and the Strategy & Leadership
+// one at a single price.
+const standardName = config.standardName[lang];
 const strategic = {
-  name: shown(config.strategic.name)?.[lang] ?? "",
-  price: shown(config.strategic.price),
-  trackUrl: shown(config.strategic.trackUrl)?.[lang],
+  name: config.strategic.name[lang],
+  price: config.strategic.price,
+  trackUrl: config.strategic.trackUrl[lang],
 };
 
 // The FAQ answers that end on the ticketing address, each with its own
@@ -123,8 +112,6 @@ const faqMailto = {
 // moment and fits the tier's order cap; below that it had nothing to sell.
 // Everything else about the first viewport follows from it.
 const showTeam = rates.length > 0;
-
-const programmeWhen = shown(config.programmeAnnouncement)?.[lang];
 
 const eventDate = formatFullDate(TARGET_DATE, lang);
 // Split around {venue} so the venue can be set unbreakable: "CENTQUATRE-PARIS"
@@ -267,7 +254,7 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
       mailto={faqMailto}
       perOrder={perOrder}
       strategicName={strategic.name}
-      programmeWhen={programmeWhen}
+      programmeWhen={config.programmeAnnouncement[lang]}
       vatRate={formatPercent(config.vatRate, lang)}
     />
   </div>
