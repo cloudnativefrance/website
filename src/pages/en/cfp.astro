@@ -164,17 +164,20 @@ const criteria = [
             </p>
           </article>
         ))}
-        <article class="sm:col-span-2 lg:col-span-3 flex flex-wrap items-center gap-4 rounded-lg border border-accent/60 bg-card p-4 md:p-5 transition-colors hover:border-accent">
-          <div class="inline-flex items-center justify-center w-9 h-9 rounded-full text-lg bg-accent/15 shrink-0" aria-hidden="true">
-            {offPiste.emoji}
-          </div>
-          <h3 class="text-base md:text-lg font-bold text-foreground tracking-tight shrink-0">
-            {offPiste.title}
-          </h3>
-          <p class="flex-1 min-w-0 text-sm md:text-base text-muted-foreground leading-relaxed">
-            {offPiste.body}
-          </p>
-        </article>
+      </div>
+    </section>
+
+    <section class="w-full bg-accent/10 border-y border-accent/30">
+      <div class="mx-auto max-w-6xl px-4 md:px-6 py-5 md:py-6 flex flex-wrap items-center gap-4">
+        <div class="inline-flex items-center justify-center w-9 h-9 rounded-full text-lg bg-accent/15 shrink-0" aria-hidden="true">
+          {offPiste.emoji}
+        </div>
+        <h3 class="text-base md:text-lg font-bold text-foreground tracking-tight shrink-0">
+          {offPiste.title}
+        </h3>
+        <p class="flex-1 min-w-0 text-sm md:text-base text-muted-foreground leading-relaxed">
+          {offPiste.body}
+        </p>
       </div>
     </section>
 
@@ -209,6 +212,9 @@ const criteria = [
           <ul role="list" class="mt-5 space-y-4">
             <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
               <span aria-hidden="true">🇫🇷</span> All talks are <strong class="font-semibold text-foreground">in French</strong> — English slides accepted if that makes prep easier.
+            </li>
+            <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
+              <span aria-hidden="true">🎙️</span> <strong class="font-semibold text-foreground">First time on stage?</strong> Coaching is available for first-time speakers — and for anyone who wants it — to help you prepare your proposal and your talk.
             </li>
             <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
               <strong class="font-semibold text-foreground">Our values</strong>: <span aria-hidden="true">❤️</span> Community · <span aria-hidden="true">🌍</span> Inclusion &amp; diversity · <span aria-hidden="true">🌱</span> Ecology · <span aria-hidden="true">🇫🇷</span> Digital sovereignty
