@@ -2,7 +2,7 @@
 /**
  * The purchase action, rendered from a `PurchaseTarget` — both tickets render
  * the same one: one link to the alf.io listing, where the quantity is chosen,
- * in a new tab that screen readers hear about.
+ * in a new tab that screen readers hear about and the ↗ arrow announces.
  */
 import type { PurchaseTarget } from "@/lib/tickets/purchase";
 import type { TierId } from "@/config/tickets";
@@ -42,6 +42,6 @@ const buttonClass =
   >
     {t("tickets.purchase.buy")}
     <span class="sr-only"> {t("tickets.new_tab")}</span>
-    <Icon name="arrow-right" size={20} />
+    <Icon name="arrow-up-right" size={20} />
   </a>
 </div>
