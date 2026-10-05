@@ -426,8 +426,6 @@ export const ui = {
     "flags.cfp.soon.title": "L'appel à propositions arrive",
     "flags.cfp.soon.body":
       "Inscrivez-vous à la newsletter pour être alerté(e) dès l'ouverture.",
-    "flags.tickets.soon.title": "La billetterie arrive",
-    "flags.tickets.soon.body": "Les inscriptions ouvrent le 15 janvier 2027.",
     "flags.programme.soon.title": "Le programme arrive",
     "flags.programme.soon.body":
       "Le programme complet sera dévoilé en avril 2027.",
@@ -979,8 +977,6 @@ export const ui = {
     "flags.cfp.soon.title": "The Call for Papers is coming",
     "flags.cfp.soon.body":
       "Subscribe to the newsletter and we'll let you know as soon as it opens.",
-    "flags.tickets.soon.title": "Tickets coming soon",
-    "flags.tickets.soon.body": "Registration opens on January 15, 2027.",
     "flags.programme.soon.title": "The schedule is coming",
     "flags.programme.soon.body":
       "The full schedule will be unveiled in April 2027.",

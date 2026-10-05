@@ -54,8 +54,6 @@ export interface TicketingConfig {
 }
 
 export const TICKETING: TicketingConfig = {
-  // The new alf.io instance (Sept 2026). Whether it or tickets.* is the public
-  // host after the switch is still open.
   listingUrl: "https://billetterie.cloudnativedays.fr/event/cnd-2027",
   // Ticketing opens on 13 October 2026: set to "seb" that day.
   currentPhase: "pre_opening",

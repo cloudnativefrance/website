@@ -5,7 +5,7 @@ import { describe, it, expect, vi } from "vitest";
 vi.mock("astro:env/server", () => ({ TICKETS_DEMO: undefined }));
 
 import { TICKETING, type TicketingConfig } from "@/config/tickets";
-import { cheaperGroupRates, tierStates } from "@/lib/tickets/phase";
+import { cheaperGroupRates, offerTier, tierStates } from "@/lib/tickets/phase";
 import { codeUrl, handOffOnce, openInNewTab } from "@/lib/tickets/alfio";
 import { buildMailto } from "@/lib/tickets/mailto";
 import {
@@ -14,6 +14,7 @@ import {
   ticketDemosEnabled,
 } from "@/lib/tickets/demo";
 import { formatDiscount } from "@/lib/tickets/format";
+import { ticketOffers } from "@/lib/event-schema";
 
 describe("tiers", () => {
   it("puts past, current and upcoming tiers in order", () => {
@@ -47,6 +48,15 @@ describe("cheaperGroupRates", () => {
     expect(rates(199, 20)).toEqual(["4_9", "10_plus"]);
     expect(rates(159, 20)).toEqual(["10_plus"]);
     expect(rates(199, 5)).toEqual(["4_9"]);
+  });
+});
+
+describe("ticketOffers", () => {
+  it("prices nothing before the opening, then the standard price of the moment", () => {
+    expect(ticketOffers("pre_opening", "/billetterie/")).toBeUndefined();
+    expect(ticketOffers("regular", "/billetterie/")).toMatchObject({
+      price: offerTier(TICKETING, "regular").price,
+    });
   });
 });
 

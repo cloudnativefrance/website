@@ -84,10 +84,10 @@ describe("parseFlagOverrides", () => {
   });
 
   it("parses several and tolerates whitespace around tokens", () => {
-    expect(parseFlagOverrides(" programme=on , tickets=off ")).toEqual(
+    expect(parseFlagOverrides(" programme=on , cfp=off ")).toEqual(
       new Map([
         ["programme", "on"],
-        ["tickets", "off"],
+        ["cfp", "off"],
       ]),
     );
   });
@@ -148,8 +148,8 @@ describe("readEnvOverride", () => {
   });
 
   it("returns undefined for a flag absent from a populated FLAG_OVERRIDES", () => {
-    delete process.env.FLAG_TICKETS;
+    delete process.env.FLAG_CFP;
     process.env.FLAG_OVERRIDES = "programme=on";
-    expect(readEnvOverride("tickets")).toBeUndefined();
+    expect(readEnvOverride("cfp")).toBeUndefined();
   });
 });
