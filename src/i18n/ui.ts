@@ -428,10 +428,9 @@ export const ui = {
       "Votre place pour CND France 2027, le jeudi 3 juin au CENTQUATRE-PARIS\u00a0: les tarifs, venir en équipe, utiliser un code.",
     "tickets.h1": "Votre place pour CND France 2027",
     "tickets.when": "{date} · {venue}, Paris 19e",
-    "tickets.lead":
-      "Une journée de conférences et de retours d'expérience cloud native, par et pour la communauté.",
     "tickets.door.code": "J'ai un code",
     // {name} is the config's public ticket name: standard, Stratégie & Leadership.
+    // The card title capitalises it ("Billet Standard"); prose keeps it as is.
     "tickets.offer.ticket": "Billet {name}",
     "tickets.offer.ttc": "TTC",
     "tickets.offer.last_seats": "Dernières places",
@@ -464,27 +463,26 @@ export const ui = {
     "tickets.strategic.track": "Découvrir le parcours Stratégie & Leadership",
     "tickets.included.title": "Ce que comprend votre billet",
     "tickets.included.talks":
-      "Tous les talks et retours d'expérience de la journée",
+      "Toutes les conférences et retours d'expérience de la journée",
     "tickets.included.village": "L'accès au village partenaires",
     "tickets.included.meals": "Le déjeuner, le café et de quoi grignoter",
-    "tickets.included.goodies": "Les goodies",
-    "tickets.included.evening.title": "Et le soir, on continue",
+    "tickets.included.goodies": "Des goodies exclusifs",
+    "tickets.included.evening.title": "Une soirée pour prolonger la journée",
     "tickets.included.evening.body":
-      "Nouveauté 2027\u00a0: la soirée est comprise dans le billet, sans option à ajouter.",
+      "Nouveauté 2027\u00a0: la soirée est comprise dans le billet, sans option à ajouter. L'occasion de faire de nouvelles rencontres, d'échanger entre pairs, de revenir sur les conférences de la journée ou, tout simplement, de se détendre.",
     "tickets.faq.title": "Questions fréquentes",
     "tickets.faq.payment.q": "Comment se passe le paiement\u202f?",
     "tickets.faq.payment.a":
-      "Par carte bancaire, via Stripe, sur {host}. Notre billetterie tourne sur alf.io, un logiciel open source que nous hébergeons nous-mêmes.",
-    "tickets.faq.ttc.q": "Les prix sont-ils TTC\u202f?",
-    "tickets.faq.ttc.a": "Oui, tous les prix affichés sont TTC.",
-    "tickets.faq.ttc.rate": "Taux de TVA\u00a0: {rate}.",
+      "Par carte bancaire, via Stripe, sur {host}. Besoin de payer par virement\u202f? Écrivez-nous à",
     "tickets.faq.change.q": "Quand le prix change-t-il\u202f?",
     "tickets.faq.change.a":
       "Le tarif en cours s'arrête à la date affichée, ou plus tôt si ses places partent avant. Le suivant prend le relais aussitôt\u00a0: la billetterie ne ferme jamais entre deux tarifs.",
     "tickets.faq.strategic.q":
-      "Le parcours Stratégie & Leadership est-il réservé au billet {name}\u202f?",
+      "Le parcours Stratégie & Leadership est-il ouvert à tous\u202f?",
     "tickets.faq.strategic.a":
-      "Non\u00a0: ses talks sont ouverts à tous les participant(e)s, dans la limite des places de la salle. Le billet {name} y ajoute un accès prioritaire et un espace réservé pour échanger entre pairs.",
+      "Oui\u00a0: ses talks sont ouverts à tous les participant(e)s, quel que soit leur billet, dans la limite des places de la salle. En revanche, l'espace d'échanges est réservé aux titulaires du billet {name}, qui ont aussi un accès prioritaire à la salle.",
+    "tickets.faq.ttc.q": "Les prix affichés sont-ils TTC\u202f?",
+    "tickets.faq.ttc.a": "Oui, TVA à {rate} comprise.",
     "tickets.faq.per_order.q": "Combien de places par commande\u202f?",
     "tickets.faq.per_order.a":
       "Jusqu'à {early} pendant les deux premiers tarifs, pour qu'ils profitent au plus grand nombre, puis jusqu'à {later}. Pour plus de places, écrivez-nous.",
@@ -517,6 +515,10 @@ export const ui = {
     "tickets.inclusion.mail.subject": "Demande de tarif inclusion ou étudiant",
     "tickets.inclusion.mail.body":
       "Bonjour,\n\nJe souhaite venir à CND France 2027 et bénéficier d'un tarif inclusion ou étudiant.\n\nMa situation en quelques mots\u00a0:\n\nNom\u00a0:\nÉcole ou structure (le cas échéant)\u00a0:\n",
+    // {standard} and {strategic} are the config's public ticket names.
+    "tickets.wire.mail.subject": "Paiement par virement CND France 2027",
+    "tickets.wire.mail.body":
+      "Bonjour,\n\nJe souhaite payer par virement mes billets pour CND France 2027.\n\nBillet ({standard} ou {strategic})\u00a0:\nNombre de places\u00a0:\nNom\u00a0:\nSociété (le cas échéant)\u00a0:\n",
     "tickets.sticky.buy": "Acheter",
   },
   en: {
@@ -927,8 +929,6 @@ export const ui = {
       "Your seat at CND France 2027, Thursday 3 June at CENTQUATRE-PARIS: prices, coming as a team, using a code.",
     "tickets.h1": "Your seat at CND France 2027",
     "tickets.when": "{date} · {venue}, Paris",
-    "tickets.lead":
-      "A day of cloud native talks and experience reports, by and for the community.",
     "tickets.door.code": "I have a code",
     "tickets.offer.ticket": "{name} ticket",
     "tickets.offer.ttc": "VAT incl.",
@@ -963,24 +963,23 @@ export const ui = {
     "tickets.included.talks": "Every talk and experience report of the day",
     "tickets.included.village": "Access to the partner village",
     "tickets.included.meals": "Lunch, coffee and snacks",
-    "tickets.included.goodies": "The goodies",
-    "tickets.included.evening.title": "Stay for the evening",
+    "tickets.included.goodies": "Exclusive goodies",
+    "tickets.included.evening.title": "An evening to round off the day",
     "tickets.included.evening.body":
-      "New in 2027: the evening is part of the ticket, with no add-on to buy.",
+      "New in 2027: the evening is part of the ticket, with no add-on to buy. A chance to meet new people, talk with your peers, look back on the day's talks or simply unwind.",
     "tickets.faq.title": "Frequently asked questions",
     "tickets.faq.payment.q": "How does payment work?",
     "tickets.faq.payment.a":
-      "By card, through Stripe, on {host}. Our ticketing runs on alf.io, open-source software we host ourselves.",
-    "tickets.faq.ttc.q": "Do prices include VAT?",
-    "tickets.faq.ttc.a": "Yes, every price shown includes VAT.",
-    "tickets.faq.ttc.rate": "VAT rate: {rate}.",
+      "By card, through Stripe, on {host}. Need to pay by bank transfer? Write to us at",
     "tickets.faq.change.q": "When does the price change?",
     "tickets.faq.change.a":
       "The current price ends on the date shown, or sooner if its seats go before then. The next one takes over at once: ticketing never closes between two prices.",
     "tickets.faq.strategic.q":
-      "Is the Strategy & Leadership track reserved for the {name} ticket?",
+      "Is the Strategy & Leadership track open to everyone?",
     "tickets.faq.strategic.a":
-      "No: its talks are open to every attendee, as long as the room has seats. The {name} ticket adds priority access and a reserved space to meet your peers.",
+      "Yes: its talks are open to every attendee, whatever their ticket, as long as the room has seats. The space to meet your peers, however, is reserved for {name} ticket holders, who also get priority access to the room.",
+    "tickets.faq.ttc.q": "Do the prices shown include VAT?",
+    "tickets.faq.ttc.a": "Yes, they include VAT at {rate}.",
     "tickets.faq.per_order.q": "How many seats per order?",
     "tickets.faq.per_order.a":
       "Up to {early} during the first two prices, so they reach as many people as possible, then up to {later}. Need more? Write to us.",
@@ -1010,6 +1009,9 @@ export const ui = {
     "tickets.inclusion.mail.subject": "Inclusion or student rate request",
     "tickets.inclusion.mail.body":
       "Hello,\n\nI'd like to come to CND France 2027 at an inclusion or student rate.\n\nMy situation in a few words:\n\nName:\nSchool or organisation (if any):\n",
+    "tickets.wire.mail.subject": "Bank transfer payment CND France 2027",
+    "tickets.wire.mail.body":
+      "Hello,\n\nI'd like to pay for my CND France 2027 tickets by bank transfer.\n\nTicket ({standard} or {strategic}):\nNumber of seats:\nName:\nCompany (if any):\n",
     "tickets.sticky.buy": "Buy",
   },
 } as const;

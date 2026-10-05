@@ -11,7 +11,12 @@ import type { TierDefinition } from "@/config/tickets";
 import type { TierUrgency, TierWithState } from "@/lib/tickets/phase";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
-import { fill, formatDayMonth, priceParts } from "@/lib/tickets/format";
+import {
+  fill,
+  formatDayMonth,
+  priceParts,
+  upperFirst,
+} from "@/lib/tickets/format";
 import Icon from "./Icon.astro";
 import TierLadder from "./TierLadder.astro";
 
@@ -62,7 +67,7 @@ const deadline = urgency.endsAt
           class="text-foreground text-2xl font-semibold tracking-[-0.01em]"
           data-ticket-name="standard"
         >
-          {fill(t("tickets.offer.ticket"), { name: ticketName })}
+          {fill(t("tickets.offer.ticket"), { name: upperFirst(ticketName) })}
         </h2>
         <p
           class="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-2 text-base font-semibold"

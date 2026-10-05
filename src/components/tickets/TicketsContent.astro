@@ -23,7 +23,13 @@ import { CONTACT_EMAILS, TARGET_DATE } from "@/lib/event";
 import { buildMailto } from "@/lib/tickets/mailto";
 import { placeholdersAllowed } from "@/lib/tickets/demo";
 import { assertShippable, shown } from "@/lib/tickets/drafts";
-import { fill, formatFullDate, formatPrice } from "@/lib/tickets/format";
+import {
+  fill,
+  formatFullDate,
+  formatPercent,
+  formatPrice,
+  upperFirst,
+} from "@/lib/tickets/format";
 import {
   assertTicketingConfig,
   cheaperGroupRates,
@@ -93,6 +99,14 @@ const strategic = {
   price: shown(config.strategic.price),
   trackUrl: shown(config.strategic.trackUrl)?.[lang],
 };
+const wireMailto = buildMailto(
+  email,
+  t("tickets.wire.mail.subject"),
+  fill(t("tickets.wire.mail.body"), {
+    standard: standardName,
+    strategic: strategic.name,
+  }),
+);
 
 // Door 2 is rendered only when a group rate actually beats the price of the
 // moment and fits the tier's order cap; below that it had nothing to sell.
@@ -107,15 +121,15 @@ const eventDate = formatFullDate(TARGET_DATE, lang);
 const [whenBefore, whenAfter = ""] = t("tickets.when").split("{venue}");
 const when = {
   before: fill(whenBefore, {
-    date: eventDate.charAt(0).toUpperCase() + eventDate.slice(1),
+    date: upperFirst(eventDate),
   }),
   venue: t("hero.venue"),
   after: whenAfter,
 };
 
-// "standard" is lower-case in French prose; the bar's label opens on it.
+// "standard" is lower-case in prose; the bar's label opens on it.
 const sticky = {
-  label: `${standardName.charAt(0).toUpperCase()}${standardName.slice(1)} · ${tier.name[lang]}`,
+  label: `${upperFirst(standardName)} · ${tier.name[lang]}`,
   price: formatPrice(tier.price, lang),
   action: { href: target.href, rel: target.rel, text: t("tickets.sticky.buy") },
   analytics: {
@@ -150,11 +164,6 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
           {when.before}<span class="whitespace-nowrap">{when.venue}</span>{
             when.after
           }
-        </p>
-        <p
-          class="text-muted-foreground max-w-[58ch] text-base text-pretty sm:text-lg"
-        >
-          {t("tickets.lead")}
         </p>
       </header>
 
@@ -249,10 +258,11 @@ const perOrder = { early: Math.max(...early), later: Math.max(...later) };
       host={host}
       email={email}
       inclusionMailto={inclusionMailto}
+      wireMailto={wireMailto}
       perOrder={perOrder}
       strategicName={strategic.name}
       programmeWhen={programmeWhen}
-      vatRate={shown(config.vatRate)}
+      vatRate={formatPercent(config.vatRate, lang)}
       invoice={shown(config.invoice)?.[lang]}
       transfer={shown(config.transferAndRefund)?.[lang]}
       termsUrl={shown(config.termsUrl)}

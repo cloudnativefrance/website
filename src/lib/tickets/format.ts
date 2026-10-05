@@ -97,7 +97,17 @@ export function formatFullDate(iso: string | number, lang: Locale): string {
  */
 export function formatDiscount(from: number, to: number, lang: Locale): string {
   const percent = Math.floor(((from - to) / from) * 100);
-  return lang === "en" ? `−${percent}%` : `−${percent} %`;
+  return `−${formatPercent(percent, lang)}`;
+}
+
+/** A percentage: French sets a narrow no-break space before the sign. */
+export function formatPercent(percent: number, lang: Locale): string {
+  return lang === "en" ? `${percent}%` : `${percent} %`;
+}
+
+/** The text with its first letter capitalised: "standard" → "Standard". */
+export function upperFirst(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 /** Replace `{name}` tokens in an i18n string. */

@@ -105,7 +105,8 @@ export interface TicketingConfig {
   /** "La soirée est comprise", in the ticket contents — to confirm with the evening team: `true` once confirmed. */
   eveningIncluded: Maybe<true>;
   eveningDetails: Maybe<Localized>;
-  vatRate: Maybe<string>;
+  /** The VAT every price includes, in percent. */
+  vatRate: number;
   invoice: Maybe<Localized>;
   transferAndRefund: Maybe<Localized>;
   termsUrl: Maybe<string>;
@@ -124,9 +125,10 @@ export const TICKETING: TicketingConfig = {
   // soon" page. Opening day is this line set to "seb" — a production build then
   // refuses the page until every tbd() below is decided (`assertShippable`).
   currentPhase: "pre_opening",
+  // Lower-case, as prose uses it; the card title capitalises it.
   standardName: tbd("Nom public du billet standard", {
     fr: "standard",
-    en: "Standard",
+    en: "standard",
   }),
   tiers: [
     {
@@ -188,7 +190,7 @@ export const TICKETING: TicketingConfig = {
     true,
   ),
   eveningDetails: tbd("Contenu de la soirée (pôle soirée)"),
-  vatRate: tbd("Taux de TVA affiché (10 % aujourd'hui ?)"),
+  vatRate: 20,
   invoice: tbd("Facture au nom de la société, devis, virement (question à JC)"),
   transferAndRefund: tbd("Annulation et changement de nom"),
   termsUrl: tbd("Lien vers les conditions générales de vente"),

@@ -220,13 +220,13 @@ describe("drafts", () => {
 
   it("lets a decided config ship, and an undecided value with no draft — its line is not rendered", () => {
     expect(shippingProblems(decided)).toEqual([]);
-    expect(shippingProblems({ ...decided, vatRate: tbd("TVA") })).toEqual([]);
+    expect(shippingProblems({ ...decided, termsUrl: tbd("CGV") })).toEqual([]);
   });
 
   it("blocks on any draft, and on the two ticket names and the S&L price even without one", () => {
     expect(() =>
-      assertShippable({ ...decided, vatRate: tbd("TVA", "10 %") }),
-    ).toThrow(/vatRate/);
+      assertShippable({ ...decided, termsUrl: tbd("CGV", "/cgv") }),
+    ).toThrow(/termsUrl/);
     const required = {
       ...decided,
       standardName: tbd("Nom"),

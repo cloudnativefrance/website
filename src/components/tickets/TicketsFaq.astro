@@ -16,12 +16,15 @@ interface Props {
   host: string;
   email: string;
   inclusionMailto: string;
+  /** Paying by bank transfer is a request by mail. */
+  wireMailto: string;
   perOrder: { early: number; later: number };
-  /** The Strategy & Leadership ticket's public name: its question says the track is open to every ticket. */
+  /** The Strategy & Leadership ticket's public name: the track is open to every ticket, its exchange space is not. */
   strategicName: string;
   /** When the programme is announced; its question is left out while undecided. */
   programmeWhen?: string;
-  vatRate?: string;
+  /** The VAT rate every price includes, formatted. */
+  vatRate: string;
   /** Decided answers; the waiting copy stands in until then. */
   invoice?: string;
   transfer?: string;
@@ -33,6 +36,7 @@ const {
   host,
   email,
   inclusionMailto,
+  wireMailto,
   perOrder,
   strategicName,
   programmeWhen,
@@ -70,7 +74,15 @@ const link =
           class="faq-icon"
         /></summary
       >
-      <p>{fill(t("tickets.faq.payment.a"), { host })}</p>
+      <p>
+        {fill(t("tickets.faq.payment.a"), { host })}{" "}
+        <a
+          href={wireMailto}
+          class={link}
+          data-umami-event="tickets-wire-contact"
+          data-umami-event-source="faq">{email}</a
+        >.
+      </p>
     </details>
     <details class="faq group">
       <summary
@@ -84,7 +96,7 @@ const link =
     </details>
     <details class="faq group" data-faq="strategic">
       <summary
-        >{fill(t("tickets.faq.strategic.q"), { name: strategicName })}<Icon
+        >{t("tickets.faq.strategic.q")}<Icon
           name="plus"
           size={18}
           class="faq-icon"
@@ -100,10 +112,7 @@ const link =
           class="faq-icon"
         /></summary
       >
-      <p>
-        {t("tickets.faq.ttc.a")}
-        {vatRate && ` ${fill(t("tickets.faq.ttc.rate"), { rate: vatRate })}`}
-      </p>
+      <p>{fill(t("tickets.faq.ttc.a"), { rate: vatRate })}</p>
     </details>
     <details class="faq group">
       <summary
