@@ -517,11 +517,11 @@ export const ui = {
     "tickets.code.submit": "Utiliser mon code",
     "tickets.code.empty": "Saisissez votre code pour continuer.",
     "tickets.strategic.perks":
-      "Tout ce que comprend le billet {standard}, avec en plus un accès prioritaire à la salle Stratégie & Leadership et un espace réservé pour échanger entre pairs.",
+      "Un parcours de conférences et un espace d'échanges entre pairs, réservés aux titulaires de ce billet. En plus de tout ce que comprend le billet {standard}.",
     "tickets.strategic.track": "Découvrir le parcours Stratégie & Leadership",
     "tickets.included.title": "Ce que comprend votre billet",
     "tickets.included.talks":
-      "Toutes les conférences et retours d'expérience de la journée",
+      "Les conférences et retours d'expérience de la journée",
     "tickets.included.village": "L'accès au village partenaires",
     "tickets.included.meals": "Le déjeuner, le café et de quoi grignoter",
     "tickets.included.goodies": "Des goodies exclusifs",
@@ -539,7 +539,7 @@ export const ui = {
     "tickets.faq.strategic.q":
       "Le parcours Stratégie & Leadership est-il ouvert à tous\u202f?",
     "tickets.faq.strategic.a":
-      "Oui, ses conférences sont ouvertes à tous les participant(e)s, quel que soit leur billet, dans la limite des places de la salle. En revanche, l'espace d'échanges est réservé aux titulaires du billet {name}, qui ont aussi un accès prioritaire à la salle.",
+      "Non, ses conférences et son espace d'échanges sont réservés aux titulaires du billet {strategic}. Le billet {standard} donne accès à toutes les autres conférences de la journée.",
     "tickets.faq.ttc.q": "Les prix affichés sont-ils TTC\u202f?",
     "tickets.faq.ttc.a": "Oui, TVA à {rate} comprise.",
     "tickets.faq.per_order.q": "Combien de places par commande\u202f?",
@@ -1068,10 +1068,10 @@ export const ui = {
     "tickets.code.submit": "Use my code",
     "tickets.code.empty": "Enter your code to continue.",
     "tickets.strategic.perks":
-      "Everything in the {standard} ticket, plus priority access to the Strategy & Leadership room and a reserved space to meet your peers.",
+      "A track of talks and a space to meet your peers, for holders of this ticket only. On top of everything in the {standard} ticket.",
     "tickets.strategic.track": "About the Strategy & Leadership track",
     "tickets.included.title": "What your ticket includes",
-    "tickets.included.talks": "Every talk and experience report of the day",
+    "tickets.included.talks": "The day's talks and experience reports",
     "tickets.included.village": "Access to the partner village",
     "tickets.included.meals": "Lunch, coffee and snacks",
     "tickets.included.goodies": "Exclusive goodies",
@@ -1089,7 +1089,7 @@ export const ui = {
     "tickets.faq.strategic.q":
       "Is the Strategy & Leadership track open to everyone?",
     "tickets.faq.strategic.a":
-      "Yes, its talks are open to every attendee, whatever their ticket, as long as the room has seats. The space to meet your peers, however, is reserved for {name} ticket holders, who also get priority access to the room.",
+      "No, its talks and its space to meet your peers are reserved for {strategic} ticket holders. The {standard} ticket gives access to every other talk of the day.",
     "tickets.faq.ttc.q": "Do the prices shown include VAT?",
     "tickets.faq.ttc.a": "Yes, they include VAT at {rate}.",
     "tickets.faq.per_order.q": "How many seats per order?",

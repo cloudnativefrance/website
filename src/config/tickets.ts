@@ -45,8 +45,8 @@ export interface TicketingConfig {
   tiers: readonly TierDefinition[];
   groupRates: readonly GroupRate[];
   /**
-   * The standard ticket plus priority access to the Stratégie & Leadership
-   * room and a reserved space, at one price for the whole season.
+   * The standard ticket plus the Stratégie & Leadership room and its exchange
+   * space, both reserved for its holders, at one price for the whole season.
    */
   strategic: { name: Localized; price: number; trackUrl: Localized };
   /** In percent. */
@@ -103,7 +103,7 @@ export const TICKETING: TicketingConfig = {
   ],
   strategic: {
     name: { fr: "Stratégie & Leadership", en: "Strategy & Leadership" },
-    price: 299,
+    price: 399,
     trackUrl: {
       fr: "/track-strategie-leadership",
       en: "/en/track-strategy-leadership",
