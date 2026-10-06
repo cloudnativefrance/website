@@ -54,7 +54,7 @@ export interface TicketingConfig {
 }
 
 export const TICKETING: TicketingConfig = {
-  listingUrl: "https://billetterie.cloudnativedays.fr/event/cnd-2027",
+  listingUrl: "https://billetterie.cloudnativedays.fr/event/cndfr2027",
   // Ticketing opens on 13 October 2026: set to "seb" that day.
   currentPhase: "pre_opening",
   // Lower-case, as prose uses it; card titles capitalise it.
@@ -108,6 +108,6 @@ export const TICKETING: TicketingConfig = {
       en: "/en/track-strategy-leadership",
     },
   },
-  vatRate: 20,
+  vatRate: 10,
   programmeAnnouncement: { fr: "en mars 2027", en: "in March 2027" },
 };

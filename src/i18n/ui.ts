@@ -544,7 +544,8 @@ export const ui = {
       "Jusqu'à {early} pendant les Super Early Bird et Early Bird, pour qu'ils profitent au plus grand nombre, puis jusqu'à {later}. Pour plus de places, écrivez-nous à",
     "tickets.faq.invoice.q":
       "Puis-je avoir une facture au nom de ma société\u202f?",
-    "tickets.faq.invoice.a": "Oui, il suffit de nous écrire à",
+    "tickets.faq.invoice.a":
+      "Oui, elle arrive automatiquement par mail, avec votre billet. Pensez bien à renseigner les informations de votre société lors du paiement. En cas de problème, écrivez-nous à",
     "tickets.faq.code.q":
       "J'ai un code partenaire ou une invitation, comment faire\u202f?",
     "tickets.faq.code.a":
@@ -572,10 +573,6 @@ export const ui = {
       "Plus de places par commande CND France 2027",
     "tickets.per_order.mail.body":
       "Bonjour,\n\nJe souhaite commander pour CND France 2027 plus de places que le maximum par commande.\n\nBillet ({standard} ou {strategic})\u00a0:\nNombre de places\u00a0:\nNom\u00a0:\nSociété (le cas échéant)\u00a0:\n",
-    "tickets.invoice.mail.subject":
-      "Facture au nom de ma société CND France 2027",
-    "tickets.invoice.mail.body":
-      "Bonjour,\n\nJe souhaite une facture au nom de ma société pour mes billets CND France 2027.\n\nRéférence de commande (si elle est déjà passée)\u00a0:\nSociété\u00a0:\nAdresse de facturation\u00a0:\nNuméro de TVA intracommunautaire (le cas échéant)\u00a0:\n",
     "tickets.sticky.buy": "Acheter",
   },
   en: {
@@ -1093,7 +1090,8 @@ export const ui = {
     "tickets.faq.per_order.a":
       "Up to {early} during Super Early Bird and Early Bird, so they reach as many people as possible, then up to {later}. Need more? Write to us at",
     "tickets.faq.invoice.q": "Can I get an invoice in my company's name?",
-    "tickets.faq.invoice.a": "Yes, just write to us at",
+    "tickets.faq.invoice.a":
+      "Yes, it is emailed to you automatically, along with your ticket. Just make sure to enter your company details at checkout. If anything goes wrong, write to us at",
     "tickets.faq.code.q":
       "I have a partner code or an invitation. What do I do?",
     "tickets.faq.code.a":
@@ -1119,9 +1117,6 @@ export const ui = {
     "tickets.per_order.mail.subject": "More seats per order CND France 2027",
     "tickets.per_order.mail.body":
       "Hello,\n\nI'd like to order more seats for CND France 2027 than the per-order limit.\n\nTicket ({standard} or {strategic}):\nNumber of seats:\nName:\nCompany (if any):\n",
-    "tickets.invoice.mail.subject": "Company invoice CND France 2027",
-    "tickets.invoice.mail.body":
-      "Hello,\n\nI'd like an invoice in my company's name for my CND France 2027 tickets.\n\nOrder reference (if already placed):\nCompany:\nBilling address:\nVAT number (if any):\n",
     "tickets.sticky.buy": "Buy",
   },
 } as const;

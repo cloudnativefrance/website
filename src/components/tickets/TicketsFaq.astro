@@ -18,7 +18,7 @@ const ticketNames = {
   standard: TICKETING.standardName[lang],
   strategic: TICKETING.strategic.name[lang],
 };
-const mailto = (topic: "wire" | "per_order" | "invoice" | "inclusion") =>
+const mailto = (topic: "wire" | "per_order" | "inclusion") =>
   buildMailto(
     email,
     t(`tickets.${topic}.mail.subject`),
@@ -77,7 +77,7 @@ const link =
     <FaqItem question={t("tickets.faq.invoice.q")}>
       {t("tickets.faq.invoice.a")}{" "}
       <a
-        href={mailto("invoice")}
+        href={`mailto:${email}`}
         class={link}
         data-umami-event="tickets-invoice-contact">{email}</a
       >.
