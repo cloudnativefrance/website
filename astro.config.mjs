@@ -101,9 +101,6 @@ export default defineConfig({
       prefixDefaultLocale: false,
       redirectToDefaultLocale: false,
     },
-    fallback: {
-      en: "fr",
-    },
   },
   fonts: [
     {
