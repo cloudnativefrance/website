@@ -1,0 +1,14 @@
+---
+/** One demo page per phase, only when the demo is on (src/lib/tickets/demo.ts). */
+import TicketsPage from "@/components/tickets/TicketsPage.astro";
+import type { Phase } from "@/config/tickets";
+import { demoStaticPaths, ticketDemosEnabled } from "@/lib/tickets/demo";
+
+export function getStaticPaths() {
+  return ticketDemosEnabled() ? demoStaticPaths() : [];
+}
+
+const { phase } = Astro.props as { phase: Phase };
+---
+
+<TicketsPage lang="fr" phase={phase} simulated />

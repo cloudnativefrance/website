@@ -83,8 +83,12 @@ export default defineConfig({
       // and don't redeploy post-event just to add routes to the sitemap, so
       // these routes are excluded permanently. Post-event inbound links come
       // from CountdownTimer and the conditional nav entry.
+      // The ticketing demo (src/lib/tickets/demo.ts) is never indexed.
       filter: (page) =>
-        !/\/replays\/?$/.test(page) && !/\/en\/replays\/?$/.test(page),
+        !/\/replays\/?$/.test(page) &&
+        !/\/en\/replays\/?$/.test(page) &&
+        !/\/billetterie\/demo(\/|$)/.test(page) &&
+        !/\/en\/tickets\/demo(\/|$)/.test(page),
       i18n: {
         defaultLocale: "fr",
         locales: { fr: "fr-FR", en: "en-US" },
@@ -116,11 +120,19 @@ export default defineConfig({
     },
   ],
   env: {
-    schema: Object.fromEntries(
-      Object.entries(generateFlagEnvSchema()).map(([key, entry]) => [
-        key,
-        envField.enum(entry),
-      ]),
-    ),
+    schema: {
+      ...Object.fromEntries(
+        Object.entries(generateFlagEnvSchema()).map(([key, entry]) => [
+          key,
+          envField.enum(entry),
+        ]),
+      ),
+      // See src/lib/tickets/demo.ts.
+      TICKETS_DEMO: envField.boolean({
+        context: "server",
+        access: "public",
+        optional: true,
+      }),
+    },
   },
 });

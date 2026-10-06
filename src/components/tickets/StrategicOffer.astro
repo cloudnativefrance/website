@@ -1,0 +1,64 @@
+---
+/**
+ * The Stratégie & Leadership ticket, drawn like the standard one but without
+ * the lift shadow. One price for the season: no tier, no date, no ladder. It
+ * says only what it adds; the track's page says the rest.
+ */
+import { TICKETING } from "@/config/tickets";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { fill } from "@/lib/tickets/format";
+import BigPrice from "./BigPrice.astro";
+import Icon from "./Icon.astro";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const { name, price, trackUrl } = TICKETING.strategic;
+---
+
+<article
+  id="strategie-leadership"
+  class="door border-primary/35 bg-card grid gap-6 rounded-xl border p-5 sm:p-8 lg:grid-cols-[minmax(0,26rem)_auto] lg:gap-10"
+  aria-labelledby="strategic-title"
+>
+  <div class="flex flex-col gap-3">
+    <h2
+      id="strategic-title"
+      class="text-foreground text-2xl font-semibold tracking-[-0.01em]"
+    >
+      {fill(t("tickets.offer.ticket"), { name: name[lang] })}
+    </h2>
+    <BigPrice amount={price} lang={lang} />
+    <p class="text-muted-foreground max-w-[52ch] text-base text-pretty">
+      {
+        fill(t("tickets.strategic.perks"), {
+          standard: TICKETING.standardName[lang],
+        })
+      }
+    </p>
+    {
+      /* Inline, not flex: when the line wraps, the arrow follows the last word. */
+    }
+    <p class="text-base font-semibold text-pretty">
+      <a
+        href={trackUrl[lang]}
+        class="text-primary-strong underline-offset-4 hover:underline"
+        data-umami-event="tickets-strategic-track"
+      >
+        {t("tickets.strategic.track")}<Icon
+          name="arrow-right"
+          size={16}
+          class="ml-1.5 inline-block align-[-0.125em]"
+        /></a
+      >
+    </p>
+  </div>
+
+  <div class="flex flex-col items-start justify-center" data-offer-action>
+    <slot name="purchase" />
+  </div>
+</article>

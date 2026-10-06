@@ -45,6 +45,7 @@ Schema changes that span the CSV pipeline (Sheet column → parser → Zod schem
   `SPONSORS_CSV_URL_{2023,2026,2027}`, `TEAM_CSV_URL`.
   Editions with no Pretalx event read a frozen `src/content/schedule/sessions-{year}.json`.
 - **Site origin**: `PUBLIC_SITE_URL` (build-time only) sets `site` in `astro.config.mjs`, which drives canonical URLs, hreflang, the sitemap, `robots.txt` and the `noindex` meta tag. Falls back to production when unset or empty — the single production-origin literal lives in `src/lib/site-env.ts`. CI sets it to the staging origin for the `staging` branch.
+- **Ticketing demo**: `TICKETS_DEMO`, an `astro:env` boolean (build-time). Unset: on under `pnpm dev`, off in any build; CI sets it to `true` for the `staging` branch; a production-origin build refuses `true`. `pnpm dev:like-prod` hides it. See `src/lib/tickets/demo.ts`.
 - **Testing**: `pnpm test` (Vitest). Component tests may mock `astro:content` via `vi.mock`.
 - **Build/dev**: `pnpm build` / `pnpm dev`. Hosted in Docker + nginx (see `Dockerfile`, `nginx/`).
 
@@ -52,4 +53,5 @@ Schema changes that span the CSV pipeline (Sheet column → parser → Zod schem
 
 - Bilingual routes: French at `/`, English mirrored at `/en/`. Keep i18n keys in sync.
 - Commit style: Conventional commits (`feat:`, `fix:`, `chore:`, `ci:`). Short subject, "why" in body.
+- Formatting: Prettier, as editors like VS Code apply it on save (`.prettierrc`: `prettier-plugin-astro`, and `prettier-plugin-tailwindcss`, which sorts class lists). Run `pnpm exec prettier --write <file>` on every file you create, before calling the work done. Much of the existing code predates Prettier: in a file that already exists, format only the lines you add or change, never the whole file, so the diff stays yours. Source-shape tests (regexes over `.astro` source) must tolerate Prettier's wrapping (`\s*`, optional parentheses).
 - See `DESIGN.md` for visual/UX decisions log and `STITCH_WORKFLOW.md` for the Stitch process.

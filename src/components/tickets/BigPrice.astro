@@ -1,0 +1,40 @@
+---
+/** A ticket's price at monumental scale, the currency set small. */
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { priceParts } from "@/lib/tickets/format";
+
+interface Props {
+  amount: number;
+  lang: Locale;
+}
+
+const { amount, lang } = Astro.props;
+const t = useTranslations(lang);
+const price = priceParts(amount, lang);
+---
+
+<p class="text-foreground flex items-baseline gap-3" data-price={amount}>
+  <span
+    class="text-[clamp(3.5rem,11vw,5.5rem)] leading-none font-bold tracking-[-0.035em] tabular-nums"
+  >
+    {
+      price.before && (
+        <span class="mr-1 align-top text-[0.45em] font-semibold tracking-normal">
+          {price.before}
+        </span>
+      )
+    }
+    {price.amount}
+    {
+      price.after && (
+        <span class="ml-1.5 text-[0.45em] font-semibold tracking-normal">
+          {price.after}
+        </span>
+      )
+    }
+  </span>
+  <span class="text-muted-foreground text-base font-medium">
+    {t("tickets.offer.ttc")}
+  </span>
+</p>

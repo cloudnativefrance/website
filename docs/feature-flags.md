@@ -10,7 +10,7 @@ This guide is the operator's manual for the CND France feature flag system. It c
 
 Flags gate two kinds of things:
 
-- **Entire pages** (e.g. `/cfp`, `/tickets`, `/programme`). Before the flag activates, the URL renders a "coming soon" layout with localized copy and a newsletter CTA. After activation, the same URL renders the real page.
+- **Entire pages** (e.g. `/cfp`, `/programme`). Before the flag activates, the URL renders a "coming soon" layout with localized copy and a newsletter CTA. After activation, the same URL renders the real page.
 - **Individual UI elements** (e.g. the homepage countdown). Wrapped in `<FeatureGate>`, they simply appear or don't, with no fallback content.
 
 All activations are **date-driven by default**. You set `opens` and optionally `closes`; the system flips state automatically. A daily CI cron detects the flip and redeploys within ≤24 hours of the target date. Env var overrides let you force a state for staging previews or emergency kill switches.
@@ -32,10 +32,6 @@ export const FLAGS = {
   cfp: {
     opens: "2026-09-01T00:00:00+02:00",
     closes: "2027-02-28T23:59:59+01:00",
-    kind: "page",
-  },
-  tickets: {
-    opens: "2027-01-15T00:00:00+01:00",
     kind: "page",
   },
   programme: {
@@ -116,7 +112,7 @@ Example: adding `sponsorship_pack` to gate a `/sponsorship` page until 2026-10-0
      : <ComingSoonLayout flag="sponsorship_pack" lang={lang} />}
    ```
 
-   > **Design note — external-redirect pages (e.g. `/tickets`):** When the active state redirects to an external URL, use `<meta http-equiv="refresh">` placed inside `<main>` (not in `<head>`). `Layout.astro` does not expose a `<head>` slot, so injecting elements into `<head>` from a page file is not supported. The shipped `/tickets` route uses this pattern.
+   > **Design note — external-redirect pages:** When the active state redirects to an external URL, use `<meta http-equiv="refresh">` placed inside `<main>` (not in `<head>`). `Layout.astro` does not expose a `<head>` slot, so injecting elements into `<head>` from a page file is not supported.
 
 4. **Route test (deferred):** Vitest cannot import `.astro` files without the Astro Vite plugin. Use a Playwright E2E test with env overrides instead (see Known gaps).
 
@@ -183,7 +179,7 @@ Flag names with underscores become uppercase with underscores preserved: `homepa
 
 **Staging preview** — preview the real page before the date:
 ```bash
-FLAG_TICKETS=on pnpm build
+FLAG_PROGRAMME=on pnpm build
 ```
 Flags resolve from `process.env` at **build** time (`src/lib/flags.ts`), and the
 shipped artifact is a static nginx image — a Kubernetes-level env var on the
@@ -313,10 +309,10 @@ Set the env override in `.env.local`:
 ```bash
 # .env.local (git-ignored)
 FLAG_CFP=on
-FLAG_TICKETS=on
+FLAG_PROGRAMME=on
 ```
 
-Then `pnpm dev` — `/cfp` and `/tickets` render their real content even though the actual date hasn't arrived.
+Then `pnpm dev` — `/cfp` and `/programme` render their real content even though the actual date hasn't arrived.
 
 ---
 

@@ -33,10 +33,6 @@ export const FLAGS = {
     closes: "2027-02-28T23:59:59+01:00",
     kind: "page",
   },
-  tickets: {
-    opens: "2027-01-15T00:00:00+01:00",
-    kind: "page",
-  },
   programme: {
     opens: "2027-04-01T09:00:00+02:00",
     kind: "page",
