@@ -1,0 +1,44 @@
+---
+/**
+ * 404 — nginx serves this page for every unknown URL (`error_page 404
+ * /404.html` in nginx/nginx.conf), /en/… paths included, so there is no
+ * English twin under src/pages/en/: one page carries both languages, French
+ * first as the default locale, English below in its own `lang` block.
+ */
+import Layout from "../layouts/Layout.astro";
+import { useTranslations, getLocalePath } from "@/i18n/utils";
+
+const fr = useTranslations("fr");
+const en = useTranslations("en");
+---
+
+<Layout
+  title={`${fr("notfound.heading")} | ${fr("site.title")}`}
+  lang="fr"
+  newsletter={false}
+>
+  <main class="mx-auto max-w-prose px-4 py-24 md:py-32">
+    <p class="text-sm font-medium text-muted-foreground">404</p>
+    <h1 class="mt-2 text-4xl font-bold leading-tight text-foreground">
+      {fr("notfound.heading")}
+    </h1>
+    <p class="mt-4 text-base md:text-lg text-muted-foreground">{fr("notfound.lead")}</p>
+    <a
+      href={getLocalePath("fr", "/")}
+      class="mt-8 inline-flex items-center justify-center h-11 px-5 rounded-md bg-primary text-primary-foreground text-base font-semibold hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    >
+      {fr("notfound.home")}
+    </a>
+
+    <div lang="en" class="mt-16 border-t border-border pt-8">
+      <p class="text-base font-semibold text-foreground">{en("notfound.heading")}</p>
+      <p class="mt-1 text-base text-muted-foreground">{en("notfound.lead")}</p>
+      <a
+        href={getLocalePath("en", "/")}
+        class="mt-3 inline-block text-base font-medium text-foreground underline underline-offset-4 hover:text-primary rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        {en("notfound.home")}
+      </a>
+    </div>
+  </main>
+</Layout>
