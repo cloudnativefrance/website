@@ -28,7 +28,10 @@ export const ui = {
     "about.subnav.venue": "Infos pratiques",
     "about.subnav.team": "L'équipe",
     "about.page.placeholder": "Le contenu de cette page arrive très prochainement.",
-    "tickets.coming_soon.title": "La billetterie ouvre mardi 13/10 à 10h",
+    "tickets.opening.badge": "Billetterie 2027",
+    "tickets.opening.title": "La billetterie ouvre",
+    "tickets.opening.date": "mardi 13 octobre à 10h",
+    "tickets.opening.body": "Une journée au CENTQUATRE-PARIS avec toute la communauté francophone du Cloud Native — le 3 juin 2027.",
     "site.title": "Cloud Native Days France 2027",
     "site.description": "3 juin 2027 — CENTQUATRE-PARIS",
     "seo.default_description":
@@ -444,7 +447,10 @@ export const ui = {
     "about.subnav.venue": "Practical info",
     "about.subnav.team": "The team",
     "about.page.placeholder": "Content for this page is coming soon.",
-    "tickets.coming_soon.title": "Tickets open on Tuesday 13/10 at 10am",
+    "tickets.opening.badge": "Ticketing 2027",
+    "tickets.opening.title": "Ticket sales open",
+    "tickets.opening.date": "Tuesday 13 October at 10:00",
+    "tickets.opening.body": "One day at CENTQUATRE-PARIS with the entire French-speaking Cloud Native community — June 3, 2027.",
     "site.title": "Cloud Native Days France 2027",
     "site.description": "June 3, 2027 — CENTQUATRE-PARIS",
     "seo.default_description":
