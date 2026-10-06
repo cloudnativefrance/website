@@ -29,6 +29,9 @@ export const ui = {
     "about.subnav.team": "L'équipe",
     "about.page.placeholder":
       "Le contenu de cette page arrive très prochainement.",
+    "tickets.coming_soon.title": "La billetterie sera bientôt ouverte",
+    "tickets.coming_soon.body":
+      "Inscrivez-vous à la newsletter pour être informé(e) dès l'ouverture de la billetterie et bénéficier des tarifs Early Bird.",
     "tickets.opening.badge": "Billetterie 2027",
     "tickets.opening.title": "La billetterie ouvre",
     "tickets.opening.date": "mardi 13 octobre à 10h",
@@ -598,6 +601,9 @@ export const ui = {
     "about.subnav.venue": "Practical info",
     "about.subnav.team": "The team",
     "about.page.placeholder": "Content for this page is coming soon.",
+    "tickets.coming_soon.title": "Tickets opening soon",
+    "tickets.coming_soon.body":
+      "Subscribe to the newsletter to be notified when ticketing opens and benefit from Early Bird rates.",
     "tickets.opening.badge": "Ticketing 2027",
     "tickets.opening.title": "Ticket sales open",
     "tickets.opening.date": "Tuesday 13 October at 10:00",

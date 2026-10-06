@@ -1,7 +1,7 @@
 ---
 /**
- * The `pre_opening` phase: the announcement of the opening date. The layout's
- * newsletter block is its only action.
+ * The `pre_opening` phase: the pre-2027 "coming soon" page, as it was. The
+ * layout's newsletter block is its only action.
  */
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
@@ -15,22 +15,13 @@ const t = useTranslations(lang);
 ---
 
 <main class="mx-auto max-w-3xl px-4 py-24 text-center md:px-6 md:py-32">
-  <span
-    class="bg-accent/15 text-accent inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold tracking-wider uppercase"
-  >
-    <span aria-hidden="true">🎟️</span>
-    {t("tickets.opening.badge")}
-  </span>
   <h1
-    class="text-foreground mt-5 text-4xl font-bold tracking-tight md:text-5xl"
+    class="text-foreground text-4xl font-bold tracking-tight md:text-5xl"
     style="letter-spacing:-0.02em;"
   >
-    {t("tickets.opening.title")}
-    <span class="text-primary whitespace-nowrap"
-      >{t("tickets.opening.date")}</span
-    >
+    {t("tickets.coming_soon.title")}
   </h1>
   <p class="text-muted-foreground mt-6 text-base md:text-lg">
-    {t("tickets.opening.body")}
+    {t("tickets.coming_soon.body")}
   </p>
 </main>

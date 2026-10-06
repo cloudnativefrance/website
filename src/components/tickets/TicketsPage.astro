@@ -1,15 +1,18 @@
 ---
 /**
  * What /billetterie, /en/tickets and the demo routes mount: the "coming soon"
- * page before the opening, then the ticketing page for the tier on sale.
+ * page before the opening (then with its date), then the ticketing page for
+ * the tier on sale.
  */
 import Layout from "@/layouts/Layout.astro";
 import type { Phase } from "@/config/tickets";
 import { useTranslations } from "@/i18n/utils";
 import type { Locale } from "@/i18n/ui";
 import { ticketDemosEnabled } from "@/lib/tickets/demo";
+import { isPreOpening } from "@/lib/tickets/phase";
 import TicketsContent from "./TicketsContent.astro";
 import TicketsComingSoon from "./TicketsComingSoon.astro";
+import TicketsComingSoonDated from "./TicketsComingSoonDated.astro";
 import DemoBar from "./DemoBar.astro";
 
 interface Props {
@@ -22,23 +25,26 @@ interface Props {
 const { lang, phase, simulated = false } = Astro.props;
 const t = useTranslations(lang);
 const switcher = ticketDemosEnabled();
-const comingSoon = phase === "pre_opening";
+const comingSoon = isPreOpening(phase);
+const description = !comingSoon
+  ? t("tickets.meta.description")
+  : phase === "pre_opening_dated"
+    ? t("tickets.opening.body")
+    : t("tickets.coming_soon.body");
 ---
 
 <Layout
   title={comingSoon ? t("nav.tickets") : t("tickets.meta.title")}
-  description={comingSoon
-    ? t("tickets.opening.body")
-    : t("tickets.meta.description")}
+  description={description}
   lang={lang}
   newsletter={comingSoon}
   noindex={simulated}
 >
   {switcher && <DemoBar lang={lang} phase={phase} simulated={simulated} />}
+  {phase === "pre_opening" && <TicketsComingSoon lang={lang} />}
+  {phase === "pre_opening_dated" && <TicketsComingSoonDated lang={lang} />}
   {
-    phase === "pre_opening" ? (
-      <TicketsComingSoon lang={lang} />
-    ) : (
+    !isPreOpening(phase) && (
       <TicketsContent lang={lang} phase={phase} demo={switcher} />
     )
   }

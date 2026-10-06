@@ -1,7 +1,7 @@
 import { TICKETING, type Phase } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { getLocalePath } from "@/i18n/utils";
-import { offerTier } from "@/lib/tickets/phase";
+import { isPreOpening, offerTier } from "@/lib/tickets/phase";
 
 export interface EventSchemaInput {
   lang: Locale;
@@ -55,7 +55,7 @@ export function buildEventSchema({ lang, siteUrl, description }: EventSchemaInpu
  * site shows no price either.
  */
 export function ticketOffers(phase: Phase, url: string) {
-  if (phase === "pre_opening") return undefined;
+  if (isPreOpening(phase)) return undefined;
   return {
     "@type": "Offer",
     url,

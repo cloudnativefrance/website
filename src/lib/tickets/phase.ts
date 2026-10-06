@@ -1,5 +1,7 @@
 import type {
   GroupRate,
+  Phase,
+  PreOpeningPhase,
   TicketingConfig,
   TierDefinition,
   TierId,
@@ -10,6 +12,11 @@ export type TierState = "past" | "current" | "upcoming";
 export interface TierWithState {
   tier: TierDefinition;
   state: TierState;
+}
+
+/** Before the opening: no ticket on sale, no price shown. */
+export function isPreOpening(phase: Phase): phase is PreOpeningPhase {
+  return phase === "pre_opening" || phase === "pre_opening_dated";
 }
 
 export function offerTier(

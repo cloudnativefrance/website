@@ -34,6 +34,7 @@ export function ticketDemosEnabled({
 
 const PHASE_SLUGS: Record<Phase, string> = {
   pre_opening: "avant-ouverture",
+  pre_opening_dated: "avant-ouverture-avec-date",
   seb: "super-early-bird",
   eb: "early-bird",
   regular: "regular",

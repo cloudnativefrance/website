@@ -53,7 +53,9 @@ describe("cheaperGroupRates", () => {
 
 describe("ticketOffers", () => {
   it("prices nothing before the opening, then the standard price of the moment", () => {
-    expect(ticketOffers("pre_opening", "/billetterie/")).toBeUndefined();
+    for (const phase of ["pre_opening", "pre_opening_dated"] as const) {
+      expect(ticketOffers(phase, "/billetterie/")).toBeUndefined();
+    }
     expect(ticketOffers("regular", "/billetterie/")).toMatchObject({
       price: offerTier(TICKETING, "regular").price,
     });

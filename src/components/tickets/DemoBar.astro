@@ -13,7 +13,7 @@
 import { TICKETING, type Phase } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { DEMO_PHASES, demoPath } from "@/lib/tickets/demo";
-import { offerTier } from "@/lib/tickets/phase";
+import { isPreOpening, offerTier } from "@/lib/tickets/phase";
 
 const fr = {
   badge: "Démo",
@@ -22,6 +22,7 @@ const fr = {
   close: "Fermer les réglages",
   phase: "Phase",
   pre_opening: "Avant ouverture",
+  pre_opening_dated: "Avant ouverture avec date",
   scenario:
     "Scénario simulé\u00a0: les tarifs précédents sont affichés comme épuisés.",
   config: "État de la config",
@@ -35,6 +36,7 @@ const COPY: Record<Locale, typeof fr> = {
     close: "Close the settings",
     phase: "Phase",
     pre_opening: "Before opening",
+    pre_opening_dated: "Before opening, with date",
     scenario: "Simulated season: every earlier price is shown as sold out.",
     config: "Config state",
   },
@@ -50,7 +52,7 @@ const { lang, phase, simulated } = Astro.props;
 const copy = COPY[lang];
 
 const phaseLabel = (p: Phase) =>
-  p === "pre_opening" ? copy.pre_opening : offerTier(TICKETING, p).name[lang];
+  isPreOpening(p) ? copy[p] : offerTier(TICKETING, p).name[lang];
 
 const legend =
   "text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-muted-foreground";

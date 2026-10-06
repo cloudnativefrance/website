@@ -6,6 +6,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import TicketsContent from "../TicketsContent.astro";
 import TicketsComingSoon from "../TicketsComingSoon.astro";
+import TicketsComingSoonDated from "../TicketsComingSoonDated.astro";
 import { TICKETING } from "@/config/tickets";
 import { ui } from "@/i18n/ui";
 import { formatDayMonth } from "@/lib/tickets/format";
@@ -90,14 +91,16 @@ describe.each(TICKETING.tiers)("phase $id", (tier) => {
   });
 });
 
-describe("the coming-soon page", () => {
-  it("sells nothing: no price, no link to alf.io", async () => {
-    for (const lang of ["fr", "en"] as const) {
-      const html = await container.renderToString(TicketsComingSoon, {
-        props: { lang },
-      });
-      expect(html).not.toContain(alfioHost);
-      expect(html).not.toMatch(/\d\s*€|€\s*\d/);
+describe("the coming-soon pages", () => {
+  it("sell nothing: no price, no link to alf.io", async () => {
+    for (const page of [TicketsComingSoon, TicketsComingSoonDated]) {
+      for (const lang of ["fr", "en"] as const) {
+        const html = await container.renderToString(page, {
+          props: { lang },
+        });
+        expect(html).not.toContain(alfioHost);
+        expect(html).not.toMatch(/\d\s*€|€\s*\d/);
+      }
     }
   });
 });

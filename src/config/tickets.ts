@@ -5,14 +5,15 @@
  * in alf.io.
  *
  * Changing phase is changing `currentPhase` and shipping: `pre_opening` serves
- * the "coming soon" page, a tier id sells that tier, and every tier before it
- * reads "Épuisé".
+ * the "coming soon" page, `pre_opening_dated` the one announcing the opening
+ * date, a tier id sells that tier, and every tier before it reads "Épuisé".
  */
 
 export type Localized = { fr: string; en: string };
 
 export type TierId = "seb" | "eb" | "regular" | "last_chance";
-export type Phase = "pre_opening" | TierId;
+export type PreOpeningPhase = "pre_opening" | "pre_opening_dated";
+export type Phase = PreOpeningPhase | TierId;
 
 export interface TierDefinition {
   id: TierId;
@@ -56,7 +57,7 @@ export interface TicketingConfig {
 export const TICKETING: TicketingConfig = {
   listingUrl: "https://billetterie.cloudnativedays.fr/event/cndfr2027",
   // Ticketing opens on 13 October 2026: set to "seb" that day.
-  currentPhase: "pre_opening",
+  currentPhase: "pre_opening_dated",
   // Lower-case, as prose uses it; card titles capitalise it.
   standardName: { fr: "standard", en: "standard" },
   tiers: [
