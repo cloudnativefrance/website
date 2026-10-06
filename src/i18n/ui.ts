@@ -28,8 +28,7 @@ export const ui = {
     "about.subnav.venue": "Infos pratiques",
     "about.subnav.team": "L'équipe",
     "about.page.placeholder": "Le contenu de cette page arrive très prochainement.",
-    "tickets.coming_soon.title": "La billetterie sera bientôt ouverte",
-    "tickets.coming_soon.body": "Inscrivez-vous à la newsletter pour être informé(e) dès l'ouverture de la billetterie et bénéficier des tarifs Early Bird.",
+    "tickets.coming_soon.title": "La billetterie ouvre mardi 13/10 à 10h",
     "site.title": "Cloud Native Days France 2027",
     "site.description": "3 juin 2027 — CENTQUATRE-PARIS",
     "seo.default_description":
@@ -445,8 +444,7 @@ export const ui = {
     "about.subnav.venue": "Practical info",
     "about.subnav.team": "The team",
     "about.page.placeholder": "Content for this page is coming soon.",
-    "tickets.coming_soon.title": "Tickets opening soon",
-    "tickets.coming_soon.body": "Subscribe to the newsletter to be notified when ticketing opens and benefit from Early Bird rates.",
+    "tickets.coming_soon.title": "Tickets open on Tuesday 13/10 at 10am",
     "site.title": "Cloud Native Days France 2027",
     "site.description": "June 3, 2027 — CENTQUATRE-PARIS",
     "seo.default_description":
