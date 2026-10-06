@@ -25,9 +25,10 @@ interface Props {
   noindex?: boolean;
 }
 
-// Bump ?v= whenever public/og-default.png changes. The asset is served
-// immutable/max-age=1yr, so the query string is what busts browser, CDN and
-// social-scraper caches (otherwise a same-name swap never propagates).
+// Bump ?v= whenever public/og-default.png changes. Browsers would pick up a
+// same-name swap within a day (nginx serves public/ files with max-age=1d),
+// but social scrapers key their own long-lived cache on the URL, so the query
+// string is what makes a new image show up in link previews.
 const OG_DEFAULT_IMAGE = "/og-default.png?v=2027";
 
 const {

@@ -54,6 +54,7 @@ RUN --mount=type=secret,id=pretalx_token \
 # capabilities: drop ALL) without permission gymnastics.
 FROM nginxinc/nginx-unprivileged:1.27-alpine AS runtime
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
+COPY nginx/security-headers.conf /etc/nginx/security-headers.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 # Base image already EXPOSEs 8080 and CMDs nginx -g "daemon off;" with logs
 # symlinked to /dev/stdout and /dev/stderr — nothing else to do here.
