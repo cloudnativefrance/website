@@ -1,5 +1,13 @@
 # Ticketing page 2027 v2 (showcase only) Implementation Plan
 
+> **Status (2026-10-06): executed on 27/09/2026, then overtaken. Do not execute it.**
+> The work that followed reshaped what this plan builds: `drafts.ts`, `purchase.ts`,
+> `url.ts` and the `tbd()` mechanism are gone, the pre-opening state is the existing
+> coming-soon pages, the demo is the `TICKETS_DEMO` toggle in both locales, and
+> `/billetterie` and `/en/tickets` now mount the page. It stays as the record of that
+> session. What shipped, and why it moved, is in the spec's _Changes after
+> implementation_.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Turn the 2027 ticketing demo into the showcase-only page decided on 22/09/2026: variant B alone, no proof section, no inclusion footer, Strategy & Leadership always on sale, no "À confirmer" chip (with a production guard instead), and every hand-off to alf.io in a new tab.
