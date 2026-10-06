@@ -1,0 +1,67 @@
+---
+/**
+ * What the standard ticket includes. A plain checklist, not a grid of feature
+ * cards; the evening — new in 2027 and the launch's main argument — gets the
+ * section's one card, its novelty in a pink pill.
+ */
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import Icon from "./Icon.astro";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const items = [
+  t("tickets.included.talks"),
+  t("tickets.included.village"),
+  t("tickets.included.meals"),
+  t("tickets.included.goodies"),
+];
+---
+
+<section
+  class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-16"
+  aria-labelledby="included-title"
+>
+  <div class="flex flex-col gap-6">
+    <h2
+      id="included-title"
+      class="text-foreground text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl"
+    >
+      {t("tickets.included.title")}
+    </h2>
+    <ul class="flex flex-col gap-3">
+      {
+        items.map((item) => (
+          <li class="text-foreground flex items-start gap-3 text-lg">
+            <span class="bg-primary/10 text-primary-strong mt-1 grid size-6 shrink-0 place-items-center rounded-full">
+              <Icon name="check" size={14} />
+            </span>
+            <span class="text-pretty">{item}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div
+    class="border-border bg-card flex flex-col gap-3 rounded-xl border p-6 sm:p-8"
+  >
+    <h3
+      class="text-foreground text-2xl font-semibold tracking-[-0.01em] text-balance"
+    >
+      {t("tickets.included.evening.title")}
+      <span
+        class="bg-accent text-accent-foreground ml-1 inline-flex items-center rounded-full px-2.5 py-1 align-[0.2em] text-xs leading-none font-bold tracking-[0.06em] whitespace-nowrap uppercase"
+      >
+        {t("tickets.included.evening.new")}
+      </span>
+    </h3>
+    <p class="text-foreground text-lg text-pretty">
+      {t("tickets.included.evening.body")}
+    </p>
+  </div>
+</section>

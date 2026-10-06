@@ -1,0 +1,117 @@
+---
+import { TICKETING } from "@/config/tickets";
+import type { Locale } from "@/i18n/ui";
+import { getLocalePath, useTranslations } from "@/i18n/utils";
+import { CONTACT_EMAILS } from "@/lib/event";
+import { fill, formatPercent } from "@/lib/tickets/format";
+import { buildMailto } from "@/lib/tickets/mailto";
+import FaqItem from "./FaqItem.astro";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const email = CONTACT_EMAILS.tickets;
+const ticketNames = {
+  standard: TICKETING.standardName[lang],
+  strategic: TICKETING.strategic.name[lang],
+};
+const mailto = (topic: "wire" | "per_order" | "inclusion") =>
+  buildMailto(
+    email,
+    t(`tickets.${topic}.mail.subject`),
+    fill(t(`tickets.${topic}.mail.body`), ticketNames),
+  );
+// The answer names the tiers: {early} is the first one's cap, {later} the last one's.
+const perOrder = {
+  early: TICKETING.tiers[0].maxPerOrder,
+  later: TICKETING.tiers[TICKETING.tiers.length - 1].maxPerOrder,
+};
+const link =
+  "font-medium text-primary-strong underline underline-offset-4 decoration-primary-strong/40 hover:decoration-primary-strong";
+---
+
+<section
+  class="grid gap-8 lg:grid-cols-[minmax(0,0.6fr)_minmax(0,1.4fr)] lg:gap-16"
+  aria-labelledby="faq-title"
+>
+  <h2
+    id="faq-title"
+    class="text-foreground text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl"
+  >
+    {t("tickets.faq.title")}
+  </h2>
+
+  <div class="divide-border border-border divide-y border-y">
+    <FaqItem question={t("tickets.faq.payment.q")}>
+      {t("tickets.faq.payment.a")}{" "}
+      <a
+        href={mailto("wire")}
+        class={link}
+        data-umami-event="tickets-wire-contact">{email}</a
+      >.
+    </FaqItem>
+    <FaqItem question={t("tickets.faq.change.q")}>
+      {t("tickets.faq.change.a")}
+    </FaqItem>
+    <FaqItem question={t("tickets.faq.strategic.q")}>
+      {fill(t("tickets.faq.strategic.a"), { name: ticketNames.strategic })}
+    </FaqItem>
+    <FaqItem question={t("tickets.faq.ttc.q")}>
+      {
+        fill(t("tickets.faq.ttc.a"), {
+          rate: formatPercent(TICKETING.vatRate, lang),
+        })
+      }
+    </FaqItem>
+    <FaqItem question={t("tickets.faq.per_order.q")}>
+      {fill(t("tickets.faq.per_order.a"), perOrder)}{" "}
+      <a
+        href={mailto("per_order")}
+        class={link}
+        data-umami-event="tickets-per-order-contact">{email}</a
+      >.
+    </FaqItem>
+    <FaqItem question={t("tickets.faq.invoice.q")}>
+      {t("tickets.faq.invoice.a")}{" "}
+      <a
+        href={`mailto:${email}`}
+        class={link}
+        data-umami-event="tickets-invoice-contact">{email}</a
+      >.
+    </FaqItem>
+    <FaqItem question={t("tickets.faq.code.q")}>
+      {t("tickets.faq.code.a")}
+    </FaqItem>
+    <FaqItem question={t("tickets.faq.inclusion.q")}>
+      {t("tickets.faq.inclusion.a")}{" "}
+      <a
+        href={mailto("inclusion")}
+        class={link}
+        data-umami-event="tickets-inclusion-contact">{email}</a
+      >.
+    </FaqItem>
+    <FaqItem question={t("tickets.faq.access.q")}>
+      {t("tickets.faq.access.a")}{" "}
+      <a
+        href={`${getLocalePath(lang, "/informations-utiles")}#accessibilite`}
+        class={link}>{t("tickets.faq.access.link")}</a
+      >
+    </FaqItem>
+    <FaqItem question={t("tickets.faq.coc.q")}>
+      {t("tickets.faq.coc.a")}{" "}
+      <a href={getLocalePath(lang, "/code-of-conduct")} class={link}
+        >{t("tickets.faq.coc.link")}</a
+      >
+    </FaqItem>
+    <FaqItem question={t("tickets.faq.programme.q")}>
+      {
+        fill(t("tickets.faq.programme.a"), {
+          when: TICKETING.programmeAnnouncement[lang],
+        })
+      }
+    </FaqItem>
+  </div>
+</section>

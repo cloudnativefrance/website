@@ -12,7 +12,7 @@ This document describes the design-to-code workflow using **Google Stitch** (AI 
 
 #### 1a. Prerequisites
 
-- **Node.js** >= 22.13.0 (we used mise: `mise install node@22.13.0 && mise use node@22.13.0`)
+- **Node.js** (we used mise: `mise install` in this repository folder)
 - **gcloud CLI** installed and authenticated
 
 #### 1b. Google Cloud Authentication

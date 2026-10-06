@@ -1,0 +1,88 @@
+---
+/**
+ * "J'ai un code": partners, invitations, promo codes. The site checks nothing,
+ * alf.io knows the codes.
+ *
+ * Without JavaScript the form is a GET to the listing with `?code=` (alf.io's
+ * support to confirm with JC); `tickets-ui.ts` sends it to `/code/<CODE>`.
+ */
+import { TICKETING, type TierId } from "@/config/tickets";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import Icon from "./Icon.astro";
+
+interface Props {
+  lang: Locale;
+  phase: TierId;
+}
+
+const { lang, phase } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<article
+  class="door border-border bg-card flex flex-col gap-4 rounded-xl border p-5 sm:px-8 sm:py-6 lg:flex-row lg:items-center lg:gap-8"
+  aria-labelledby="door-code-title"
+>
+  <div class="flex flex-col gap-1 lg:shrink-0">
+    <h2
+      id="door-code-title"
+      class="text-foreground text-2xl font-semibold tracking-[-0.01em]"
+    >
+      {t("tickets.door.code")}
+    </h2>
+    <p class="text-muted-foreground text-sm">{t("tickets.code.intro")}</p>
+  </div>
+
+  <form
+    method="get"
+    action={TICKETING.listingUrl}
+    target="_blank"
+    class="flex flex-col gap-2 lg:min-w-0 lg:flex-1 lg:flex-row lg:items-center lg:gap-6"
+    novalidate
+    data-tickets-code
+  >
+    <label for="ticket-code" class="sr-only">
+      {t("tickets.code.intro")}
+      {t("tickets.code.label")}
+    </label>
+    <div class="flex flex-col gap-2 lg:max-w-md lg:min-w-0 lg:flex-1">
+      <div class="flex flex-col gap-2 min-[380px]:flex-row">
+        <input
+          id="ticket-code"
+          name="code"
+          type="text"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          enterkeyhint="go"
+          placeholder={t("tickets.code.label")}
+          class="border-input bg-background text-foreground caret-primary placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/40 aria-invalid:border-destructive-strong aria-invalid:ring-destructive/20 h-11 min-w-0 flex-1 rounded-lg border px-3 text-base transition-[border-color,box-shadow] duration-150 focus-visible:ring-3 focus-visible:outline-none aria-invalid:ring-3"
+          data-code-input
+        />
+        {
+          /* No-wrap from lg only: on a phone it would push the grid column past the viewport. */
+        }
+        <button
+          type="submit"
+          class="border-input bg-card text-foreground hover:bg-muted focus-visible:ring-ring/50 inline-flex h-11 items-center justify-center gap-2 rounded-lg border px-4 text-base font-semibold transition-[background-color,scale] duration-150 ease-out focus-visible:ring-3 focus-visible:outline-none active:scale-[0.96] lg:whitespace-nowrap"
+          data-umami-event="tickets-code"
+          data-umami-event-phase={phase}
+        >
+          {t("tickets.code.submit")}
+          <span class="sr-only"> {t("tickets.new_tab")}</span>
+          <Icon name="arrow-up-right" size={16} />
+        </button>
+      </div>
+      <p
+        id="ticket-code-error"
+        class="text-destructive-strong text-sm font-medium"
+        role="alert"
+        hidden
+        data-code-error
+      >
+        {t("tickets.code.empty")}
+      </p>
+    </div>
+  </form>
+</article>
