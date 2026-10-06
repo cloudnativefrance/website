@@ -34,6 +34,7 @@ const PATH_TRANSLATIONS: Record<string, Partial<Record<Locale, string>>> = {
   sponsors: { fr: "partenaires" },
   speakers: { fr: "intervenants" },
   discover: { fr: "decouvrir" },
+  "terms-of-sale": { fr: "cgv" },
 };
 
 function localizeSegment(seg: string, lang: Locale): string {
