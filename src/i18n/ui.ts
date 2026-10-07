@@ -272,6 +272,7 @@ export const ui = {
     "legal.coc.title": "Code de conduite",
     "legal.privacy.title": "Politique de confidentialité",
     "legal.terms.title": "Mentions légales",
+    "legal.sale.title": "Conditions générales de vente et de participation",
     "legal.last_updated": "Dernière mise à jour : {date}",
     "footer.tagline":
       "La conférence de référence sur le Cloud Native et le DevOps",
@@ -292,6 +293,7 @@ export const ui = {
     "footer.legal.coc": "Code de conduite",
     "footer.legal.privacy": "Confidentialité",
     "footer.legal.terms": "Mentions légales",
+    "footer.legal.sale": "CGV",
     "footer.copyright": "© 2027 Cloud Native France · Association loi 1901",
     "footer.social.linkedin_aria":
       "LinkedIn Cloud Native France (nouvelle fenêtre)",
@@ -830,6 +832,7 @@ export const ui = {
     "legal.coc.title": "Code of Conduct",
     "legal.privacy.title": "Privacy Policy",
     "legal.terms.title": "Terms of Service",
+    "legal.sale.title": "Terms and Conditions of Sale and Participation",
     "legal.last_updated": "Last updated: {date}",
     "footer.tagline": "The reference conference on Cloud Native and DevOps",
     "footer.association":
@@ -848,6 +851,7 @@ export const ui = {
     "footer.legal.coc": "Code of Conduct",
     "footer.legal.privacy": "Privacy",
     "footer.legal.terms": "Terms",
+    "footer.legal.sale": "Terms of Sale",
     "footer.copyright":
       "© 2027 Cloud Native France · non-profit association (loi 1901)",
     "footer.social.linkedin_aria":
