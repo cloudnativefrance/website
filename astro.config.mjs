@@ -83,8 +83,12 @@ export default defineConfig({
       // and don't redeploy post-event just to add routes to the sitemap, so
       // these routes are excluded permanently. Post-event inbound links come
       // from CountdownTimer and the conditional nav entry.
+      // The CFP demo (src/lib/cfp/demo.ts) is never indexed.
       filter: (page) =>
-        !/\/replays\/?$/.test(page) && !/\/en\/replays\/?$/.test(page),
+        !/\/replays\/?$/.test(page) &&
+        !/\/en\/replays\/?$/.test(page) &&
+        !/\/cfp\/demo(\/|$)/.test(page) &&
+        !/\/en\/cfp\/demo(\/|$)/.test(page),
       i18n: {
         defaultLocale: "fr",
         locales: { fr: "fr-FR", en: "en-US" },

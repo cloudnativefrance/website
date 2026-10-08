@@ -92,7 +92,7 @@ describe("demo gate", () => {
     }
   });
 
-  it("uses URL-safe, unaccented slugs under /cfp/demo/ and /en/cfp/demo/ — the sitemap never sees them without the demo", () => {
+  it("uses URL-safe, unaccented slugs under /cfp/demo/ and /en/cfp/demo/ — the sitemap filter keeps the demo pages out of the index", () => {
     expect(DEMO_PHASES.map((p) => demoPath(p, "fr"))).toEqual([
       "/cfp/demo/avant-ouverture/",
       "/cfp/demo/ouvert/",

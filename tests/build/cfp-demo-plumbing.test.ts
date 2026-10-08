@@ -21,6 +21,10 @@ const WORKFLOW = readFileSync(
   resolve(import.meta.dirname, "../../.github/workflows/build-image.yml"),
   "utf-8",
 );
+const ASTRO_CONFIG = readFileSync(
+  resolve(import.meta.dirname, "../../astro.config.mjs"),
+  "utf-8",
+);
 
 describe("Dockerfile CFP_DEMO", () => {
   it("declares the build-arg empty by default, so a plain build has no demo", () => {
@@ -40,5 +44,16 @@ describe("build-image.yml CFP_DEMO", () => {
       /CFP_DEMO=\$\{\{\s*github\.ref_name == 'staging' && 'true' \|\| ''\s*\}\}/,
     );
     expect(WORKFLOW.match(/CFP_DEMO=/g)).toHaveLength(1);
+  });
+});
+
+describe("astro.config.mjs sitemap filter", () => {
+  it("keeps the CFP demo pages out of the sitemap, both locales", () => {
+    // Listing a noindex page in the sitemap is a Search Console error — the
+    // demo routes must be filtered out, not just marked un-indexable.
+    expect(ASTRO_CONFIG).toContain(String.raw`!/\/cfp\/demo(\/|$)/.test(page)`);
+    expect(ASTRO_CONFIG).toContain(
+      String.raw`!/\/en\/cfp\/demo(\/|$)/.test(page)`,
+    );
   });
 });
