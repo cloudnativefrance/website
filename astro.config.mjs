@@ -116,11 +116,19 @@ export default defineConfig({
     },
   ],
   env: {
-    schema: Object.fromEntries(
-      Object.entries(generateFlagEnvSchema()).map(([key, entry]) => [
-        key,
-        envField.enum(entry),
-      ]),
-    ),
+    schema: {
+      ...Object.fromEntries(
+        Object.entries(generateFlagEnvSchema()).map(([key, entry]) => [
+          key,
+          envField.enum(entry),
+        ]),
+      ),
+      // See src/lib/cfp/demo.ts.
+      CFP_DEMO: envField.boolean({
+        context: "server",
+        access: "public",
+        optional: true,
+      }),
+    },
   },
 });

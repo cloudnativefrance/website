@@ -26,6 +26,10 @@ ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
 # An unknown name or a value other than on/off fails the build (src/lib/flags.ts).
 ARG FLAG_OVERRIDES=
 ENV FLAG_OVERRIDES=$FLAG_OVERRIDES
+# The CFP demo, `true` on staging only. Empty by default so a plain
+# `docker build` is the production site (src/lib/cfp/demo.ts).
+ARG CFP_DEMO=
+ENV CFP_DEMO=$CFP_DEMO
 # Pretalx API token, as a BuildKit secret — deliberately NOT a build-arg.
 # Build-args are recorded in image history, so `docker history` on a published
 # image would print the token to anyone who can pull it. A secret mount exists

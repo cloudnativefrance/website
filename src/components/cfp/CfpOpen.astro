@@ -1,0 +1,444 @@
+---
+/**
+ * The `open` phase: the CFP page itself, ported from the staging routes.
+ * Both locales' content arrays live here, keyed by lang; the markup is
+ * shared. The staging pages duplicated the markup per locale because they
+ * were pages — as one component there is exactly one copy of the JSX, so
+ * the FR and EN trees cannot drift apart while editors work on one of them.
+ */
+import { Picture } from "astro:assets";
+import type { Locale } from "@/i18n/ui";
+import { cfpEventUrl, cfpEventLabel } from "@/lib/pretalx";
+import intervenantPhoto from "@/assets/photos/contact/intervenants.jpg";
+import participantPhoto from "@/assets/photos/contact/participant.jpg";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const CFP_URL = cfpEventUrl();
+const CFP_LABEL = cfpEventLabel();
+
+const fr = {
+  badge: "CFP 2027 — ouvert",
+  heroTitle: "Proposez une intervention",
+  heroSub: "Une journée. 7 thèmes. 3 formats. Et votre voix.",
+  heroCta: "Soumettre une proposition",
+  formatsLink: null as string | null,
+  eventLine:
+    "3 juin 2027 · CENTQUATRE-PARIS · au cœur de la communauté francophone du Cloud Native",
+  themesTitle: "Les 7 thèmes",
+  themesSub: "Choisissez celui qui correspond le mieux à votre sujet.",
+  formatsTitle: "Les formats",
+  knowTitle: "À savoir",
+  knowFrench: {
+    before: "Toutes les présentations se déroulent ",
+    strong: "en français",
+    after: " — slides en anglais acceptés si cela facilite votre préparation.",
+  },
+  knowCoaching: {
+    strong: "Première fois sur scène ?",
+    after: "Un coaching est proposé aux primo-oratrices et primo-orateurs — et à toute personne qui en ressent le besoin — pour préparer votre proposition et votre prise de parole.",
+  },
+  knowValues: {
+    label: "Nos valeurs",
+    colon: " : ",
+    items: [
+      { emoji: "❤️", text: "Communauté" },
+      { emoji: "🌍", text: "Inclusion & diversité" },
+      { emoji: "🌱", text: "Écologie" },
+      { emoji: "🇫🇷", text: "Autonomie numérique" },
+    ],
+  },
+  committeeTitle: "Ce que le comité privilégie",
+  committeeIntro:
+    "Notre comité de sélection — bénévoles de l'organisation CND France et membres reconnus des communautés cloud native francophones — privilégiera les propositions qui\u00a0:",
+  closingTitle: "Soumettez votre proposition",
+  closingCta: "Proposer une intervention",
+  heroPhotoAlt: "Intervenant(e) sur scène à Cloud Native Days France 2026",
+  closingPhotoAlt: "Participantes et participants à Cloud Native Days France 2026",
+  formats: [
+    {
+      duration: "10 min",
+      title: "Présentation éclair",
+      body: "Un format court et synthétique pour aller droit au but. Le temps est votre principal challenge — assurez-vous que votre contenu soit concis et percutant.",
+    },
+    {
+      duration: "30 min",
+      title: "Retour d'expérience",
+      body: "Idéal pour partager des cas concrets en entreprise, des retours sur des projets open source, ou une expérience personnelle. Q&A incluses.",
+    },
+    {
+      duration: "45 min",
+      title: "Conférence",
+      body: "Pour approfondir un sujet complexe, entrer dans les détails techniques, avec éventuellement des démonstrations. Q&A incluses.",
+    },
+  ],
+  parcours: [
+    {
+      emoji: "🔓",
+      title: "Autonomie numérique et Open Source",
+      body: "Maîtriser sa dépendance : souveraineté des données, alternatives ouvertes, contribution amont, et le coût réel de la réversibilité.",
+    },
+    {
+      emoji: "🎯",
+      title: "DevEx et Platform Engineering",
+      body: "Construire une plateforme que les équipes choisissent d'utiliser : golden paths, self-service, et la mesure de ce qui leur fait réellement gagner du temps.",
+    },
+    {
+      emoji: "🤖",
+      title: "L'IA à l'épreuve du réel",
+      body: "Ce que l'IA change vraiment en production : coûts, latence, données, garde-fous. Des retours d'expérience plutôt que des démos.",
+    },
+    {
+      emoji: "🔭",
+      title: "Observabilité et fiabilité",
+      body: "Comprendre un système en production : des signaux utiles plutôt que des tableaux de bord, des SLO tenables, et ce qu'on apprend d'un incident.",
+    },
+    {
+      emoji: "🛡️",
+      title: "Sécurité et confiance",
+      body: "Sécuriser sans bloquer : chaîne d'approvisionnement, secrets, identités et conformité, intégrés au travail des équipes plutôt qu'ajoutés après.",
+    },
+    {
+      emoji: "🧱",
+      title: "Fondations: Infrastructure, données, réseau",
+      body: "Les couches sur lesquelles tout repose : Kubernetes, stockage, réseau, bases de données — leur exploitation au quotidien et à l'échelle.",
+    },
+  ],
+  horsPiste: {
+    emoji: "🚀",
+    title: "Hors pistes, sujets divers",
+    body: "Ce qui n'entre nulle part ailleurs et mérite d'être entendu : expérimentations, angles inattendus, et le retour d'expérience qu'on n'ose pas raconter.",
+  },
+  criteria: [
+    { key: "Retours d'expérience", body: "concrets sur l'application des technologies Cloud Native." },
+    { key: "Open source", body: "moteurs d'innovation et de collaboration." },
+    { key: "Innovation et expertise technique", body: "qui repoussent les limites de votre domaine." },
+    { key: "Projets francophones et locaux", body: "valorisant notre écosystème." },
+    { key: "Contenu inédit", body: "ou rarement présenté lors d'autres conférences." },
+    { key: "Diversité", body: "des profils et des approches." },
+  ],
+};
+
+const COPY: Record<Locale, typeof fr> = {
+  fr,
+  en: {
+    badge: "CFP 2027 — open",
+    heroTitle: "Submit a talk",
+    heroSub: "One day. 7 themes. 3 formats. And your voice.",
+    heroCta: "Submit a proposal",
+    formatsLink: "See the formats",
+    eventLine:
+      "June 3, 2027 · CENTQUATRE-PARIS · at the heart of the French-speaking Cloud Native community",
+    themesTitle: "The 7 themes",
+    themesSub: "Pick the one that fits your topic best.",
+    formatsTitle: "The formats",
+    knowTitle: "Good to know",
+    knowFrench: {
+      before: "All talks are ",
+      strong: "in French",
+      after: " — English slides accepted if that makes prep easier.",
+    },
+    knowCoaching: {
+      strong: "First time on stage?",
+      after: "Coaching is available for first-time speakers — and for anyone who wants it — to help you prepare your proposal and your talk.",
+    },
+    knowValues: {
+      label: "Our values",
+      colon: ": ",
+      items: [
+        { emoji: "❤️", text: "Community" },
+        { emoji: "🌍", text: "Inclusion & diversity" },
+        { emoji: "🌱", text: "Ecology" },
+        { emoji: "🇫🇷", text: "Digital sovereignty" },
+      ],
+    },
+    committeeTitle: "What the committee favours",
+    committeeIntro:
+      "Our selection committee — CND France volunteers and recognised members of the French-speaking cloud native communities — will favour proposals that:",
+    closingTitle: "Submit your proposal",
+    closingCta: "Submit a talk",
+    heroPhotoAlt: "Speaker on stage at Cloud Native Days France 2026",
+    closingPhotoAlt: "Attendees at Cloud Native Days France 2026",
+    formats: [
+      {
+        duration: "10 min",
+        title: "Lightning talk",
+        body: "Short and to the point. Time is the constraint — keep it concise and impactful.",
+      },
+      {
+        duration: "30 min",
+        title: "Experience report",
+        body: "Production stories, open source retrospectives, or a personal contribution. Q&A included.",
+      },
+      {
+        duration: "45 min",
+        title: "Conference talk",
+        body: "Deep dive into a complex topic, technical details, possibly with live demos. Q&A included.",
+      },
+    ],
+    parcours: [
+      {
+        emoji: "🔓",
+        title: "Digital sovereignty & Open Source",
+        body: "Mastering your dependencies: data sovereignty, open alternatives, upstream contribution, and the real cost of reversibility.",
+      },
+      {
+        emoji: "🎯",
+        title: "DevEx & Platform Engineering",
+        body: "Building a platform teams choose to use: golden paths, self-service, and measuring what actually saves them time.",
+      },
+      {
+        emoji: "🤖",
+        title: "AI put to the test",
+        body: "What AI really changes in production: cost, latency, data, guardrails. Experience reports, not demos.",
+      },
+      {
+        emoji: "🔭",
+        title: "Observability & reliability",
+        body: "Understanding a system in production: useful signals over dashboards, sustainable SLOs, and what an incident teaches you.",
+      },
+      {
+        emoji: "🛡️",
+        title: "Security & trust",
+        body: "Securing without blocking: supply chain, secrets, identities and compliance, built into the work of teams rather than bolted on after.",
+      },
+      {
+        emoji: "🧱",
+        title: "Foundations: infrastructure, data, networking",
+        body: "The layers everything rests on: Kubernetes, storage, networking, databases — running them day to day, at scale.",
+      },
+    ],
+    horsPiste: {
+      emoji: "🚀",
+      title: "Off-piste & misc",
+      body: "What fits nowhere else and deserves to be heard: experiments, unexpected angles, and the experience report you don't dare tell.",
+    },
+    criteria: [
+      { key: "Experience reports", body: "concrete application of Cloud Native tech." },
+      { key: "Open source", body: "drivers of innovation and collaboration." },
+      { key: "Innovation and technical expertise", body: "that push the limits of your field." },
+      { key: "French-speaking and local projects", body: "showcasing our ecosystem." },
+      { key: "Fresh material", body: "rarely seen at other conferences." },
+      { key: "Diversity", body: "of profiles and approaches." },
+    ],
+  },
+};
+
+const copy = COPY[lang];
+---
+
+<main>
+  <section class="mx-auto max-w-6xl px-4 md:px-6 pt-16 md:pt-24 pb-10 md:pb-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+      <div>
+        <span class="inline-flex items-center rounded-full bg-accent/15 text-accent px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+          {copy.badge}
+        </span>
+        <h1 class="mt-5 text-4xl md:text-6xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+          {copy.heroTitle}
+        </h1>
+        <p class="mt-4 text-base md:text-lg text-muted-foreground">
+          {copy.heroSub}
+        </p>
+        <a
+          href={CFP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-8 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-base font-semibold px-6 h-12 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          {copy.heroCta} <span aria-hidden="true">→</span>
+        </a>
+        {copy.formatsLink && (
+          <p class="mt-3 text-sm">
+            <a
+              href="#formats"
+              class="font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {copy.formatsLink}
+            </a>
+          </p>
+        )}
+        <p class="mt-4 text-sm text-muted-foreground">
+          {copy.eventLine}
+        </p>
+      </div>
+      <Picture
+        src={intervenantPhoto}
+        alt={copy.heroPhotoAlt}
+        widths={[400, 600, 800, 1200]}
+        sizes="(min-width: 768px) 45vw, 100vw"
+        formats={["avif", "webp"]}
+        loading="eager"
+        decoding="async"
+        class="w-full aspect-[4/3] object-cover rounded-lg border border-border"
+      />
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
+    <h2 class="text-2xl md:text-3xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+      {copy.themesTitle}
+    </h2>
+    <p class="mt-2 text-sm md:text-base text-muted-foreground">
+      {copy.themesSub}
+    </p>
+    <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {
+        copy.parcours.map((th) => (
+          <article class="rounded-lg border border-border bg-card p-4 md:p-5 transition-colors hover:border-primary/60">
+            <div class="flex items-center gap-3">
+              <div class="inline-flex items-center justify-center w-9 h-9 rounded-full text-lg bg-primary/10 shrink-0" aria-hidden="true">
+                {th.emoji}
+              </div>
+              <h3 class="text-base md:text-lg font-bold text-foreground tracking-tight">
+                {th.title}
+              </h3>
+            </div>
+            <p class="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">
+              {th.body}
+            </p>
+          </article>
+        ))
+      }
+      <article class="sm:col-span-2 lg:col-span-3 flex flex-wrap items-center gap-4 rounded-lg border border-border bg-card p-4 md:p-5 transition-colors hover:border-primary/60">
+        <div class="inline-flex items-center justify-center w-9 h-9 rounded-full text-lg bg-primary/10 shrink-0" aria-hidden="true">
+          {copy.horsPiste.emoji}
+        </div>
+        <h3 class="text-base md:text-lg font-bold text-foreground tracking-tight shrink-0">
+          {copy.horsPiste.title}
+        </h3>
+        <p class="flex-1 min-w-0 text-sm md:text-base text-muted-foreground leading-relaxed">
+          {copy.horsPiste.body}
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section id="formats" class="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
+    <div class="grid md:grid-cols-2 gap-8 md:gap-12">
+      <div>
+        <h3 class="text-xl font-bold text-foreground tracking-tight">
+          {copy.formatsTitle}
+        </h3>
+        <ul role="list" class="mt-5 space-y-5">
+          {
+            copy.formats.map((f) => (
+              <li>
+                <div class="flex items-center gap-3">
+                  <span class="shrink-0 inline-flex items-center rounded-full bg-primary/10 text-primary px-3 py-1.5 text-xs md:text-sm font-bold">
+                    {f.duration}
+                  </span>
+                  <h4 class="text-base md:text-lg font-bold text-foreground tracking-tight">
+                    {f.title}
+                  </h4>
+                </div>
+                <p class="mt-1.5 text-sm md:text-base text-muted-foreground leading-relaxed">
+                  {f.body}
+                </p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-xl font-bold text-foreground tracking-tight">
+          {copy.knowTitle}
+        </h3>
+        <ul role="list" class="mt-5 space-y-4">
+          <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
+            <span aria-hidden="true">🇫🇷</span> {copy.knowFrench.before}
+            <strong class="font-semibold text-foreground">{copy.knowFrench.strong}</strong>
+            {copy.knowFrench.after}
+          </li>
+          <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
+            <span aria-hidden="true">🎙️</span> <strong class="font-semibold text-foreground">{copy.knowCoaching.strong}</strong> {copy.knowCoaching.after}
+          </li>
+          <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
+            <strong class="font-semibold text-foreground">{copy.knowValues.label}</strong>
+            {copy.knowValues.colon}
+            {
+              copy.knowValues.items.map((v, i) => (
+                <>
+                  {i > 0 && " · "}
+                  <span aria-hidden="true">{v.emoji}</span> {v.text}
+                </>
+              ))
+            }
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
+    <h2 class="text-2xl md:text-3xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+      {copy.committeeTitle}
+    </h2>
+    <p class="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">
+      {copy.committeeIntro}
+    </p>
+    <ul role="list" class="mt-6 grid sm:grid-cols-2 gap-x-8 gap-y-5">
+      {
+        copy.criteria.map((c) => (
+          <li>
+            <div class="flex items-start gap-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="shrink-0 mt-0.5 text-primary"
+                aria-hidden="true"
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <p class="text-base md:text-lg font-bold text-foreground tracking-tight">
+                {c.key}
+              </p>
+            </div>
+            <p class="ms-[34px] mt-1 text-sm md:text-base text-muted-foreground leading-relaxed">
+              {c.body}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="mt-8 bg-card border-y border-border">
+    <div class="mx-auto max-w-6xl px-4 md:px-6 py-12 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+      <div>
+        <h2 class="text-2xl md:text-3xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
+          {copy.closingTitle}
+        </h2>
+        <a
+          href={CFP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-8 inline-flex items-center justify-center gap-2 rounded-md bg-primary text-primary-foreground text-base md:text-lg font-semibold px-8 h-14 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          {copy.closingCta} <span aria-hidden="true">→</span>
+        </a>
+        <p class="mt-4 text-xs text-muted-foreground">{CFP_LABEL}</p>
+      </div>
+      <Picture
+        src={participantPhoto}
+        alt={copy.closingPhotoAlt}
+        widths={[400, 600, 800, 1200]}
+        sizes="(min-width: 768px) 45vw, 100vw"
+        formats={["avif", "webp"]}
+        loading="lazy"
+        decoding="async"
+        class="w-full aspect-[4/3] object-cover rounded-lg border border-border"
+      />
+    </div>
+  </section>
+</main>

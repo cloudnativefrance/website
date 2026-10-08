@@ -1,0 +1,58 @@
+---
+/**
+ * The `coming_soon` phase: the "ouvre bientôt" page. The shell is the one
+ * <ComingSoonLayout> established (hex-mesh background, radial overlay,
+ * centered heading + body, accent newsletter CTA), but with no "Ouverture
+ * le {date}" line — the CFP 2027 is not announced yet, and inventing a date
+ * is worse than none. The CTA is the page's only action, so the dispatcher
+ * turns the layout's newsletter band off for this phase: the whole page IS
+ * the newsletter appeal.
+ */
+import GeoBackground from "@/components/patterns/GeoBackground.astro";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { NEWSLETTER_URL } from "@/lib/event";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const title = t("cfp.coming_soon.title");
+const body = t("cfp.coming_soon.body");
+const notifyCta = t("flags.soon.notify_cta");
+---
+
+<main>
+  <section
+    class="relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden px-4 py-16 md:py-24"
+  >
+    <GeoBackground class="absolute inset-0" />
+    <div
+      class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--color-background)_0%,_var(--color-secondary)_100%)] opacity-40 pointer-events-none"
+    ></div>
+    <div
+      class="relative z-10 mx-auto flex w-full max-w-2xl flex-col items-center gap-6 text-center"
+    >
+      <h1
+        class="text-3xl font-bold leading-tight tracking-[-0.02em] text-foreground md:text-4xl"
+      >
+        {title}
+      </h1>
+      <p
+        class="max-w-[60ch] text-base leading-[1.6] text-muted-foreground md:text-lg"
+      >
+        {body}
+      </p>
+      <a
+        href={NEWSLETTER_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center justify-center h-[52px] rounded-md border-2 border-destructive-strong text-destructive-strong bg-transparent text-lg font-bold px-8 transition-[color,background-color,border-color,box-shadow] duration-150 hover:bg-destructive-strong/10 hover:text-destructive-strong hover:border-destructive-strong hover:shadow-[0_0_0_4px_color-mix(in_oklab,var(--destructive-strong)_15%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive-strong/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      >
+        {notifyCta}
+      </a>
+    </div>
+  </section>
+</main>

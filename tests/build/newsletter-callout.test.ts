@@ -17,6 +17,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { ui } from "@/i18n/ui";
 import { NEWSLETTER_URL } from "@/lib/event";
+import { CFP } from "@/config/cfp";
 
 const DIST = resolve(import.meta.dirname, "../../dist");
 const HEADING_ID = "newsletter-callout-heading";
@@ -35,8 +36,6 @@ const REMOVED_KEYS = [
   "hero.cta.newsletter_aria",
   "footer.newsletter.heading",
   "tickets.coming_soon.cta",
-  "cfp.closed_for_now.cta",
-  "cfp.closed_for_now.notify_text",
 ] as const;
 
 /** Routes that must carry the band. One per layout family. */
@@ -44,7 +43,6 @@ const WITH_BAND = [
   "index.html",
   "en/index.html",
   "decouvrir/index.html",
-  "cfp/index.html",
   "billetterie/index.html",
 ] as const;
 
@@ -56,6 +54,15 @@ const WITHOUT_BAND = [
   "en/privacy/index.html",
   "programme/2027/index.html",
 ] as const;
+
+/**
+ * The CFP page's band follows its phase (src/config/cfp.ts): the coming-soon
+ * page IS the newsletter appeal (CfpPage passes newsletter={false}), while
+ * the open and closed pages keep the band. Hardcoding either list would make
+ * the next phase flip fail this suite for the wrong reason.
+ */
+const CFP_PAGES = ["cfp/index.html", "en/cfp/index.html"] as const;
+const cfpWantsBand = CFP.currentPhase !== "coming_soon";
 
 const distExists = existsSync(resolve(DIST, "index.html"));
 
@@ -94,6 +101,20 @@ describe("newsletter callout distribution", () => {
     it.skipIf(!distExists)(`${page} opts out of the band`, () => {
       expect(readPage(page)).not.toContain(HEADING_ID);
     });
+  }
+
+  for (const page of CFP_PAGES) {
+    it.skipIf(!distExists)(
+      `${page} ${cfpWantsBand ? "carries" : "opts out of"} the band (phase: ${CFP.currentPhase})`,
+      () => {
+        const html = readPage(page);
+        if (cfpWantsBand) {
+          expect(html.split(`id="${HEADING_ID}"`).length - 1).toBe(1);
+        } else {
+          expect(html).not.toContain(HEADING_ID);
+        }
+      },
+    );
   }
 });
 

@@ -28,11 +28,6 @@ export interface FlagDefinition {
 }
 
 export const FLAGS = {
-  cfp: {
-    opens: "2026-09-01T00:00:00+02:00",
-    closes: "2027-02-28T23:59:59+01:00",
-    kind: "page",
-  },
   tickets: {
     opens: "2027-01-15T00:00:00+01:00",
     kind: "page",
