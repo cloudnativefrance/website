@@ -1,0 +1,57 @@
+---
+/**
+ * What /cfp, /en/cfp and the demo routes mount: the "ouvre bientôt" page
+ * while the CFP 2027 is unannounced (`coming_soon`), the CFP page itself
+ * once it opens (`open`), and the "programme coming soon" page after the
+ * deadline (`closed`). The phase comes from `src/config/cfp.ts`; flipping
+ * it is editing that file and shipping.
+ */
+import Layout from "@/layouts/Layout.astro";
+import type { CfpPhase } from "@/config/cfp";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { cfpDemosEnabled } from "@/lib/cfp/demo";
+import CfpComingSoon from "./CfpComingSoon.astro";
+import CfpOpen from "./CfpOpen.astro";
+import CfpClosed from "./CfpClosed.astro";
+import DemoBar from "./DemoBar.astro";
+
+interface Props {
+  lang: Locale;
+  phase: CfpPhase;
+  /** A demo route's phase rather than the config's own: never indexed. */
+  simulated?: boolean;
+}
+
+const { lang, phase, simulated = false } = Astro.props;
+const t = useTranslations(lang);
+const demos = cfpDemosEnabled();
+
+const meta: Record<CfpPhase, { title: string; description: string }> = {
+  coming_soon: {
+    title: t("cfp.coming_soon.title"),
+    description: t("cfp.coming_soon.body"),
+  },
+  open: {
+    title: t("cfp.meta.title"),
+    description: t("cfp.meta.description"),
+  },
+  closed: {
+    title: t("cfp.closed.title"),
+    description: t("cfp.closed.body"),
+  },
+};
+---
+
+<Layout
+  title={meta[phase].title}
+  description={meta[phase].description}
+  lang={lang}
+  newsletter={phase !== "coming_soon"}
+  noindex={simulated}
+>
+  {demos && <DemoBar lang={lang} phase={phase} simulated={simulated} />}
+  {phase === "coming_soon" && <CfpComingSoon lang={lang} />}
+  {phase === "open" && <CfpOpen lang={lang} />}
+  {phase === "closed" && <CfpClosed lang={lang} />}
+</Layout>

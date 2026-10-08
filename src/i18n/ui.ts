@@ -80,9 +80,16 @@ export const ui = {
     "cfp.cta.notify": "Me notifier",
     "cfp.cta.submit": "Soumettre une conférence",
     "cfp.deadline": "Clôture le {date}",
-    "cfp.closed_for_now.title": "Notre CFP est actuellement fermé",
-    "cfp.closed_for_now.body":
-      "Le Call For Paper (appel à conférencier(e)s) de l'édition 2027 ouvrira début 2027.",
+    // Phase copy for the commit-flipped phase system (src/config/cfp.ts).
+    "cfp.meta.title": "Appel à conférences (CFP)",
+    "cfp.meta.description":
+      "Proposez votre conférence à Cloud Native Days France 2027 : 7 thèmes, 3 formats.",
+    "cfp.coming_soon.title": "L'appel à propositions arrive",
+    "cfp.coming_soon.body":
+      "Inscrivez-vous à la newsletter pour être alerté(e) dès l'ouverture.",
+    "cfp.closed.title": "Le CFP est clôturé",
+    "cfp.closed.body":
+      "Merci pour vos propositions ! Le programme arrive bientôt — on vous concocte un programme aux petits oignons. 🧑‍🍳",
     "speakers.heading": "Nos intervenant(e)s",
     "speakers.subtext":
       "Découvrez les intervenant(e)s de Cloud Native Days France 2026.",
@@ -429,9 +436,6 @@ export const ui = {
     // --- Feature flags (coming-soon layout) ---
     "flags.soon.notify_cta": "Être prévenu(e)",
     "flags.soon.opens_on": "Ouverture le {date}",
-    "flags.cfp.soon.title": "L'appel à propositions arrive",
-    "flags.cfp.soon.body":
-      "Inscrivez-vous à la newsletter pour être alerté(e) dès l'ouverture.",
     "flags.programme.soon.title": "Le programme arrive",
     "flags.programme.soon.body":
       "Le programme complet sera dévoilé en avril 2027.",
@@ -655,9 +659,16 @@ export const ui = {
     "cfp.cta.notify": "Notify me",
     "cfp.cta.submit": "Submit a talk",
     "cfp.deadline": "Submissions close {date}",
-    "cfp.closed_for_now.title": "Our CFP is currently closed",
-    "cfp.closed_for_now.body":
-      "The Call for Papers for the 2027 edition will open in early 2027.",
+    // Phase copy for the commit-flipped phase system (src/config/cfp.ts).
+    "cfp.meta.title": "Call for Papers (CFP)",
+    "cfp.meta.description":
+      "Submit your talk to Cloud Native Days France 2027: 7 themes, 3 formats.",
+    "cfp.coming_soon.title": "The Call for Papers is coming",
+    "cfp.coming_soon.body":
+      "Subscribe to the newsletter and we'll let you know as soon as it opens.",
+    "cfp.closed.title": "The CFP is closed",
+    "cfp.closed.body":
+      "Thank you for your submissions! The programme is coming soon — we're cooking up something really special for you. 🧑‍🍳",
     "speakers.heading": "Our speakers",
     "speakers.subtext": "Meet the speakers from Cloud Native Days France 2026.",
     "speakers.keynote_rail_label": "Opening keynote",
@@ -983,9 +994,6 @@ export const ui = {
     // --- Feature flags (coming-soon layout) ---
     "flags.soon.notify_cta": "Notify me",
     "flags.soon.opens_on": "Opens on {date}",
-    "flags.cfp.soon.title": "The Call for Papers is coming",
-    "flags.cfp.soon.body":
-      "Subscribe to the newsletter and we'll let you know as soon as it opens.",
     "flags.programme.soon.title": "The schedule is coming",
     "flags.programme.soon.body":
       "The full schedule will be unveiled in April 2027.",

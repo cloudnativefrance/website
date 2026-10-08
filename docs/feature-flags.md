@@ -10,7 +10,7 @@ This guide is the operator's manual for the CND France feature flag system. It c
 
 Flags gate two kinds of things:
 
-- **Entire pages** (e.g. `/cfp`, `/programme`). Before the flag activates, the URL renders a "coming soon" layout with localized copy and a newsletter CTA. After activation, the same URL renders the real page.
+- **Entire pages** (e.g. `/programme`). Before the flag activates, the URL renders a "coming soon" layout with localized copy and a newsletter CTA. After activation, the same URL renders the real page.
 - **Individual UI elements** (e.g. the homepage countdown). Wrapped in `<FeatureGate>`, they simply appear or don't, with no fallback content.
 
 All activations are **date-driven by default**. You set `opens` and optionally `closes`; the system flips state automatically. A daily CI cron detects the flip and redeploys within ≤24 hours of the target date. Env var overrides let you force a state for staging previews or emergency kill switches.
@@ -27,13 +27,14 @@ All activations are **date-driven by default**. You set `opens` and optionally `
 
 Single source of truth: **`src/config/flags.ts`**.
 
+> **October 2026:** `cfp` left this registry. `/cfp` now runs on the same
+> commit-flipped phase system as the billetterie: `CFP.currentPhase` in
+> `src/config/cfp.ts` (`coming_soon` | `open` | `closed`) — flipping the phase
+> is editing that value and shipping. No dates, no env override. All three
+> phases can be previewed with the `CFP_DEMO` switcher (`src/lib/cfp/demo.ts`).
+
 ```ts
 export const FLAGS = {
-  cfp: {
-    opens: "2026-09-01T00:00:00+02:00",
-    closes: "2027-02-28T23:59:59+01:00",
-    kind: "page",
-  },
   programme: {
     opens: "2027-04-01T09:00:00+02:00",
     kind: "page",
@@ -206,7 +207,7 @@ through to `FLAG_OVERRIDES` instead of erroring — see `readEnvOverride()` in
 
 **Emergency kill switch** — hide a page immediately without editing dates:
 ```bash
-FLAG_CFP=off pnpm build && deploy
+FLAG_PROGRAMME=off pnpm build && deploy
 ```
 Then leave the override in place until you decide whether to roll back the date change or fix the underlying issue.
 
@@ -227,7 +228,7 @@ The env schema is generated from the registry via `generateFlagEnvSchema()` in `
 override arg (used in tests) > env var > date window
 ```
 
-If `FLAG_CFP=on` is set AND `FLAGS.cfp.opens` is in the future, the flag is `active`. The env var always wins unless a test explicitly passes an override argument to `getFlagState`.
+If `FLAG_PROGRAMME=on` is set AND `FLAGS.programme.opens` is in the future, the flag is `active`. The env var always wins unless a test explicitly passes an override argument to `getFlagState`.
 
 ---
 
@@ -281,12 +282,12 @@ import { describe, test, expect } from "vitest";
 import { getFlagState } from "@/lib/flags";
 import { FLAGS } from "@/config/flags";
 
-test("cfp is pending in august 2026", () => {
-  expect(getFlagState(FLAGS.cfp, new Date("2026-08-15T12:00:00+02:00"))).toBe("pending");
+test("programme is pending in august 2026", () => {
+  expect(getFlagState(FLAGS.programme, new Date("2026-08-15T12:00:00+02:00"))).toBe("pending");
 });
 
-test("cfp is active on open date", () => {
-  expect(getFlagState(FLAGS.cfp, new Date("2026-09-01T00:00:00+02:00"))).toBe("active");
+test("programme is active on open date", () => {
+  expect(getFlagState(FLAGS.programme, new Date("2027-04-01T09:00:00+02:00"))).toBe("active");
 });
 ```
 
@@ -297,7 +298,7 @@ import { vi, beforeEach, afterEach } from "vitest";
 
 beforeEach(() => {
   vi.useFakeTimers();
-  vi.setSystemTime(new Date("2026-08-30"));  // pretend we're before CFP opens
+  vi.setSystemTime(new Date("2026-08-30"));  // pretend we're before programme opens
 });
 afterEach(() => { vi.useRealTimers(); });
 ```
@@ -308,11 +309,10 @@ Set the env override in `.env.local`:
 
 ```bash
 # .env.local (git-ignored)
-FLAG_CFP=on
 FLAG_PROGRAMME=on
 ```
 
-Then `pnpm dev` — `/cfp` and `/programme` render their real content even though the actual date hasn't arrived.
+Then `pnpm dev` — `/programme` renders its real content even though the actual date hasn't arrived.
 
 ---
 
@@ -390,9 +390,9 @@ The `homepage_countdown` flag gates the element, but if the flag is mis-wired (e
 The plan originally called for Vitest route-rendering tests using Astro's experimental `astro/container` API. Attempting this revealed that Vitest cannot import `.astro` files without the Astro Vite plugin configured, and wiring that plugin into `vitest.config.ts` is non-trivial in Astro 6. Unit-level coverage is strong (state machine boundaries, registry integrity, i18n completeness), so the practical fix is Playwright E2E tests driven by env overrides:
 
 ```
-FLAG_CFP=on pnpm build && pnpm preview
-# Then a Playwright spec visits /cfp and asserts real CFP content renders.
-# Repeat with FLAG_CFP unset to assert the coming-soon branch.
+FLAG_PROGRAMME=on pnpm build && pnpm preview
+# Then a Playwright spec visits /programme and asserts real programme content renders.
+# Repeat with FLAG_PROGRAMME unset to assert the coming-soon branch.
 ```
 
 Filed as a follow-up; does not block the feature-flag landing.

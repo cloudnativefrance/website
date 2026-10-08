@@ -84,11 +84,14 @@ export default defineConfig({
       // these routes are excluded permanently. Post-event inbound links come
       // from CountdownTimer and the conditional nav entry.
       // The ticketing demo (src/lib/tickets/demo.ts) is never indexed.
+      // The CFP demo (src/lib/cfp/demo.ts) is never indexed.
       filter: (page) =>
         !/\/replays\/?$/.test(page) &&
         !/\/en\/replays\/?$/.test(page) &&
         !/\/billetterie\/demo(\/|$)/.test(page) &&
-        !/\/en\/tickets\/demo(\/|$)/.test(page),
+        !/\/en\/tickets\/demo(\/|$)/.test(page) &&
+        !/\/cfp\/demo(\/|$)/.test(page) &&
+        !/\/en\/cfp\/demo(\/|$)/.test(page),
       i18n: {
         defaultLocale: "fr",
         locales: { fr: "fr-FR", en: "en-US" },
@@ -126,6 +129,12 @@ export default defineConfig({
       ),
       // See src/lib/tickets/demo.ts.
       TICKETS_DEMO: envField.boolean({
+        context: "server",
+        access: "public",
+        optional: true,
+      }),
+      // See src/lib/cfp/demo.ts.
+      CFP_DEMO: envField.boolean({
         context: "server",
         access: "public",
         optional: true,

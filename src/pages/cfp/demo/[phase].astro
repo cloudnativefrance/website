@@ -1,0 +1,14 @@
+---
+/** One demo page per phase, only when the demo is on (src/lib/cfp/demo.ts). */
+import CfpPage from "@/components/cfp/CfpPage.astro";
+import type { CfpPhase } from "@/config/cfp";
+import { cfpDemosEnabled, demoStaticPaths } from "@/lib/cfp/demo";
+
+export function getStaticPaths() {
+  return cfpDemosEnabled() ? demoStaticPaths() : [];
+}
+
+const { phase } = Astro.props as { phase: CfpPhase };
+---
+
+<CfpPage lang="fr" phase={phase} simulated />

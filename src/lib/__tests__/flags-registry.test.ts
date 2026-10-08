@@ -23,7 +23,6 @@ describe("flag registry", () => {
 
   it("includes the spec-required flags", () => {
     const names = Object.keys(FLAGS) as FlagName[];
-    expect(names).toContain("cfp");
     expect(names).toContain("programme");
     expect(names).toContain("homepage_countdown");
   });

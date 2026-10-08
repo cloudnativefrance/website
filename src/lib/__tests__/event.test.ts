@@ -2,7 +2,7 @@
  * Unit tests for src/lib/event.ts (formerly cfp.ts).
  *
  * Covers: TARGET_DATE, NEWSLETTER_URL, getReplaysPath, isPostEvent.
- * CFP state logic is tested in src/lib/__tests__/flags.test.ts against getFlagState(FLAGS.cfp).
+ * The CFP phase system is tested in src/lib/__tests__/cfp.test.ts.
  */
 
 import { describe, it, expect } from "vitest";

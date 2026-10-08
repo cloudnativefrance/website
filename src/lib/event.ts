@@ -4,7 +4,7 @@
  * Formerly cfp.ts; renamed when the ad-hoc CFP state machine was subsumed by
  * the feature flag system (src/lib/flags.ts, src/config/flags.ts). This file
  * now holds only the event anchor (TARGET_DATE, isPostEvent), outbound URLs,
- * and locale-aware path helpers. CFP date logic lives in FLAGS.cfp.
+ * and locale-aware path helpers. The CFP phase lives in src/config/cfp.ts.
  */
 
 import { EDITION_2026 } from "@/lib/editions-data";
