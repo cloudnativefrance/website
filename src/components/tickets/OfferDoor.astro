@@ -1,7 +1,8 @@
 ---
 /**
- * The standard ticket: the price of the moment and what ends it, the purchase
- * button, then the season's tiers. The only card with a lift shadow.
+ * The standard ticket: its name in a neutral band, the price of the moment
+ * and what ends it, the purchase button, then the season's tiers. The only
+ * card with a lift shadow.
  */
 import { TICKETING, type TierDefinition } from "@/config/tickets";
 import type { TierWithState } from "@/lib/tickets/phase";
@@ -9,6 +10,7 @@ import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { fill, formatDayMonth, upperFirst } from "@/lib/tickets/format";
 import BigPrice from "./BigPrice.astro";
+import CardBand from "./CardBand.astro";
 import Icon from "./Icon.astro";
 import TierLadder from "./TierLadder.astro";
 
@@ -21,45 +23,40 @@ interface Props {
 const { lang, tier, ladder } = Astro.props;
 const t = useTranslations(lang);
 
-// The last tier runs to the event day: no date, and nothing comes after it.
+// Nothing comes after the last tier: its pill says so.
 const lastTier = ladder.at(-1)?.state === "current";
 const pill = lastTier
   ? t("tickets.offer.last_seats")
   : tier.closesWhenSoldOut
     ? t("tickets.ladder.limited_stock")
     : undefined;
-const deadline = lastTier
-  ? undefined
-  : fill(
-      t(
-        tier.closesWhenSoldOut
-          ? "tickets.ladder.until_or_sold_out"
-          : "tickets.ladder.until",
-      ),
-      { date: formatDayMonth(tier.endsAt, lang) },
-    );
+// Any tier ends early if the event sells out, the last one included, which
+// runs to the event day (08/10/2026).
+const deadline = fill(t("tickets.ladder.until_or_sold_out"), {
+  date: formatDayMonth(tier.endsAt, lang),
+});
 ---
 
 <article
   id="offre"
-  class="door border-primary/35 bg-card relative flex grow flex-col gap-8 rounded-xl border p-5 shadow-[0_1px_2px_oklch(15.5%_0.04_268/0.05),0_12px_32px_-12px_oklch(15.5%_0.04_268/0.18)] sm:p-8 dark:shadow-[0_0_0_1px_oklch(62.5%_0.162_259.9/0.25),var(--shadow-glow-primary)]"
+  class="door border-primary/35 bg-card relative flex grow flex-col rounded-xl border shadow-[0_1px_2px_oklch(15.5%_0.04_268/0.05),0_12px_32px_-12px_oklch(15.5%_0.04_268/0.18)] dark:shadow-[0_0_0_1px_oklch(62.5%_0.162_259.9/0.25),var(--shadow-glow-primary)]"
   aria-labelledby="door-offer-title"
 >
-  <div class="grid gap-6 lg:grid-cols-[minmax(0,26rem)_auto] lg:gap-10">
-    <div class="flex flex-col gap-3">
-      <div class="flex flex-col gap-1.5">
-        <h2
-          id="door-offer-title"
-          class="text-foreground text-2xl font-semibold tracking-[-0.01em]"
-        >
-          {
-            fill(t("tickets.offer.ticket"), {
-              name: upperFirst(TICKETING.standardName[lang]),
-            })
-          }
-        </h2>
+  <CardBand>
+    <h2 id="door-offer-title" class="text-2xl font-semibold tracking-[-0.01em]">
+      {
+        fill(t("tickets.offer.ticket"), {
+          name: upperFirst(TICKETING.standardName[lang]),
+        })
+      }
+    </h2>
+  </CardBand>
+
+  <div class="flex grow flex-col gap-8 p-5 sm:p-8">
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,36rem)_auto] lg:gap-10">
+      <div class="flex flex-col gap-3">
         <p
-          class="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-2 text-base font-semibold"
+          class="text-foreground flex flex-wrap items-center gap-x-3 gap-y-2 text-base font-semibold"
         >
           <span>{tier.name[lang]}</span>
           {
@@ -73,30 +70,26 @@ const deadline = lastTier
             )
           }
         </p>
+        <BigPrice amount={tier.price} lang={lang} />
+        <p
+          class="text-foreground flex items-center gap-2 text-base font-semibold text-pretty"
+          data-offer-deadline
+        >
+          <Icon name="clock" size={18} />
+          <span>{deadline}</span>
+        </p>
       </div>
-      <BigPrice amount={tier.price} lang={lang} />
-      {
-        deadline && (
-          <p
-            class="text-foreground flex items-center gap-2 text-base font-semibold text-pretty"
-            data-offer-deadline
-          >
-            <Icon name="clock" size={18} />
-            <span>{deadline}</span>
-          </p>
-        )
-      }
+
+      <div class="flex flex-col items-start justify-center" data-offer-action>
+        <slot name="purchase" />
+      </div>
     </div>
 
-    <div class="flex flex-col items-start justify-center" data-offer-action>
-      <slot name="purchase" />
+    {
+      /* mt-auto: beside a taller "Venir en équipe", the slack goes above the ladder. */
+    }
+    <div class="mt-auto">
+      <TierLadder items={ladder} lang={lang} />
     </div>
-  </div>
-
-  {
-    /* mt-auto: beside a taller "Venir en équipe", the slack goes above the ladder. */
-  }
-  <div class="mt-auto">
-    <TierLadder items={ladder} lang={lang} />
   </div>
 </article>

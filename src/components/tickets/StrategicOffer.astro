@@ -1,64 +1,95 @@
 ---
 /**
  * The Stratégie & Leadership ticket, drawn like the standard one but without
- * the lift shadow. One price for the season: no tier, no date, no ladder. It
- * says only what it adds; the track's page says the rest.
+ * the lift shadow, and set apart by its band: CND Deep Purple, with the
+ * "Nouveauté 2027" pill. One price for the season: no tier, no date, no
+ * ladder; under it, its fixed number of seats. It says who it is for and what it adds; the track's page says the
+ * rest.
  */
 import { TICKETING } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
 import { fill } from "@/lib/tickets/format";
 import BigPrice from "./BigPrice.astro";
+import CardBand from "./CardBand.astro";
 import Icon from "./Icon.astro";
 
 interface Props {
   lang: Locale;
+  /**
+   * Pushes the button to the card's right edge. Beside "Venir en équipe" the
+   * standard card's button sits at its own right edge, so the two cannot line
+   * up: each then ends its card.
+   */
+  actionAtEnd?: boolean;
 }
 
-const { lang } = Astro.props;
+const { lang, actionAtEnd = false } = Astro.props;
 const t = useTranslations(lang);
-const { name, price, trackUrl } = TICKETING.strategic;
+const { name, price, seats, trackUrl } = TICKETING.strategic;
 ---
 
 <article
   id="strategie-leadership"
-  class="door border-primary/35 bg-card grid gap-6 rounded-xl border p-5 sm:p-8 lg:grid-cols-[minmax(0,26rem)_auto] lg:gap-10"
+  class="door border-chart-5 bg-card flex flex-col rounded-xl border dark:border-[oklch(45%_0.16_284)]"
   aria-labelledby="strategic-title"
 >
-  <div class="flex flex-col gap-3">
-    <h2
-      id="strategic-title"
-      class="text-foreground text-2xl font-semibold tracking-[-0.01em]"
-    >
+  <CardBand tone="brand">
+    <h2 id="strategic-title" class="text-2xl font-semibold tracking-[-0.01em]">
       {fill(t("tickets.offer.ticket"), { name: name[lang] })}
     </h2>
-    <BigPrice amount={price} lang={lang} />
-    <p class="text-muted-foreground max-w-[52ch] text-base text-pretty">
-      {
-        fill(t("tickets.strategic.perks"), {
-          standard: TICKETING.standardName[lang],
-        })
-      }
-    </p>
-    {
-      /* Inline, not flex: when the line wraps, the arrow follows the last word. */
-    }
-    <p class="text-base font-semibold text-pretty">
-      <a
-        href={trackUrl[lang]}
-        class="text-primary-strong underline-offset-4 hover:underline"
-        data-umami-event="tickets-strategic-track"
-      >
-        {t("tickets.strategic.track")}<Icon
-          name="arrow-right"
-          size={16}
-          class="ml-1.5 inline-block align-[-0.125em]"
-        /></a
-      >
-    </p>
-  </div>
+    <span
+      class="bg-accent text-accent-foreground inline-flex items-center rounded-full px-2.5 py-1 text-xs leading-none font-bold tracking-[0.06em] whitespace-nowrap uppercase"
+    >
+      {t("tickets.strategic.new")}
+    </span>
+  </CardBand>
 
-  <div class="flex flex-col items-start justify-center" data-offer-action>
-    <slot name="purchase" />
+  <div
+    class="grid gap-6 p-5 sm:p-8 lg:grid-cols-[minmax(0,36rem)_auto] lg:gap-10"
+  >
+    <div class="flex flex-col gap-3">
+      <BigPrice amount={price} lang={lang} />
+      <p
+        class="text-foreground flex items-center gap-2 text-base font-semibold text-pretty"
+      >
+        <Icon name="users" size={18} />
+        <span>{fill(t("tickets.strategic.seats"), { count: seats })}</span>
+      </p>
+      <div
+        class="text-muted-foreground flex max-w-[52ch] flex-col gap-2 text-base text-pretty"
+      >
+        <p>
+          {fill(t("tickets.strategic.audience"), { strategic: name[lang] })}
+        </p>
+        <p>{t("tickets.strategic.perks")}</p>
+      </div>
+      {
+        /* Inline, not flex: when the line wraps, the arrow follows the last word. */
+      }
+      <p class="text-base font-semibold text-pretty">
+        <a
+          href={trackUrl[lang]}
+          class="text-primary-strong underline-offset-4 hover:underline"
+          data-umami-event="tickets-strategic-track"
+        >
+          {t("tickets.strategic.track")}<Icon
+            name="arrow-right"
+            size={16}
+            class="ml-1.5 inline-block align-[-0.125em]"
+          /></a
+        >
+      </p>
+    </div>
+
+    <div
+      class:list={[
+        "flex flex-col items-start justify-center",
+        actionAtEnd && "lg:items-end",
+      ]}
+      data-offer-action
+    >
+      <slot name="purchase" />
+    </div>
   </div>
 </article>

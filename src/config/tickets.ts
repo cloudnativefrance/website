@@ -25,7 +25,10 @@ export interface TierDefinition {
    * its quota live, so a future tier never shows a date.
    */
   endsAt: string;
-  /** The tier also closes when its alf.io quota runs out. */
+  /**
+   * The tier has its own alf.io quota and closes when it runs out: the
+   * "Places limitées" pill. Any tier also ends if the event sells out.
+   */
   closesWhenSoldOut: boolean;
   maxPerOrder: number;
 }
@@ -45,10 +48,17 @@ export interface TicketingConfig {
   tiers: readonly TierDefinition[];
   groupRates: readonly GroupRate[];
   /**
-   * The standard ticket plus the Stratégie & Leadership room and its exchange
-   * space, both reserved for its holders, at one price for the whole season.
+   * The standard ticket plus the Stratégie & Leadership track and its lounge,
+   * both reserved for its holders, at one price for the whole season.
+   * `seats` is fixed, the room's capacity: the one number of places the page
+   * shows (08/10/2026).
    */
-  strategic: { name: Localized; price: number; trackUrl: Localized };
+  strategic: {
+    name: Localized;
+    price: number;
+    seats: number;
+    trackUrl: Localized;
+  };
   /** In percent. */
   vatRate: number;
   programmeAnnouncement: Localized;
@@ -104,6 +114,7 @@ export const TICKETING: TicketingConfig = {
   strategic: {
     name: { fr: "Stratégie & Leadership", en: "Strategy & Leadership" },
     price: 399,
+    seats: 200,
     trackUrl: {
       fr: "/track-strategie-leadership",
       en: "/en/track-strategy-leadership",

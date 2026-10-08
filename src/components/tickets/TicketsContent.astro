@@ -64,6 +64,11 @@ const umami = (billet: "standard" | "strategique", palier: string) => ({
             afterVenue
           }
         </p>
+        <p class="text-muted-foreground text-base text-pretty">
+          <strong class="text-foreground font-semibold"
+            >{t("tickets.advice.lead")}</strong
+          >{" "}{t("tickets.advice")}
+        </p>
       </header>
 
       {
@@ -96,7 +101,7 @@ const umami = (billet: "standard" | "strategique", palier: string) => ({
           )
         }
         <div class="lg:col-span-12" style={`--door-index: ${showTeam ? 2 : 1}`}>
-          <StrategicOffer lang={lang}>
+          <StrategicOffer lang={lang} actionAtEnd={showTeam}>
             <PurchaseControl
               slot="purchase"
               lang={lang}
