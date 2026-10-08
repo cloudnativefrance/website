@@ -494,6 +494,9 @@ export const ui = {
       "Votre place pour CND France 2027, le jeudi 3 juin au CENTQUATRE-PARIS\u00a0: les tarifs, venir en équipe, utiliser un code.",
     "tickets.h1": "Votre place pour CND France 2027",
     "tickets.when": "{date} · {venue}, Paris 19e",
+    "tickets.advice.lead": "Un conseil\u00a0:",
+    "tickets.advice":
+      "prenez votre place sans tarder, nous attendons plus de 2\u202f500 participants.",
     "tickets.door.code": "J'ai un code",
     // {name} is the config's ticket name, capitalised by the card title.
     "tickets.offer.ticket": "Billet {name}",
@@ -503,8 +506,8 @@ export const ui = {
     "tickets.new_tab": "(nouvel onglet)",
     // "Quatre" is the config's four tiers.
     "tickets.ladder.title": "Quatre tarifs jusqu'au jour J",
-    "tickets.ladder.until": "Jusqu'au {date}",
-    "tickets.ladder.until_or_sold_out": "Jusqu'au {date} ou épuisement",
+    "tickets.ladder.until_or_sold_out":
+      "Jusqu'au {date} ou\u00a0épuisement\u00a0des\u00a0stocks",
     "tickets.ladder.limited_stock": "Places limitées",
     "tickets.ladder.sold_out": "Épuisé",
     // Screen readers only.
@@ -523,8 +526,12 @@ export const ui = {
     "tickets.code.label": "Votre code",
     "tickets.code.submit": "Utiliser mon code",
     "tickets.code.empty": "Saisissez votre code pour continuer.",
+    "tickets.strategic.audience":
+      "Le billet {strategic} s'adresse à celles et ceux qui occupent des fonctions de direction et de décision\u00a0: CEO, CTO, DSI, VPs…",
     "tickets.strategic.perks":
-      "Un parcours de conférences et un espace d'échanges entre pairs, réservés aux titulaires de ce billet. En plus de tout ce que comprend le billet {standard}.",
+      "En plus de toute l'expérience CND France, il donne accès à un parcours de conférences exclusif dédié aux enjeux stratégiques, avec des intervenant(e)s sélectionné(e)s par un comité dédié, ainsi qu'à un lounge pour échanger entre pairs.",
+    "tickets.strategic.new": "Nouveauté 2027",
+    "tickets.strategic.seats": "{count} places seulement",
     "tickets.strategic.track": "Découvrir le parcours Stratégie & Leadership",
     "tickets.included.title": "Ce que comprend votre billet",
     "tickets.included.talks":
@@ -546,7 +553,7 @@ export const ui = {
     "tickets.faq.strategic.q":
       "Le parcours Stratégie & Leadership est-il ouvert à tous\u202f?",
     "tickets.faq.strategic.a":
-      "Non, ses conférences et son espace d'échanges sont réservés aux titulaires du billet {strategic}. Le billet {standard} donne accès à toutes les autres conférences de la journée.",
+      "Non, ses conférences et son lounge sont réservés aux titulaires du billet {strategic}. Le billet {standard} donne accès à toutes les autres conférences de la journée.",
     "tickets.faq.ttc.q": "Les prix affichés sont-ils TTC\u202f?",
     "tickets.faq.ttc.a": "Oui, TVA à {rate} comprise.",
     "tickets.faq.per_order.q": "Combien de places par commande\u202f?",
@@ -564,7 +571,8 @@ export const ui = {
       "Existe-t-il un tarif étudiant ou solidaire\u202f?",
     "tickets.faq.inclusion.a":
       "Oui, au cas par cas, pour les étudiant(e)s et pour celles et ceux que le prix empêcherait de venir. Écrivez-nous à",
-    "tickets.faq.access.q": "Le lieu est-il accessible\u202f?",
+    "tickets.faq.access.q":
+      "Le lieu est-il accessible à toutes et à tous\u202f?",
     "tickets.faq.access.a":
       "Oui\u00a0: accès en fauteuil, ascenseurs, toilettes adaptées, chiens guides bienvenus. Pour un besoin particulier, écrivez-nous.",
     "tickets.faq.access.link": "Informations pratiques",
@@ -1053,6 +1061,9 @@ export const ui = {
       "Your seat at CND France 2027, Thursday 3 June at CENTQUATRE-PARIS: prices, coming as a team, using a code.",
     "tickets.h1": "Your seat at CND France 2027",
     "tickets.when": "{date} · {venue}, Paris",
+    "tickets.advice.lead": "Our advice:",
+    "tickets.advice":
+      "get your ticket early, we're expecting more than 2,500 attendees.",
     "tickets.door.code": "I have a code",
     "tickets.offer.ticket": "{name} ticket",
     "tickets.offer.ttc": "VAT incl.",
@@ -1061,7 +1072,6 @@ export const ui = {
     "tickets.new_tab": "(new tab)",
     // "Four" is the config's four tiers.
     "tickets.ladder.title": "Four prices, up to the day itself",
-    "tickets.ladder.until": "Until {date}",
     "tickets.ladder.until_or_sold_out": "Until {date} or sold out",
     "tickets.ladder.limited_stock": "Limited seats",
     "tickets.ladder.sold_out": "Sold out",
@@ -1081,8 +1091,12 @@ export const ui = {
     "tickets.code.label": "Your code",
     "tickets.code.submit": "Use my code",
     "tickets.code.empty": "Enter your code to continue.",
+    "tickets.strategic.audience":
+      "The {strategic} ticket is for those in leadership and decision-making roles: CEOs, CTOs, CIOs, VPs…",
     "tickets.strategic.perks":
-      "A track of talks and a space to meet your peers, for holders of this ticket only. On top of everything in the {standard} ticket.",
+      "On top of the full CND France experience, it gives access to an exclusive track of talks on strategic issues, with speakers chosen by a dedicated committee, and to a lounge to meet your peers.",
+    "tickets.strategic.new": "New in 2027",
+    "tickets.strategic.seats": "Only {count} seats",
     "tickets.strategic.track": "About the Strategy & Leadership track",
     "tickets.included.title": "What your ticket includes",
     "tickets.included.talks": "The day's talks and experience reports",
@@ -1103,7 +1117,7 @@ export const ui = {
     "tickets.faq.strategic.q":
       "Is the Strategy & Leadership track open to everyone?",
     "tickets.faq.strategic.a":
-      "No, its talks and its space to meet your peers are reserved for {strategic} ticket holders. The {standard} ticket gives access to every other talk of the day.",
+      "No, its talks and its lounge are reserved for {strategic} ticket holders. The {standard} ticket gives access to every other talk of the day.",
     "tickets.faq.ttc.q": "Do the prices shown include VAT?",
     "tickets.faq.ttc.a": "Yes, they include VAT at {rate}.",
     "tickets.faq.per_order.q": "How many seats per order?",
@@ -1119,7 +1133,7 @@ export const ui = {
     "tickets.faq.inclusion.q": "Is there a student or solidarity rate?",
     "tickets.faq.inclusion.a":
       "Yes, case by case, for students and for anyone the price would keep away. Write to us at",
-    "tickets.faq.access.q": "Is the venue accessible?",
+    "tickets.faq.access.q": "Is the venue accessible to everyone?",
     "tickets.faq.access.a":
       "Yes: wheelchair access, lifts, accessible toilets, guide dogs welcome. For any specific need, write to us.",
     "tickets.faq.access.link": "Practical information",

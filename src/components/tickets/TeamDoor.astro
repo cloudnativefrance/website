@@ -14,6 +14,7 @@ import { useTranslations } from "@/i18n/utils";
 import { CONTACT_EMAILS } from "@/lib/event";
 import { fill, formatDiscount, formatPrice } from "@/lib/tickets/format";
 import { buildMailto } from "@/lib/tickets/mailto";
+import CardBand from "./CardBand.astro";
 import Icon from "./Icon.astro";
 
 interface Props {
@@ -34,64 +35,65 @@ const mailto = buildMailto(
 
 <article
   id="equipe"
-  class="door border-border bg-card flex grow flex-col gap-5 rounded-xl border p-5 sm:p-8"
+  class="door border-border bg-card flex grow flex-col rounded-xl border"
   aria-labelledby="door-team-title"
 >
-  <h2
-    id="door-team-title"
-    class="text-foreground text-2xl font-semibold tracking-[-0.01em]"
-  >
-    {t("tickets.team.title")}
-  </h2>
+  <CardBand>
+    <h2 id="door-team-title" class="text-2xl font-semibold tracking-[-0.01em]">
+      {t("tickets.team.title")}
+    </h2>
+  </CardBand>
 
-  <div class="flex flex-col gap-2">
-    {
-      /* Rows are subgrids: the prices share a column whatever the tag's width. */
-    }
-    <dl
-      class="divide-border border-border grid grid-cols-[1fr_auto_auto] gap-x-2 divide-y border-y"
-    >
+  <div class="flex grow flex-col gap-5 p-5 sm:p-8">
+    <div class="flex flex-col gap-2">
       {
-        rates.map((rate) => (
-          <div
-            class="col-span-3 grid grid-cols-subgrid items-baseline py-3.5"
-            data-group-rate={rate.id}
-          >
-            <dt class="text-muted-foreground pr-2 text-sm">
-              {t(`tickets.team.rate.${rate.id}`)}
-            </dt>
-            <dd class="text-foreground text-xl font-semibold tracking-[-0.01em] whitespace-nowrap tabular-nums">
-              {formatPrice(rate.price, lang)}
-              <span
-                class="text-muted-foreground text-sm font-medium tracking-normal"
-                aria-hidden="true"
-              >
-                {t("tickets.team.per_person.short")}*
-              </span>
-              <span class="sr-only">{t("tickets.team.per_person")}</span>
-            </dd>
-            <dd class="bg-accent text-accent-foreground self-center justify-self-start rounded-full px-1.5 py-0.5 text-xs leading-none font-bold whitespace-nowrap tabular-nums">
-              {formatDiscount(tier.price, rate.price, lang)}
-            </dd>
-          </div>
-        ))
+        /* Rows are subgrids: the prices share a column whatever the tag's width. */
       }
-    </dl>
-    <p class="text-muted-foreground text-right text-xs text-pretty">
-      <span aria-hidden="true">* </span>{
-        fill(t("tickets.team.only"), { name: TICKETING.standardName[lang] })
-      }
-    </p>
-  </div>
+      <dl
+        class="divide-border border-border grid grid-cols-[1fr_auto_auto] gap-x-2 divide-y border-y"
+      >
+        {
+          rates.map((rate) => (
+            <div
+              class="col-span-3 grid grid-cols-subgrid items-baseline py-3.5"
+              data-group-rate={rate.id}
+            >
+              <dt class="text-muted-foreground pr-2 text-sm">
+                {t(`tickets.team.rate.${rate.id}`)}
+              </dt>
+              <dd class="text-foreground text-xl font-semibold tracking-[-0.01em] whitespace-nowrap tabular-nums">
+                {formatPrice(rate.price, lang)}
+                <span
+                  class="text-muted-foreground text-sm font-medium tracking-normal"
+                  aria-hidden="true"
+                >
+                  {t("tickets.team.per_person.short")}*
+                </span>
+                <span class="sr-only">{t("tickets.team.per_person")}</span>
+              </dd>
+              <dd class="bg-accent text-accent-foreground self-center justify-self-start rounded-full px-1.5 py-0.5 text-xs leading-none font-bold whitespace-nowrap tabular-nums">
+                {formatDiscount(tier.price, rate.price, lang)}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+      <p class="text-muted-foreground text-right text-xs text-pretty">
+        <span aria-hidden="true">* </span>{
+          fill(t("tickets.team.only"), { name: TICKETING.standardName[lang] })
+        }
+      </p>
+    </div>
 
-  <div class="mt-auto">
-    <a
-      href={mailto}
-      class="border-input bg-card text-foreground hover:bg-muted focus-visible:ring-ring/50 inline-flex h-11 items-center gap-2 rounded-lg border px-4 text-base font-semibold transition-[background-color,scale] duration-150 ease-out focus-visible:ring-3 focus-visible:outline-none active:scale-[0.96]"
-      data-umami-event="tickets-group-contact"
-    >
-      <Icon name="mail" size={18} />
-      {t("tickets.team.cta.group")}
-    </a>
+    <div class="mt-auto">
+      <a
+        href={mailto}
+        class="border-input bg-card text-foreground hover:bg-muted focus-visible:ring-ring/50 inline-flex h-11 items-center gap-2 rounded-lg border px-4 text-base font-semibold transition-[background-color,scale] duration-150 ease-out focus-visible:ring-3 focus-visible:outline-none active:scale-[0.96]"
+        data-umami-event="tickets-group-contact"
+      >
+        <Icon name="mail" size={18} />
+        {t("tickets.team.cta.group")}
+      </a>
+    </div>
   </div>
 </article>

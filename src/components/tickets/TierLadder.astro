@@ -1,8 +1,9 @@
 ---
 /**
- * The season's four prices as a timeline: the tier on sale drawn as the one
- * selected box, the ones behind it struck through and "Épuisé", the ones ahead
- * outlined. No box shows a date: the team may extend or re-quota a tier live.
+ * The season's four prices as a progress bar: filled up to the tier on sale,
+ * its segments interlocking like chevrons, each pointing to the next tier. The
+ * tiers behind are struck through and "Épuisé", the ones ahead greyed. No tier
+ * shows a date: the team may extend or re-quota a tier live.
  */
 import type { TierState, TierWithState } from "@/lib/tickets/phase";
 import type { Locale } from "@/i18n/ui";
@@ -18,11 +19,12 @@ interface Props {
 const { items, lang } = Astro.props;
 const t = useTranslations(lang);
 
-const stateClass: Record<TierState, string> = {
-  past: "border-dashed border-input/60 bg-muted/40 text-muted-foreground",
-  current:
-    "border-2 border-primary-strong bg-primary/6 text-foreground ring-4 ring-primary/15 shadow-[0_8px_20px_-14px_oklch(48%_0.18_259.9/0.5)]",
-  upcoming: "border-border bg-transparent text-muted-foreground",
+// Information, not options (08/10/2026): no box, no ring, which read as
+// tiles to pick. The fill runs from the season's start to the tier on sale.
+const segmentClass: Record<TierState, string> = {
+  past: "bg-primary/30",
+  current: "bg-primary",
+  upcoming: "bg-border",
 };
 ---
 
@@ -31,20 +33,35 @@ const stateClass: Record<TierState, string> = {
     {t("tickets.ladder.title")}
   </h3>
 
-  <ol class="grid grid-cols-1 gap-5 sm:grid-cols-4 sm:gap-7">
+  {
+    /* Mobile: one row per tier, the bar down the left, the prices in one
+       column (rows are subgrids). From sm: one column per tier under its
+       segment of a horizontal bar. */
+  }
+  <ol
+    class="grid grid-cols-[auto_1fr_auto_auto] gap-x-3 gap-y-1 sm:grid-cols-4 sm:gap-x-1 sm:gap-y-0"
+  >
     {
-      items.map(({ tier, state }, index) => (
+      items.map(({ tier, state }) => (
         <li
           class:list={[
-            "relative flex items-center justify-between gap-3 rounded-lg border px-4 py-2.5 sm:flex-col sm:items-start sm:justify-center sm:gap-0.5 sm:px-3.5",
-            stateClass[state],
+            "col-span-4 grid grid-cols-subgrid items-baseline sm:col-span-1 sm:flex sm:flex-col sm:items-start sm:pr-3",
+            state === "current" ? "text-foreground" : "text-muted-foreground",
           ]}
           aria-current={state === "current" ? "step" : undefined}
           data-tier={tier.id}
         >
+          {/* Runs into the li's padding from sm, so the segments sit 4px apart. */}
+          <span
+            aria-hidden="true"
+            class:list={[
+              "segment w-2.5 self-stretch sm:-mr-3 sm:mb-3 sm:h-2.5 sm:w-auto",
+              segmentClass[state],
+            ]}
+          />
           <span
             class:list={[
-              "text-sm font-semibold",
+              "py-2.5 text-sm font-semibold sm:py-0",
               state === "current" && "text-primary-strong",
             ]}
           >
@@ -56,10 +73,10 @@ const stateClass: Record<TierState, string> = {
               </span>
             )}
           </span>
-          <span class="flex flex-wrap items-baseline justify-end gap-x-2 gap-y-0.5 sm:justify-start">
+          <span class="contents sm:flex sm:flex-wrap sm:items-baseline sm:gap-x-2 sm:gap-y-0.5">
             <span
               class:list={[
-                "text-lg font-bold tracking-[-0.02em] tabular-nums",
+                "justify-self-end text-lg font-bold tracking-[-0.02em] tabular-nums",
                 state === "past" &&
                   "decoration-muted-foreground/50 line-through decoration-[1.5px]",
               ]}
@@ -73,22 +90,65 @@ const stateClass: Record<TierState, string> = {
               </span>
             )}
           </span>
-
-          {/* The chevron to the next tier, in the gutter: down on mobile, along the row from sm. */}
-          {index < items.length - 1 && (
-            <span
-              aria-hidden="true"
-              class="text-muted-foreground/60 pointer-events-none absolute top-full left-1/2 -translate-x-1/2 translate-y-0.5 sm:top-1/2 sm:left-full sm:translate-x-1.5 sm:-translate-y-1/2"
-            >
-              <Icon
-                name="chevron-right"
-                size={16}
-                class="rotate-90 sm:rotate-0"
-              />
-            </span>
-          )}
         </li>
       ))
     }
   </ol>
 </div>
+
+<style>
+  /* Each segment ends in a point that nests into the next one's notch: the
+     chevrons of the old ladder, now the bar's own joints. Down on mobile,
+     along the row from sm; the outer ends are rounded. */
+  .segment {
+    --tip: 5px;
+    clip-path: polygon(
+      0 0,
+      50% var(--tip),
+      100% 0,
+      100% calc(100% - var(--tip)),
+      50% 100%,
+      0 calc(100% - var(--tip))
+    );
+  }
+  li:first-child .segment {
+    border-radius: 999px 999px 0 0;
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% calc(100% - var(--tip)),
+      50% 100%,
+      0 calc(100% - var(--tip))
+    );
+  }
+  li:last-child .segment {
+    border-radius: 0 0 999px 999px;
+    clip-path: polygon(0 0, 50% var(--tip), 100% 0, 100% 100%, 0 100%);
+  }
+  @media (min-width: 40rem) {
+    .segment {
+      clip-path: polygon(
+        0 0,
+        calc(100% - var(--tip)) 0,
+        100% 50%,
+        calc(100% - var(--tip)) 100%,
+        0 100%,
+        var(--tip) 50%
+      );
+    }
+    li:first-child .segment {
+      border-radius: 999px 0 0 999px;
+      clip-path: polygon(
+        0 0,
+        calc(100% - var(--tip)) 0,
+        100% 50%,
+        calc(100% - var(--tip)) 100%,
+        0 100%
+      );
+    }
+    li:last-child .segment {
+      border-radius: 0 999px 999px 0;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, var(--tip) 50%);
+    }
+  }
+</style>
