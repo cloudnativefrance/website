@@ -492,7 +492,7 @@ export const ui = {
     "tickets.meta.title": "Billetterie · CND France 2027",
     "tickets.meta.description":
       "Votre place pour CND France 2027, le jeudi 3 juin au CENTQUATRE-PARIS\u00a0: les tarifs, venir en équipe, utiliser un code.",
-    "tickets.h1": "Votre place pour CND France 2027",
+    "tickets.h1": "Billetterie CND France 2027",
     "tickets.when": "{date} · {venue}, Paris 19e",
     "tickets.advice.lead": "Un conseil\u00a0:",
     "tickets.advice":
@@ -1059,7 +1059,7 @@ export const ui = {
     "tickets.meta.title": "Tickets · CND France 2027",
     "tickets.meta.description":
       "Your seat at CND France 2027, Thursday 3 June at CENTQUATRE-PARIS: prices, coming as a team, using a code.",
-    "tickets.h1": "Your seat at CND France 2027",
+    "tickets.h1": "CND France 2027 tickets",
     "tickets.when": "{date} · {venue}, Paris",
     "tickets.advice.lead": "Our advice:",
     "tickets.advice":
