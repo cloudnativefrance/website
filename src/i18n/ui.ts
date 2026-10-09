@@ -183,7 +183,7 @@ export const ui = {
     // signal. The subtitle is where a visitor learns this before meeting a
     // five-column grid.
     "schedule.subtitle.2027":
-      "50+ conf\u00e9rences sur 5 salles en parall\u00e8le, dont une consacr\u00e9e \u00e0 la strat\u00e9gie et aux enjeux d'organisation dans nos entreprises. Construisez votre agenda personnel, exportez-le en .ics.",
+      "70+ conf\u00e9rences sur 5 salles en parall\u00e8le, dont une consacr\u00e9e \u00e0 la strat\u00e9gie et aux enjeux d'organisation dans nos entreprises. Construisez votre agenda personnel, exportez-le en .ics.",
     // Shown under the room name in the grid header. Editorial, not derived: in
     // an early programme every room looks single-track, so inferring this from
     // the data would badge all five.
@@ -393,7 +393,7 @@ export const ui = {
     "discover.hero.bestof.caption": "CND France : le FILM",
     "discover.hero.coulisses.caption": "CND France : les COULISSES",
     "discover.intro.p1":
-      "La communauté francophone passionnée de devops et de cloud native se retrouve à Paris. Une journée de retours d'expérience et de rencontres — ouverte à toutes et tous, des juniors curieux à l'archi senior jusqu'aux décideurs en quête des dernières tendances.",
+      "La communauté francophone passionnée de devops et de cloud native se retrouve à Paris. Une journée de retours d'expérience et de rencontres ouverte à toutes et tous : des profils juniors curieux aux architectes senior jusqu'aux personnes décideuses en quête des dernières tendances.",
     "discover.intro.p2":
       "CND France n'est pas un n-ième \"salon\" tech, c'est une journée de rassemblement de tout l'écosystème prônant le partage d'expertise et d'expérience dans un lieu atypique et plein de charme.",
     "discover.intro.highlights.title": "CND France se distingue par :",
@@ -602,7 +602,7 @@ export const ui = {
     "schedule.subtitle":
       "50+ talks across 4 parallel tracks. Build your personal agenda and export it as .ics.",
     "schedule.subtitle.2027":
-      "50+ talks across 5 parallel rooms, one of them devoted to strategy and the organisational challenges facing our companies. Build your personal agenda and export it as .ics.",
+      "70+ talks across 5 parallel rooms, one of them devoted to strategy and the organisational challenges facing our companies. Build your personal agenda and export it as .ics.",
     "schedule.room_note.2027.Eiffel": "Strategy & Leadership",
     "schedule.empty_state": "The schedule for this edition will be published soon.",
     "schedule.notice.2027_coming": "The 2027 schedule will be announced in February 2027. In the meantime, browse the 2026 schedule below or (re)watch the 2026 talks on our YouTube channel!",
@@ -802,7 +802,7 @@ export const ui = {
     "discover.hero.bestof.caption": "Discover CND France",
     "discover.hero.coulisses.caption": "Behind the scenes, told by our volunteers",
     "discover.intro.p1":
-      "The French-speaking DevOps and cloud-native community gathers in Paris. A day of real-world experience reports and conversations — open to everyone, from curious juniors to senior architects all the way to decision-makers tracking the latest trends.",
+      "The French-speaking DevOps and cloud-native community comes together in Paris. A day of experience reports and conversations open to everyone: from curious junior profiles to senior architects, all the way to the decision-makers seeking the latest trends.",
     "discover.intro.p2":
       "CND France is not just another tech expo — it's a day of gathering for the entire ecosystem, promoting the sharing of expertise and experience in an atypical and charming venue.",
     "discover.intro.highlights.title": "CND France stands out for:",
