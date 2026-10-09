@@ -497,7 +497,7 @@ export const ui = {
     "cfp.closed.note":
       "CFP closed — thanks to everyone who submitted. See you on June 3, 2027.",
     "cfp.cta.notify": "Notify me",
-    "cfp.cta.submit": "Submit a talk",
+    "cfp.cta.submit": "Submit a proposal",
     "cfp.deadline": "Submissions close {date}",
     // Phase copy for the commit-flipped phase system (src/config/cfp.ts).
     "cfp.meta.title": "Call for Papers (CFP)",
