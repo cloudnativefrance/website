@@ -40,6 +40,11 @@ export function cfpEventUrl(): string {
   return `${PRETALX_BASE}/${pickCfpEvent()}/`;
 }
 
+/** A URL as a display string: no scheme, no trailing slash. */
+function displayUrl(url: string): string {
+  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+}
+
 /**
  * The same URL as a display string: no scheme, no trailing slash.
  *
@@ -48,7 +53,26 @@ export function cfpEventUrl(): string {
  * start rendering the link differently.
  */
 export function cfpEventLabel(): string {
-  return cfpEventUrl().replace(/^https?:\/\//, "").replace(/\/$/, "");
+  return displayUrl(cfpEventUrl());
+}
+
+/**
+ * The CFP 2027 submit URL — slug written out, not picked dynamically.
+ *
+ * cfpEventUrl() resolves through pickCfpEvent(), i.e. the newest edition the
+ * registry flags `cfpOpen`. That flag exists to close /cfp when submissions
+ * end, so deriving the submit link from it means the link silently retargets
+ * (or throws at build) the moment the committee flips it. The submit path
+ * belongs to the announced edition: pin the slug to 2027.
+ */
+export function cfpSubmitUrl(): string {
+  return `${PRETALX_BASE}/2027/submit`;
+}
+
+/** The submit URL as a display string — same treatment as cfpEventLabel, so
+ *  the label under the CTA and the link it describes never diverge. */
+export function cfpSubmitLabel(): string {
+  return displayUrl(cfpSubmitUrl());
 }
 
 export function scheduleExportUrl(slug: string): string {
