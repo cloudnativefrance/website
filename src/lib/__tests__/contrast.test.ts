@@ -130,4 +130,26 @@ describe("solid brand fills", () => {
       expect(Number(ratio.toFixed(2)), `${label} on ${fill} (${mode})`).toBeGreaterThanOrEqual(4.5);
     });
   });
+
+  // The CFP open page's hero badge (2026-10 review round): the old treatment
+  // painted --accent as *text* on a 15% tint — 2.24:1 in light, failing AA
+  // for a 12px uppercase label. It became the accent's own fill/foreground
+  // pair, which the palette authored for exactly this: 8.62:1. Brand hues are
+  // never dark-overridden, but both modes are asserted so a future retune
+  // cannot silently break the pairing.
+  it("keeps --accent legible under --accent-foreground", () => {
+    for (const [mode, tokens] of [
+      ["light", light],
+      ["dark", dark],
+    ] as const) {
+      const ratio = contrastRatio(
+        parseOklch(tokens["--accent"] ?? light["--accent"]),
+        parseOklch(tokens["--accent-foreground"] ?? light["--accent-foreground"])
+      );
+      expect(
+        Number(ratio.toFixed(2)),
+        `--accent fill on ${mode} with --accent-foreground`
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+  });
 });

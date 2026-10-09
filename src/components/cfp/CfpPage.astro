@@ -41,13 +41,19 @@ const meta: Record<CfpPhase, { title: string; description: string }> = {
     description: t("cfp.closed.body"),
   },
 };
+
+// Only the closed page keeps the site-wide band: coming_soon IS the
+// newsletter appeal, and the open page carries its own CTAs — a subscription
+// pitch under the submit button competes with the action the page exists for.
+// Closed readers' next thing is the programme, which the band announces.
+const band = phase === "closed";
 ---
 
 <Layout
   title={meta[phase].title}
   description={meta[phase].description}
   lang={lang}
-  newsletter={phase !== "coming_soon"}
+  newsletter={band}
   noindex={simulated}
 >
   {demos && <DemoBar lang={lang} phase={phase} simulated={simulated} />}

@@ -62,13 +62,14 @@ const WITHOUT_BAND = [
 ] as const;
 
 /**
- * The CFP page's band follows its phase (src/config/cfp.ts): the coming-soon
- * page IS the newsletter appeal (CfpPage passes newsletter={false}), while
- * the open and closed pages keep the band. Hardcoding either list would make
- * the next phase flip fail this suite for the wrong reason.
+ * The CFP page's band follows its phase (src/config/cfp.ts): only the closed
+ * page keeps it. The coming-soon page IS the newsletter appeal and the open
+ * page carries its own CTAs (CfpPage passes newsletter={false} for both).
+ * Hardcoding either list would make the next phase flip fail this suite for
+ * the wrong reason.
  */
 const CFP_PAGES = ["cfp/index.html", "en/cfp/index.html"] as const;
-const cfpWantsBand = CFP.currentPhase !== "coming_soon";
+const cfpWantsBand = CFP.currentPhase === "closed";
 
 const distExists = existsSync(resolve(DIST, "index.html"));
 
