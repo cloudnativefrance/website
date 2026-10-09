@@ -25,6 +25,7 @@ export const ui = {
     "nav.speakers.label": "Intervenant(e)s",
     "about.subnav.heading": "À découvrir aussi",
     "about.subnav.discover": "Découvrir CND France",
+    "about.subnav.strategy": "Stratégie & Leadership",
     "about.subnav.venue": "Infos pratiques",
     "about.subnav.team": "L'équipe",
     "about.page.placeholder":
@@ -527,12 +528,75 @@ export const ui = {
     "tickets.code.submit": "Utiliser mon code",
     "tickets.code.empty": "Saisissez votre code pour continuer.",
     "tickets.strategic.audience":
-      "Le billet {strategic} s'adresse à celles et ceux qui occupent des fonctions de direction et de décision\u00a0: CEO, CTO, DSI, VPs…",
+      "Le billet {strategic} s'adresse à celles et ceux qui occupent des fonctions de direction et de décision\u00a0: CEO, CTO, DSI, VP…",
     "tickets.strategic.perks":
       "En plus de toute l'expérience CND France, il donne accès à un parcours de conférences exclusif dédié aux enjeux stratégiques, avec des intervenant(e)s sélectionné(e)s par un comité dédié, ainsi qu'à un lounge pour échanger entre pairs.",
     "tickets.strategic.new": "Nouveauté 2027",
     "tickets.strategic.seats": "{count} places seulement",
     "tickets.strategic.track": "Découvrir le parcours Stratégie & Leadership",
+    "strategy.meta.title": "Parcours Stratégie & Leadership · CND France 2027",
+    "strategy.meta.description":
+      "Nouveauté 2027 : une journée de conférences et de tables rondes pour celles et ceux qui décident, avec un salon réservé. 200 places.",
+    "strategy.hero.lead": "Les enjeux du cloud native, vus du côté de la décision.",
+    "strategy.hero.body":
+      "Une journée de conférences et de tables rondes pour prendre du recul entre pairs, au cœur de Cloud Native Days France.",
+    "strategy.facts.seats": "{count} places",
+    "strategy.facts.price": "Tarif de lancement {price}",
+    "strategy.facts.lounge": "{lounge} réservé",
+    "strategy.cta": "Réserver ma place",
+    "strategy.cta.opening": "Ouverture de la billetterie le {date}",
+    "strategy.audience.title": "Pour celles et ceux qui décident",
+    "strategy.audience.body":
+      "Ce parcours s'adresse aux personnes qui occupent des fonctions de direction et de décision (CEO, CTO, DSI, VP…) et qui arbitrent les choix technologiques, budgétaires et organisationnels de leur entreprise.",
+    "strategy.challenges.title": "Quatre enjeux, vus du côté de la décision",
+    "strategy.challenges.stake": "L'enjeu",
+    "strategy.challenges.roi.title": "Stratégie et ROI cloud",
+    "strategy.challenges.roi.topics":
+      "Arbitrages entre cloud public, privé ou on-premise, FinOps, coût total des plateformes.",
+    "strategy.challenges.roi.stake": "Investir là où la valeur se crée.",
+    "strategy.challenges.autonomy.title": "Autonomie numérique",
+    "strategy.challenges.autonomy.topics":
+      "Souveraineté des données, alternatives ouvertes, coût réel de la réversibilité.",
+    "strategy.challenges.autonomy.stake":
+      "Garder la maîtrise de ses choix technologiques.",
+    "strategy.challenges.ai.title": "IA en production",
+    "strategy.challenges.ai.topics":
+      "Passer du POC à la plateforme, gouverner les usages, maîtriser les coûts.",
+    "strategy.challenges.ai.stake":
+      "Transformer l'expérimentation en valeur durable.",
+    "strategy.challenges.trends.title": "Signaux faibles et tendances",
+    "strategy.challenges.trends.topics":
+      "Ce qui émerge dans l'écosystème cloud native et ce qu'il faut anticiper.",
+    "strategy.challenges.trends.stake":
+      "Décider avant que le marché ne décide pour vous.",
+    "strategy.format.title": "Une programmation sur invitation",
+    "strategy.format.body":
+      "Les intervenant(e)s sont choisi(e)s par un comité dédié. Conférences et tables rondes alternent pour faire place aux retours d'expérience et au débat.",
+    "strategy.day.title": "Votre journée",
+    "strategy.day.keynote":
+      "La keynote d'ouverture de CND France, qui fait cette année une place à la stratégie et au leadership.",
+    "strategy.day.track":
+      "Les conférences et tables rondes du parcours tout au long de la journée, en salle {room}.",
+    "strategy.day.talks":
+      "L'accès à toutes les autres conférences de CND France, puisque votre billet inclut le billet standard.",
+    "strategy.day.breaks":
+      "Des pauses pensées pour rencontrer les partenaires du village.",
+    "strategy.day.lunch":
+      "Le déjeuner servi au {lounge}, à l'écart de l'affluence.",
+    "strategy.lounge.title": "Le {lounge}",
+    "strategy.lounge.body":
+      "Entre deux sessions, au déjeuner ou autour d'un café, retrouvez vos pairs : celles et ceux qui font face aux mêmes arbitrages que vous. Réservé aux détenteurs et détentrices du billet {strategic}, le salon vous permet de prolonger les débats, comparer vos approches et nouer des relations qui durent au-delà de la journée.",
+    "strategy.lounge.circle": "Un cercle restreint de {count} pairs",
+    "strategy.lounge.coffee": "Un café de qualité",
+    "strategy.lounge.workspace": "De quoi poser votre ordinateur et le recharger",
+    "strategy.lounge.lunch": "Le déjeuner, à l'écart de l'affluence",
+    "strategy.ticket.title": "Votre billet {strategic}",
+    "strategy.ticket.launch": "Tarif de lancement",
+    "strategy.ticket.included": "Inclus",
+    "strategy.ticket.included.event": "Toute l'expérience CND France",
+    "strategy.ticket.included.track": "Le parcours {strategic}",
+    "strategy.ticket.included.lounge": "L'accès au {lounge}",
+    "strategy.ticket.included.lunch": "Le déjeuner servi au salon",
     "tickets.included.title": "Ce que comprend votre billet",
     "tickets.included.talks":
       "Les conférences et retours d'expérience de la journée",
@@ -614,6 +678,7 @@ export const ui = {
     "nav.speakers.label": "Speakers",
     "about.subnav.heading": "Explore more",
     "about.subnav.discover": "Discover CND France",
+    "about.subnav.strategy": "Strategy & Leadership",
     "about.subnav.venue": "Practical info",
     "about.subnav.team": "The team",
     "about.page.placeholder": "Content for this page is coming soon.",
@@ -1099,6 +1164,67 @@ export const ui = {
     "tickets.strategic.new": "New in 2027",
     "tickets.strategic.seats": "Only {count} seats",
     "tickets.strategic.track": "About the Strategy & Leadership track",
+    "strategy.meta.title": "Strategy & Leadership track · CND France 2027",
+    "strategy.meta.description":
+      "New in 2027: a day of talks and panel discussions for those who make the calls, with a private lounge. 200 seats.",
+    "strategy.hero.lead": "Cloud native challenges, seen from the decision-maker's seat.",
+    "strategy.hero.body":
+      "A day of talks and panel discussions to step back with your peers, at the heart of Cloud Native Days France.",
+    "strategy.facts.seats": "{count} seats",
+    "strategy.facts.price": "Launch price {price}",
+    "strategy.facts.lounge": "Private {lounge}",
+    "strategy.cta": "Reserve my seat",
+    "strategy.cta.opening": "Ticket sales open {date}",
+    "strategy.audience.title": "For those who make the calls",
+    "strategy.audience.body":
+      "This track is for people in leadership and decision-making roles (CEOs, CTOs, CIOs, VPs…) who shape their company's technology, budget and organizational choices.",
+    "strategy.challenges.title": "Four challenges, seen from the decision-maker's seat",
+    "strategy.challenges.stake": "The challenge",
+    "strategy.challenges.roi.title": "Cloud strategy & ROI",
+    "strategy.challenges.roi.topics":
+      "Public cloud, private cloud or on-premise trade-offs, FinOps, the total cost of platforms.",
+    "strategy.challenges.roi.stake": "Invest where value is created.",
+    "strategy.challenges.autonomy.title": "Digital autonomy",
+    "strategy.challenges.autonomy.topics":
+      "Data sovereignty, open alternatives, the true cost of reversibility.",
+    "strategy.challenges.autonomy.stake":
+      "Stay in control of your technology choices.",
+    "strategy.challenges.ai.title": "AI in production",
+    "strategy.challenges.ai.topics":
+      "From proof of concept to platform, governing usage, keeping costs in check.",
+    "strategy.challenges.ai.stake": "Turn experiments into lasting value.",
+    "strategy.challenges.trends.title": "Weak signals & trends",
+    "strategy.challenges.trends.topics":
+      "What is emerging in the cloud native ecosystem and what to anticipate.",
+    "strategy.challenges.trends.stake":
+      "Decide before the market decides for you.",
+    "strategy.format.title": "An invitation-only line-up",
+    "strategy.format.body":
+      "Speakers are selected by a dedicated committee. Talks and panel discussions alternate to make room for real-world experience and debate.",
+    "strategy.day.title": "Your day",
+    "strategy.day.keynote":
+      "The CND France opening keynote, which this year makes room for strategy and leadership.",
+    "strategy.day.track":
+      "The track's talks and panels throughout the day, in the {room} room.",
+    "strategy.day.talks":
+      "Access to every other CND France talk, since your ticket includes the standard ticket.",
+    "strategy.day.breaks":
+      "Breaks designed to meet the partners in the sponsor village.",
+    "strategy.day.lunch": "Lunch served in the {lounge}, away from the crowds.",
+    "strategy.lounge.title": "The {lounge}",
+    "strategy.lounge.body":
+      "Between sessions, over lunch or a coffee, meet your peers: people facing the same trade-offs as you. Reserved for {strategic} ticket holders, the salon is where you carry on the debates, compare approaches and build relationships that last beyond the day.",
+    "strategy.lounge.circle": "A close circle of {count} peers",
+    "strategy.lounge.coffee": "Quality coffee",
+    "strategy.lounge.workspace": "Somewhere to set down and recharge your laptop",
+    "strategy.lounge.lunch": "Lunch, away from the crowds",
+    "strategy.ticket.title": "Your {strategic} ticket",
+    "strategy.ticket.launch": "Launch price",
+    "strategy.ticket.included": "Included",
+    "strategy.ticket.included.event": "The full CND France experience",
+    "strategy.ticket.included.track": "The {strategic} track",
+    "strategy.ticket.included.lounge": "Access to the {lounge}",
+    "strategy.ticket.included.lunch": "Lunch served in the salon",
     "tickets.included.title": "What your ticket includes",
     "tickets.included.talks": "The day's talks and experience reports",
     "tickets.included.village": "Access to the partner village",

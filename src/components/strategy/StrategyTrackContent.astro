@@ -1,0 +1,312 @@
+---
+/**
+ * The Stratégie & Leadership track's page: who it is for, what it covers, the
+ * day, the lounge, then the ticket. It sells one ticket, so it has one action,
+ * "Réserver ma place", at the top and on the ticket. The price, seats, room
+ * and lounge name come from `TICKETING.strategic`, as on the billetterie, so
+ * the two pages cannot disagree. Kept apart from `StrategyTrackPage` so the
+ * tests can render it without a layout.
+ */
+import { TICKETING, type Phase } from "@/config/tickets";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { fill, formatPrice } from "@/lib/tickets/format";
+import BigPrice from "@/components/tickets/BigPrice.astro";
+import CardBand from "@/components/tickets/CardBand.astro";
+import Icon, { type IconName } from "@/components/tickets/Icon.astro";
+import ReserveButton from "./ReserveButton.astro";
+
+interface Props {
+  lang: Locale;
+  phase?: Phase;
+}
+
+const { lang, phase = TICKETING.currentPhase } = Astro.props;
+const t = useTranslations(lang);
+const { name, price, launchPrice, seats, room, lounge } = TICKETING.strategic;
+const values = {
+  strategic: name[lang],
+  lounge: lounge[lang],
+  room,
+  count: seats,
+};
+
+const facts: { icon: IconName; text: string }[] = [
+  { icon: "users", text: fill(t("strategy.facts.seats"), values) },
+  {
+    icon: "tag",
+    text: launchPrice
+      ? fill(t("strategy.facts.price"), {
+          price: `${formatPrice(price, lang)} ${t("tickets.offer.ttc")}`,
+        })
+      : `${formatPrice(price, lang)} ${t("tickets.offer.ttc")}`,
+  },
+  { icon: "coffee", text: fill(t("strategy.facts.lounge"), values) },
+];
+
+const challenges = (["roi", "autonomy", "ai", "trends"] as const).map(
+  (key) => ({
+    title: t(`strategy.challenges.${key}.title`),
+    topics: t(`strategy.challenges.${key}.topics`),
+    stake: t(`strategy.challenges.${key}.stake`),
+  }),
+);
+
+const day = (["keynote", "track", "talks", "breaks", "lunch"] as const).map(
+  (key) => fill(t(`strategy.day.${key}`), values),
+);
+
+const perks: { icon: IconName; text: string }[] = [
+  { icon: "users", text: fill(t("strategy.lounge.circle"), values) },
+  { icon: "coffee", text: t("strategy.lounge.coffee") },
+  { icon: "laptop", text: t("strategy.lounge.workspace") },
+  { icon: "utensils", text: t("strategy.lounge.lunch") },
+];
+
+const included = (["event", "track", "lounge", "lunch"] as const).map((key) =>
+  fill(t(`strategy.ticket.included.${key}`), values),
+);
+
+const container = "mx-auto max-w-7xl px-4 md:px-6 lg:px-8";
+const h2 =
+  "text-foreground text-3xl leading-tight font-bold tracking-[-0.02em] text-balance sm:text-4xl";
+---
+
+<main class="strategy-page">
+  <section
+    class="bg-chart-5 relative isolate overflow-hidden text-white dark:bg-[oklch(26%_0.12_285)]"
+    aria-labelledby="strategy-title"
+  >
+    <svg
+      class="absolute inset-0 -z-10 size-full [mask-image:radial-gradient(60%_90%_at_100%_0%,black_0%,transparent_80%)] text-white/16"
+      aria-hidden="true"
+    >
+      <pattern
+        id="strategy-hero-hex"
+        width="60"
+        height="104"
+        patternUnits="userSpaceOnUse"
+      >
+        <path
+          d="M30 0 L60 17.3 L60 52 L30 69.3 L0 52 L0 17.3 Z M30 69.3 L30 104"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1"></path>
+        <circle cx="30" cy="0" r="1.6" fill="currentColor"></circle>
+        <circle cx="60" cy="52" r="1.6" fill="currentColor"></circle>
+        <circle cx="0" cy="52" r="1.6" fill="currentColor"></circle>
+      </pattern>
+      <rect width="100%" height="100%" fill="url(#strategy-hero-hex)"></rect>
+    </svg>
+
+    <div
+      class:list={[container, "flex flex-col items-start gap-6 py-16 md:py-24"]}
+    >
+      <span
+        class="bg-accent text-accent-foreground inline-flex items-center rounded-full px-3 py-1.5 text-xs leading-none font-bold tracking-[0.06em] uppercase"
+      >
+        {t("tickets.strategic.new")}
+      </span>
+      <h1
+        id="strategy-title"
+        class="text-5xl leading-[1.02] font-bold tracking-[-0.035em] text-balance sm:text-6xl lg:text-7xl"
+      >
+        {name[lang]}
+      </h1>
+      <div class="flex max-w-3xl flex-col gap-3">
+        <p
+          class="text-xl leading-snug font-semibold text-pretty text-white sm:text-2xl"
+        >
+          {t("strategy.hero.lead")}
+        </p>
+        <p class="text-lg text-pretty text-white/80">
+          {t("strategy.hero.body")}
+        </p>
+      </div>
+      <ul class="flex flex-wrap gap-2.5">
+        {
+          facts.map((fact) => (
+            <li class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold">
+              <Icon name={fact.icon} size={16} />
+              {fact.text}
+            </li>
+          ))
+        }
+      </ul>
+      <div class="pt-2">
+        <ReserveButton lang={lang} phase={phase} position="hero" onDark />
+      </div>
+    </div>
+  </section>
+
+  <section class:list={[container, "py-16 md:py-24"]}>
+    <div class="grid gap-6 lg:grid-cols-12 lg:gap-10">
+      <h2 class:list={[h2, "lg:col-span-5"]}>{t("strategy.audience.title")}</h2>
+      <p
+        class="text-foreground text-lg text-pretty sm:text-xl lg:col-span-7 lg:pt-1"
+      >
+        {t("strategy.audience.body")}
+      </p>
+    </div>
+  </section>
+
+  <section
+    class:list={[container, "pb-16 md:pb-24"]}
+    aria-labelledby="strategy-challenges"
+  >
+    <h2 id="strategy-challenges" class:list={[h2, "max-w-3xl"]}>
+      {t("strategy.challenges.title")}
+    </h2>
+    <ol class="mt-8 grid gap-5 sm:grid-cols-2 md:mt-10 lg:gap-6">
+      {
+        challenges.map((item, index) => (
+          <li class="bg-card border-border flex flex-col gap-3 rounded-xl border p-6 sm:p-8">
+            <span class="text-primary-strong text-sm font-bold tracking-[0.06em] tabular-nums">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <h3 class="text-foreground text-2xl font-semibold tracking-[-0.01em]">
+              {item.title}
+            </h3>
+            <p class="text-muted-foreground text-base text-pretty">
+              {item.topics}
+            </p>
+            <div class="border-border mt-auto border-t pt-4">
+              <p class="text-primary-strong text-xs font-bold tracking-[0.06em] uppercase">
+                {t("strategy.challenges.stake")}
+              </p>
+              <p class="text-foreground mt-1 text-lg font-semibold text-pretty">
+                {item.stake}
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section class:list={[container, "pb-16 md:pb-24"]}>
+    <div class="grid gap-10 lg:grid-cols-12 lg:gap-12">
+      <div
+        class="bg-secondary flex flex-col gap-4 self-start rounded-xl p-6 sm:p-8 lg:col-span-5"
+      >
+        <h2 class="text-foreground text-2xl font-bold tracking-[-0.01em]">
+          {t("strategy.format.title")}
+        </h2>
+        <p class="text-foreground text-lg text-pretty">
+          {t("strategy.format.body")}
+        </p>
+      </div>
+      <div class="lg:col-span-7">
+        <h2 class={h2}>{t("strategy.day.title")}</h2>
+        <ol class="border-border mt-8 flex flex-col gap-6 border-l-2 pl-6">
+          {
+            day.map((step) => (
+              <li class="text-foreground relative text-lg text-pretty">
+                <span
+                  class="bg-primary ring-background absolute top-2 -left-[calc(1.5rem+7px)] size-3 rounded-full ring-4"
+                  aria-hidden="true"
+                />
+                {step}
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="border-border bg-muted/50 border-y"
+    aria-labelledby="strategy-lounge"
+  >
+    <div
+      class:list={[
+        container,
+        "grid gap-10 py-16 md:py-24 lg:grid-cols-12 lg:gap-12",
+      ]}
+    >
+      <div class="flex flex-col gap-4 lg:col-span-5">
+        <h2 id="strategy-lounge" class={h2}>
+          {fill(t("strategy.lounge.title"), values)}
+        </h2>
+        <p class="text-foreground text-lg text-pretty">
+          {fill(t("strategy.lounge.body"), values)}
+        </p>
+      </div>
+      <ul class="grid gap-4 sm:grid-cols-2 lg:col-span-7">
+        {
+          perks.map((perk) => (
+            <li class="bg-card border-border flex items-center gap-4 rounded-xl border p-5">
+              <span class="bg-chart-5 flex size-11 shrink-0 items-center justify-center rounded-lg text-white dark:bg-[oklch(40%_0.16_284)]">
+                <Icon name={perk.icon} size={22} />
+              </span>
+              <span class="text-foreground text-base font-semibold text-pretty">
+                {perk.text}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section
+    class:list={[container, "py-16 md:py-24"]}
+    aria-labelledby="strategy-ticket"
+  >
+    <article
+      class="border-chart-5 bg-card flex flex-col rounded-xl border dark:border-[oklch(45%_0.16_284)]"
+    >
+      <CardBand tone="brand">
+        <h2
+          id="strategy-ticket"
+          class="text-2xl font-semibold tracking-[-0.01em]"
+        >
+          {fill(t("strategy.ticket.title"), values)}
+        </h2>
+        {
+          launchPrice && (
+            <span class="bg-accent text-accent-foreground inline-flex items-center rounded-full px-2.5 py-1 text-xs leading-none font-bold tracking-[0.06em] whitespace-nowrap uppercase">
+              {t("strategy.ticket.launch")}
+            </span>
+          )
+        }
+      </CardBand>
+      <div
+        class="grid gap-8 p-5 sm:p-8 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:gap-12"
+      >
+        <div class="flex flex-col gap-3">
+          <BigPrice amount={price} lang={lang} />
+          <p
+            class="text-foreground flex items-center gap-2 text-base font-semibold"
+          >
+            <Icon name="users" size={18} />
+            <span>{fill(t("tickets.strategic.seats"), values)}</span>
+          </p>
+        </div>
+        <div>
+          <h3
+            class="text-muted-foreground text-xs font-bold tracking-[0.06em] uppercase"
+          >
+            {t("strategy.ticket.included")}
+          </h3>
+          <ul class="mt-3 flex flex-col gap-2.5">
+            {
+              included.map((item) => (
+                <li class="text-foreground flex items-start gap-2.5 text-base font-medium">
+                  <Icon
+                    name="check"
+                    size={18}
+                    class="text-primary-strong mt-0.5"
+                  />
+                  {item}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <ReserveButton lang={lang} phase={phase} position="ticket" />
+      </div>
+    </article>
+  </section>
+</main>

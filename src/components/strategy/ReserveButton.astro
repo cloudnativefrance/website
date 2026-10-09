@@ -1,0 +1,59 @@
+---
+/**
+ * "Réserver ma place": the alf.io listing in a new tab, like the billetterie's
+ * own button, in every phase. Before the opening, the date is said under it.
+ */
+import { TICKETING, type Phase } from "@/config/tickets";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import { fill } from "@/lib/tickets/format";
+import { isPreOpening } from "@/lib/tickets/phase";
+import Icon from "@/components/tickets/Icon.astro";
+
+interface Props {
+  lang: Locale;
+  phase: Phase;
+  /** Where on the page the button sits, for the analytics event. */
+  position: "hero" | "ticket";
+  /** On the Deep Purple hero: the opening note is set light. */
+  onDark?: boolean;
+}
+
+const { lang, phase, position, onDark = false } = Astro.props;
+const t = useTranslations(lang);
+const open = !isPreOpening(phase);
+---
+
+<div class="flex flex-col items-start gap-3">
+  {/* White on --primary passes contrast only this large and bold (3.6:1). */}
+  <a
+    href={TICKETING.listingUrl}
+    target="_blank"
+    rel="noopener"
+    class:list={[
+      "bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring/50 inline-flex h-13 items-center justify-center gap-2 rounded-lg px-7 text-xl font-bold whitespace-nowrap shadow-[var(--shadow-glow-primary)] transition-[background-color,scale] duration-150 ease-out focus-visible:ring-3 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96]",
+      onDark
+        ? "focus-visible:ring-offset-chart-5"
+        : "focus-visible:ring-offset-card",
+    ]}
+    data-umami-event="strategy-reserve"
+    data-umami-event-position={position}
+    data-reserve
+  >
+    {t("strategy.cta")}
+    <span class="sr-only"> {t("tickets.new_tab")}</span>
+    <Icon name="arrow-up-right" size={20} />
+  </a>
+  {
+    !open && (
+      <p
+        class:list={[
+          "text-sm font-medium",
+          onDark ? "text-white/80" : "text-muted-foreground",
+        ]}
+      >
+        {fill(t("strategy.cta.opening"), { date: t("tickets.opening.date") })}
+      </p>
+    )
+  }
+</div>

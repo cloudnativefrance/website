@@ -56,8 +56,18 @@ export interface TicketingConfig {
   strategic: {
     name: Localized;
     price: number;
+    /**
+     * The price is the launch price: the track's page says so. It will rise
+     * closer to the event, at no announced date, so the page never names the
+     * next price (09/10/2026). Set to false the day the price changes.
+     */
+    launchPrice: boolean;
     seats: number;
     trackUrl: Localized;
+    /** The track's room, as the 2027 programme names it. */
+    room: string;
+    /** The lounge next to it, reserved for the ticket's holders. */
+    lounge: Localized;
   };
   /** In percent. */
   vatRate: number;
@@ -114,11 +124,14 @@ export const TICKETING: TicketingConfig = {
   strategic: {
     name: { fr: "Stratégie & Leadership", en: "Strategy & Leadership" },
     price: 399,
+    launchPrice: true,
     seats: 200,
     trackUrl: {
-      fr: "/track-strategie-leadership",
+      fr: "/parcours-strategie-leadership",
       en: "/en/track-strategy-leadership",
     },
+    room: "Eiffel",
+    lounge: { fr: "Salon Eiffel", en: "Salon Eiffel" },
   },
   vatRate: 10,
   programmeAnnouncement: { fr: "en mars 2027", en: "in March 2027" },

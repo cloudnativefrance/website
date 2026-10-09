@@ -1,0 +1,24 @@
+---
+/** What /parcours-strategie-leadership and /en/track-strategy-leadership mount. */
+import Layout from "@/layouts/Layout.astro";
+import { TICKETING } from "@/config/tickets";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import StrategyTrackContent from "./StrategyTrackContent.astro";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<Layout
+  title={t("strategy.meta.title")}
+  description={t("strategy.meta.description")}
+  lang={lang}
+  canonicalPath={TICKETING.strategic.trackUrl[lang]}
+>
+  <StrategyTrackContent lang={lang} />
+</Layout>
