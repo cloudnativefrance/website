@@ -495,9 +495,9 @@ export const ui = {
       "Votre place pour CND France 2027, le jeudi 3 juin au CENTQUATRE-PARIS\u00a0: les tarifs, venir en équipe, utiliser un code.",
     "tickets.h1": "Billetterie CND France 2027",
     "tickets.when": "{date} · {venue}, Paris 19e",
-    "tickets.advice.lead": "Un conseil\u00a0:",
-    "tickets.advice":
-      "prenez votre place sans tarder, nous attendons plus de 2\u202f500 participants.",
+    "tickets.advice.lead":
+      "Plus de 2\u202f500 participant(e)s attendu(e)s\u00a0:",
+    "tickets.advice": "prenez votre place sans tarder, les places sont limitées.",
     "tickets.door.code": "J'ai un code",
     // {name} is the config's ticket name, capitalised by the card title.
     "tickets.offer.ticket": "Billet {name}",
@@ -528,9 +528,11 @@ export const ui = {
     "tickets.code.submit": "Utiliser mon code",
     "tickets.code.empty": "Saisissez votre code pour continuer.",
     "tickets.strategic.audience":
-      "Le billet {strategic} s'adresse à celles et ceux qui occupent des fonctions de direction et de décision\u00a0: CEO, CTO, DSI, VP…",
-    "tickets.strategic.perks":
-      "En plus de toute l'expérience CND France, il donne accès à un parcours de conférences exclusif dédié aux enjeux stratégiques, avec des intervenant(e)s sélectionné(e)s par un comité dédié, ainsi qu'à un lounge pour échanger entre pairs.",
+      "Pour celles et ceux qui décident\u00a0: CEO, CTO, DSI, VP…",
+    "tickets.strategic.perks.event": "Toute l'expérience CND France",
+    "tickets.strategic.perks.track":
+      "Un parcours de conférences et de tables rondes sur invitation",
+    "tickets.strategic.perks.lounge": "Le {lounge}, pour échanger entre pairs",
     "tickets.strategic.new": "Nouveauté 2027",
     "tickets.strategic.seats": "{count} places seulement",
     "tickets.strategic.track": "Découvrir le parcours Stratégie & Leadership",
@@ -1126,9 +1128,8 @@ export const ui = {
       "Your seat at CND France 2027, Thursday 3 June at CENTQUATRE-PARIS: prices, coming as a team, using a code.",
     "tickets.h1": "CND France 2027 tickets",
     "tickets.when": "{date} · {venue}, Paris",
-    "tickets.advice.lead": "Our advice:",
-    "tickets.advice":
-      "get your ticket early, we're expecting more than 2,500 attendees.",
+    "tickets.advice.lead": "More than 2,500 attendees expected:",
+    "tickets.advice": "get your ticket early, seats are limited.",
     "tickets.door.code": "I have a code",
     "tickets.offer.ticket": "{name} ticket",
     "tickets.offer.ttc": "VAT incl.",
@@ -1157,9 +1158,11 @@ export const ui = {
     "tickets.code.submit": "Use my code",
     "tickets.code.empty": "Enter your code to continue.",
     "tickets.strategic.audience":
-      "The {strategic} ticket is for those in leadership and decision-making roles: CEOs, CTOs, CIOs, VPs…",
-    "tickets.strategic.perks":
-      "On top of the full CND France experience, it gives access to an exclusive track of talks on strategic issues, with speakers chosen by a dedicated committee, and to a lounge to meet your peers.",
+      "For those who make the calls: CEOs, CTOs, CIOs, VPs…",
+    "tickets.strategic.perks.event": "The full CND France experience",
+    "tickets.strategic.perks.track":
+      "An invitation-only track of talks and panel discussions",
+    "tickets.strategic.perks.lounge": "The {lounge}, to connect with your peers",
     "tickets.strategic.new": "New in 2027",
     "tickets.strategic.seats": "Only {count} seats",
     "tickets.strategic.track": "About the Strategy & Leadership track",

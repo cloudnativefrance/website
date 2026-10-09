@@ -3,8 +3,10 @@
  * The Stratégie & Leadership ticket, drawn like the standard one but without
  * the lift shadow, and set apart by its band: CND Deep Purple, with the
  * "Nouveauté 2027" pill. One price for the season: no tier, no date, no
- * ladder; under it, its fixed number of seats. It says who it is for and what it adds; the track's page says the
- * rest.
+ * ladder. Above it, "Tarif de lancement" while `launchPrice` holds, where the
+ * standard card names its tier; under it, its fixed number of seats, set in
+ * the band's purple: the card's urgency, ahead of the copy. Then who it is for
+ * and what it adds, as three checks; the track's page says the rest.
  */
 import { TICKETING } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
@@ -16,17 +18,17 @@ import Icon from "./Icon.astro";
 
 interface Props {
   lang: Locale;
-  /**
-   * Pushes the button to the card's right edge. Beside "Venir en équipe" the
-   * standard card's button sits at its own right edge, so the two cannot line
-   * up: each then ends its card.
-   */
-  actionAtEnd?: boolean;
 }
 
-const { lang, actionAtEnd = false } = Astro.props;
+const { lang } = Astro.props;
 const t = useTranslations(lang);
-const { name, price, seats, trackUrl } = TICKETING.strategic;
+const { name, price, launchPrice, seats, trackUrl, lounge } =
+  TICKETING.strategic;
+const perks = [
+  t("tickets.strategic.perks.event"),
+  t("tickets.strategic.perks.track"),
+  fill(t("tickets.strategic.perks.lounge"), { lounge: lounge[lang] }),
+];
 ---
 
 <article
@@ -46,23 +48,45 @@ const { name, price, seats, trackUrl } = TICKETING.strategic;
   </CardBand>
 
   <div
-    class="grid gap-6 p-5 sm:p-8 lg:grid-cols-[minmax(0,36rem)_auto] lg:gap-10"
+    class="grid gap-6 p-5 sm:p-8 lg:grid-cols-[minmax(0,36rem)_1fr] lg:gap-10"
   >
     <div class="flex flex-col gap-3">
+      {
+        launchPrice && (
+          <p class="text-foreground text-base font-semibold">
+            {t("strategy.ticket.launch")}
+          </p>
+        )
+      }
       <BigPrice amount={price} lang={lang} />
+      {
+        /* A filled Deep Purple pill, the track page's white hero pill turned
+           over: not pink, which the band's "Nouveauté 2027" already holds. */
+      }
       <p
-        class="text-foreground flex items-center gap-2 text-base font-semibold text-pretty"
+        class="bg-chart-5 inline-flex items-center gap-2 self-start rounded-full px-4 py-2 text-base font-bold text-white dark:bg-[oklch(40%_0.16_284)]"
       >
         <Icon name="users" size={18} />
         <span>{fill(t("tickets.strategic.seats"), { count: seats })}</span>
       </p>
-      <div
-        class="text-muted-foreground flex max-w-[52ch] flex-col gap-2 text-base text-pretty"
-      >
-        <p>
-          {fill(t("tickets.strategic.audience"), { strategic: name[lang] })}
+      <div class="flex max-w-[52ch] flex-col gap-2.5 pt-1 text-base">
+        <p class="text-muted-foreground text-pretty">
+          {t("tickets.strategic.audience")}
         </p>
-        <p>{t("tickets.strategic.perks")}</p>
+        <ul class="flex flex-col gap-2">
+          {
+            perks.map((perk) => (
+              <li class="text-foreground flex items-start gap-2.5 font-medium text-pretty">
+                <Icon
+                  name="check"
+                  size={18}
+                  class="text-primary-strong mt-0.5"
+                />
+                {perk}
+              </li>
+            ))
+          }
+        </ul>
       </div>
       {
         /* Inline, not flex: when the line wraps, the arrow follows the last word. */
@@ -82,11 +106,9 @@ const { name, price, seats, trackUrl } = TICKETING.strategic;
       </p>
     </div>
 
+    {/* The button ends the card, like the standard ticket's above. */}
     <div
-      class:list={[
-        "flex flex-col items-start justify-center",
-        actionAtEnd && "lg:items-end",
-      ]}
+      class="flex flex-col items-start justify-center lg:items-end"
       data-offer-action
     >
       <slot name="purchase" />
