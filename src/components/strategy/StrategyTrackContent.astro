@@ -31,8 +31,15 @@ const values = {
   count: seats,
 };
 
-const facts: { icon: IconName; text: string }[] = [
-  { icon: "users", text: fill(t("strategy.facts.seats"), values) },
+// The seats are the one fact that asks to act now: filled white, where the
+// others are outlined. Not a second pink pill, which would cancel out
+// "Nouveauté 2027" (one accent per section, DESIGN.md).
+const facts: { icon: IconName; text: string; strong?: boolean }[] = [
+  {
+    icon: "users",
+    text: fill(t("tickets.strategic.seats"), values),
+    strong: true,
+  },
   {
     icon: "tag",
     text: launchPrice
@@ -126,7 +133,14 @@ const h2 =
       <ul class="flex flex-wrap gap-2.5">
         {
           facts.map((fact) => (
-            <li class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold">
+            <li
+              class:list={[
+                "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm",
+                fact.strong
+                  ? "text-chart-5 border-white bg-white font-bold dark:text-[oklch(26%_0.12_285)]"
+                  : "border-white/20 bg-white/10 font-semibold",
+              ]}
+            >
               <Icon name={fact.icon} size={16} />
               {fact.text}
             </li>

@@ -540,7 +540,6 @@ export const ui = {
     "strategy.hero.lead": "Les enjeux du cloud native, vus du côté de la décision.",
     "strategy.hero.body":
       "Une journée de conférences et de tables rondes pour prendre du recul entre pairs, au cœur de Cloud Native Days France.",
-    "strategy.facts.seats": "{count} places",
     "strategy.facts.price": "Tarif de lancement {price}",
     "strategy.facts.lounge": "{lounge} réservé",
     "strategy.cta": "Réserver ma place",
@@ -1170,7 +1169,6 @@ export const ui = {
     "strategy.hero.lead": "Cloud native challenges, seen from the decision-maker's seat.",
     "strategy.hero.body":
       "A day of talks and panel discussions to step back with your peers, at the heart of Cloud Native Days France.",
-    "strategy.facts.seats": "{count} seats",
     "strategy.facts.price": "Launch price {price}",
     "strategy.facts.lounge": "Private {lounge}",
     "strategy.cta": "Reserve my seat",
