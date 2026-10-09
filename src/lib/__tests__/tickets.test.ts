@@ -71,15 +71,15 @@ describe("formatDiscount", () => {
 describe("codeUrl", () => {
   const listing = "https://x.test/event/e";
 
-  it("drops spaces, encodes path characters, refuses an empty code", () => {
+  it("drops spaces, upper-cases, encodes path characters, refuses an empty code", () => {
     expect(codeUrl(listing, " \t ")).toEqual({ ok: false });
-    expect(codeUrl(listing, " PART NER ")).toEqual({
+    expect(codeUrl(listing, " Part ner ")).toEqual({
       ok: true,
       code: "PARTNER",
       url: "https://x.test/event/e/code/PARTNER",
     });
     expect(codeUrl(listing, "a/b?c#d")).toMatchObject({
-      url: "https://x.test/event/e/code/a%2Fb%3Fc%23d",
+      url: "https://x.test/event/e/code/A%2FB%3FC%23D",
     });
   });
 });

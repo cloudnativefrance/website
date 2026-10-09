@@ -9,11 +9,11 @@ export type CodeResult =
 
 /**
  * The URL that applies a code a visitor typed. The site checks nothing: alf.io
- * knows the codes. Whitespace is dropped (copy-paste adds it), an empty code
- * is refused.
+ * knows the codes. Whitespace is dropped (copy-paste adds it), the code is
+ * upper-cased (alf.io's codes are, 09/10/2026), an empty code is refused.
  */
 export function codeUrl(listingUrl: string, raw: string): CodeResult {
-  const code = raw.replace(/\s+/g, "");
+  const code = raw.replace(/\s+/g, "").toUpperCase();
   if (!code) return { ok: false };
   return {
     ok: true,
