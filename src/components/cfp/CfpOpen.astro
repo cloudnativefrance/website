@@ -8,7 +8,7 @@
  */
 import { Picture } from "astro:assets";
 import type { Locale } from "@/i18n/ui";
-import { cfpEventUrl, cfpEventLabel } from "@/lib/pretalx";
+import { cfpSubmitUrl, cfpSubmitLabel } from "@/lib/pretalx";
 import intervenantPhoto from "@/assets/photos/contact/intervenants.jpg";
 import participantPhoto from "@/assets/photos/contact/participant.jpg";
 
@@ -17,8 +17,8 @@ interface Props {
 }
 
 const { lang } = Astro.props;
-const CFP_URL = cfpEventUrl();
-const CFP_LABEL = cfpEventLabel();
+const CFP_URL = cfpSubmitUrl();
+const CFP_LABEL = cfpSubmitLabel();
 
 const fr = {
   badge: "CFP 2027 — ouvert",
@@ -66,12 +66,12 @@ const fr = {
     },
     {
       duration: "30 min",
-      title: "Retour d'expérience",
+      title: "Cas concret",
       body: "Idéal pour partager des cas concrets en entreprise, des retours sur des projets open source, ou une expérience personnelle. Q&A incluses.",
     },
     {
       duration: "45 min",
-      title: "Conférence",
+      title: "Deep dive",
       body: "Pour approfondir un sujet complexe, entrer dans les détails techniques, avec éventuellement des démonstrations. Q&A incluses.",
     },
   ],
@@ -170,12 +170,12 @@ const COPY: Record<Locale, typeof fr> = {
       },
       {
         duration: "30 min",
-        title: "Experience report",
+        title: "Talk",
         body: "Production stories, open source retrospectives, or a personal contribution. Q&A included.",
       },
       {
         duration: "45 min",
-        title: "Conference talk",
+        title: "Deep dive",
         body: "Deep dive into a complex topic, technical details, possibly with live demos. Q&A included.",
       },
     ],

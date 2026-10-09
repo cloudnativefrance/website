@@ -114,4 +114,20 @@ describe("solid brand fills", () => {
     );
     expect(Number(ratio.toFixed(2))).toBeGreaterThanOrEqual(4.5);
   });
+
+  // The newsletter band's solid CTA (2026-10): `--destructive-strong` painted
+  // AS a fill, which the "-strong" naming never contemplated — it was authored
+  // for text/borders. So the label flips by mode: white on the light L=54%
+  // fill clears AA, but the same white on the dark L=68% fill measured 3.16:1
+  // and fails; dark paints --background on the fill instead. Asserted here so
+  // a token retune cannot silently break the pairing.
+  describe.each([
+    ["light", light["--destructive-strong"], light["--destructive-foreground"]],
+    ["dark", dark["--destructive-strong"], dark["--background"]],
+  ])("%s solid CTA", (mode, fill, label) => {
+    it("clears AA", () => {
+      const ratio = contrastRatio(parseOklch(fill), parseOklch(label));
+      expect(Number(ratio.toFixed(2)), `${label} on ${fill} (${mode})`).toBeGreaterThanOrEqual(4.5);
+    });
+  });
 });
