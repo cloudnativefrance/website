@@ -53,7 +53,7 @@ const deadline = fill(t("tickets.ladder.until_or_sold_out"), {
   </CardBand>
 
   <div class="flex grow flex-col gap-8 p-5 sm:p-8">
-    <div class="grid gap-6 lg:grid-cols-[minmax(0,36rem)_auto] lg:gap-10">
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,36rem)_1fr] lg:gap-10">
       <div class="flex flex-col gap-3">
         <p
           class="text-foreground flex flex-wrap items-center gap-x-3 gap-y-2 text-base font-semibold"
@@ -80,7 +80,13 @@ const deadline = fill(t("tickets.ladder.until_or_sold_out"), {
         </p>
       </div>
 
-      <div class="flex flex-col items-start justify-center" data-offer-action>
+      {
+        /* The button ends the card, as on the Stratégie & Leadership one below. */
+      }
+      <div
+        class="flex flex-col items-start justify-center lg:items-end"
+        data-offer-action
+      >
         <slot name="purchase" />
       </div>
     </div>
