@@ -8,6 +8,7 @@
  */
 import { Picture } from "astro:assets";
 import type { Locale } from "@/i18n/ui";
+import { getLocalePath } from "@/i18n/utils";
 import { cfpSubmitUrl, cfpSubmitLabel } from "@/lib/pretalx";
 import intervenantPhoto from "@/assets/photos/contact/intervenants.jpg";
 import participantPhoto from "@/assets/photos/contact/participant.jpg";
@@ -22,14 +23,21 @@ const CFP_LABEL = cfpSubmitLabel();
 
 const fr = {
   badge: "CFP 2027 — ouvert",
-  heroTitle: "Proposez une intervention",
+  heroTitle: "Et si vous montiez sur scène ?",
   heroSub: "Une journée. 7 thèmes. 3 formats. Et votre voix.",
   heroCta: "Soumettre une proposition",
   formatsLink: null as string | null,
   eventLine:
     "3 juin 2027 · CENTQUATRE-PARIS · au cœur de la communauté francophone du Cloud Native",
+  deadlineLine: {
+    before: "Soumissions ouvertes jusqu'au ",
+    strong: "31 janvier 2027",
+    after: " — réponse du comité fin février 2027.",
+  },
   themesTitle: "Les 7 thèmes",
   themesSub: "Choisissez celui qui correspond le mieux à votre sujet.",
+  multiTopics:
+    "Envie de proposer plusieurs sujets ? Soumettez une proposition séparée pour chacun — le comité les évaluera indépendamment.",
   formatsTitle: "Les formats",
   knowTitle: "À savoir",
   knowFrench: {
@@ -39,23 +47,34 @@ const fr = {
   },
   knowCoaching: {
     strong: "Première fois sur scène ?",
-    after: "Un coaching est proposé aux primo-oratrices et primo-orateurs — et à toute personne qui en ressent le besoin — pour préparer votre proposition et votre prise de parole.",
+    after: "Un coaching est proposé aux primo-oratrices et primo-orateurs — et à toute personne qui en ressent le besoin — pour préparer votre proposition et votre prise de parole. Pour le demander, écrivez à speakers@cloudnativedays.fr.",
   },
   knowValues: {
     label: "Nos valeurs",
     colon: " : ",
     items: [
       { emoji: "❤️", text: "Communauté" },
-      { emoji: "🌍", text: "Inclusion & diversité" },
+      { emoji: "🌍", text: "Inclusion et diversité" },
       { emoji: "🌱", text: "Écologie" },
       { emoji: "🇫🇷", text: "Autonomie numérique" },
     ],
   },
-  committeeTitle: "Ce que le comité privilégie",
+  knowCoc: {
+    before: "L'événement se déroule selon notre ",
+    link: "code de conduite",
+    after: "",
+  },
+  knowInfo: {
+    before: "Pour toute information",
+    sep: " : ",
+    email: "speakers@cloudnativedays.fr",
+  },
+  committeeTitle: "Nos critères de sélection",
   committeeIntro:
-    "Notre comité de sélection — bénévoles de l'organisation CND France et membres reconnus des communautés cloud native francophones — privilégiera les propositions qui\u00a0:",
-  closingTitle: "Soumettez votre proposition",
-  closingCta: "Proposer une intervention",
+    "Notre comité de sélection — bénévoles de l'organisation CND France et membres reconnus des communautés cloud native francophones — privilégiera les propositions qui respecteront un maximum des critères suivants\u00a0:",
+  closingTitle: "Vous avez quelque chose à raconter. Nous avons la scène.",
+  closingCta: "Soumettre une proposition",
+  closingDeadline: "Clôture le 31 janvier 2027",
   heroPhotoAlt: "Intervenant(e) sur scène à Cloud Native Days France 2026",
   closingPhotoAlt: "Participantes et participants à Cloud Native Days France 2026",
   formats: [
@@ -103,13 +122,13 @@ const fr = {
     },
     {
       emoji: "🧱",
-      title: "Fondations: Infrastructure, données, réseau",
+      title: "Fondations\u00a0: infrastructure, données, réseau",
       body: "Les couches sur lesquelles tout repose : Kubernetes, stockage, réseau, bases de données — leur exploitation au quotidien et à l'échelle.",
     },
   ],
   horsPiste: {
     emoji: "🚀",
-    title: "Hors pistes, sujets divers",
+    title: "Hors-piste, sujets divers",
     body: "Ce qui n'entre nulle part ailleurs et mérite d'être entendu : expérimentations, angles inattendus, et le retour d'expérience qu'on n'ose pas raconter.",
   },
   criteria: [
@@ -126,14 +145,21 @@ const COPY: Record<Locale, typeof fr> = {
   fr,
   en: {
     badge: "CFP 2027 — open",
-    heroTitle: "Submit a talk",
+    heroTitle: "What if you took the stage?",
     heroSub: "One day. 7 themes. 3 formats. And your voice.",
     heroCta: "Submit a proposal",
     formatsLink: "See the formats",
     eventLine:
       "June 3, 2027 · CENTQUATRE-PARIS · at the heart of the French-speaking Cloud Native community",
+    deadlineLine: {
+      before: "Submissions close ",
+      strong: "January 31, 2027",
+      after: " — the committee responds by the end of February 2027.",
+    },
     themesTitle: "The 7 themes",
     themesSub: "Pick the one that fits your topic best.",
+    multiTopics:
+      "Want to submit several topics? Send a separate proposal for each — the committee evaluates them independently.",
     formatsTitle: "The formats",
     knowTitle: "Good to know",
     knowFrench: {
@@ -143,7 +169,7 @@ const COPY: Record<Locale, typeof fr> = {
     },
     knowCoaching: {
       strong: "First time on stage?",
-      after: "Coaching is available for first-time speakers — and for anyone who wants it — to help you prepare your proposal and your talk.",
+      after: "Coaching is available for first-time speakers — and for anyone who wants it — to help you prepare your proposal and your talk. To request it, write to speakers@cloudnativedays.fr.",
     },
     knowValues: {
       label: "Our values",
@@ -155,11 +181,22 @@ const COPY: Record<Locale, typeof fr> = {
         { emoji: "🇫🇷", text: "Digital sovereignty" },
       ],
     },
-    committeeTitle: "What the committee favours",
+    knowCoc: {
+      before: "The event runs under our ",
+      link: "code of conduct",
+      after: "",
+    },
+    knowInfo: {
+      before: "For anything else",
+      sep: ": ",
+      email: "speakers@cloudnativedays.fr",
+    },
+    committeeTitle: "Our selection criteria",
     committeeIntro:
-      "Our selection committee — CND France volunteers and recognised members of the French-speaking cloud native communities — will favour proposals that:",
-    closingTitle: "Submit your proposal",
-    closingCta: "Submit a talk",
+      "Our selection committee — CND France volunteers and recognised members of the French-speaking cloud native communities — will favour proposals that meet as many of the following criteria as possible:",
+    closingTitle: "You have something to say. We have the stage.",
+    closingCta: "Submit a proposal",
+    closingDeadline: "Submissions close January 31, 2027.",
     heroPhotoAlt: "Speaker on stage at Cloud Native Days France 2026",
     closingPhotoAlt: "Attendees at Cloud Native Days France 2026",
     formats: [
@@ -228,13 +265,17 @@ const COPY: Record<Locale, typeof fr> = {
 };
 
 const copy = COPY[lang];
+// Both contact routes are in-page actions: the code-of-conduct path follows
+// the locale, the coaching/info line hands people straight to a mail client.
+const COC_PATH = getLocalePath(lang, "/code-of-conduct");
+const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
 ---
 
 <main>
   <section class="mx-auto max-w-6xl px-4 md:px-6 pt-16 md:pt-24 pb-10 md:pb-12">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
       <div>
-        <span class="inline-flex items-center rounded-full bg-accent/15 text-accent px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+        <span class="inline-flex items-center rounded-full bg-accent text-accent-foreground px-3 py-1 text-xs font-semibold uppercase tracking-wider">
           {copy.badge}
         </span>
         <h1 class="mt-5 text-4xl md:text-6xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
@@ -263,6 +304,11 @@ const copy = COPY[lang];
         )}
         <p class="mt-4 text-sm text-muted-foreground">
           {copy.eventLine}
+        </p>
+        <p class="mt-2 text-sm text-muted-foreground">
+          {copy.deadlineLine.before}
+          <span class="font-semibold text-foreground">{copy.deadlineLine.strong}</span>
+          {copy.deadlineLine.after}
         </p>
       </div>
       <Picture
@@ -303,18 +349,23 @@ const copy = COPY[lang];
           </article>
         ))
       }
-      <article class="sm:col-span-2 lg:col-span-3 flex flex-wrap items-center gap-4 rounded-lg border border-border bg-card p-4 md:p-5 transition-colors hover:border-primary/60">
-        <div class="inline-flex items-center justify-center w-9 h-9 rounded-full text-lg bg-primary/10 shrink-0" aria-hidden="true">
-          {copy.horsPiste.emoji}
+      <article class="sm:col-span-2 lg:col-span-3 rounded-lg border border-border bg-card p-4 md:p-5 transition-colors hover:border-primary/60">
+        <div class="flex items-center gap-3">
+          <div class="inline-flex items-center justify-center w-9 h-9 rounded-full text-lg bg-primary/10 shrink-0" aria-hidden="true">
+            {copy.horsPiste.emoji}
+          </div>
+          <h3 class="text-base md:text-lg font-bold text-foreground tracking-tight">
+            {copy.horsPiste.title}
+          </h3>
         </div>
-        <h3 class="text-base md:text-lg font-bold text-foreground tracking-tight shrink-0">
-          {copy.horsPiste.title}
-        </h3>
-        <p class="flex-1 min-w-0 text-sm md:text-base text-muted-foreground leading-relaxed">
+        <p class="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">
           {copy.horsPiste.body}
         </p>
       </article>
     </div>
+    <p class="mt-4 rounded-lg border border-primary/40 bg-primary/10 px-5 py-4 text-sm md:text-base text-foreground leading-relaxed">
+      {copy.multiTopics}
+    </p>
   </section>
 
   <section id="formats" class="mx-auto max-w-6xl px-4 md:px-6 py-10 md:py-12">
@@ -367,6 +418,25 @@ const copy = COPY[lang];
                 </>
               ))
             }
+          </li>
+          <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
+            {copy.knowCoc.before}
+            <a
+              href={COC_PATH}
+              class="font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {copy.knowCoc.link}
+            </a>
+            {copy.knowCoc.after}
+          </li>
+          <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
+            {copy.knowInfo.before}{copy.knowInfo.sep}
+            <a
+              href={SPEAKERS_MAILTO}
+              class="font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {copy.knowInfo.email}
+            </a>
           </li>
         </ul>
       </div>
@@ -427,7 +497,8 @@ const copy = COPY[lang];
         >
           {copy.closingCta} <span aria-hidden="true">→</span>
         </a>
-        <p class="mt-4 text-xs text-muted-foreground">{CFP_LABEL}</p>
+        <p class="mt-4 text-sm text-muted-foreground">{copy.closingDeadline}</p>
+        <p class="mt-1 text-xs text-muted-foreground">{CFP_LABEL}</p>
       </div>
       <Picture
         src={participantPhoto}
