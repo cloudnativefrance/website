@@ -113,15 +113,18 @@ const aboutDD = (() => {
   const aboutPath = getLocalePath(lang, lang === "en" ? "/discover" : "/decouvrir");
   const venuePath = getLocalePath(lang, "/informations-utiles");
   const teamPath = getLocalePath(lang, "/team");
+  const strategyPath = getLocalePath(lang, "/track-strategy-leadership");
   return {
     key: "nav.home",
     label: t("nav.home"),
     active:
       currentPath.startsWith(aboutPath) ||
+      currentPath.startsWith(strategyPath) ||
       currentPath.startsWith(venuePath) ||
       currentPath.startsWith(teamPath),
     items: [
       { href: aboutPath, label: t("about.subnav.discover"), current: currentPath.startsWith(aboutPath) },
+      { href: strategyPath, label: t("about.subnav.strategy"), current: currentPath.startsWith(strategyPath) },
       { href: venuePath, label: t("about.subnav.venue"),    current: currentPath.startsWith(venuePath) },
       { href: teamPath,  label: t("about.subnav.team"),     current: currentPath.startsWith(teamPath) },
     ],
