@@ -539,6 +539,7 @@ export const ui = {
     "tickets.included.village": "L'accès au village partenaires",
     "tickets.included.meals": "Le déjeuner, le café et de quoi grignoter",
     "tickets.included.goodies": "Des goodies exclusifs",
+    "tickets.included.closing": "L'accès à la soirée de clôture",
     "tickets.included.evening.title": "Une soirée pour prolonger la journée",
     "tickets.included.evening.new": "Nouveauté 2027",
     "tickets.included.evening.body":
@@ -1103,6 +1104,7 @@ export const ui = {
     "tickets.included.village": "Access to the partner village",
     "tickets.included.meals": "Lunch, coffee and snacks",
     "tickets.included.goodies": "Exclusive goodies",
+    "tickets.included.closing": "Access to the closing evening",
     "tickets.included.evening.title": "An evening to round off the day",
     "tickets.included.evening.new": "New in 2027",
     "tickets.included.evening.body":

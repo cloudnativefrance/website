@@ -2,7 +2,9 @@
 /**
  * What the standard ticket includes. A plain checklist, not a grid of feature
  * cards; the evening — new in 2027 and the launch's main argument — gets the
- * section's one card, its novelty in a pink pill.
+ * section's one card, its novelty in a pink pill. The checklist's last line
+ * names it and points to that card: right beside it from lg, below it before.
+ * From lg the card stretches to the list's height, so the arrow always meets it.
  */
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
@@ -23,7 +25,7 @@ const items = [
 ---
 
 <section
-  class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-16"
+  class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16"
   aria-labelledby="included-title"
 >
   <div class="flex flex-col gap-6">
@@ -44,6 +46,23 @@ const items = [
           </li>
         ))
       }
+      {
+        /* Inline, not flex: when the line wraps, the arrow follows the last word. */
+      }
+      <li class="text-foreground flex items-start gap-3 text-lg">
+        <span
+          class="bg-primary/10 text-primary-strong mt-1 grid size-6 shrink-0 place-items-center rounded-full"
+        >
+          <Icon name="check" size={14} />
+        </span>
+        <span class="text-pretty"
+          >{t("tickets.included.closing")}<Icon
+            name="arrow-right"
+            size={18}
+            class="text-primary-strong ml-2 inline-block rotate-90 align-[-0.2em] lg:rotate-0"
+          /></span
+        >
+      </li>
     </ul>
   </div>
 
