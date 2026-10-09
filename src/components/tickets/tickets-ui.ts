@@ -4,7 +4,8 @@
  */
 import { codeUrl, handOffOnce, openInNewTab } from "@/lib/tickets/alfio";
 
-// "J'ai un code": strip whitespace, refuse an empty code, hand it to alf.io.
+// "J'ai un code": upper-case it as it is typed, strip whitespace, refuse an
+// empty code, hand it to alf.io.
 for (const form of document.querySelectorAll<HTMLFormElement>(
   "[data-tickets-code]",
 )) {
@@ -35,7 +36,16 @@ for (const form of document.querySelectorAll<HTMLFormElement>(
     input.value = result.code;
     if (handOff()) openInNewTab(result.url, window);
   });
-  input.addEventListener("input", () => showError(false));
+  input.addEventListener("input", (event) => {
+    showError(false);
+    // Not mid-composition: rewriting the value would break an IME's input.
+    if ((event as InputEvent).isComposing) return;
+    const { value, selectionStart, selectionEnd } = input;
+    const upper = value.toUpperCase();
+    if (upper === value) return;
+    input.value = upper;
+    input.setSelectionRange(selectionStart, selectionEnd);
+  });
 }
 
 // Mobile bar: shown while both tickets' buttons are off screen. It watches the
