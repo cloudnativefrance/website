@@ -5,7 +5,8 @@
  *   1. The six newsletter.* keys resolve in both locales.
  *   2. The six keys orphaned by the CTA consolidation are gone — leaving them
  *      behind would let a future edit resurrect a second entry point.
- *   3. The band renders exactly once on content pages and not at all on the
+ *   3. The band renders exactly once on content pages, twice on the homepages
+ *      (band + hand-placed mid-page callout), and not at all on the
  *      opted-out ones (legal pages, ComingSoonLayout).
  *
  * Invariants 1-2 read the source dictionary and always run. Invariant 3 reads
@@ -40,11 +41,16 @@ const REMOVED_KEYS = [
 
 /** Routes that must carry the band. One per layout family. */
 const WITH_BAND = [
-  "index.html",
-  "en/index.html",
   "decouvrir/index.html",
   "billetterie/index.html",
 ] as const;
+
+/**
+ * The homepage carries the heading twice: the hand-placed mid-page callout
+ * (where the pitch lands) and the site-wide band above the footer (where
+ * readers look for the signup) — the approved dual placement of 2026-10.
+ */
+const HOME_PAGES = ["index.html", "en/index.html"] as const;
 
 /** Routes that opt out: legal pages, and ComingSoonLayout which is itself a newsletter appeal. */
 const WITHOUT_BAND = [
@@ -97,6 +103,14 @@ describe("newsletter callout distribution", () => {
     });
   }
 
+  for (const page of HOME_PAGES) {
+    it.skipIf(!distExists)(`${page} carries the band and the mid-page callout`, () => {
+      const html = readPage(page);
+      const occurrences = html.split(`id="${HEADING_ID}"`).length - 1;
+      expect(occurrences).toBe(2);
+    });
+  }
+
   for (const page of WITHOUT_BAND) {
     it.skipIf(!distExists)(`${page} opts out of the band`, () => {
       expect(readPage(page)).not.toContain(HEADING_ID);
@@ -130,11 +144,11 @@ describe("newsletter callout CTA", () => {
     expect(anchor).toContain('target="_blank"');
   });
 
-  it.skipIf(!distExists)("is the only newsletter entry point left on the homepage", () => {
-    // Before consolidation the homepage carried two: the hero button and the
-    // footer link. The band replaces both.
+  it.skipIf(!distExists)("pitches the newsletter twice on the homepage", () => {
+    // Mid-page callout + site-wide band (approved 2026-10: the footer is
+    // where readers look for the signup, so the homepage keeps both).
     const html = readPage("index.html");
     const occurrences = html.split(NEWSLETTER_URL).length - 1;
-    expect(occurrences).toBe(1);
+    expect(occurrences).toBe(2);
   });
 });

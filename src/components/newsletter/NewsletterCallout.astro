@@ -63,16 +63,21 @@ const t = useTranslations(resolvedLang);
         aria-label={t("newsletter.cta_aria")}
         class={cn(
           buttonVariants({ variant: "outline", size: "lg" }),
-          "h-12 px-6 text-base font-semibold",
-          // The `dark:` overrides are not redundant. The outline variant ships
-          // `dark:border-input`/`dark:bg-input/30`, which tailwind-merge cannot
-          // drop because they sit in a different variant group than the plain
-          // classes below — and in dark mode `:is(.dark *)` outranks them. That
-          // repainted the border in --input, 1.01:1 against the band, which is
-          // what "the border is the same colour as the background" was.
-          "border-2 border-destructive-strong text-destructive-strong bg-transparent",
-          "dark:border-destructive-strong dark:bg-transparent",
-          "hover:bg-destructive-strong/10 hover:text-destructive-strong hover:border-destructive-strong dark:hover:bg-destructive-strong/10",
+          "h-14 px-6 text-lg font-semibold",
+          // Solid red fill. The text pairing is computed, not eyeballed, and
+          // asserted in src/lib/__tests__/contrast.test.ts: on the light
+          // --destructive-strong fill (L=54%) white clears AA at 5.66:1, but
+          // the same white on the dark fill (L=68%) is 3.16:1 — a fail — so
+          // dark mode paints --background on the fill instead: 6.12:1.
+          // The dark: overrides remain mandatory: the outline variant's
+          // dark:bg-input/30 outranks plain classes via `:is(.dark *)`.
+          "border-2 border-transparent bg-destructive-strong text-destructive-foreground",
+          "dark:border-transparent dark:bg-destructive-strong dark:text-background",
+          // Hover moves the fill AWAY from the label, never toward it: darken
+          // in light (more room under white text), lighten in dark (more room
+          // under the near-black label). Same color-mix idiom as the glow.
+          "hover:bg-[color-mix(in_oklab,var(--color-destructive-strong)_88%,black)] hover:text-destructive-foreground",
+          "dark:hover:bg-[color-mix(in_oklab,var(--color-destructive-strong)_88%,white)] dark:hover:text-background",
           "hover:shadow-[0_0_0_4px_color-mix(in_oklab,var(--destructive-strong)_15%,transparent)]",
           "focus-visible:ring-destructive-strong/50",
           "gap-2"

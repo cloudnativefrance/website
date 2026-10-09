@@ -22,16 +22,14 @@ const allSponsors = isFlagActive("homepage_sponsors") ? await getSponsors() : []
 const platinumSponsors = allSponsors.filter((s) => s.data.tier === "platinum");
 ---
 
-<!-- newsletter={false}: the band is placed by hand below, after KeyNumbers.
-     Tickets and the CFP are both closed, so on this page the newsletter is
-     the only action available — it belongs where the pitch lands, not after
-     the reader has stopped looking for one. Every other route keeps the
-     site-wide placement above the footer. -->
+<!-- The homepage pitches the newsletter twice, by design (approved 2026-10):
+     the mid-page callout below stays where the pitch lands, and the site-wide
+     band renders above the footer — where readers look for the signup. Every
+     other route carries only the band. -->
 <Layout
   title={t("site.title")}
   description={description}
   ogType="event"
-  newsletter={false}
 >
   <script type="application/ld+json" set:html={schemaJson} />
   <main>

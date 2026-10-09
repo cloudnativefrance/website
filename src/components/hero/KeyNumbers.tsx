@@ -35,7 +35,7 @@ function useCountUp(target: number, duration: number, start: boolean): number {
 
 const stats = [
   { value: 2500, suffix: "", labelKey: "keynumbers.attendees" },
-  { value: 50, suffix: "+", labelKey: "keynumbers.talks" },
+  { value: 70, suffix: "+", labelKey: "keynumbers.talks" },
   { value: 40, suffix: "+", labelKey: "keynumbers.partners" },
 ] as const;
 
