@@ -45,17 +45,22 @@ export interface PretalxEventEntry {
 /**
  * Editions with a Pretalx event. 2023 predates the instance.
  *
+ * 2026 is FROZEN — the edition ran 2026-02-03 and its programme is served from
+ * the committed archives (`sessions-2026.json` / `speakers-2026.json`), so no
+ * build ever fetches it again. The entry stays because `cfpOpen` and the event
+ * identity must survive the freeze.
+ *
  * 2027's event now exists (slug "2027", `is_public: false`), so it is mapped
  * with `access: "preview"` — no schedule has been released, so the wip
  * schedule is read through the authenticated REST API, gated behind the
  * `programme` flag same as any other preview edition.
  *
- * Deliberately no `cfpOpen` here. The event is non-public: a submitter who
+ * Deliberately no `cfpOpen` on 2027. The event is non-public: a submitter who
  * reached it would hit a login redirect, not a submission form. `/cfp` keeps
  * pointing at 2026 until the organiser flips the Pretalx event public — that
  * is a one-word edit here, independent of when the schedule itself releases.
  */
 export const PRETALX_EVENT: Partial<Record<Edition, PretalxEventEntry>> = {
-  2026: { slug: "2026", access: "public", cfpOpen: true },
+  2026: { slug: "2026", access: "frozen", cfpOpen: true },
   2027: { slug: "2027", access: "preview" },
 };

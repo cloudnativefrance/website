@@ -51,6 +51,17 @@ describe("loadSessions / loadSpeakers gate", () => {
   });
 
   it("still reads a loadable public edition through its normal path", async () => {
+    // Explicit registry mock: with 2026 flipped to `frozen` in the real
+    // registry, an unmocked run would read the archive and pass for the wrong
+    // reason. This case pins the PUBLIC path — fetch fails, snapshot fallback
+    // serves — whatever the real registry says about 2026.
+    vi.doMock("@/lib/edition-registry", async (orig) => {
+      const actual = await orig<typeof import("@/lib/edition-registry")>();
+      return {
+        ...actual,
+        PRETALX_EVENT: { 2026: { slug: "2026", access: "public" } },
+      };
+    });
     vi.doMock("@/lib/edition-visibility", () => ({
       isEditionLoadable: () => true,
       assertEditionPublishable: () => {},

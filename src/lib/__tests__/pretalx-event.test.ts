@@ -3,10 +3,13 @@ import { cfpEventUrl, pickCfpEvent, PRETALX_BASE } from "@/lib/pretalx";
 import { PRETALX_EVENT } from "@/lib/edition-registry";
 
 describe("PRETALX_EVENT", () => {
-  it("marks 2026 as public and as the current CFP target", () => {
+  it("marks 2026 as frozen and as the current CFP target", () => {
+    // The 2026 edition is over: its programme is served from the committed
+    // frozen archives and no build fetches it. `cfpOpen` stays true until the
+    // 2027 opening flips it — deliberate, and asserted by cfpEventUrl below.
     expect(PRETALX_EVENT[2026]).toEqual({
       slug: "2026",
-      access: "public",
+      access: "frozen",
       cfpOpen: true,
     });
   });

@@ -12,6 +12,13 @@
  * Reads the built output rather than the source, because the defect was in
  * what the image service PRODUCED, not in what the component asked for — a
  * source-shape assertion would have passed against the broken build.
+ *
+ * Scope note (the 2026 freeze): the square assertion applies to the
+ * `/_astro/*.webp` derivatives of REMOTE sources only — exactly what the bug
+ * lived in. A frozen edition serves committed `/speakers/*.jpg` as-is, whose
+ * shape is CSS-cropped, never re-encoded; the speaker-photos suite owns the
+ * existence of those files. The "the page renders portraits" count spans both
+ * kinds so the assertion never silently becomes vacuous.
  */
 import { describe, it, expect } from "vitest";
 import { readFileSync, existsSync } from "node:fs";
@@ -34,25 +41,32 @@ function webpSize(file: string): { w: number; h: number } | null {
   return null;
 }
 
-describe("optimised speaker portraits", () => {
+describe("speaker portrait render shape", () => {
   if (!existsSync(PAGE)) {
     it.skip("needs a build — run `pnpm build` first", () => {});
     return;
   }
 
   const html = readFileSync(PAGE, "utf-8");
-  // Only the <img> tags this component emits: an /_astro/ webp with an alt.
+  // Only the <img> tags this component emits, both rungs: an /_astro/ webp
+  // (remote source, optimised at build time) or a /speakers/ jpg (committed).
   const srcs = [
     ...new Set(
-      [...html.matchAll(/<img\s+src="(\/_astro\/[^"]+\.webp)"[^>]*alt="[^"]*"/g)].map((m) => m[1]),
+      [
+        ...html.matchAll(
+          /<img\s+src="(\/(?:_astro\/[^"]+\.webp|speakers\/[^"]+\.jpg))"[^>]*alt="[^"]*"/g,
+        ),
+      ].map((m) => m[1]),
     ),
   ];
+  // The optimised derivatives — the only ones the aspect bug can affect.
+  const webps = srcs.filter((s) => s.startsWith("/_astro/"));
 
-  it("the page actually renders optimised portraits", () => {
+  it("the page actually renders portraits", () => {
     expect(srcs.length).toBeGreaterThan(10);
   });
 
-  it.each(srcs)("%s is square", (src) => {
+  it.each(webps)("%s is square", (src) => {
     const size = webpSize(resolve(ROOT, "dist", src.replace(/^\//, "")));
     expect(size, `could not read ${src}`).not.toBeNull();
     // Square, because the component clips to a circle at w-16 h-16 / w-32 h-32.

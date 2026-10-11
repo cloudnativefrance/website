@@ -109,7 +109,11 @@ describe("every edition up to CURRENT_EDITION has public data", () => {
           `privately un-hides an unannounced programme on cloudnativedays.fr — the ` +
           `exact outcome the 2027 gating exists to prevent. Bump CURRENT_EDITION ` +
           `only after the reveal, once the edition's Pretalx event is access: "public" ` +
-          `(or its schedule is frozen into sessions-${year}.json).`,
+          `(or its schedule is frozen into sessions-${year}.json).\n\n` +
+          `If you got here by flipping an edition to access: "frozen": a frozen ` +
+          `edition serves ONLY its committed archive, so the freeze must land ` +
+          `first — run \`pnpm freeze:edition ${year}\` and commit ` +
+          `sessions-${year}.json / speakers-${year}.json before the flip.`,
       ).toBe(true);
     },
   );
