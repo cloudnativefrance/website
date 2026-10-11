@@ -10,7 +10,7 @@ This guide is the operator's manual for the CND France feature flag system. It c
 
 Flags gate two kinds of things:
 
-- **Entire pages** (e.g. `/tickets`, `/programme`). Before the flag activates, the URL renders a "coming soon" layout with localized copy and a newsletter CTA. After activation, the same URL renders the real page.
+- **Entire pages** (e.g. `/programme`). Before the flag activates, the URL renders a "coming soon" layout with localized copy and a newsletter CTA. After activation, the same URL renders the real page.
 - **Individual UI elements** (e.g. the homepage countdown). Wrapped in `<FeatureGate>`, they simply appear or don't, with no fallback content.
 
 All activations are **date-driven by default**. You set `opens` and optionally `closes`; the system flips state automatically. A daily CI cron detects the flip and redeploys within ≤24 hours of the target date. Env var overrides let you force a state for staging previews or emergency kill switches.
@@ -35,10 +35,6 @@ Single source of truth: **`src/config/flags.ts`**.
 
 ```ts
 export const FLAGS = {
-  tickets: {
-    opens: "2027-01-15T00:00:00+01:00",
-    kind: "page",
-  },
   programme: {
     opens: "2027-04-01T09:00:00+02:00",
     kind: "page",
@@ -117,7 +113,7 @@ Example: adding `sponsorship_pack` to gate a `/sponsorship` page until 2026-10-0
      : <ComingSoonLayout flag="sponsorship_pack" lang={lang} />}
    ```
 
-   > **Design note — external-redirect pages (e.g. `/tickets`):** When the active state redirects to an external URL, use `<meta http-equiv="refresh">` placed inside `<main>` (not in `<head>`). `Layout.astro` does not expose a `<head>` slot, so injecting elements into `<head>` from a page file is not supported. The shipped `/tickets` route uses this pattern.
+   > **Design note — external-redirect pages:** When the active state redirects to an external URL, use `<meta http-equiv="refresh">` placed inside `<main>` (not in `<head>`). `Layout.astro` does not expose a `<head>` slot, so injecting elements into `<head>` from a page file is not supported.
 
 4. **Route test (deferred):** Vitest cannot import `.astro` files without the Astro Vite plugin. Use a Playwright E2E test with env overrides instead (see Known gaps).
 
@@ -184,7 +180,7 @@ Flag names with underscores become uppercase with underscores preserved: `homepa
 
 **Staging preview** — preview the real page before the date:
 ```bash
-FLAG_TICKETS=on pnpm build
+FLAG_PROGRAMME=on pnpm build
 ```
 Flags resolve from `process.env` at **build** time (`src/lib/flags.ts`), and the
 shipped artifact is a static nginx image — a Kubernetes-level env var on the
@@ -211,7 +207,7 @@ through to `FLAG_OVERRIDES` instead of erroring — see `readEnvOverride()` in
 
 **Emergency kill switch** — hide a page immediately without editing dates:
 ```bash
-FLAG_TICKETS=off pnpm build && deploy
+FLAG_PROGRAMME=off pnpm build && deploy
 ```
 Then leave the override in place until you decide whether to roll back the date change or fix the underlying issue.
 
@@ -232,7 +228,7 @@ The env schema is generated from the registry via `generateFlagEnvSchema()` in `
 override arg (used in tests) > env var > date window
 ```
 
-If `FLAG_TICKETS=on` is set AND `FLAGS.tickets.opens` is in the future, the flag is `active`. The env var always wins unless a test explicitly passes an override argument to `getFlagState`.
+If `FLAG_PROGRAMME=on` is set AND `FLAGS.programme.opens` is in the future, the flag is `active`. The env var always wins unless a test explicitly passes an override argument to `getFlagState`.
 
 ---
 
@@ -286,12 +282,12 @@ import { describe, test, expect } from "vitest";
 import { getFlagState } from "@/lib/flags";
 import { FLAGS } from "@/config/flags";
 
-test("tickets is pending in august 2026", () => {
-  expect(getFlagState(FLAGS.tickets, new Date("2026-08-15T12:00:00+02:00"))).toBe("pending");
+test("programme is pending in august 2026", () => {
+  expect(getFlagState(FLAGS.programme, new Date("2026-08-15T12:00:00+02:00"))).toBe("pending");
 });
 
-test("tickets is active on open date", () => {
-  expect(getFlagState(FLAGS.tickets, new Date("2027-01-15T00:00:00+01:00"))).toBe("active");
+test("programme is active on open date", () => {
+  expect(getFlagState(FLAGS.programme, new Date("2027-04-01T09:00:00+02:00"))).toBe("active");
 });
 ```
 
@@ -302,7 +298,7 @@ import { vi, beforeEach, afterEach } from "vitest";
 
 beforeEach(() => {
   vi.useFakeTimers();
-  vi.setSystemTime(new Date("2026-08-30"));  // pretend we're before tickets opens
+  vi.setSystemTime(new Date("2026-08-30"));  // pretend we're before programme opens
 });
 afterEach(() => { vi.useRealTimers(); });
 ```
@@ -314,10 +310,9 @@ Set the env override in `.env.local`:
 ```bash
 # .env.local (git-ignored)
 FLAG_PROGRAMME=on
-FLAG_TICKETS=on
 ```
 
-Then `pnpm dev` — `/programme` and `/tickets` render their real content even though the actual date hasn't arrived.
+Then `pnpm dev` — `/programme` renders its real content even though the actual date hasn't arrived.
 
 ---
 

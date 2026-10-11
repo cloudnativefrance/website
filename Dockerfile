@@ -26,6 +26,10 @@ ENV PUBLIC_SITE_URL=$PUBLIC_SITE_URL
 # An unknown name or a value other than on/off fails the build (src/lib/flags.ts).
 ARG FLAG_OVERRIDES=
 ENV FLAG_OVERRIDES=$FLAG_OVERRIDES
+# The ticketing demo, `true` on staging only. Empty by default so a plain
+# `docker build` is the production site (src/lib/tickets/demo.ts).
+ARG TICKETS_DEMO=
+ENV TICKETS_DEMO=$TICKETS_DEMO
 # The CFP demo, `true` on staging only. Empty by default so a plain
 # `docker build` is the production site (src/lib/cfp/demo.ts).
 ARG CFP_DEMO=
@@ -54,6 +58,7 @@ RUN --mount=type=secret,id=pretalx_token \
 # capabilities: drop ALL) without permission gymnastics.
 FROM nginxinc/nginx-unprivileged:1.27-alpine AS runtime
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
+COPY nginx/security-headers.conf /etc/nginx/security-headers.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 # Base image already EXPOSEs 8080 and CMDs nginx -g "daemon off;" with logs
 # symlinked to /dev/stdout and /dev/stderr — nothing else to do here.

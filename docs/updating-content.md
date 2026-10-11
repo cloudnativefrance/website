@@ -105,7 +105,8 @@ in step.
 ### Editions with no Pretalx event
 
 2023 reads a frozen `src/content/schedule/speakers-{year}.json`. It is historical
-and not meant to be extended.
+and not meant to be extended. A frozen edition (`access: "frozen"`, like 2026)
+reads the same archive — portraits included, all local under `public/speakers/`.
 
 ---
 
@@ -139,7 +140,9 @@ lives there, not in a CSV header.
 
 Editions with no public Pretalx event (2023, and 2027 until its event opens) read a frozen
 `src/content/schedule/sessions-{year}.json` archive instead — that JSON is historical and is
-not meant to be extended.
+not meant to be extended. A finished edition is frozen the same way: its registry entry flips
+to `access: "frozen"` (`src/lib/edition-registry.ts`) after `pnpm freeze:edition <year>` writes
+the archives, and no build fetches it from Pretalx again — 2026 is frozen.
 
 > **2027 landmine:** `sessions-2027.json` is intentionally `[]`. Do **not** regenerate it from
 > the Sheet — that tab holds a contaminated scratch copy of the 2026 rows (identical ids, all

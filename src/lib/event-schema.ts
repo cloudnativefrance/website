@@ -1,4 +1,7 @@
+import { TICKETING, type Phase } from "@/config/tickets";
 import type { Locale } from "@/i18n/ui";
+import { getLocalePath } from "@/i18n/utils";
+import { isPreOpening, offerTier } from "@/lib/tickets/phase";
 
 export interface EventSchemaInput {
   lang: Locale;
@@ -37,17 +40,28 @@ export function buildEventSchema({ lang, siteUrl, description }: EventSchemaInpu
       name: "Cloud Native France",
       url: base,
     },
-    offers: {
-      "@type": "Offer",
-      url: "https://tickets.cloudnativedays.fr/",
-      availability: "https://schema.org/InStock",
-      validFrom: "2026-01-01T00:00:00+01:00",
-      priceCurrency: "EUR",
-      price: "0",
-    },
+    offers: ticketOffers(
+      TICKETING.currentPhase,
+      `${base}${getLocalePath(lang, "/tickets")}/`,
+    ),
     image: `${base}/og-default.png`,
     description,
     inLanguage: lang === "fr" ? "fr-FR" : "en-US",
+  };
+}
+
+/**
+ * The standard ticket's price of the moment. None before the opening: the
+ * site shows no price either.
+ */
+export function ticketOffers(phase: Phase, url: string) {
+  if (isPreOpening(phase)) return undefined;
+  return {
+    "@type": "Offer",
+    url,
+    availability: "https://schema.org/InStock",
+    priceCurrency: "EUR",
+    price: offerTier(TICKETING, phase).price,
   };
 }
 

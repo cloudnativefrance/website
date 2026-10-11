@@ -22,9 +22,9 @@ const LAYOUT_PATH = resolve(
 describe("Layout.astro analytics tracker", () => {
   const source = readFileSync(LAYOUT_PATH, "utf-8");
 
-  it("derives the analytics flag from Astro.site, not a separate env flag", () => {
+  it("derives the analytics flag from Astro.site, not a separate env flag — and never under astro dev", () => {
     expect(source).toMatch(
-      /const\s+analyticsEnabled\s*=\s*isProductionOrigin\(\s*Astro\.site\?\.origin\s*\)/,
+      /const\s+analyticsEnabled\s*=\s*!import\.meta\.env\.DEV\s*&&\s*isProductionOrigin\(\s*Astro\.site\?\.origin\s*\)/,
     );
   });
 

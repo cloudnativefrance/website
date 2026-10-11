@@ -1,0 +1,29 @@
+---
+/** The purchase button both tickets share: the alf.io listing, in a new tab. */
+import { TICKETING } from "@/config/tickets";
+import type { Locale } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import Icon from "./Icon.astro";
+
+interface Props {
+  lang: Locale;
+  analytics: Record<string, string>;
+}
+
+const { lang, analytics } = Astro.props;
+const t = useTranslations(lang);
+---
+
+{/* White on --primary passes contrast only this large and bold (3.6:1). */}
+<a
+  href={TICKETING.listingUrl}
+  target="_blank"
+  rel="noopener"
+  class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring/50 focus-visible:ring-offset-card inline-flex h-13 items-center justify-center gap-2 rounded-lg px-7 text-xl font-bold whitespace-nowrap shadow-[var(--shadow-glow-primary)] transition-[background-color,scale] duration-150 ease-out focus-visible:ring-3 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96]"
+  data-umami-event="tickets-purchase"
+  {...analytics}
+>
+  {t("tickets.purchase.buy")}
+  <span class="sr-only"> {t("tickets.new_tab")}</span>
+  <Icon name="arrow-up-right" size={20} />
+</a>

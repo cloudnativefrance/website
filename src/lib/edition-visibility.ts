@@ -64,12 +64,16 @@ export function resolveEditionLoadable(
   flagActive: boolean,
 ): boolean {
   if (access === "preview") return flagActive;
-  // Everything else — a public event, or no Pretalx event at all (2023, or an
-  // edition listed in EDITIONS before its event exists). A PAST edition always
-  // renders; a FUTURE one waits for the flag even when its Pretalx event is
-  // already public, because `access` decides how the data is fetched and the
-  // flag decides when it is published. Making the event public in Pretalx must
-  // not, by itself, publish the programme on the site.
+  // Everything else — a public event, a frozen edition, or no Pretalx event at
+  // all (2023, or an edition listed in EDITIONS before its event exists). A
+  // PAST edition always renders; a FUTURE one waits for the flag even when its
+  // Pretalx event is already public, because `access` decides how the data is
+  // fetched and the flag decides when it is published. Making the event public
+  // in Pretalx must not, by itself, publish the programme on the site.
+  //
+  // A frozen edition renders through the arithmetic exactly like a public one:
+  // freezing is about WHERE the data comes from (the committed archive, never
+  // the network) and fails closed at the fetch, not at the render.
   return year <= currentEdition || flagActive;
 }
 
