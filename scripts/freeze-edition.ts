@@ -27,7 +27,10 @@
  *
  * Run: pnpm freeze:edition <year>        e.g. pnpm freeze:edition 2026
  * Flags:
- *   --force   write even when a shrink/enrichment guard trips.
+ *   --force      write even when a shrink/enrichment guard trips.
+ *   --refreeze   re-run a FROZEN edition, reading its committed archive (no
+ *                network) to re-apply the photo rules — e.g. after fixing a
+ *                misnamed committed portrait. All guards still run.
  *
  * This script does NOT edit the registry. Data first; the flip is the PR's own
  * visible edit.
@@ -64,7 +67,9 @@ const PHOTO_MAX = 400;
 
 function fail(message: string): never {
   console.error(`${TAG} ${message}`);
-  console.error(`${TAG} usage: pnpm freeze:edition <year> [--force]`);
+  console.error(
+    `${TAG} usage: pnpm freeze:edition <year> [--force] [--refreeze]`,
+  );
   process.exit(1);
 }
 
@@ -99,6 +104,7 @@ async function downloadPortrait(
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const force = args.includes("--force");
+  const refreeze = args.includes("--refreeze");
   const yearArg = args.filter((a) => !a.startsWith("--"))[0];
   if (!yearArg) fail("missing <year>");
   const yearNum = Number(yearArg);
@@ -106,7 +112,7 @@ async function main(): Promise<void> {
   const year = yearNum;
 
   const event = PRETALX_EVENT[year];
-  const refusal = freezeRefusal(year, event?.access);
+  const refusal = freezeRefusal(year, event?.access, refreeze);
   if (refusal) fail(refusal);
 
   // Floors derive from the repo's own record of what the edition held — never
@@ -123,7 +129,11 @@ async function main(): Promise<void> {
       `floors from ${snapshotPath}: ${floors.talks} talks, ${floors.persons} distinct persons`,
   );
 
-  console.log(`${TAG} LAST live read of ${year}: loadSessions + loadSpeakers`);
+  console.log(
+    event!.access === "frozen"
+      ? `${TAG} refreeze: rewriting ${year}'s archives FROM its committed archive — no network read happens`
+      : `${TAG} LAST live read of ${year}: loadSessions + loadSpeakers`,
+  );
   const sessions = await loadSessions(year);
   const records = await loadSpeakers(year);
 

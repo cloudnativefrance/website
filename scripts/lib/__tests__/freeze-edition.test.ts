@@ -27,6 +27,24 @@ describe("freezeRefusal", () => {
   it("refuses an already-frozen edition", () => {
     expect(freezeRefusal(2026, "frozen")).toMatch(/already frozen/);
   });
+
+  it("names --refreeze in the frozen refusal, so the override is discoverable", () => {
+    expect(freezeRefusal(2026, "frozen")).toMatch(/--refreeze/);
+  });
+
+  it("with refreeze, the already-frozen refusal lifts — the archive rewrite is safe", () => {
+    expect(freezeRefusal(2026, "frozen", true)).toBeUndefined();
+  });
+
+  it("refreeze does NOT unlock a preview edition", () => {
+    expect(freezeRefusal(2027, "preview", true)).toMatch(/access: "preview"/);
+  });
+
+  it("refreeze does NOT unlock a year without a registry entry", () => {
+    expect(freezeRefusal(2099, undefined, true)).toMatch(
+      /no PRETALX_EVENT entry/,
+    );
+  });
 });
 
 describe("snapshotFloors", () => {

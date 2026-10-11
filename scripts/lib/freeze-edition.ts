@@ -18,19 +18,31 @@ import type { EditionAccess } from "../../src/lib/edition-registry";
  * the data a live build was already serving. A `preview` edition has no
  * released schedule to freeze; a `frozen` one is already frozen; an unmapped
  * year has no event to read. Anything but `"public"` returns a refusal.
+ *
+ * `refreeze` lifts exactly one refusal — the already-frozen one. For a frozen
+ * edition `loadSessions`/`loadSpeakers` read the COMMITTED archive (frozen
+ * issues no network request), so re-running is an archive-to-archive rewrite
+ * whose only live effect is re-applying the photo rules (e.g. picking up a
+ * committed portrait that was misnamed at freeze time). Every guard — floors,
+ * shrink, enrichment, photo planning — still runs. The `preview` and
+ * no-registry-entry refusals are never lifted: there is no released data to
+ * freeze, and that boundary is the leak the guard exists for.
  */
 export function freezeRefusal(
   year: number,
   access: EditionAccess | undefined,
+  refreeze = false,
 ): string | undefined {
   if (access === undefined) {
     return `no PRETALX_EVENT entry for ${year} — nothing to read from Pretalx`;
   }
   if (access === "frozen") {
+    if (refreeze) return undefined;
     return (
       `${year} is already frozen — its committed archive is the source of ` +
       "truth; re-freezing would overwrite reviewed data with a live read that " +
-      "must not happen"
+      "must not happen. If re-writing the archives from the committed archive " +
+      "itself is intended (photo-rule repair), re-run with --refreeze"
     );
   }
   if (access !== "public") {
