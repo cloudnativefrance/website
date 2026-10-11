@@ -39,6 +39,7 @@ const legalLinks = [
   { key: "footer.legal.coc"     as const, path: "/code-of-conduct" },
   { key: "footer.legal.privacy" as const, path: "/privacy" },
   { key: "footer.legal.terms"   as const, path: "/terms" },
+  { key: "footer.legal.sale" as const, path: "/terms-of-sale" },
 ].map(({ key, path }) => ({ key, label: t(key), href: getLocalePath(lang, path) }));
 
 ---
