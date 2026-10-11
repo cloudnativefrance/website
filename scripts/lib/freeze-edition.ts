@@ -14,7 +14,7 @@ import type { EditionAccess } from "../../src/lib/edition-registry";
  * Why a live read of `year` is allowed exactly once — as the freeze itself.
  *
  * Freezing is the LAST live read of an edition: it must go through the real
- * public path (`loadSessions` + `loadSpeakers`) so the archive is byte-forbye
+ * public path (`loadSessions` + `loadSpeakers`) so the archive is byte-for-byte
  * the data a live build was already serving. A `preview` edition has no
  * released schedule to freeze; a `frozen` one is already frozen; an unmapped
  * year has no event to read. Anything but `"public"` returns a refusal.

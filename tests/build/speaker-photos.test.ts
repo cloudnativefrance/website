@@ -21,6 +21,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { PRETALX_EVENT } from "@/lib/edition-registry";
 
 const PAGES = [
   "dist/intervenants/2026/index.html",
@@ -72,19 +73,39 @@ describe("speaker portraits", () => {
     }
   });
 
-  it("keeps the frozen archive 100% local — no Pretalx URL may be committed", () => {
-    // The freeze (scripts/freeze-edition.ts) promises the archive never puts
-    // Pretalx back on a page's critical path. Assert the DATA, not just one
-    // build's HTML: an absolute URL that slips into the archive is a leak
-    // waiting for the next rebuild, dist or no dist.
-    const archive = JSON.parse(
-      readFileSync("src/content/schedule/speakers-2026.json", "utf8"),
-    ) as { slug: string; photo_url: string }[];
-    const remote = archive
-      .filter((r) => /^https?:\/\//.test(r.photo_url))
-      .map((r) => r.slug);
-    expect(remote, `Pretalx URLs committed for: ${remote.join(", ")}`).toEqual(
-      [],
-    );
-  });
+  // Registry-driven, so the next freeze (2027, 2028, …) is covered the moment
+  // its entry flips — this check must not have to be edited to keep protecting.
+  const frozenEditions = Object.entries(PRETALX_EVENT)
+    .filter(([, entry]) => entry?.access === "frozen")
+    .map(([year]) => Number(year));
+
+  if (frozenEditions.length === 0) {
+    it.skip("no frozen editions — nothing to check archive locality of", () => {});
+  }
+
+  it.each(frozenEditions)(
+    "keeps the frozen archive of %i 100% local — no Pretalx URL may be committed",
+    (year) => {
+      // The freeze (scripts/freeze-edition.ts) promises the archive never puts
+      // Pretalx back on a page's critical path. Assert the DATA, not just one
+      // build's HTML: an absolute URL that slips into the archive is a leak
+      // waiting for the next rebuild, dist or no dist.
+      // A missing archive is a different failure — the guard test in
+      // edition-visibility.test.ts already refuses the flip until BOTH
+      // sessions- and speakers-{year}.json are committed and populated.
+      const file = `src/content/schedule/speakers-${year}.json`;
+      if (!existsSync(file)) return;
+      const archive = JSON.parse(readFileSync(file, "utf8")) as {
+        slug: string;
+        photo_url: string;
+      }[];
+      const remote = archive
+        .filter((r) => /^https?:\/\//.test(r.photo_url))
+        .map((r) => r.slug);
+      expect(
+        remote,
+        `Pretalx URLs committed for: ${remote.join(", ")}`,
+      ).toEqual([]);
+    },
+  );
 });
