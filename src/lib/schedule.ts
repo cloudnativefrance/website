@@ -59,8 +59,9 @@ export interface SessionRow {
  *
  * Editions with a public Pretalx event are fetched from its released schedule
  * export at build time, falling back to the committed snapshot when Pretalx is
- * unreachable. Editions without one (2023, and 2027 until its event opens) read
- * a frozen JSON archive.
+ * unreachable. A `frozen` edition reads its committed frozen archive and issues
+ * no request at all. Editions without a Pretalx event (2023, and 2027 until its
+ * event opens) read a frozen JSON archive too.
  */
 export async function loadSessions(
   year: Edition = CURRENT_EDITION,
@@ -73,7 +74,10 @@ export async function loadSessions(
   // speakers on every build and is not a route, so a route-only gate cannot
   // protect it. A non-loadable edition reads its frozen archive and issues no
   // request at all — there is then nothing in memory for any consumer to leak.
-  if (event && isEditionLoadable(year)) {
+  // `access: "frozen"` joins that rule explicitly: a frozen edition IS loadable
+  // (it must keep rendering) but must never reach a fetch branch — fail closed,
+  // gate the fetch, not the render.
+  if (event && event.access !== "frozen" && isEditionLoadable(year)) {
     if (event.access === "preview") {
       // No released schedule yet — read the wip one through the authenticated
       // reader instead of the anonymous export.

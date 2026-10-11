@@ -5,6 +5,7 @@ import {
   diffSpeakerSlugs,
   insertSlugEntries,
   slugify,
+  slugSyncRefusal,
   type NewSlugEntry,
 } from "../speaker-slug-sync";
 import { SPEAKER_SLUGS } from "../../../src/data/speaker-slugs";
@@ -225,5 +226,17 @@ describe("insertSlugEntries", () => {
     const lines = out.split("\n");
     const idx = lines.indexOf('  "Zzz Real Test": "zzz-real-test",');
     expect(lines[idx + 1]).toBe("};");
+  });
+});
+
+describe("slugSyncRefusal", () => {
+  it("refuses a frozen edition: its speaker list IS the committed archive", () => {
+    expect(slugSyncRefusal("frozen")).toMatch(/frozen/);
+    expect(slugSyncRefusal("frozen")).toMatch(/nothing to read from Pretalx/);
+  });
+
+  it("says nothing for the access modes the sync legitimately reads", () => {
+    expect(slugSyncRefusal("public")).toBeUndefined();
+    expect(slugSyncRefusal("preview")).toBeUndefined();
   });
 });
