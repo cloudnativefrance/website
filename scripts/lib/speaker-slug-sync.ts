@@ -8,6 +8,26 @@
  * so it is importable by tests with no network, filesystem or process.argv
  * involved — see `scripts/lib/__tests__/speaker-slug-sync.test.ts`.
  */
+import type { EditionAccess } from "../../src/lib/edition-registry";
+
+/**
+ * The guard message `scripts/sync-speaker-slugs.ts` prints for an edition its
+ * reader must not touch. Only `frozen` refuses: a frozen edition's speaker list
+ * IS the committed archive, and reading Pretalx for it would either fetch a
+ * stale-forever event or, worse, invite someone to "fix" the archive by hand.
+ *
+ * `public` and `preview` are undefined here — both are legitimately prepared by
+ * this script (see its REQUIREMENT 3 for why it reads Pretalx directly).
+ */
+export function slugSyncRefusal(access: EditionAccess): string | undefined {
+  if (access === "frozen") {
+    return (
+      "edition is frozen: its speaker list is the committed archive; " +
+      "nothing to read from Pretalx"
+    );
+  }
+  return undefined;
+}
 
 /**
  * Lowercase, NFD-normalise, strip diacritics, non-alphanumerics to `-`,

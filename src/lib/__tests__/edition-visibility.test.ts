@@ -7,7 +7,7 @@ import {
   resolveEditionLoadable,
 } from "@/lib/edition-visibility";
 import { CURRENT_EDITION, EDITIONS } from "@/lib/editions";
-import { PRETALX_EVENT } from "@/lib/edition-registry";
+import { PRETALX_EVENT, type EditionAccess } from "@/lib/edition-registry";
 
 const CURRENT = 2026 as const;
 
@@ -80,21 +80,37 @@ describe("resolveEditionLoadable", () => {
 describe("every edition up to CURRENT_EDITION has public data", () => {
   const REPO_ROOT = resolve(import.meta.dirname, "../../../");
 
-  /** A frozen archive counts as public data only if it actually has rows. */
-  const hasPopulatedArchive = (year: number): boolean => {
-    const path = resolve(REPO_ROOT, `src/content/schedule/sessions-${year}.json`);
+  /** An archive counts as public data only if it exists AND has rows. */
+  const hasPopulatedArchive = (
+    kind: "sessions" | "speakers",
+    year: number,
+  ): boolean => {
+    const path = resolve(
+      REPO_ROOT,
+      `src/content/schedule/${kind}-${year}.json`,
+    );
     if (!existsSync(path)) return false;
     const parsed = JSON.parse(readFileSync(path, "utf-8"));
     return Array.isArray(parsed) && parsed.length > 0;
   };
 
+  /**
+   * `hasPopulatedArchive` is the real-repo probe; the predicate's truth table
+   * is pinned against synthetic file states in the describe below.
+   */
   const publishable = EDITIONS.filter((year) => year <= CURRENT_EDITION);
 
   it.each(publishable)(
     "%i is either a public Pretalx event or a populated frozen archive",
     (year) => {
       const access = PRETALX_EVENT[year]?.access;
-      const ok = access === "public" || hasPopulatedArchive(year);
+      const ok = editionHasPublicData(access, year, hasPopulatedArchive);
+      // Which archives this access mode must be able to serve — drives the
+      // failure message so it names the file(s) actually missing.
+      const required =
+        access === "frozen"
+          ? [`sessions-${year}.json`, `speakers-${year}.json`]
+          : [`sessions-${year}.json`];
 
       expect(
         ok,
@@ -103,16 +119,93 @@ describe("every edition up to CURRENT_EDITION has public data", () => {
           `programme flag is not consulted for a past or current edition. But ` +
           `${year} has no public data: its PRETALX_EVENT access is ` +
           `${access === undefined ? "unset (no event mapped)" : `"${access}"`} and ` +
-          `src/content/schedule/sessions-${year}.json is missing or empty.\n\n` +
+          `the archive(s) it must serve under src/content/schedule/ — ` +
+          `${required.join(", ")} — are missing or empty.\n\n` +
           `If you got here by bumping CURRENT_EDITION: that bump is what publishes ` +
           `an edition. Moving it to an edition whose programme is still being built ` +
           `privately un-hides an unannounced programme on cloudnativedays.fr — the ` +
           `exact outcome the 2027 gating exists to prevent. Bump CURRENT_EDITION ` +
           `only after the reveal, once the edition's Pretalx event is access: "public" ` +
-          `(or its schedule is frozen into sessions-${year}.json).`,
+          `(or its schedule is frozen into sessions-${year}.json).\n\n` +
+          `If you got here by flipping an edition to access: "frozen": a frozen ` +
+          `edition serves ONLY its committed archive, and BOTH halves of it — ` +
+          `sessions AND speakers — are read on every build, so the freeze must ` +
+          `land first: run \`pnpm freeze:edition ${year}\` and commit ` +
+          `sessions-${year}.json / speakers-${year}.json before the flip.`,
       ).toBe(true);
     },
   );
+});
+
+/**
+ * The predicate behind the guard above, as a pure function of (access, year,
+ * archive probe) so its whole truth table is testable against SYNTHETIC file
+ * states — without mutating repo files, which the real-repo case above covers.
+ *
+ * A frozen edition reads BOTH archives — `loadSessions` from
+ * sessions-{year}.json and `loadSpeakers` from speakers-{year}.json, the
+ * latter through src/content.config.ts on every build. A missing or empty
+ * speakers archive therefore renders an empty speakers page with zero network
+ * requests and zero other red tests; only this guard can catch it. The freeze
+ * script writes both, but the guard exists for hand-repair and future process
+ * mistakes — `--refreeze` and a `--force`ed archive rewrite can leave a
+ * one-sided state, which is exactly what this must refuse.
+ */
+function editionHasPublicData(
+  access: EditionAccess | undefined,
+  year: number,
+  hasArchive: (kind: "sessions" | "speakers", year: number) => boolean,
+): boolean {
+  if (access === "frozen") {
+    return hasArchive("sessions", year) && hasArchive("speakers", year);
+  }
+  // A public edition needs no committed archive at all; an unmapped edition
+  // (2023's shape) has always been judged on its sessions archive alone, and
+  // changing that here would be a different decision than this guard makes.
+  return access === "public" || hasArchive("sessions", year);
+}
+
+describe("editionHasPublicData (guard predicate, synthetic file states)", () => {
+  // Probe standing in for the filesystem: which archive KINDS "exist".
+  const fakeFs =
+    (existing: readonly ("sessions" | "speakers")[]) =>
+    (kind: "sessions" | "speakers"): boolean =>
+      existing.includes(kind);
+
+  it("accepts a frozen edition only when BOTH archives are populated", () => {
+    expect(
+      editionHasPublicData("frozen", 2026, fakeFs(["sessions", "speakers"])),
+    ).toBe(true);
+  });
+
+  it("refuses a frozen edition whose speakers archive is missing or empty", () => {
+    // The hole the review caught: sessions-only repair passes the old guard
+    // and ships an empty /intervenants/2026 with a green suite.
+    expect(editionHasPublicData("frozen", 2026, fakeFs(["sessions"]))).toBe(
+      false,
+    );
+  });
+
+  it("refuses a frozen edition whose sessions archive is missing or empty", () => {
+    expect(editionHasPublicData("frozen", 2026, fakeFs(["speakers"]))).toBe(
+      false,
+    );
+  });
+
+  it("refuses a frozen edition with no archives at all", () => {
+    expect(editionHasPublicData("frozen", 2026, fakeFs([]))).toBe(false);
+  });
+
+  it("still accepts a public edition with no archives", () => {
+    expect(editionHasPublicData("public", 2027, fakeFs([]))).toBe(true);
+  });
+
+  it("keeps judging an unmapped edition on its sessions archive alone", () => {
+    expect(editionHasPublicData(undefined, 2023, fakeFs(["sessions"]))).toBe(
+      true,
+    );
+    expect(editionHasPublicData(undefined, 2023, fakeFs([]))).toBe(false);
+  });
 });
 
 describe("assertEditionPublishable", () => {

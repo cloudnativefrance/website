@@ -58,8 +58,18 @@ const WITHOUT_BAND = [
   "terms/index.html",
   "code-of-conduct/index.html",
   "en/privacy/index.html",
-  "programme/2027/index.html",
 ] as const;
+
+/**
+ * The 2027 programme page follows its rendering, the way the CFP page follows
+ * its phase: while the programme flag is off the page is a ComingSoonLayout
+ * (newsletter={false}, because it IS the newsletter appeal); with the flag on
+ * it is a normal content page and carries the band exactly once, like
+ * programme/2026. The discriminator is read off the BUILT page, not the test's
+ * own flag environment — vitest never sees the build's FLAG_OVERRIDES, and a
+ * hardcoded entry here failed the moment the preview edition rendered.
+ */
+const PROGRAMME_2027 = "programme/2027/index.html";
 
 /**
  * The CFP page's band follows its phase (src/config/cfp.ts): only the closed
@@ -117,6 +127,18 @@ describe("newsletter callout distribution", () => {
       expect(readPage(page)).not.toContain(HEADING_ID);
     });
   }
+
+  it.skipIf(!distExists)(
+    `${PROGRAMME_2027} opts out only while it renders ComingSoon (0), and carries the band once as a content page (1)`,
+    () => {
+      const html = readPage(PROGRAMME_2027);
+      const soonTitle = (ui.fr as Record<string, string>)[
+        "flags.programme.soon.title"
+      ];
+      const occurrences = html.split(`id="${HEADING_ID}"`).length - 1;
+      expect(occurrences).toBe(html.includes(soonTitle) ? 0 : 1);
+    },
+  );
 
   for (const page of CFP_PAGES) {
     it.skipIf(!distExists)(

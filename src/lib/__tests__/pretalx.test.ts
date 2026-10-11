@@ -24,6 +24,22 @@ vi.mock("../pretalx", async (importOriginal) => {
   };
 });
 
+// This file pins the PUBLIC fetch path, which the real registry no longer
+// routes any edition through since 2026 was frozen — so the public shape is
+// restated here as the fixture. The frozen dispatch itself is covered by
+// frozen-edition.test.ts and the real-registry guard in
+// edition-visibility.test.ts; 2023/2027 keep their real entries below.
+vi.mock("../edition-registry", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../edition-registry")>();
+  return {
+    ...actual,
+    PRETALX_EVENT: {
+      ...actual.PRETALX_EVENT,
+      2026: { slug: "2026", access: "public" },
+    },
+  };
+});
+
 const doc = JSON.parse(
   readFileSync("src/content/schedule/pretalx-2026.json", "utf8"),
 ) as PretalxScheduleExport;
