@@ -85,7 +85,11 @@ import {
   fetchWipScheduleId,
 } from "../src/lib/pretalx-preview-api";
 import { scheduledPersonCodes } from "../src/lib/pretalx-preview";
-import { diffSpeakerSlugs, insertSlugEntries } from "./lib/speaker-slug-sync";
+import {
+  diffSpeakerSlugs,
+  insertSlugEntries,
+  slugSyncRefusal,
+} from "./lib/speaker-slug-sync";
 
 loadLocalEnv();
 
@@ -144,6 +148,11 @@ async function main(): Promise<void> {
 
   const event = PRETALX_EVENT[year];
   if (!event) usageError(`no PRETALX_EVENT entry for ${year} — nothing to read yet`);
+
+  // A frozen edition never reaches the network: its committed archive is the
+  // speaker list, and Pretalx reads for it are exactly what the freeze forbids.
+  const refusal = slugSyncRefusal(event.access);
+  if (refusal) usageError(`${year}: ${refusal}`);
 
   // Requirement 3: name the edition, event slug and access mode BEFORE any
   // network call, so an empty result can never be mistaken for a read that

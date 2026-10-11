@@ -51,8 +51,11 @@ for (const [yearStr, event] of Object.entries(PRETALX_EVENT)) {
   // rather than on whether the export happens to be readable.
   if (event.access !== "public") {
     console.log(
-      `${out}: skipped — ${year} is access: "${event.access}", and a committed ` +
-        `snapshot would publish it. Flip it to "public" only after the reveal.`,
+      `${out}: skipped — ${year} is access: "${event.access}", and only ` +
+        `"public" editions are snapshotted. A preview snapshot would publish an ` +
+        `unannounced programme to this public repo — flip it to "public" only ` +
+        `after the reveal. A frozen edition's source of truth is its committed ` +
+        `archive (sessions-${year}.json / speakers-${year}.json), not Pretalx.`,
     );
     continue;
   }

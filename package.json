@@ -15,7 +15,8 @@
     "test:watch": "vitest",
     "optimize:photos": "tsx scripts/optimize-photos.ts",
     "sync:pretalx": "tsx scripts/sync-pretalx.ts",
-    "sync:speaker-slugs": "tsx scripts/sync-speaker-slugs.ts"
+    "sync:speaker-slugs": "tsx scripts/sync-speaker-slugs.ts",
+    "freeze:edition": "tsx scripts/freeze-edition.ts"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.3",

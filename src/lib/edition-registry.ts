@@ -14,7 +14,7 @@
  */
 import type { Edition } from "./editions";
 
-export type EditionAccess = "public" | "preview";
+export type EditionAccess = "public" | "preview" | "frozen";
 
 export interface PretalxEventEntry {
   slug: string;
@@ -25,6 +25,10 @@ export interface PretalxEventEntry {
    *               /<slug>/schedule/export/schedule.json serves it.
    *   "preview" — no released schedule; readable only through the authenticated
    *               REST API, and only in a build where the `programme` flag is active.
+   *   "frozen"  — the edition is over; the schedule is served from the committed
+   *               frozen archive (`sessions-{year}.json` / `speakers-{year}.json`)
+   *               and NO network request is ever issued for it. The entry stays
+   *               so `cfpOpen` and the event identity survive the freeze.
    *
    * Flips when a schedule is released, NEVER merely when the event becomes
    * visible to submitters — the export does not exist until a release, so an

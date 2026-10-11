@@ -102,8 +102,12 @@ export async function loadSpeakers(year: Edition): Promise<SpeakerRecord[]> {
   // A fixture only ever stands in for a year with no real PRETALX_EVENT entry
   // (see preview-fixture.ts) — it never overrides one that already exists.
   const event = PRETALX_EVENT[year] ?? fixtureEvent(year);
-  // See the matching comment in schedule.ts's loadSessions.
-  if (!event || !isEditionLoadable(year)) return loadArchivedSpeakers(year);
+  // See the matching comment in schedule.ts's loadSessions. A frozen edition is
+  // loadable — its pages must keep rendering — but its committed archive is the
+  // ONLY source: it must never reach either fetch branch below.
+  if (!event || event.access === "frozen" || !isEditionLoadable(year)) {
+    return loadArchivedSpeakers(year);
+  }
 
   if (event.access === "preview") {
     // No released schedule yet — read the wip one through the authenticated
