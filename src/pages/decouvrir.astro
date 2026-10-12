@@ -6,6 +6,7 @@ import DiscoverIntro from "@/components/discover/DiscoverIntro.astro";
 import PhotoGallery from "@/components/discover/PhotoGallery.astro";
 import DiscoverValues from "@/components/discover/DiscoverValues.astro";
 import AudienceProfiles from "@/components/discover/AudienceProfiles.astro";
+import { TICKETING } from "@/config/tickets";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -54,7 +55,15 @@ const t = useTranslations(lang);
         { icon: "☁️", title: t("discover.audience.cloud.title"), topics: t("discover.audience.cloud.topics") },
         { icon: "⚙️", title: t("discover.audience.ops.title"),   topics: t("discover.audience.ops.topics") },
         { icon: "🏗️", title: t("discover.audience.lead.title"),  topics: t("discover.audience.lead.topics") },
-        { icon: "🎯", title: t("discover.audience.cto.title"),   topics: t("discover.audience.cto.topics") },
+        {
+          icon: "🎯",
+          title: t("discover.audience.cto.title"),
+          topics: t("discover.audience.cto.topics"),
+          badge: {
+            label: t("discover.audience.cto.badge"),
+            href: TICKETING.strategic.trackUrl[lang],
+          },
+        },
       ]}
     />
 
