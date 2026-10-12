@@ -65,8 +65,8 @@ const day = (["keynote", "track", "talks", "breaks", "lunch"] as const).map(
 
 const perks: { icon: IconName; text: string }[] = [
   { icon: "users", text: fill(t("strategy.lounge.circle"), values) },
-  { icon: "coffee", text: t("strategy.lounge.coffee") },
   { icon: "laptop", text: t("strategy.lounge.workspace") },
+  { icon: "coffee", text: t("strategy.lounge.drinks") },
   { icon: "utensils", text: t("strategy.lounge.lunch") },
 ];
 
@@ -153,19 +153,33 @@ const h2 =
     </div>
   </section>
 
-  <section class:list={[container, "py-16 md:py-24"]}>
+  <section class:list={[container, "py-16 md:pt-14 md:pb-12"]}>
     <div class="grid gap-6 lg:grid-cols-12 lg:gap-10">
       <h2 class:list={[h2, "lg:col-span-5"]}>{t("strategy.audience.title")}</h2>
-      <p
-        class="text-foreground text-lg text-pretty sm:text-xl lg:col-span-7 lg:pt-1"
-      >
-        {t("strategy.audience.body")}
-      </p>
+      <div class="flex flex-col gap-6 lg:col-span-7 lg:pt-1">
+        <p class="text-foreground text-lg text-pretty sm:text-xl">
+          {t("strategy.audience.body")}
+        </p>
+        <ul
+          class="flex flex-wrap gap-2.5"
+          aria-label={t("strategy.audience.roles_label")}
+        >
+          {
+            t("strategy.audience.roles")
+              .split("|")
+              .map((role) => (
+                <li class="bg-card border-border text-foreground rounded-lg border px-3.5 py-2 text-base font-semibold shadow-[var(--shadow-sm)]">
+                  {role}
+                </li>
+              ))
+          }
+        </ul>
+      </div>
     </div>
   </section>
 
   <section
-    class:list={[container, "pb-16 md:pb-24"]}
+    class:list={[container, "pb-16 md:pb-14"]}
     aria-labelledby="strategy-challenges"
   >
     <h2 id="strategy-challenges" class:list={[h2, "max-w-3xl"]}>
@@ -198,34 +212,52 @@ const h2 =
     </ol>
   </section>
 
-  <section class:list={[container, "pb-16 md:pb-24"]}>
+  {
+    /* The room comes right after the challenges: it is where they are
+       discussed, and the page must show it as clearly as the lounge. */
+  }
+  <section
+    class:list={[container, "pb-16 md:pb-24"]}
+    aria-labelledby="strategy-room"
+  >
     <div class="grid gap-10 lg:grid-cols-12 lg:gap-12">
+      <div class="flex flex-col gap-4 lg:col-span-7">
+        <h2 id="strategy-room" class={h2}>
+          {fill(t("strategy.room.title"), values)}
+        </h2>
+        <p class="text-foreground text-lg text-pretty sm:text-xl">
+          {fill(t("strategy.room.body"), values)}
+        </p>
+      </div>
       <div
         class="bg-secondary flex flex-col gap-4 self-start rounded-xl p-6 sm:p-8 lg:col-span-5"
       >
-        <h2 class="text-foreground text-2xl font-bold tracking-[-0.01em]">
+        <h3 class="text-foreground text-2xl font-bold tracking-[-0.01em]">
           {t("strategy.format.title")}
-        </h2>
+        </h3>
         <p class="text-foreground text-lg text-pretty">
           {t("strategy.format.body")}
         </p>
       </div>
-      <div class="lg:col-span-7">
-        <h2 class={h2}>{t("strategy.day.title")}</h2>
-        <ol class="border-border mt-8 flex flex-col gap-6 border-l-2 pl-6">
-          {
-            day.map((step) => (
-              <li class="text-foreground relative text-lg text-pretty">
-                <span
-                  class="bg-primary ring-background absolute top-2 -left-[calc(1.5rem+7px)] size-3 rounded-full ring-4"
-                  aria-hidden="true"
-                />
-                {step}
-              </li>
-            ))
-          }
-        </ol>
-      </div>
+    </div>
+  </section>
+
+  <section class:list={[container, "pb-16 md:pb-14"]}>
+    <div class="max-w-3xl">
+      <h2 class={h2}>{t("strategy.day.title")}</h2>
+      <ol class="border-border mt-8 flex flex-col gap-6 border-l-2 pl-6">
+        {
+          day.map((step) => (
+            <li class="text-foreground relative text-lg text-pretty">
+              <span
+                class="bg-primary ring-background absolute top-2 -left-[calc(1.5rem+7px)] size-3 rounded-full ring-4"
+                aria-hidden="true"
+              />
+              {step}
+            </li>
+          ))
+        }
+      </ol>
     </div>
   </section>
 
@@ -236,7 +268,7 @@ const h2 =
     <div
       class:list={[
         container,
-        "grid gap-10 py-16 md:py-24 lg:grid-cols-12 lg:gap-12",
+        "grid gap-10 py-16 md:py-14 lg:grid-cols-12 lg:gap-12",
       ]}
     >
       <div class="flex flex-col gap-4 lg:col-span-5">

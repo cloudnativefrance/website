@@ -490,6 +490,7 @@ export const ui = {
     "discover.audience.cto.title": "CTO, DSI & VP…",
     "discover.audience.cto.topics":
       "Stratégie et ROI cloud · Autonomie numérique · IA en production · Tendances",
+    "discover.audience.cto.badge": "Billet Stratégie & Leadership",
     "discover.replays.title": "Les talks 2026",
     "discover.replays.cta": "Voir tous les replays",
     "tickets.meta.title": "Billetterie · CND France 2027",
@@ -498,8 +499,9 @@ export const ui = {
     "tickets.h1": "Billetterie CND France 2027",
     "tickets.when": "{date} · {venue}, Paris 19e",
     "tickets.advice.lead":
-      "Plus de 2\u202f500 participant(e)s attendu(e)s\u00a0:",
-    "tickets.advice": "prenez votre place sans tarder, les places sont limitées.",
+      "CND France était sold-out les deux précédentes éditions\u00a0:",
+    "tickets.advice":
+      "prenez votre place sans tarder au tarif le plus avantageux.",
     "tickets.door.code": "J'ai un code",
     // {name} is the config's ticket name, capitalised by the card title.
     "tickets.offer.ticket": "Billet {name}",
@@ -533,12 +535,12 @@ export const ui = {
       "Pour celles et ceux qui décident\u00a0: CEO, CTO, DSI, VP…",
     "tickets.strategic.perks.event": "Toute l'expérience CND France",
     "tickets.strategic.perks.track":
-      "Un parcours de conférences et de tables rondes sur invitation",
+      "La salle {room}, pour des conférences stratégie et leadership",
     "tickets.strategic.perks.lounge": "Le {lounge}, pour échanger entre pairs",
     "tickets.strategic.new": "Nouveauté 2027",
     "tickets.strategic.seats": "{count} places seulement",
-    "tickets.strategic.track": "Découvrir le parcours Stratégie & Leadership",
-    "strategy.meta.title": "Parcours Stratégie & Leadership · CND France 2027",
+    "tickets.strategic.track": "En savoir plus sur Stratégie & Leadership",
+    "strategy.meta.title": "Stratégie & Leadership · CND France 2027",
     "strategy.meta.description":
       "Nouveauté 2027 : une journée de conférences et de tables rondes pour celles et ceux qui décident, avec un salon réservé. 200 places.",
     "strategy.hero.lead": "Les enjeux du cloud native, vus du côté de la décision.",
@@ -550,7 +552,11 @@ export const ui = {
     "strategy.cta.opening": "Ouverture de la billetterie le {date}",
     "strategy.audience.title": "Pour celles et ceux qui décident",
     "strategy.audience.body":
-      "Ce parcours s'adresse aux personnes qui occupent des fonctions de direction et de décision (CEO, CTO, DSI, VP…) et qui arbitrent les choix technologiques, budgétaires et organisationnels de leur entreprise.",
+      "Ces conférences s'adressent aux personnes qui occupent des fonctions de direction et de décision, et qui arbitrent les choix technologiques, budgétaires et organisationnels de leur entreprise.",
+    // Separated by "|": one card each. The last one keeps the list open.
+    "strategy.audience.roles":
+      "CEO|COO|CTO|CPTO|DSI|RSSI|CPO|VP Engineering|VP Product|Head of…",
+    "strategy.audience.roles_label": "Fonctions concernées",
     "strategy.challenges.title": "Quatre enjeux, vus du côté de la décision",
     "strategy.challenges.stake": "L'enjeu",
     "strategy.challenges.roi.title": "Stratégie et ROI cloud",
@@ -574,12 +580,15 @@ export const ui = {
       "Décider avant que le marché ne décide pour vous.",
     "strategy.format.title": "Une programmation sur invitation",
     "strategy.format.body":
-      "Les intervenant(e)s sont choisi(e)s par un comité dédié. Conférences et tables rondes alternent pour faire place aux retours d'expérience et au débat.",
+      "Les intervenant(e)s sont choisi(e)s par un comité dédié parmi des figures inspirantes de l'écosystème\u00a0: dirigeant(e)s et expert(e)s issu(e)s des entreprises et des institutions qui comptent dans la tech.",
+    "strategy.room.title": "La salle {room}",
+    "strategy.room.body":
+      "Une salle dédiée, réservée aux titulaires du billet {strategic}, avec sa propre programmation tout au long de la journée\u00a0: conférences, retours d'expérience et tables rondes pensés pour celles et ceux qui décident.",
     "strategy.day.title": "Votre journée",
     "strategy.day.keynote":
       "La keynote d'ouverture de CND France, qui fait cette année une place à la stratégie et au leadership.",
     "strategy.day.track":
-      "Les conférences et tables rondes du parcours tout au long de la journée, en salle {room}.",
+      "Les conférences et tables rondes Stratégie & Leadership tout au long de la journée, en salle {room}.",
     "strategy.day.talks":
       "L'accès à toutes les autres conférences de CND France, puisque votre billet inclut le billet standard.",
     "strategy.day.breaks":
@@ -590,21 +599,23 @@ export const ui = {
     "strategy.lounge.body":
       "Entre deux sessions, au déjeuner ou autour d'un café, retrouvez vos pairs : celles et ceux qui font face aux mêmes arbitrages que vous. Réservé aux détenteurs et détentrices du billet {strategic}, le salon vous permet de prolonger les débats, comparer vos approches et nouer des relations qui durent au-delà de la journée.",
     "strategy.lounge.circle": "Un cercle restreint de {count} pairs",
-    "strategy.lounge.coffee": "Un café de qualité",
-    "strategy.lounge.workspace": "De quoi poser votre ordinateur et le recharger",
+    "strategy.lounge.workspace": "Un espace confortable pour travailler ou échanger",
+    "strategy.lounge.drinks":
+      "Une sélection soignée de boissons, tout au long de la journée",
     "strategy.lounge.lunch": "Le déjeuner, à l'écart de l'affluence",
     "strategy.ticket.title": "Votre billet {strategic}",
     "strategy.ticket.launch": "Tarif de lancement",
     "strategy.ticket.included": "Inclus",
     "strategy.ticket.included.event": "Toute l'expérience CND France",
-    "strategy.ticket.included.track": "Le parcours {strategic}",
+    "strategy.ticket.included.track":
+      "Les conférences {strategic}, en salle {room}",
     "strategy.ticket.included.lounge": "L'accès au {lounge}",
     "strategy.ticket.included.lunch": "Le déjeuner servi au salon",
     "tickets.included.title": "Ce que comprend votre billet",
-    "tickets.included.talks":
-      "Les conférences et retours d'expérience de la journée",
+    "tickets.included.talks": "Les conférences et retours d'expérience",
     "tickets.included.village": "L'accès au village partenaires",
-    "tickets.included.meals": "Le déjeuner, le café et de quoi grignoter",
+    "tickets.included.meals":
+      "Une restauration gourmande et généreuse, car on ne plaisante pas avec les repas\u202f!",
     "tickets.included.goodies": "Des goodies exclusifs",
     "tickets.included.closing": "L'accès à la soirée de clôture",
     "tickets.included.evening.title": "Une soirée pour prolonger la journée",
@@ -619,9 +630,9 @@ export const ui = {
     "tickets.faq.change.a":
       "Le tarif en cours s'arrête à la date affichée, ou plus tôt si le stock de places associé est épuisé. Puis le tarif suivant prend le relais aussitôt.",
     "tickets.faq.strategic.q":
-      "Le parcours Stratégie & Leadership est-il ouvert à tous\u202f?",
+      "Les conférences Stratégie & Leadership sont-elles ouvertes à tous\u202f?",
     "tickets.faq.strategic.a":
-      "Non, ses conférences et son lounge sont réservés aux titulaires du billet {strategic}. Le billet {standard} donne accès à toutes les autres conférences de la journée.",
+      "Non, elles sont réservées aux titulaires du billet {strategic}, tout comme le {lounge}. Le billet {standard} donne accès à toutes les autres conférences de la journée.",
     "tickets.faq.ttc.q": "Les prix affichés sont-ils TTC\u202f?",
     "tickets.faq.ttc.a": "Oui, TVA à {rate} comprise.",
     "tickets.faq.per_order.q": "Combien de places par commande\u202f?",
@@ -1125,6 +1136,7 @@ export const ui = {
     "discover.audience.cto.title": "CTO, CIO & VP…",
     "discover.audience.cto.topics":
       "Cloud strategy & ROI · Digital sovereignty · AI in production · Trends",
+    "discover.audience.cto.badge": "Strategy & Leadership ticket",
     "discover.replays.title": "The 2026 talks",
     "discover.replays.cta": "Watch all replays",
     "tickets.meta.title": "Tickets · CND France 2027",
@@ -1132,8 +1144,8 @@ export const ui = {
       "Your seat at CND France 2027, Thursday 3 June at CENTQUATRE-PARIS: prices, coming as a team, using a code.",
     "tickets.h1": "CND France 2027 tickets",
     "tickets.when": "{date} · {venue}, Paris",
-    "tickets.advice.lead": "More than 2,500 attendees expected:",
-    "tickets.advice": "get your ticket early, seats are limited.",
+    "tickets.advice.lead": "CND France sold out its two previous editions:",
+    "tickets.advice": "get your ticket now at the best price.",
     "tickets.door.code": "I have a code",
     "tickets.offer.ticket": "{name} ticket",
     "tickets.offer.ttc": "VAT incl.",
@@ -1165,12 +1177,12 @@ export const ui = {
       "For those who make the calls: CEOs, CTOs, CIOs, VPs…",
     "tickets.strategic.perks.event": "The full CND France experience",
     "tickets.strategic.perks.track":
-      "An invitation-only track of talks and panel discussions",
+      "The {room} room, for strategy and leadership talks",
     "tickets.strategic.perks.lounge": "The {lounge}, to connect with your peers",
     "tickets.strategic.new": "New in 2027",
     "tickets.strategic.seats": "Only {count} seats",
-    "tickets.strategic.track": "About the Strategy & Leadership track",
-    "strategy.meta.title": "Strategy & Leadership track · CND France 2027",
+    "tickets.strategic.track": "More about Strategy & Leadership",
+    "strategy.meta.title": "Strategy & Leadership · CND France 2027",
     "strategy.meta.description":
       "New in 2027: a day of talks and panel discussions for those who make the calls, with a private lounge. 200 seats.",
     "strategy.hero.lead": "Cloud native challenges, seen from the decision-maker's seat.",
@@ -1182,7 +1194,10 @@ export const ui = {
     "strategy.cta.opening": "Ticket sales open {date}",
     "strategy.audience.title": "For those who make the calls",
     "strategy.audience.body":
-      "This track is for people in leadership and decision-making roles (CEOs, CTOs, CIOs, VPs…) who shape their company's technology, budget and organizational choices.",
+      "These talks are for people in leadership and decision-making roles who shape their company's technology, budget and organizational choices.",
+    "strategy.audience.roles":
+      "CEO|COO|CTO|CPTO|CIO|CISO|CPO|VP Engineering|VP Product|Head of…",
+    "strategy.audience.roles_label": "Roles",
     "strategy.challenges.title": "Four challenges, seen from the decision-maker's seat",
     "strategy.challenges.stake": "The challenge",
     "strategy.challenges.roi.title": "Cloud strategy & ROI",
@@ -1205,12 +1220,15 @@ export const ui = {
       "Decide before the market decides for you.",
     "strategy.format.title": "An invitation-only line-up",
     "strategy.format.body":
-      "Speakers are selected by a dedicated committee. Talks and panel discussions alternate to make room for real-world experience and debate.",
+      "Speakers are selected by a dedicated committee among inspiring figures from the ecosystem: leaders and experts from the companies and institutions that matter in tech.",
+    "strategy.room.title": "The {room} room",
+    "strategy.room.body":
+      "A dedicated room, reserved for {strategic} ticket holders, with its own programme throughout the day: talks, experience reports and panel discussions designed for those who make the calls.",
     "strategy.day.title": "Your day",
     "strategy.day.keynote":
       "The CND France opening keynote, which this year makes room for strategy and leadership.",
     "strategy.day.track":
-      "The track's talks and panels throughout the day, in the {room} room.",
+      "Strategy & Leadership talks and panels throughout the day, in the {room} room.",
     "strategy.day.talks":
       "Access to every other CND France talk, since your ticket includes the standard ticket.",
     "strategy.day.breaks":
@@ -1220,20 +1238,21 @@ export const ui = {
     "strategy.lounge.body":
       "Between sessions, over lunch or a coffee, meet your peers: people facing the same trade-offs as you. Reserved for {strategic} ticket holders, the salon is where you carry on the debates, compare approaches and build relationships that last beyond the day.",
     "strategy.lounge.circle": "A close circle of {count} peers",
-    "strategy.lounge.coffee": "Quality coffee",
-    "strategy.lounge.workspace": "Somewhere to set down and recharge your laptop",
+    "strategy.lounge.workspace": "A comfortable space to work or talk",
+    "strategy.lounge.drinks": "A curated selection of drinks, all day long",
     "strategy.lounge.lunch": "Lunch, away from the crowds",
     "strategy.ticket.title": "Your {strategic} ticket",
     "strategy.ticket.launch": "Launch price",
     "strategy.ticket.included": "Included",
     "strategy.ticket.included.event": "The full CND France experience",
-    "strategy.ticket.included.track": "The {strategic} track",
+    "strategy.ticket.included.track": "{strategic} talks, in the {room} room",
     "strategy.ticket.included.lounge": "Access to the {lounge}",
     "strategy.ticket.included.lunch": "Lunch served in the salon",
     "tickets.included.title": "What your ticket includes",
-    "tickets.included.talks": "The day's talks and experience reports",
+    "tickets.included.talks": "Talks and experience reports",
     "tickets.included.village": "Access to the partner village",
-    "tickets.included.meals": "Lunch, coffee and snacks",
+    "tickets.included.meals":
+      "Generous, delicious food, because we don't joke about meals!",
     "tickets.included.goodies": "Exclusive goodies",
     "tickets.included.closing": "Access to the closing evening",
     "tickets.included.evening.title": "An evening to round off the day",
@@ -1248,9 +1267,9 @@ export const ui = {
     "tickets.faq.change.a":
       "The current price ends on the date shown, or sooner if its allocation of seats sells out. Then the next price takes over at once.",
     "tickets.faq.strategic.q":
-      "Is the Strategy & Leadership track open to everyone?",
+      "Are the Strategy & Leadership talks open to everyone?",
     "tickets.faq.strategic.a":
-      "No, its talks and its lounge are reserved for {strategic} ticket holders. The {standard} ticket gives access to every other talk of the day.",
+      "No, they are reserved for {strategic} ticket holders, as is the {lounge}. The {standard} ticket gives access to every other talk of the day.",
     "tickets.faq.ttc.q": "Do the prices shown include VAT?",
     "tickets.faq.ttc.a": "Yes, they include VAT at {rate}.",
     "tickets.faq.per_order.q": "How many seats per order?",
