@@ -19,6 +19,8 @@ import { resolve } from "node:path";
 import { ui } from "@/i18n/ui";
 import { NEWSLETTER_URL } from "@/lib/event";
 import { CFP } from "@/config/cfp";
+import { TICKETING } from "@/config/tickets";
+import { isPreOpening } from "@/lib/tickets/phase";
 
 const DIST = resolve(import.meta.dirname, "../../dist");
 const HEADING_ID = "newsletter-callout-heading";
@@ -40,10 +42,7 @@ const REMOVED_KEYS = [
 ] as const;
 
 /** Routes that must carry the band. One per layout family. */
-const WITH_BAND = [
-  "decouvrir/index.html",
-  "billetterie/index.html",
-] as const;
+const WITH_BAND = ["decouvrir/index.html"] as const;
 
 /**
  * The homepage carries the heading twice: the hand-placed mid-page callout
@@ -80,6 +79,17 @@ const PROGRAMME_2027 = "programme/2027/index.html";
  */
 const CFP_PAGES = ["cfp/index.html", "en/cfp/index.html"] as const;
 const cfpWantsBand = CFP.currentPhase === "closed";
+
+/**
+ * The ticketing page's band follows its phase (src/config/tickets.ts): the
+ * coming-soon pages keep it, the selling page leaves it out (TicketsPage
+ * passes newsletter={comingSoon}).
+ */
+const TICKETS_PAGES = [
+  "billetterie/index.html",
+  "en/tickets/index.html",
+] as const;
+const ticketsWantBand = isPreOpening(TICKETING.currentPhase);
 
 const distExists = existsSync(resolve(DIST, "index.html"));
 
@@ -146,6 +156,20 @@ describe("newsletter callout distribution", () => {
       () => {
         const html = readPage(page);
         if (cfpWantsBand) {
+          expect(html.split(`id="${HEADING_ID}"`).length - 1).toBe(1);
+        } else {
+          expect(html).not.toContain(HEADING_ID);
+        }
+      },
+    );
+  }
+
+  for (const page of TICKETS_PAGES) {
+    it.skipIf(!distExists)(
+      `${page} ${ticketsWantBand ? "carries" : "opts out of"} the band (phase: ${TICKETING.currentPhase})`,
+      () => {
+        const html = readPage(page);
+        if (ticketsWantBand) {
           expect(html.split(`id="${HEADING_ID}"`).length - 1).toBe(1);
         } else {
           expect(html).not.toContain(HEADING_ID);

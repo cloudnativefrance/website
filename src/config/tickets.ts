@@ -76,8 +76,8 @@ export interface TicketingConfig {
 
 export const TICKETING: TicketingConfig = {
   listingUrl: "https://billetterie.cloudnativedays.fr/event/cndfr2027",
-  // Ticketing opens on 13 October 2026: set to "seb" that day.
-  currentPhase: "pre_opening_dated",
+  // Change this line manually to change the current phase:
+  currentPhase: "seb",
   // Lower-case, as prose uses it; card titles capitalise it.
   standardName: { fr: "standard", en: "standard" },
   tiers: [
