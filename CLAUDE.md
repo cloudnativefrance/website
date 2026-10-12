@@ -6,6 +6,7 @@ Astro + React islands + Tailwind 4 + shadcn/ui. Deployed on Kubernetes. French/E
 
 This project uses the [Superpowers](https://github.com/obra/superpowers) plugin for task-level workflow (brainstorming → writing-plans → executing-plans → verification). Superpowers skills auto-surface when their triggering conditions are met — let them.
 
+- **Branch flow — staging puis main**: PRs merge into `staging` for validation; `main` receives content only through `staging` → `main` release merges, never a direct PR merge into `main`. Before merging a PR, verify its actual base landed (`gh pr view <n> --json baseRefName`) — a failed `gh pr edit` retarget merges into the wrong branch. Never chain retarget + verify + merge in one command batch: a failed step must abort the batch.
 - For any non-trivial visual or feature work, start with `superpowers:brainstorming` to clarify intent and design before code.
 - For multi-step implementation, use `superpowers:writing-plans` then `superpowers:executing-plans` / `superpowers:subagent-driven-development`.
 - For bugs or unexpected behavior, use `superpowers:systematic-debugging` before proposing fixes.
