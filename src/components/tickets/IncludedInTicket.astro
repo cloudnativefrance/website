@@ -1,11 +1,10 @@
 ---
 /**
  * What the standard ticket includes. A plain checklist, not a grid of feature
- * cards; the evening — new in 2027 and the launch's main argument — gets the
- * section's one card, its novelty in a neutral pill, like the
- * Stratégie & Leadership ticket's. The checklist's last line
- * names it and points to that card: right beside it from lg, below it before.
- * From lg the card stretches to the list's height, so the arrow always meets it.
+ * cards: one column, kept narrow so the lines stay readable inside the page's
+ * wide container. The last line teases what is not announced yet — the evening
+ * had its own card here until the organisers froze its details; restore it
+ * from git history (tickets.included.evening.*) once they are settled.
  */
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
@@ -22,66 +21,27 @@ const items = [
   t("tickets.included.village"),
   t("tickets.included.meals"),
   t("tickets.included.goodies"),
+  t("tickets.included.surprises"),
 ];
 ---
 
-<section
-  class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16"
-  aria-labelledby="included-title"
->
-  <div class="flex flex-col gap-6">
-    <h2
-      id="included-title"
-      class="text-foreground text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl"
-    >
-      {t("tickets.included.title")}
-    </h2>
-    <ul class="flex flex-col gap-3">
-      {
-        items.map((item) => (
-          <li class="text-foreground flex items-start gap-3 text-lg">
-            <span class="bg-primary/10 text-primary-strong mt-1 grid size-6 shrink-0 place-items-center rounded-full">
-              <Icon name="check" size={14} />
-            </span>
-            <span class="text-pretty">{item}</span>
-          </li>
-        ))
-      }
-      {
-        /* Inline, not flex: when the line wraps, the arrow follows the last word. */
-      }
-      <li class="text-foreground flex items-start gap-3 text-lg">
-        <span
-          class="bg-primary/10 text-primary-strong mt-1 grid size-6 shrink-0 place-items-center rounded-full"
-        >
-          <Icon name="check" size={14} />
-        </span>
-        <span class="text-pretty"
-          >{t("tickets.included.closing")}<Icon
-            name="arrow-right"
-            size={18}
-            class="text-primary-strong ml-2 inline-block rotate-90 align-[-0.2em] lg:rotate-0"
-          /></span
-        >
-      </li>
-    </ul>
-  </div>
-
-  <div
-    class="border-border bg-card flex flex-col gap-3 rounded-xl border p-6 sm:p-8"
+<section class="flex max-w-3xl flex-col gap-6" aria-labelledby="included-title">
+  <h2
+    id="included-title"
+    class="text-foreground text-3xl font-bold tracking-[-0.02em] text-balance sm:text-4xl"
   >
-    <h3
-      class="text-foreground text-2xl font-semibold tracking-[-0.01em] text-balance"
-    >
-      {t("tickets.included.evening.title")}
-      <span
-        class="border-border bg-card text-foreground ml-1 inline-flex items-center rounded-full border px-2.5 py-1 align-[0.2em] text-xs leading-none font-bold tracking-[0.06em] whitespace-nowrap uppercase"
-      >
-        {t("tickets.included.evening.new")}
-      </span>
-    </h3>
-    <p class="text-foreground text-lg text-pretty">
-      {t("tickets.included.evening.body")}
-    </p>
-  </div>
+    {t("tickets.included.title")}
+  </h2>
+  <ul class="flex flex-col gap-3">
+    {
+      items.map((item) => (
+        <li class="text-foreground flex items-start gap-3 text-lg">
+          <span class="bg-primary/10 text-primary-strong mt-1 grid size-6 shrink-0 place-items-center rounded-full">
+            <Icon name="check" size={14} />
+          </span>
+          <span class="text-pretty">{item}</span>
+        </li>
+      ))
+    }
+  </ul>
 </section>

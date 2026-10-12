@@ -617,11 +617,7 @@ export const ui = {
     "tickets.included.meals":
       "Une restauration gourmande et généreuse, car on ne plaisante pas avec les repas\u202f!",
     "tickets.included.goodies": "Des goodies exclusifs",
-    "tickets.included.closing": "L'accès à la soirée de clôture",
-    "tickets.included.evening.title": "Une soirée pour prolonger la journée",
-    "tickets.included.evening.new": "Nouveauté 2027",
-    "tickets.included.evening.body":
-      "La soirée est comprise dans le billet, sans option à ajouter. L'occasion de faire de nouvelles rencontres, d'échanger entre pairs, de revenir sur les conférences de la journée ou, tout simplement, de se détendre.",
+    "tickets.included.surprises": "Et des surprises annoncées bientôt\u202f!",
     "tickets.faq.title": "Questions fréquentes",
     "tickets.faq.payment.q": "Comment se passe le paiement\u202f?",
     "tickets.faq.payment.a":
@@ -1254,11 +1250,7 @@ export const ui = {
     "tickets.included.meals":
       "Generous, delicious food, because we don't joke about meals!",
     "tickets.included.goodies": "Exclusive goodies",
-    "tickets.included.closing": "Access to the closing evening",
-    "tickets.included.evening.title": "An evening to round off the day",
-    "tickets.included.evening.new": "New in 2027",
-    "tickets.included.evening.body":
-      "The evening is part of the ticket, with no add-on to buy. A chance to meet new people, talk with your peers, look back on the day's talks or simply unwind.",
+    "tickets.included.surprises": "And more surprises, announced soon!",
     "tickets.faq.title": "Frequently asked questions",
     "tickets.faq.payment.q": "How does payment work?",
     "tickets.faq.payment.a":
