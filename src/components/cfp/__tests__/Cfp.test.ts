@@ -46,34 +46,29 @@ const CLOSED_SRC = readFileSync(
 );
 
 describe("CfpOpen — editorial pass copy", () => {
-  it("fr hero states the deadline buffed to a pill beside the badge", async () => {
+  it("fr hero states the deadline in red under the CTA, badge green", async () => {
     const m = await mainText(CfpOpen, "fr");
-    expect(m).toContain("⏱ Date limite\u00a0: 31 janvier 2027");
+    expect(m).toContain("Date limite\u00a0: 31 janvier 2027");
     expect(m).not.toContain("réponse du comité fin février");
     expect(m).not.toContain("Soumissions ouvertes jusqu'au");
-    // The old muted deadline line below the CTAs is gone — the date rides
-    // in the pill row now.
-    expect(m).toContain("CFP 2027 — ouvert");
+    expect(m).toContain("CFP 2027 · ouvert");
     const html = await render(CfpOpen, "fr");
-    expect(html).toContain("bg-primary text-primary-foreground");
+    // The badge is the green state pill; the deadline rides under the CTA
+    // in the red urgency treatment (mirroring the billetterie's).
+    expect(html).toContain("bg-green-600");
+    expect(html).toContain("text-white");
+    expect(html).toContain("text-red-600");
+    expect(html).not.toContain("⏱");
   });
 
-  it("the hero's two pills share one row", async () => {
-    const html = await render(CfpOpen, "fr");
-    const i = html.indexOf('class="flex flex-wrap items-center gap-2"');
-    expect(i).toBeGreaterThan(0);
-    const row = html.slice(i, html.indexOf("</div>", i));
-    expect(row).toContain("bg-accent");
-    expect(row).toContain("⏱");
-  });
-
-  it("the old strong-span deadline paragraph no longer exists", () => {
-    expect(OPEN_SRC).not.toContain("deadlineLine");
+  it("the previous round's two-pill row is gone", () => {
+    expect(OPEN_SRC).not.toContain("deadlineBadge");
+    expect(OPEN_SRC).not.toContain("flex flex-wrap items-center gap-2");
   });
 
   it("en hero mirrors it", async () => {
     const m = await mainText(CfpOpen, "en");
-    expect(m).toContain("⏱ Deadline: January 31, 2027");
+    expect(m).toContain("Deadline: January 31, 2027");
     expect(m).not.toContain("committee responds by the end of February");
   });
 
@@ -97,38 +92,110 @@ describe("CfpOpen — editorial pass copy", () => {
 
   it("DevEx theme names CI/CD and GitOps, both locales", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "golden paths, self-service, CI/CD et GitOps, et la mesure de ce qui leur fait réellement gagner du temps.",
+      "golden paths, self-service, CI/CD, GitOps, réduction de la charge cognitive et autonomie des équipes.",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "golden paths, self-service, CI/CD and GitOps, and measuring what actually saves them time.",
+      "golden paths, self-service, CI/CD, GitOps, reduced cognitive load and team autonomy.",
     );
   });
 
-  it("Fondations body ends on cost and footprint, both locales", async () => {
-    expect(await mainText(CfpOpen, "fr")).toContain(
-      "Les couches sur lesquelles tout repose : Kubernetes, stockage, réseau, bases de données, leur exploitation à l'échelle, leur coût et leur empreinte.",
+  it("Fondations: storage-focused title, resilience, FinOps and GreenOps named", async () => {
+    const m = await mainText(CfpOpen, "fr");
+    expect(m).toContain("Fondations\u00a0: infrastructure, stockage, réseau");
+    expect(m).toContain(
+      "Les couches sur lesquelles tout repose : calcul, stockage, réseau, bases de données, architectures résilientes, performance et passage à l'échelle, maîtrise des coûts (FinOps) et impact environnemental (GreenOps).",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "The layers everything rests on: Kubernetes, storage, networking, databases, running them at scale, their cost and their footprint.",
+      "The layers everything rests on: compute, storage, networking, databases, resilient architectures, performance and scaling, cost control (FinOps) and environmental impact (GreenOps).",
     );
   });
 
-  it("Autonomie numérique is plural in fr", async () => {
+  it("Autonomie numérique: plural dependencies, contribution angle", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "Maîtriser ses dépendances",
+      "Maîtriser ses dépendances technologiques : protection des données, alternatives et contribution open source, portabilité des applications et des infrastructures, interopérabilité et réversibilité pour préserver sa liberté de choix technologique.",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "Mastering your dependencies",
+      "Mastering your technology dependencies: data protection, open source alternatives and contribution, application and infrastructure portability, interoperability and reversibility to preserve your freedom of technological choice.",
     );
   });
 
-  it("IA body splits infrastructure and usage sides, both locales", async () => {
+  it("IA body: three pillars, guardrails kept, no anti-demo line", async () => {
+    const m = await mainText(CfpOpen, "fr");
+    expect(m).toContain(
+      "Déployer et exploiter l'IA en production (GPU, inférence, performances, coûts), concevoir des applications intégrant l'IA (LLM, RAG, agents et garde-fous) et mettre l'IA au service des métiers Cloud Native (développement, CI/CD, observabilité, opérations).",
+    );
+    expect(m).not.toContain("pas des démos");
+    expect(await mainText(CfpOpen, "en")).toContain(
+      "Deploying and operating AI in production (GPUs, inference, performance, cost), building AI-integrated applications (LLMs, RAG, agents and guardrails), and putting AI to work for Cloud Native practices (development, CI/CD, observability, operations).",
+    );
+  });
+
+  it("Observabilité: concrete signals over the old stance wording, dashboards kept", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "Ce que l'IA change en production, côté infrastructure (inférence, GPU, coûts, latence) comme côté usages (agents, données, garde-fous). Des retours d'expérience, pas des démos.",
+      "Comprendre, surveiller et fiabiliser les systèmes en production : métriques, logs et traces plutôt que des dashboards, SLO tenables et pratiques SRE, disponibilité, gestion des incidents et reprise après défaillance.",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "What AI changes in production — infrastructure side (inference, GPUs, cost, latency) and usage side (agents, data, guardrails). Experience reports, not demos.",
+      "Understanding, monitoring and making production systems reliable: metrics, logs and traces rather than dashboards, sustainable SLOs and SRE practices, availability, incident management and disaster recovery.",
     );
+  });
+
+  it("Sécurité: concrete enumeration keeps the without-blocking stance", async () => {
+    expect(await mainText(CfpOpen, "fr")).toContain(
+      "Sécuriser les applications et les infrastructures cloud native, de la conception à la production, sans bloquer le travail des équipes : dépendances logicielles, CI/CD, identités, accès et secrets, gestion des vulnérabilités, détection et réponse aux menaces, conformité.",
+    );
+    expect(await mainText(CfpOpen, "en")).toContain(
+      "Securing cloud native applications and infrastructure from design to production, without blocking teams' work: software dependencies, CI/CD, identities, access and secrets, vulnerability management, threat detection and response, compliance.",
+    );
+  });
+
+  it("the no-pitch rule is stated boldly, both locales", async () => {
+    expect(await mainText(CfpOpen, "fr")).toContain(
+      "Les présentations promotionnelles ou commerciales ne sont pas acceptées et sont automatiquement refusées.",
+    );
+    expect(await mainText(CfpOpen, "en")).toContain(
+      "Promotional or commercial talks are not accepted and will be automatically rejected.",
+    );
+  });
+
+  it("the coaching rides its own callout, before and after the CFP closes", async () => {
+    const m = await mainText(CfpOpen, "fr");
+    expect(m).toContain(
+      "Première fois sur scène, ou envie d'un regard extérieur ?",
+    );
+    expect(m).toContain("avant comme après la clôture du CFP");
+    expect(m).not.toContain("primo-oratrices");
+  });
+
+  it("co-speakers are welcome on every format", async () => {
+    expect(await mainText(CfpOpen, "fr")).toContain(
+      "Les co-intervenants sont les bienvenus sur tous les formats",
+    );
+    expect(await mainText(CfpOpen, "en")).toContain(
+      "Co-speakers are welcome on every format",
+    );
+  });
+
+  it("the criteria are rewritten: failures included, bingo framing gone", async () => {
+    const m = await mainText(CfpOpen, "fr");
+    expect(m).toContain("de réussites comme d'échecs");
+    expect(m).toContain("Écosystème francophone");
+    expect(m).toContain(
+      "Il n'est pas nécessaire de répondre à tous ces critères",
+    );
+    expect(m).not.toContain("au plus grand nombre des critères");
+  });
+
+  it("the lightning talk leads with the idea", async () => {
+    expect(await mainText(CfpOpen, "fr")).toContain(
+      "Un sujet, une idée forte, un message à retenir.",
+    );
+    expect(await mainText(CfpOpen, "en")).toContain(
+      "One topic, one strong idea, one message to remember.",
+    );
+  });
+
+  it("the fr page carries no em-dash prose", async () => {
+    expect(await mainText(CfpOpen, "fr")).not.toContain(" — ");
   });
 });
 
@@ -150,16 +217,17 @@ describe("CfpClosed — keeps the themes and formats", () => {
     expect(m).toContain("Hors-piste, sujets divers");
     expect(m).toContain("Présentation éclair");
     expect(m).toContain("Deep dive");
-    expect(m).toContain("CI/CD et GitOps"); // the grids read the shared module
+    expect(m).toContain("CI/CD, GitOps"); // the grids read the shared module
+    expect(m).toContain("reprise après défaillance"); // round-2 wording flows through
   });
 
   it("en: mirrors fr", async () => {
     const m = await mainText(CfpClosed, "en");
     expect(m).toContain("The themes and formats of the 2027 edition");
-    expect(m).toContain("Digital sovereignty & open source");
+    expect(m).toContain("Digital autonomy & open source");
     expect(m).toContain("Off-piste & misc");
     expect(m).toContain("Lightning talk");
-    expect(m).toContain("CI/CD and GitOps");
+    expect(m).toContain("CI/CD, GitOps");
   });
 
   it("renders the grids from the shared module", () => {
