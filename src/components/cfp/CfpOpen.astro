@@ -32,11 +32,7 @@ const fr = {
   formatsLink: null as string | null,
   eventLine:
     "3 juin 2027 · CENTQUATRE-PARIS · au cœur de la communauté francophone du Cloud Native",
-  deadlineLine: {
-    before: "Date limite\u00a0: ",
-    strong: "31 janvier 2027",
-    after: "",
-  },
+  deadlineBadge: "⏱ Date limite\u00a0: 31 janvier 2027",
   multiTopics:
     "Envie de proposer plusieurs sujets ? Soumettez une proposition séparée pour chacun — le comité les évaluera indépendamment.",
   knowTitle: "À savoir",
@@ -97,11 +93,7 @@ const COPY: Record<Locale, typeof fr> = {
     formatsLink: "See the formats",
     eventLine:
       "June 3, 2027 · CENTQUATRE-PARIS · at the heart of the French-speaking Cloud Native community",
-    deadlineLine: {
-      before: "Deadline: ",
-      strong: "January 31, 2027",
-      after: "",
-    },
+    deadlineBadge: "⏱ Deadline: January 31, 2027",
     multiTopics:
       "Want to submit several topics? Send a separate proposal for each — the committee evaluates them independently.",
     knowTitle: "Good to know",
@@ -167,9 +159,14 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
   <section class="mx-auto max-w-6xl px-4 md:px-6 pt-16 md:pt-24 pb-10 md:pb-12">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
       <div>
-        <span class="inline-flex items-center rounded-full bg-accent text-accent-foreground px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-          {copy.badge}
-        </span>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="inline-flex items-center rounded-full bg-accent text-accent-foreground px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+            {copy.badge}
+          </span>
+          <span class="inline-flex items-center rounded-full bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+            {copy.deadlineBadge}
+          </span>
+        </div>
         <h1 class="mt-5 text-4xl md:text-6xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
           {copy.heroTitle}
         </h1>
@@ -196,11 +193,6 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
         )}
         <p class="mt-4 text-sm text-muted-foreground">
           {copy.eventLine}
-        </p>
-        <p class="mt-2 text-sm text-muted-foreground">
-          {copy.deadlineLine.before}
-          <span class="font-semibold text-foreground">{copy.deadlineLine.strong}</span>
-          {copy.deadlineLine.after}
         </p>
       </div>
       <Picture

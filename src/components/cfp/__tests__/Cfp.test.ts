@@ -46,21 +46,34 @@ const CLOSED_SRC = readFileSync(
 );
 
 describe("CfpOpen — editorial pass copy", () => {
-  it("fr hero states the deadline bare: no committee-response sentence", async () => {
+  it("fr hero states the deadline buffed to a pill beside the badge", async () => {
     const m = await mainText(CfpOpen, "fr");
-    expect(m).toContain("Date limite\u00a0: 31 janvier 2027");
+    expect(m).toContain("⏱ Date limite\u00a0: 31 janvier 2027");
     expect(m).not.toContain("réponse du comité fin février");
     expect(m).not.toContain("Soumissions ouvertes jusqu'au");
+    // The old muted deadline line below the CTAs is gone — the date rides
+    // in the pill row now.
+    expect(m).toContain("CFP 2027 — ouvert");
+    const html = await render(CfpOpen, "fr");
+    expect(html).toContain("bg-primary text-primary-foreground");
   });
 
-  it("fr hero still renders the date in its own strong span", async () => {
+  it("the hero's two pills share one row", async () => {
     const html = await render(CfpOpen, "fr");
-    expect(html).toContain('class="font-semibold text-foreground"');
+    const i = html.indexOf('class="flex flex-wrap items-center gap-2"');
+    expect(i).toBeGreaterThan(0);
+    const row = html.slice(i, html.indexOf("</div>", i));
+    expect(row).toContain("bg-accent");
+    expect(row).toContain("⏱");
+  });
+
+  it("the old strong-span deadline paragraph no longer exists", () => {
+    expect(OPEN_SRC).not.toContain("deadlineLine");
   });
 
   it("en hero mirrors it", async () => {
     const m = await mainText(CfpOpen, "en");
-    expect(m).toContain("Deadline: January 31, 2027");
+    expect(m).toContain("⏱ Deadline: January 31, 2027");
     expect(m).not.toContain("committee responds by the end of February");
   });
 
