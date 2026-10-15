@@ -44,32 +44,32 @@ export const CFP_CONTENT: Record<Locale, CfpContent> = {
       {
         emoji: "🧭",
         title: "Autonomie numérique et open source",
-        body: "Maîtriser ses dépendances : souveraineté des données, alternatives ouvertes, contribution amont, et le coût réel de la réversibilité.",
+        body: "Maîtriser ses dépendances technologiques : protection des données, alternatives et contribution open source, portabilité des applications et des infrastructures, interopérabilité et réversibilité pour préserver sa liberté de choix technologique.",
       },
       {
         emoji: "🧰",
         title: "DevEx et Platform Engineering",
-        body: "Construire une plateforme que les équipes choisissent d'utiliser : golden paths, self-service, CI/CD et GitOps, et la mesure de ce qui leur fait réellement gagner du temps.",
+        body: "Concevoir des plateformes que les équipes choisissent d'utiliser : golden paths, self-service, CI/CD, GitOps, réduction de la charge cognitive et autonomie des équipes.",
       },
       {
         emoji: "🤖",
         title: "L'IA à l'épreuve du réel",
-        body: "Ce que l'IA change en production, côté infrastructure (inférence, GPU, coûts, latence) comme côté usages (agents, données, garde-fous). Des retours d'expérience, pas des démos.",
+        body: "Déployer et exploiter l'IA en production (GPU, inférence, performances, coûts), concevoir des applications intégrant l'IA (LLM, RAG, agents et garde-fous) et mettre l'IA au service des métiers Cloud Native (développement, CI/CD, observabilité, opérations).",
       },
       {
         emoji: "🔭",
         title: "Observabilité et fiabilité",
-        body: "Comprendre un système en production : des signaux utiles plutôt que des tableaux de bord, des SLO tenables, et ce qu'on apprend d'un incident.",
+        body: "Comprendre, surveiller et fiabiliser les systèmes en production : métriques, logs et traces plutôt que des dashboards, SLO tenables et pratiques SRE, disponibilité, gestion des incidents et reprise après défaillance.",
       },
       {
         emoji: "🛡️",
         title: "Sécurité et confiance",
-        body: "Sécuriser sans bloquer : chaîne d'approvisionnement, secrets, identités et conformité, intégrés au travail des équipes plutôt qu'ajoutés après.",
+        body: "Sécuriser les applications et les infrastructures cloud native, de la conception à la production, sans bloquer le travail des équipes : dépendances logicielles, CI/CD, identités, accès et secrets, gestion des vulnérabilités, détection et réponse aux menaces, conformité.",
       },
       {
         emoji: "🧱",
-        title: "Fondations\u00a0: infrastructure, données, réseau",
-        body: "Les couches sur lesquelles tout repose : Kubernetes, stockage, réseau, bases de données, leur exploitation à l'échelle, leur coût et leur empreinte.",
+        title: "Fondations\u00a0: infrastructure, stockage, réseau",
+        body: "Les couches sur lesquelles tout repose : calcul, stockage, réseau, bases de données, architectures résilientes, performance et passage à l'échelle, maîtrise des coûts (FinOps) et impact environnemental (GreenOps).",
       },
     ],
     horsPiste: {
@@ -81,7 +81,7 @@ export const CFP_CONTENT: Record<Locale, CfpContent> = {
       {
         duration: "10 min",
         title: "Présentation éclair",
-        body: "Un format court et synthétique pour aller droit au but. Le temps est votre principal défi — assurez-vous que votre contenu soit concis et percutant.",
+        body: "Un sujet, une idée forte, un message à retenir. Un format court et percutant pour partager une découverte, une expérience ou une réflexion.",
       },
       {
         duration: "30 min",
@@ -104,33 +104,33 @@ export const CFP_CONTENT: Record<Locale, CfpContent> = {
     parcours: [
       {
         emoji: "🧭",
-        title: "Digital sovereignty & open source",
-        body: "Mastering your dependencies: data sovereignty, open alternatives, upstream contribution, and the real cost of reversibility.",
+        title: "Digital autonomy & open source",
+        body: "Mastering your technology dependencies: data protection, open source alternatives and contribution, application and infrastructure portability, interoperability and reversibility to preserve your freedom of technological choice.",
       },
       {
         emoji: "🧰",
         title: "DevEx & Platform Engineering",
-        body: "Building a platform teams choose to use: golden paths, self-service, CI/CD and GitOps, and measuring what actually saves them time.",
+        body: "Designing platforms teams choose to use: golden paths, self-service, CI/CD, GitOps, reduced cognitive load and team autonomy.",
       },
       {
         emoji: "🤖",
         title: "AI put to the test",
-        body: "What AI changes in production — infrastructure side (inference, GPUs, cost, latency) and usage side (agents, data, guardrails). Experience reports, not demos.",
+        body: "Deploying and operating AI in production (GPUs, inference, performance, cost), building AI-integrated applications (LLMs, RAG, agents and guardrails), and putting AI to work for Cloud Native practices (development, CI/CD, observability, operations).",
       },
       {
         emoji: "🔭",
         title: "Observability & reliability",
-        body: "Understanding a system in production: useful signals over dashboards, sustainable SLOs, and what an incident teaches you.",
+        body: "Understanding, monitoring and making production systems reliable: metrics, logs and traces rather than dashboards, sustainable SLOs and SRE practices, availability, incident management and disaster recovery.",
       },
       {
         emoji: "🛡️",
         title: "Security & trust",
-        body: "Securing without blocking: supply chain, secrets, identities and compliance, built into the work of teams rather than bolted on after.",
+        body: "Securing cloud native applications and infrastructure from design to production, without blocking teams' work: software dependencies, CI/CD, identities, access and secrets, vulnerability management, threat detection and response, compliance.",
       },
       {
         emoji: "🧱",
-        title: "Foundations: infrastructure, data, networking",
-        body: "The layers everything rests on: Kubernetes, storage, networking, databases, running them at scale, their cost and their footprint.",
+        title: "Foundations: infrastructure, storage, networking",
+        body: "The layers everything rests on: compute, storage, networking, databases, resilient architectures, performance and scaling, cost control (FinOps) and environmental impact (GreenOps).",
       },
     ],
     horsPiste: {
@@ -142,7 +142,7 @@ export const CFP_CONTENT: Record<Locale, CfpContent> = {
       {
         duration: "10 min",
         title: "Lightning talk",
-        body: "Short and to the point. Time is the constraint — keep it concise and impactful.",
+        body: "One topic, one strong idea, one message to remember. A short, punchy format to share a discovery, an experience, or a thought.",
       },
       {
         duration: "30 min",

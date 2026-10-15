@@ -25,26 +25,29 @@ const CFP_URL = cfpSubmitUrl();
 const CFP_LABEL = cfpSubmitLabel();
 
 const fr = {
-  badge: "CFP 2027 — ouvert",
+  badge: "CFP 2027 · ouvert",
   heroTitle: "Et si vous montiez sur scène ?",
   heroSub: "Une journée. 7 thèmes. 3 formats. Et votre voix.",
   heroCta: "Soumettre une proposition",
   formatsLink: null as string | null,
   eventLine:
     "3 juin 2027 · CENTQUATRE-PARIS · au cœur de la communauté francophone du Cloud Native",
-  deadlineBadge: "⏱ Date limite\u00a0: 31 janvier 2027",
+  deadlineLine: "Date limite\u00a0: 31 janvier 2027",
   multiTopics:
-    "Envie de proposer plusieurs sujets ? Soumettez une proposition séparée pour chacun — le comité les évaluera indépendamment.",
+    "Envie de proposer plusieurs sujets ? Soumettez une proposition séparée pour chacun et le comité les évaluera indépendamment. Privilégiez la qualité plutôt que la quantité\u00a0: présenter plusieurs sujets n'augmente pas vos chances automatiquement.",
   knowTitle: "À savoir",
   knowFrench: {
     before: "Toutes les présentations se déroulent ",
     strong: "en français",
-    after: " — slides en anglais acceptés si cela facilite votre préparation.",
+    after:
+      " ; les slides en anglais sont acceptés si cela facilite votre préparation.",
   },
-  knowCoaching: {
-    strong: "Première fois sur scène ?",
-    after: "Un coaching est proposé aux primo-oratrices et primo-orateurs — et à toute personne qui en ressent le besoin — pour préparer votre proposition et votre prise de parole. Pour le demander, écrivez à speakers@cloudnativedays.fr.",
+  coaching: {
+    strong: "Première fois sur scène, ou envie d'un regard extérieur ?",
+    body: "Un coaching vous accompagne pour préparer votre proposition et votre prise de parole, avant comme après la clôture du CFP. Pour en bénéficier, écrivez à ",
   },
+  knowCosp:
+    "Présenter à plusieurs ? Les co-intervenants sont les bienvenus sur tous les formats\u00a0: ajoutez-les à votre soumission, chacun complète son profil.",
   knowValues: {
     label: "Nos valeurs",
     colon: " : ",
@@ -67,45 +70,69 @@ const fr = {
   },
   committeeTitle: "Nos critères de sélection",
   committeeIntro:
-    "Notre comité de sélection — bénévoles de l'organisation CND France et membres reconnus des communautés Cloud Native francophones — privilégiera les propositions qui répondront au plus grand nombre des critères suivants\u00a0:",
+    "Notre comité de sélection, composé de bénévoles de l'organisation et de membres des communautés Cloud Native francophones, sera particulièrement attentif aux points suivants\u00a0:",
+  noPitch:
+    "Les présentations promotionnelles ou commerciales ne sont pas acceptées et sont automatiquement refusées.",
+  committeeClosing:
+    "Il n'est pas nécessaire de répondre à tous ces critères : nous recherchons avant tout des conférences qui permettent aux participants d'apprendre, de découvrir ou de questionner leurs pratiques.",
   closingTitle: "Vous avez quelque chose à raconter. Nous avons la scène.",
   closingCta: "Soumettre une proposition",
   closingDeadline: "Clôture le 31 janvier 2027",
   heroPhotoAlt: "Intervenant(e) sur scène à Cloud Native Days France 2026",
   closingPhotoAlt: "Participantes et participants à Cloud Native Days France 2026",
   criteria: [
-    { key: "Retours d'expérience", body: "concrets sur l'application des technologies Cloud Native." },
-    { key: "Open source", body: "moteurs d'innovation et de collaboration." },
-    { key: "Innovation et expertise technique", body: "qui repoussent les limites de votre domaine." },
-    { key: "Projets francophones et locaux", body: "valorisant notre écosystème." },
-    { key: "Contenu inédit", body: "ou rarement présenté lors d'autres conférences." },
-    { key: "Diversité", body: "des profils et des approches." },
+    {
+      key: "Retours d'expérience",
+      body: "des enseignements utiles et concrets issus de projets opérationnels ou d'expérimentations, de réussites comme d'échecs.",
+    },
+    {
+      key: "Innovation et expertise",
+      body: "des contenus solides, des approches originales, avec de la profondeur technique et adaptés au format sélectionné.",
+    },
+    {
+      key: "Open source et contribution communautaire",
+      body: "une attention particulière aux technologies ouvertes, aux projets collaboratifs et au partage des connaissances.",
+    },
+    {
+      key: "Originalité du contenu",
+      body: "priorité aux conférences inédites, des angles nouveaux et des approches qui sortent des sentiers battus.",
+    },
+    {
+      key: "Diversité",
+      body: "une programmation ouverte à la diversité des profils, des parcours, des expériences et des points de vue.",
+    },
+    {
+      key: "Écosystème francophone",
+      body: "une attention particulière aux projets, initiatives et expériences issus des organisations et des communautés francophones.",
+    },
   ],
 };
 
 const COPY: Record<Locale, typeof fr> = {
   fr,
   en: {
-    badge: "CFP 2027 — open",
+    badge: "CFP 2027 · open",
     heroTitle: "What if you took the stage?",
     heroSub: "One day. 7 themes. 3 formats. And your voice.",
     heroCta: "Submit a proposal",
     formatsLink: "See the formats",
     eventLine:
       "June 3, 2027 · CENTQUATRE-PARIS · at the heart of the French-speaking Cloud Native community",
-    deadlineBadge: "⏱ Deadline: January 31, 2027",
+    deadlineLine: "Deadline: January 31, 2027",
     multiTopics:
-      "Want to submit several topics? Send a separate proposal for each — the committee evaluates them independently.",
+      "Want to submit several topics? Send a separate proposal for each and the committee evaluates them independently. Favour quality over quantity: submitting multiple proposals does not automatically increase your chances.",
     knowTitle: "Good to know",
     knowFrench: {
       before: "All talks are ",
       strong: "in French",
-      after: " — English slides accepted if that makes prep easier.",
+      after: "; English slides are accepted if that makes prep easier.",
     },
-    knowCoaching: {
-      strong: "First time on stage?",
-      after: "Coaching is available for first-time speakers — and for anyone who wants it — to help you prepare your proposal and your talk. To request it, write to speakers@cloudnativedays.fr.",
+    coaching: {
+      strong: "First time on stage, or looking for an outside perspective?",
+      body: "Dedicated coaching supports you in preparing your proposal and your talk, before and after the CFP closes. To benefit, write to ",
     },
+    knowCosp:
+      "Presenting as a pair? Co-speakers are welcome on every format: add them to your submission, and each of you completes your own profile.",
     knowValues: {
       label: "Our values",
       colon: ": ",
@@ -128,19 +155,41 @@ const COPY: Record<Locale, typeof fr> = {
     },
     committeeTitle: "Our selection criteria",
     committeeIntro:
-      "Our selection committee — CND France volunteers and recognised members of the French-speaking Cloud Native communities — will favour proposals that meet as many of the following criteria as possible:",
+      "Our selection committee — volunteers from the CND France organization and members of the French-speaking Cloud Native communities — will pay particular attention to the following:",
+    noPitch:
+      "Promotional or commercial talks are not accepted and will be automatically rejected.",
+    committeeClosing:
+      "You don't need to meet all of these criteria: above all, we're looking for talks that let attendees learn, discover, or question their practices.",
     closingTitle: "You have something to say. We have the stage.",
     closingCta: "Submit a proposal",
     closingDeadline: "Submissions close January 31, 2027.",
     heroPhotoAlt: "Speaker on stage at Cloud Native Days France 2026",
     closingPhotoAlt: "Attendees at Cloud Native Days France 2026",
     criteria: [
-      { key: "Experience reports", body: "concrete application of Cloud Native tech." },
-      { key: "Open source", body: "drivers of innovation and collaboration." },
-      { key: "Innovation and technical expertise", body: "that push the limits of your field." },
-      { key: "French-speaking and local projects", body: "showcasing our ecosystem." },
-      { key: "Fresh material", body: "rarely seen at other conferences." },
-      { key: "Diversity", body: "of profiles and approaches." },
+      {
+        key: "Experience reports",
+        body: "useful, concrete lessons from operational projects or experiments, successes and failures alike.",
+      },
+      {
+        key: "Innovation and expertise",
+        body: "solid content, original approaches, technical depth, adapted to the selected format.",
+      },
+      {
+        key: "Open source and community contribution",
+        body: "particular attention to open technologies, collaborative projects and knowledge sharing.",
+      },
+      {
+        key: "Original content",
+        body: "priority to talks that have not been given before, fresh angles and approaches off the beaten track.",
+      },
+      {
+        key: "Diversity",
+        body: "a programme open to a diversity of profiles, backgrounds, experiences and points of view.",
+      },
+      {
+        key: "French-speaking ecosystem",
+        body: "particular attention to projects, initiatives and experiences from French-speaking organizations and communities.",
+      },
     ],
   },
 };
@@ -159,14 +208,11 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
   <section class="mx-auto max-w-6xl px-4 md:px-6 pt-16 md:pt-24 pb-10 md:pb-12">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
       <div>
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="inline-flex items-center rounded-full bg-accent text-accent-foreground px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-            {copy.badge}
-          </span>
-          <span class="inline-flex items-center rounded-full bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-            {copy.deadlineBadge}
-          </span>
-        </div>
+        <span
+          class="inline-flex items-center rounded-full bg-green-600 px-3 py-1 text-xs font-semibold tracking-wider text-white uppercase"
+        >
+          {copy.badge}
+        </span>
         <h1 class="mt-5 text-4xl md:text-6xl font-bold text-foreground tracking-tight" style="letter-spacing:-0.02em;">
           {copy.heroTitle}
         </h1>
@@ -181,6 +227,9 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
         >
           {copy.heroCta} <span aria-hidden="true">→</span>
         </a>
+        <p class="mt-3 text-sm font-medium text-red-600 dark:text-red-400">
+          {copy.deadlineLine}
+        </p>
         {copy.formatsLink && (
           <p class="mt-3 text-sm">
             <a
@@ -288,8 +337,11 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
             <strong class="font-semibold text-foreground">{copy.knowFrench.strong}</strong>
             {copy.knowFrench.after}
           </li>
-          <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
-            <span aria-hidden="true">🎙️</span> <strong class="font-semibold text-foreground">{copy.knowCoaching.strong}</strong> {copy.knowCoaching.after}
+          <li
+            class="text-muted-foreground text-sm leading-relaxed md:text-base"
+          >
+            <span aria-hidden="true">👥</span>
+            {copy.knowCosp}
           </li>
           <li class="text-sm md:text-base text-muted-foreground leading-relaxed">
             <strong class="font-semibold text-foreground">{copy.knowValues.label}</strong>
@@ -323,6 +375,21 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
             </a>
           </li>
         </ul>
+        <div class="border-accent bg-accent/10 mt-6 rounded-lg border p-4">
+          <p class="text-foreground text-sm leading-relaxed md:text-base">
+            <span aria-hidden="true">🎤</span>{" "}
+            <strong class="text-foreground font-semibold"
+              >{copy.coaching.strong}</strong
+            >{" "}
+            {copy.coaching.body}
+            <a
+              href={SPEAKERS_MAILTO}
+              class="text-primary focus-visible:ring-ring font-medium underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:outline-none"
+            >
+              speakers@cloudnativedays.fr
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   </section>
@@ -333,6 +400,9 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
     </h2>
     <p class="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">
       {copy.committeeIntro}
+    </p>
+    <p class="text-foreground mt-4 text-base font-bold md:text-lg">
+      {copy.noPitch}
     </p>
     <ul role="list" class="mt-6 grid sm:grid-cols-2 gap-x-8 gap-y-5">
       {
@@ -365,6 +435,9 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
         ))
       }
     </ul>
+    <p class="mt-6 text-sm md:text-base text-muted-foreground leading-relaxed">
+      {copy.committeeClosing}
+    </p>
   </section>
 
   <section class="mt-8 bg-card border-y border-border">
@@ -381,7 +454,9 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
         >
           {copy.closingCta} <span aria-hidden="true">→</span>
         </a>
-        <p class="mt-4 text-sm text-muted-foreground">{copy.closingDeadline}</p>
+        <p class="mt-4 text-sm font-medium text-red-600 dark:text-red-400">
+          {copy.closingDeadline}
+        </p>
         <p class="mt-1 text-xs text-muted-foreground">{CFP_LABEL}</p>
       </div>
       <Picture
