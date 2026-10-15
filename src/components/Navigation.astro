@@ -14,6 +14,15 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
 
+// Shared shape for the programme dropdown items: `strong` marks the one the
+// menu should lead with (the CFP, while the call is open — see programmeDD).
+type NavItem = {
+  href: string;
+  label: string;
+  current: boolean;
+  strong?: boolean;
+};
+
 const navItems: Array<{
   key: "nav.replays" | "nav.contact";
   path: string;
@@ -73,24 +82,25 @@ const programmeDD = (() => {
   const archives      = archivedEditions();
   // Every item answers "am I the current page?" the same way — see nav-path.ts
   // for the two ways this dropdown used to answer it, and what that broke.
-  const item = (href: string, label: string) => ({
+  const item = (href: string, label: string, strong = false): NavItem => ({
     href,
     label,
     current: isCurrentPath(currentPath, href),
+    strong,
   });
   return {
     key: "nav.programme.label",
     label: t("nav.programme.label"),
     active: onProgramme || onCfp || onSpeakers,
     items: [
-      // Order: the live edition's programme, then its speakers, then the CFP.
-      // Programme and Intervenant(e)s are two views of the same edition and
-      // belong side by side; the CFP is a different kind of thing — a call to
-      // act, not a page about the content — so it reads better after them, and
-      // ahead of the finished editions below.
+      // Order: the CFP comes first, and bolded. While the call for proposals
+      // is open, its visibility outranks the edition views below — it is the
+      // one entry that asks something of the reader. Programme and
+      // Intervenant(e)s are two views of the same edition and stay side by
+      // side immediately after it, ahead of the finished editions.
+      item(cfpPath, t("nav.programme.submenu.cfp"), true),
       item(`${programmeBase}/${featured}`, t("nav.programme.submenu.programme")),
       item(`${speakersBase}/${featured}`,  t("nav.programme.submenu.intervenants")),
-      item(cfpPath,                        t("nav.programme.submenu.cfp")),
       // A finished edition gets ONE entry: its programme. An earlier version
       // listed its speakers too, on the grounds that /intervenants/<year> would
       // otherwise have no route from the nav — true of the nav, but not of the
@@ -235,7 +245,15 @@ const contactLink = linkByKey["nav.contact"];
       {(() => {
         // Same order as desktop: À propos, Programme, Partenaires, Replays, Contact.
         const order: Array<
-          | { kind: "dd"; dd: typeof aboutDD }
+          | {
+              kind: "dd";
+              dd: {
+                key: string;
+                label: string;
+                active: boolean;
+                items: NavItem[];
+              };
+            }
           | { kind: "link"; link: typeof replaysLink }
         > = [
           { kind: "dd",   dd: aboutDD },
@@ -271,7 +289,9 @@ const contactLink = linkByKey["nav.contact"];
                       href={it.href}
                       aria-current={it.current ? "page" : undefined}
                       class:list={[
-                        "flex items-center min-h-11 px-2 py-3 text-sm font-medium rounded-md",
+                        "flex min-h-11 items-center rounded-md px-2 py-3 text-sm",
+                        // Weight swapped, not stacked — see NavDropdown.astro.
+                        it.strong ? "font-bold" : "font-medium",
                         it.current ? "text-primary" : "text-foreground hover:bg-muted",
                       ]}
                     >
