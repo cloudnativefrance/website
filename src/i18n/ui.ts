@@ -532,7 +532,10 @@ export const ui = {
     "tickets.code.submit": "Utiliser mon code",
     "tickets.code.empty": "Saisissez votre code pour continuer.",
     "tickets.strategic.audience":
-      "Pour celles et ceux qui décident\u00a0: CEO, CTO, DSI, VP…",
+      "Réservé aux décideurs et décideuses tech\u00a0: CEO, CTO, DSI, VP…",
+    // Mirrors the CGV clause on the ticket's eligibility: keep the two in step.
+    "tickets.strategic.eligibility":
+      "Chaque inscription est vérifiée\u00a0: si le profil ne correspond pas, l'organisation se réserve le droit d'annuler le billet et de le rembourser.",
     "tickets.strategic.perks.event": "Toute l'expérience CND France",
     "tickets.strategic.perks.track":
       "La salle {room}, pour des conférences stratégie et leadership",
@@ -628,7 +631,7 @@ export const ui = {
     "tickets.faq.strategic.q":
       "Les conférences Stratégie & Leadership sont-elles ouvertes à tous\u202f?",
     "tickets.faq.strategic.a":
-      "Non, elles sont réservées aux titulaires du billet {strategic}, tout comme le {lounge}. Le billet {standard} donne accès à toutes les autres conférences de la journée.",
+      "Non, elles sont réservées aux titulaires du billet {strategic}, tout comme le {lounge}. Ce billet est destiné aux décideurs et décideuses tech\u00a0: chaque inscription est vérifiée, et un billet dont le profil ne correspond pas peut être annulé et remboursé. Le billet {standard} donne accès à toutes les autres conférences de la journée.",
     "tickets.faq.ttc.q": "Les prix affichés sont-ils TTC\u202f?",
     "tickets.faq.ttc.a": "Oui, TVA à {rate} comprise.",
     "tickets.faq.per_order.q": "Combien de places par commande\u202f?",
@@ -1170,7 +1173,9 @@ export const ui = {
     "tickets.code.submit": "Use my code",
     "tickets.code.empty": "Enter your code to continue.",
     "tickets.strategic.audience":
-      "For those who make the calls: CEOs, CTOs, CIOs, VPs…",
+      "Reserved for tech decision-makers: CEOs, CTOs, CIOs, VPs…",
+    "tickets.strategic.eligibility":
+      "Every registration is checked: if the profile does not match, the organizers reserve the right to cancel the ticket and refund it.",
     "tickets.strategic.perks.event": "The full CND France experience",
     "tickets.strategic.perks.track":
       "The {room} room, for strategy and leadership talks",
@@ -1261,7 +1266,7 @@ export const ui = {
     "tickets.faq.strategic.q":
       "Are the Strategy & Leadership talks open to everyone?",
     "tickets.faq.strategic.a":
-      "No, they are reserved for {strategic} ticket holders, as is the {lounge}. The {standard} ticket gives access to every other talk of the day.",
+      "No, they are reserved for {strategic} ticket holders, as is the {lounge}. This ticket is meant for tech decision-makers: every registration is checked, and a ticket whose profile does not match may be cancelled and refunded. The {standard} ticket gives access to every other talk of the day.",
     "tickets.faq.ttc.q": "Do the prices shown include VAT?",
     "tickets.faq.ttc.a": "Yes, they include VAT at {rate}.",
     "tickets.faq.per_order.q": "How many seats per order?",
