@@ -36,8 +36,8 @@ const fr = {
   multiTopics: {
     lead: "Envie de proposer plusieurs sujets ?",
     rest: "Soumettez une proposition séparée pour chacun et le comité les évaluera indépendamment. ",
-    strong: "Privilégiez la qualité plutôt que la quantité\u00a0:",
-    tail: "présenter plusieurs sujets n'augmente pas vos chances automatiquement.",
+    strong: "Privilégiez la qualité plutôt que la quantité",
+    tail: "\u00a0: présenter plusieurs sujets n'augmente pas vos chances automatiquement.",
   },
   knowTitle: "À savoir",
   knowFrench: {
@@ -78,8 +78,8 @@ const fr = {
   noPitch:
     "Les présentations promotionnelles ou commerciales ne sont pas acceptées et sont automatiquement refusées.",
   committeeClosing: {
-    strong: "Il n'est pas nécessaire de répondre à tous ces critères\u00a0:",
-    rest: "nous recherchons avant tout des conférences qui permettent aux participants d'apprendre, de découvrir ou de questionner leurs pratiques.",
+    strong: "Il n'est pas nécessaire de répondre à tous ces critères",
+    rest: "\u00a0: nous recherchons avant tout des conférences qui permettent aux participants d'apprendre, de découvrir ou de questionner leurs pratiques.",
   },
   closingTitle: "Vous avez quelque chose à raconter. Nous avons la scène.",
   closingCta: "Soumettre une proposition",
@@ -128,8 +128,8 @@ const COPY: Record<Locale, typeof fr> = {
     multiTopics: {
       lead: "Want to submit several topics?",
       rest: "Send a separate proposal for each and the committee evaluates them independently. ",
-      strong: "Favour quality over quantity:",
-      tail: "submitting multiple proposals does not automatically increase your chances.",
+      strong: "Favour quality over quantity",
+      tail: ": submitting multiple proposals does not automatically increase your chances.",
     },
     knowTitle: "Good to know",
     knowFrench: {
@@ -169,8 +169,8 @@ const COPY: Record<Locale, typeof fr> = {
     noPitch:
       "Promotional or commercial talks are not accepted and will be automatically rejected.",
     committeeClosing: {
-      strong: "You don't need to meet all of these criteria:",
-      rest: "above all, we're looking for talks that let attendees learn, discover, or question their practices.",
+      strong: "You don't need to meet all of these criteria",
+      rest: ": above all, we're looking for talks that let attendees learn, discover, or question their practices.",
     },
     closingTitle: "You have something to say. We have the stage.",
     closingCta: "Submit a proposal",
@@ -316,7 +316,7 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
     </div>
     <p class="mt-4 rounded-lg border border-primary/40 bg-primary/10 px-5 py-4 text-sm md:text-base text-foreground leading-relaxed">
       <strong class="font-semibold text-foreground">{copy.multiTopics.lead}</strong>
-      <br />
+      <br />{" "}
       {copy.multiTopics.rest}
       <strong class="font-semibold text-foreground">{copy.multiTopics.strong}</strong>{copy.multiTopics.tail}
     </p>
