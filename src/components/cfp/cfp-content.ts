@@ -37,7 +37,7 @@ export const CFP_CONTENT: Record<Locale, CfpContent> = {
   fr: {
     themesTitle: "Les 7 thèmes",
     themesSub:
-      "Choisissez celui qui correspond le mieux à votre sujet. En cas de doute, choisissez le thème le plus proche, le comité peut réaffecter une proposition.",
+      "Choisissez celui qui correspond le mieux à votre sujet. En cas de doute, choisissez le thème le plus proche, le comité s'occupera de réaffecter votre proposition.",
     formatsTitle: "Les formats",
     closedSectionTitle: "Les thèmes et les formats de l'édition 2027",
     parcours: [
@@ -98,7 +98,7 @@ export const CFP_CONTENT: Record<Locale, CfpContent> = {
   en: {
     themesTitle: "The 7 themes",
     themesSub:
-      "Pick the one that fits your topic best. If in doubt, pick the closest theme — the committee can reassign a proposal.",
+      "Pick the one that fits your topic best. If in doubt, pick the closest theme — the committee will take care of reassigning your proposal.",
     formatsTitle: "The formats",
     closedSectionTitle: "The themes and formats of the 2027 edition",
     parcours: [
