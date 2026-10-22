@@ -22,9 +22,14 @@ const render = (component: any, lang: "fr" | "en") =>
 // data-astro-source-* attributes; assert on the text it renders, not its raw
 // markup. NBSP (\u00a0, the FR colon convention) is kept; ASCII runs of
 // whitespace are collapsed.
+// Tags are removed WITHOUT adding a space: production HTML carries no
+// whitespace at tag boundaries, and a stripped tag must not fake one — that
+// phantom once hid a real "quantité\u00a0:présenter" glue bug behind a green
+// test. Word spacing across tags must come from the templates themselves
+// (which is also what screen readers read).
 const text = (html: string) =>
   html
-    .replace(/<[^>]+>/g, " ")
+    .replace(/<[^>]+>/g, "")
     .replace(/&#39;/g, "'")
     .replace(/&amp;/g, "&")
     .replace(/&quot;/g, '"')
@@ -194,6 +199,9 @@ describe("CfpOpen — editorial pass copy", () => {
       "critères\u00a0: nous recherchons avant tout des conférences",
     );
     expect(m).not.toContain("au plus grand nombre des critères");
+    expect(await mainText(CfpOpen, "en")).toContain(
+      "criteria: above all, we're looking for talks",
+    );
     // The closing line rides its own soft primary box, lead in bold.
     const i = OPEN_SRC.indexOf("{copy.committeeClosing.strong}");
     expect(i).toBeGreaterThan(-1);
