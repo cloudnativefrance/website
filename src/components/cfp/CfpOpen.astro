@@ -33,8 +33,12 @@ const fr = {
   eventLine:
     "3 juin 2027 · CENTQUATRE-PARIS · au cœur de la communauté francophone du Cloud Native",
   deadlineLine: "Date limite\u00a0: 31 janvier 2027",
-  multiTopics:
-    "Envie de proposer plusieurs sujets ? Soumettez une proposition séparée pour chacun et le comité les évaluera indépendamment. Privilégiez la qualité plutôt que la quantité\u00a0: présenter plusieurs sujets n'augmente pas vos chances automatiquement.",
+  multiTopics: {
+    lead: "Envie de proposer plusieurs sujets ?",
+    rest: "Soumettez une proposition séparée pour chacun et le comité les évaluera indépendamment. ",
+    strong: "Privilégiez la qualité plutôt que la quantité\u00a0:",
+    tail: "présenter plusieurs sujets n'augmente pas vos chances automatiquement.",
+  },
   knowTitle: "À savoir",
   knowFrench: {
     before: "Toutes les présentations se déroulent ",
@@ -119,8 +123,12 @@ const COPY: Record<Locale, typeof fr> = {
     eventLine:
       "June 3, 2027 · CENTQUATRE-PARIS · at the heart of the French-speaking Cloud Native community",
     deadlineLine: "Deadline: January 31, 2027",
-    multiTopics:
-      "Want to submit several topics? Send a separate proposal for each and the committee evaluates them independently. Favour quality over quantity: submitting multiple proposals does not automatically increase your chances.",
+    multiTopics: {
+      lead: "Want to submit several topics?",
+      rest: "Send a separate proposal for each and the committee evaluates them independently. ",
+      strong: "Favour quality over quantity:",
+      tail: "submitting multiple proposals does not automatically increase your chances.",
+    },
     knowTitle: "Good to know",
     knowFrench: {
       before: "All talks are ",
@@ -303,7 +311,10 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
       </article>
     </div>
     <p class="mt-4 rounded-lg border border-primary/40 bg-primary/10 px-5 py-4 text-sm md:text-base text-foreground leading-relaxed">
-      {copy.multiTopics}
+      <strong class="font-semibold text-foreground">{copy.multiTopics.lead}</strong>
+      <br />
+      {copy.multiTopics.rest}
+      <strong class="font-semibold text-foreground">{copy.multiTopics.strong}</strong>{copy.multiTopics.tail}
     </p>
   </section>
 

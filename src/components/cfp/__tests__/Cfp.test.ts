@@ -199,6 +199,23 @@ describe("CfpOpen — editorial pass copy", () => {
     );
   });
 
+  it("the multi-topics callout: bold lead, line break, bolded quality line", async () => {
+    const m = await mainText(CfpOpen, "fr");
+    expect(m).toContain(
+      "Envie de proposer plusieurs sujets ? Soumettez une proposition séparée pour chacun et le comité les évaluera indépendamment. Privilégiez la qualité plutôt que la quantité\u00a0: présenter plusieurs sujets n'augmente pas vos chances automatiquement.",
+    );
+    expect(await mainText(CfpOpen, "en")).toContain(
+      "Favour quality over quantity: submitting multiple proposals does not automatically increase your chances.",
+    );
+    // Structure: <strong>lead</strong> <br /> rest <strong>strong</strong>tail
+    const block = OPEN_SRC.slice(
+      OPEN_SRC.indexOf("multiTopics.lead"),
+      OPEN_SRC.indexOf("multiTopics.tail"),
+    );
+    expect(block).toMatch(/<\/strong>\s*<br\s*\/>/);
+    expect(block).toContain("multiTopics.strong");
+  });
+
   it("the fr page carries no em-dash prose", async () => {
     expect(await mainText(CfpOpen, "fr")).not.toContain(" — ");
   });
