@@ -42,7 +42,7 @@ describe("CfpBanner", () => {
     state.phase = "open";
     const html = await render();
     expect(html).toContain("Le CFP 2027 est ouvert");
-    expect(html).toContain("31 janvier");
+    expect(html).toContain("21 janvier");
     expect(html).toContain('href="/cfp"');
   });
 

@@ -86,7 +86,7 @@ export const ui = {
     // Phase copy for the commit-flipped phase system (src/config/cfp.ts).
     "cfp.meta.title": "Appel à conférences (CFP)",
     "cfp.banner.text":
-      "Le CFP 2027 est ouvert : proposez votre conférence avant le 31 janvier",
+      "Le CFP 2027 est ouvert : proposez votre conférence avant le 21 janvier",
     "cfp.meta.description":
       "Proposez votre conférence à Cloud Native Days France 2027 : 7 thèmes, 3 formats.",
     "cfp.coming_soon.title": "L'appel à propositions arrive",
@@ -751,7 +751,7 @@ export const ui = {
     "cfp.deadline": "Submissions close {date}",
     // Phase copy for the commit-flipped phase system (src/config/cfp.ts).
     "cfp.meta.title": "Call for Papers (CFP)",
-    "cfp.banner.text": "The 2027 CFP is open: submit your talk before January 31",
+    "cfp.banner.text": "The 2027 CFP is open: submit your talk before January 21",
     "cfp.meta.description":
       "Submit your talk to Cloud Native Days France 2027: 7 themes, 3 formats.",
     "cfp.coming_soon.title": "The Call for Papers is coming",

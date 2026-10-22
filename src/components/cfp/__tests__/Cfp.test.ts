@@ -49,7 +49,7 @@ const CLOSED_SRC = readFileSync(
 describe("CfpOpen — editorial pass copy", () => {
   it("fr hero states the deadline in red under the CTA, badge green", async () => {
     const m = await mainText(CfpOpen, "fr");
-    expect(m).toContain("Date limite\u00a0: 31 janvier 2027");
+    expect(m).toContain("Date limite\u00a0: 21 janvier 2027");
     expect(m).not.toContain("réponse du comité fin février");
     expect(m).not.toContain("Soumissions ouvertes jusqu'au");
     expect(m).toContain("CFP 2027 · ouvert");
@@ -69,13 +69,13 @@ describe("CfpOpen — editorial pass copy", () => {
 
   it("en hero mirrors it", async () => {
     const m = await mainText(CfpOpen, "en");
-    expect(m).toContain("Deadline: January 31, 2027");
+    expect(m).toContain("Deadline: January 21, 2027");
     expect(m).not.toContain("committee responds by the end of February");
   });
 
   it("the closing banner keeps its own deadline line", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "Clôture le 31 janvier 2027",
+      "Clôture le 21 janvier 2027",
     );
   });
 
