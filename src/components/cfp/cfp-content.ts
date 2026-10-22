@@ -13,7 +13,8 @@ import type { Locale } from "@/i18n/ui";
 export interface CfpTheme {
   emoji: string;
   title: string;
-  body: string;
+  /** 2–4 short fragments — theme cards render them as a compact bullet list. */
+  bullets: string[];
 }
 
 export interface CfpFormat {
@@ -37,45 +38,72 @@ export const CFP_CONTENT: Record<Locale, CfpContent> = {
   fr: {
     themesTitle: "Les 7 thèmes",
     themesSub:
-      "Choisissez celui qui correspond le mieux à votre sujet. En cas de doute, choisissez le thème le plus proche, le comité peut réaffecter une proposition.",
+      "Choisissez celui qui correspond le mieux à votre sujet. En cas de doute, choisissez le thème le plus proche, le comité s'occupera de réaffecter votre proposition.",
     formatsTitle: "Les formats",
     closedSectionTitle: "Les thèmes et les formats de l'édition 2027",
     parcours: [
       {
         emoji: "🧭",
         title: "Autonomie numérique et open source",
-        body: "Maîtriser ses dépendances technologiques : protection des données, alternatives et contribution open source, portabilité des applications et des infrastructures, interopérabilité et réversibilité pour préserver sa liberté de choix technologique.",
+        bullets: [
+          "Protection des données, alternatives et contribution open source.",
+          "Portabilité des applications et des infrastructures, interopérabilité.",
+          "Réversibilité : préserver sa liberté de choix technologique.",
+        ],
       },
       {
         emoji: "🧰",
         title: "DevEx et Platform Engineering",
-        body: "Concevoir des plateformes que les équipes choisissent d'utiliser : golden paths, self-service, CI/CD, GitOps, réduction de la charge cognitive et autonomie des équipes.",
+        bullets: [
+          "Des plateformes que les équipes choisissent d'utiliser.",
+          "Golden paths, self-service, CI/CD, GitOps.",
+          "Réduction de la charge cognitive, autonomie des équipes.",
+        ],
       },
       {
         emoji: "🤖",
         title: "L'IA à l'épreuve du réel",
-        body: "Déployer et exploiter l'IA en production (GPU, inférence, performances, coûts), concevoir des applications intégrant l'IA (LLM, RAG, agents et garde-fous) et mettre l'IA au service des métiers Cloud Native (développement, CI/CD, observabilité, opérations).",
+        bullets: [
+          "Déployer et exploiter l'IA en production : GPU, inférence, performances, coûts.",
+          "Concevoir des applications intégrant l'IA : LLM, RAG, agents, garde-fous.",
+          "L'IA au service des pratiques Cloud Native : développement, CI/CD, observabilité, opérations.",
+        ],
       },
       {
         emoji: "🔭",
         title: "Observabilité et fiabilité",
-        body: "Comprendre, surveiller et fiabiliser les systèmes en production : métriques, logs et traces plutôt que des dashboards, SLO tenables et pratiques SRE, disponibilité, gestion des incidents et reprise après défaillance.",
+        bullets: [
+          "Métriques, logs et traces plutôt que des dashboards.",
+          "SLO tenables et pratiques SRE.",
+          "Disponibilité, gestion des incidents, reprise après défaillance.",
+        ],
       },
       {
         emoji: "🛡️",
         title: "Sécurité et confiance",
-        body: "Sécuriser les applications et les infrastructures cloud native, de la conception à la production, sans bloquer le travail des équipes : dépendances logicielles, CI/CD, identités, accès et secrets, gestion des vulnérabilités, détection et réponse aux menaces, conformité.",
+        bullets: [
+          "Sécuriser de la conception à la production, sans bloquer le travail des équipes.",
+          "Dépendances logicielles, CI/CD, identités, accès et secrets.",
+          "Gestion des vulnérabilités, détection et réponse aux menaces, conformité.",
+        ],
       },
       {
         emoji: "🧱",
         title: "Fondations\u00a0: infrastructure, stockage, réseau",
-        body: "Les couches sur lesquelles tout repose : calcul, stockage, réseau, bases de données, architectures résilientes, performance et passage à l'échelle, maîtrise des coûts (FinOps) et impact environnemental (GreenOps).",
+        bullets: [
+          "Calcul, stockage, réseau, bases de données.",
+          "Architectures résilientes, performance et passage à l'échelle.",
+          "Maîtrise des coûts (FinOps) et impact environnemental (GreenOps).",
+        ],
       },
     ],
     horsPiste: {
       emoji: "⛷️",
       title: "Hors-piste, sujets divers",
-      body: "Ce qui n'entre nulle part ailleurs et mérite d'être entendu : expérimentations, angles inattendus, et le retour d'expérience qu'on n'ose pas raconter.",
+      bullets: [
+        "Expérimentations et angles inattendus.",
+        "Le retour d'expérience qu'on n'ose pas raconter.",
+      ],
     },
     formats: [
       {
@@ -98,45 +126,72 @@ export const CFP_CONTENT: Record<Locale, CfpContent> = {
   en: {
     themesTitle: "The 7 themes",
     themesSub:
-      "Pick the one that fits your topic best. If in doubt, pick the closest theme — the committee can reassign a proposal.",
+      "Pick the one that fits your topic best. If in doubt, pick the closest theme — the committee will take care of reassigning your proposal.",
     formatsTitle: "The formats",
     closedSectionTitle: "The themes and formats of the 2027 edition",
     parcours: [
       {
         emoji: "🧭",
         title: "Digital autonomy & open source",
-        body: "Mastering your technology dependencies: data protection, open source alternatives and contribution, application and infrastructure portability, interoperability and reversibility to preserve your freedom of technological choice.",
+        bullets: [
+          "Data protection, open source alternatives and contribution.",
+          "Application and infrastructure portability, interoperability.",
+          "Reversibility: preserving your freedom of technological choice.",
+        ],
       },
       {
         emoji: "🧰",
         title: "DevEx & Platform Engineering",
-        body: "Designing platforms teams choose to use: golden paths, self-service, CI/CD, GitOps, reduced cognitive load and team autonomy.",
+        bullets: [
+          "Platforms teams choose to use.",
+          "Golden paths, self-service, CI/CD, GitOps.",
+          "Reduced cognitive load, team autonomy.",
+        ],
       },
       {
         emoji: "🤖",
         title: "AI put to the test",
-        body: "Deploying and operating AI in production (GPUs, inference, performance, cost), building AI-integrated applications (LLMs, RAG, agents and guardrails), and putting AI to work for Cloud Native practices (development, CI/CD, observability, operations).",
+        bullets: [
+          "Deploying and operating AI in production: GPUs, inference, performance, cost.",
+          "Building AI-integrated applications: LLMs, RAG, agents, guardrails.",
+          "AI at work for Cloud Native practices: development, CI/CD, observability, operations.",
+        ],
       },
       {
         emoji: "🔭",
         title: "Observability & reliability",
-        body: "Understanding, monitoring and making production systems reliable: metrics, logs and traces rather than dashboards, sustainable SLOs and SRE practices, availability, incident management and disaster recovery.",
+        bullets: [
+          "Metrics, logs and traces rather than dashboards.",
+          "Sustainable SLOs and SRE practices.",
+          "Availability, incident management, disaster recovery.",
+        ],
       },
       {
         emoji: "🛡️",
         title: "Security & trust",
-        body: "Securing cloud native applications and infrastructure from design to production, without blocking teams' work: software dependencies, CI/CD, identities, access and secrets, vulnerability management, threat detection and response, compliance.",
+        bullets: [
+          "Securing from design to production, without blocking teams' work.",
+          "Software dependencies, CI/CD, identities, access and secrets.",
+          "Vulnerability management, threat detection and response, compliance.",
+        ],
       },
       {
         emoji: "🧱",
         title: "Foundations: infrastructure, storage, networking",
-        body: "The layers everything rests on: compute, storage, networking, databases, resilient architectures, performance and scaling, cost control (FinOps) and environmental impact (GreenOps).",
+        bullets: [
+          "Compute, storage, networking, databases.",
+          "Resilient architectures, performance and scaling.",
+          "Cost control (FinOps) and environmental impact (GreenOps).",
+        ],
       },
     ],
     horsPiste: {
       emoji: "⛷️",
       title: "Off-piste & misc",
-      body: "What fits nowhere else and deserves to be heard: experiments, unexpected angles, and the experience report you don't dare tell.",
+      bullets: [
+        "Experiments and unexpected angles.",
+        "The experience report you don't dare tell.",
+      ],
     },
     formats: [
       {

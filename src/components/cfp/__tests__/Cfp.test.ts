@@ -7,6 +7,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import CfpOpen from "../CfpOpen.astro";
 import CfpClosed from "../CfpClosed.astro";
+import { CFP_CONTENT } from "../cfp-content";
 
 let container: AstroContainer;
 
@@ -80,71 +81,75 @@ describe("CfpOpen — editorial pass copy", () => {
 
   it("fr themes sub reassures about reassignment", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "Choisissez celui qui correspond le mieux à votre sujet. En cas de doute, choisissez le thème le plus proche, le comité peut réaffecter une proposition.",
+      "Choisissez celui qui correspond le mieux à votre sujet. En cas de doute, choisissez le thème le plus proche, le comité s'occupera de réaffecter votre proposition.",
     );
   });
 
   it("en themes sub mirrors it", async () => {
     expect(await mainText(CfpOpen, "en")).toContain(
-      "Pick the one that fits your topic best. If in doubt, pick the closest theme — the committee can reassign a proposal.",
+      "Pick the one that fits your topic best. If in doubt, pick the closest theme — the committee will take care of reassigning your proposal.",
     );
   });
 
   it("DevEx theme names CI/CD and GitOps, both locales", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "golden paths, self-service, CI/CD, GitOps, réduction de la charge cognitive et autonomie des équipes.",
+      "Golden paths, self-service, CI/CD, GitOps.",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "golden paths, self-service, CI/CD, GitOps, reduced cognitive load and team autonomy.",
+      "Golden paths, self-service, CI/CD, GitOps.",
     );
   });
 
   it("Fondations: storage-focused title, resilience, FinOps and GreenOps named", async () => {
     const m = await mainText(CfpOpen, "fr");
     expect(m).toContain("Fondations\u00a0: infrastructure, stockage, réseau");
+    expect(m).toContain("Calcul, stockage, réseau, bases de données.");
     expect(m).toContain(
-      "Les couches sur lesquelles tout repose : calcul, stockage, réseau, bases de données, architectures résilientes, performance et passage à l'échelle, maîtrise des coûts (FinOps) et impact environnemental (GreenOps).",
+      "Maîtrise des coûts (FinOps) et impact environnemental (GreenOps).",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "The layers everything rests on: compute, storage, networking, databases, resilient architectures, performance and scaling, cost control (FinOps) and environmental impact (GreenOps).",
+      "Cost control (FinOps) and environmental impact (GreenOps).",
     );
   });
 
   it("Autonomie numérique: plural dependencies, contribution angle", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "Maîtriser ses dépendances technologiques : protection des données, alternatives et contribution open source, portabilité des applications et des infrastructures, interopérabilité et réversibilité pour préserver sa liberté de choix technologique.",
+      "Protection des données, alternatives et contribution open source.",
+    );
+    expect(await mainText(CfpOpen, "fr")).toContain(
+      "Réversibilité : préserver sa liberté de choix technologique.",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "Mastering your technology dependencies: data protection, open source alternatives and contribution, application and infrastructure portability, interoperability and reversibility to preserve your freedom of technological choice.",
+      "Reversibility: preserving your freedom of technological choice.",
     );
   });
 
   it("IA body: three pillars, guardrails kept, no anti-demo line", async () => {
     const m = await mainText(CfpOpen, "fr");
     expect(m).toContain(
-      "Déployer et exploiter l'IA en production (GPU, inférence, performances, coûts), concevoir des applications intégrant l'IA (LLM, RAG, agents et garde-fous) et mettre l'IA au service des métiers Cloud Native (développement, CI/CD, observabilité, opérations).",
+      "Concevoir des applications intégrant l'IA : LLM, RAG, agents, garde-fous.",
     );
     expect(m).not.toContain("pas des démos");
     expect(await mainText(CfpOpen, "en")).toContain(
-      "Deploying and operating AI in production (GPUs, inference, performance, cost), building AI-integrated applications (LLMs, RAG, agents and guardrails), and putting AI to work for Cloud Native practices (development, CI/CD, observability, operations).",
+      "Building AI-integrated applications: LLMs, RAG, agents, guardrails.",
     );
   });
 
   it("Observabilité: concrete signals over the old stance wording, dashboards kept", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "Comprendre, surveiller et fiabiliser les systèmes en production : métriques, logs et traces plutôt que des dashboards, SLO tenables et pratiques SRE, disponibilité, gestion des incidents et reprise après défaillance.",
+      "Métriques, logs et traces plutôt que des dashboards.",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "Understanding, monitoring and making production systems reliable: metrics, logs and traces rather than dashboards, sustainable SLOs and SRE practices, availability, incident management and disaster recovery.",
+      "Metrics, logs and traces rather than dashboards.",
     );
   });
 
   it("Sécurité: concrete enumeration keeps the without-blocking stance", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "Sécuriser les applications et les infrastructures cloud native, de la conception à la production, sans bloquer le travail des équipes : dépendances logicielles, CI/CD, identités, accès et secrets, gestion des vulnérabilités, détection et réponse aux menaces, conformité.",
+      "Sécuriser de la conception à la production, sans bloquer le travail des équipes.",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "Securing cloud native applications and infrastructure from design to production, without blocking teams' work: software dependencies, CI/CD, identities, access and secrets, vulnerability management, threat detection and response, compliance.",
+      "Securing from design to production, without blocking teams' work.",
     );
   });
 
@@ -166,12 +171,15 @@ describe("CfpOpen — editorial pass copy", () => {
     expect(m).not.toContain("primo-oratrices");
   });
 
-  it("co-speakers are welcome on every format", async () => {
+  it("co-speakers are welcome on every format, inclusively worded", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "Les co-intervenants sont les bienvenus sur tous les formats",
+      "Toutes les personnes co-intervenantes sont bienvenues sur tous les formats",
+    );
+    expect(await mainText(CfpOpen, "fr")).toContain(
+      "chaque personne complète son profil",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "Co-speakers are welcome on every format",
+      "All co-speakers are welcome on every format",
     );
   });
 
@@ -182,7 +190,16 @@ describe("CfpOpen — editorial pass copy", () => {
     expect(m).toContain(
       "Il n'est pas nécessaire de répondre à tous ces critères",
     );
+    expect(m).toContain(
+      "critères\u00a0: nous recherchons avant tout des conférences",
+    );
     expect(m).not.toContain("au plus grand nombre des critères");
+    // The closing line rides its own soft primary box, lead in bold.
+    const i = OPEN_SRC.indexOf("{copy.committeeClosing.strong}");
+    expect(i).toBeGreaterThan(-1);
+    const block = OPEN_SRC.slice(OPEN_SRC.lastIndexOf("<p", i), i + 120);
+    expect(block).toContain("bg-primary/10");
+    expect(block).toMatch(/<strong[^>]*>\{copy\.committeeClosing\.strong\}/);
   });
 
   it("the lightning talk leads with the idea", async () => {
@@ -194,8 +211,37 @@ describe("CfpOpen — editorial pass copy", () => {
     );
   });
 
+  it("the multi-topics callout: bold lead, line break, bolded quality line", async () => {
+    const m = await mainText(CfpOpen, "fr");
+    expect(m).toContain(
+      "Envie de proposer plusieurs sujets ? Soumettez une proposition séparée pour chacun et le comité les évaluera indépendamment. Privilégiez la qualité plutôt que la quantité\u00a0: présenter plusieurs sujets n'augmente pas vos chances automatiquement.",
+    );
+    expect(await mainText(CfpOpen, "en")).toContain(
+      "Favour quality over quantity: submitting multiple proposals does not automatically increase your chances.",
+    );
+    // Structure: <strong>lead</strong> <br /> rest <strong>strong</strong>tail
+    const block = OPEN_SRC.slice(
+      OPEN_SRC.indexOf("multiTopics.lead"),
+      OPEN_SRC.indexOf("multiTopics.tail"),
+    );
+    expect(block).toMatch(/<\/strong>\s*<br\s*\/>/);
+    expect(block).toContain("multiTopics.strong");
+  });
+
   it("the fr page carries no em-dash prose", async () => {
     expect(await mainText(CfpOpen, "fr")).not.toContain(" — ");
+  });
+
+  it("the closing section shows the 2026 stage photo with an accurate alt", async () => {
+    const html = await render(CfpOpen, "fr");
+    expect(html).toContain(
+      "Deux intervenantes sur scène à Cloud Native Days France 2026",
+    );
+    const htmlEn = await render(CfpOpen, "en");
+    expect(htmlEn).toContain("Two speakers on stage at Cloud Native Days France 2026");
+    // Its own asset: contact/participant.jpg stays on the contact pages.
+    expect(OPEN_SRC).toContain("photos/cfp/intervenantes-scene.jpg");
+    expect(OPEN_SRC).not.toContain("contact/participant.jpg");
   });
 });
 
@@ -205,6 +251,16 @@ describe("CfpOpen — themes/formats live in the shared module", () => {
     expect(OPEN_SRC).not.toMatch(/parcours:\s*\[/);
     expect(OPEN_SRC).not.toMatch(/formats:\s*\[/);
     expect(OPEN_SRC).not.toMatch(/horsPiste:\s*\{/);
+  });
+
+  it("every theme card is a 2 to 4 item bullet list, both locales", () => {
+    for (const locale of ["fr", "en"] as const) {
+      const c = CFP_CONTENT[locale];
+      for (const th of [...c.parcours, c.horsPiste]) {
+        expect(th.bullets.length).toBeGreaterThanOrEqual(2);
+        expect(th.bullets.length).toBeLessThanOrEqual(4);
+      }
+    }
   });
 });
 

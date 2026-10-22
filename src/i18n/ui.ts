@@ -53,6 +53,8 @@ export const ui = {
     "hero.venue": "CENTQUATRE-PARIS",
     "hero.cta.register": "Prenez votre place",
     "hero.cta.schedule": "Voir le programme",
+    "hero.cta.cfp": "Postuler au CFP",
+    "hero.cta.new_track": "Découvrir le nouveau track : Strategy & Leadership",
     "hero.description":
       "La communaut\u00e9 francophone passionn\u00e9e de devops et de cloud native se retrouve \u00e0 Paris. Une journ\u00e9e de retours d'exp\u00e9rience et de rencontres - ouverte \u00e0 toutes et tous, des juniors curieux \u00e0 l'archi senior jusqu'aux d\u00e9cideurs en qu\u00eate des derni\u00e8res tendances.",
     "hero.logo_alt": "Cloud Native Days France",
@@ -83,6 +85,8 @@ export const ui = {
     "cfp.deadline": "Clôture le {date}",
     // Phase copy for the commit-flipped phase system (src/config/cfp.ts).
     "cfp.meta.title": "Appel à conférences (CFP)",
+    "cfp.banner.text":
+      "Le CFP 2027 est ouvert : proposez votre conférence avant le 31 janvier",
     "cfp.meta.description":
       "Proposez votre conférence à Cloud Native Days France 2027 : 7 thèmes, 3 formats.",
     "cfp.coming_soon.title": "L'appel à propositions arrive",
@@ -715,6 +719,8 @@ export const ui = {
     "hero.venue": "CENTQUATRE-PARIS",
     "hero.cta.register": "Get your ticket",
     "hero.cta.schedule": "View schedule",
+    "hero.cta.cfp": "Submit to the CFP",
+    "hero.cta.new_track": "Discover the new track: Strategy & Leadership",
     "hero.description":
       "The French-speaking DevOps and cloud-native community comes together in Paris. A day of real-world experience reports and conversations \u2014 open to everyone, from curious juniors to senior architects all the way to decision-makers tracking the latest trends.",
     "hero.logo_alt": "Cloud Native Days France",
@@ -745,6 +751,7 @@ export const ui = {
     "cfp.deadline": "Submissions close {date}",
     // Phase copy for the commit-flipped phase system (src/config/cfp.ts).
     "cfp.meta.title": "Call for Papers (CFP)",
+    "cfp.banner.text": "The 2027 CFP is open: submit your talk before January 31",
     "cfp.meta.description":
       "Submit your talk to Cloud Native Days France 2027: 7 themes, 3 formats.",
     "cfp.coming_soon.title": "The Call for Papers is coming",

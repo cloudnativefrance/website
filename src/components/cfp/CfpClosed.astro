@@ -54,9 +54,14 @@ const content = CFP_CONTENT[lang];
                 {th.title}
               </h3>
             </div>
-            <p class="text-muted-foreground mt-2 text-sm leading-relaxed md:text-base">
-              {th.body}
-            </p>
+            <ul
+              class="text-muted-foreground mt-2 list-disc space-y-1 ps-5 text-sm leading-relaxed md:text-base"
+              role="list"
+            >
+              {th.bullets.map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
           </article>
         ))
       }
@@ -76,11 +81,14 @@ const content = CFP_CONTENT[lang];
             {content.horsPiste.title}
           </h3>
         </div>
-        <p
-          class="text-muted-foreground mt-2 text-sm leading-relaxed md:text-base"
+        <ul
+          class="text-muted-foreground mt-2 list-disc space-y-1 ps-5 text-sm leading-relaxed md:text-base"
+          role="list"
         >
-          {content.horsPiste.body}
-        </p>
+          {content.horsPiste.bullets.map((b) => (
+            <li>{b}</li>
+          ))}
+        </ul>
       </article>
     </div>
     <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">

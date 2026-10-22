@@ -1,0 +1,33 @@
+---
+/**
+ * The homepage's top CFP band ("remonter le CFP", Nov 3 reveal): the highest
+ * possible CFP spot on the page. Gated by the same commit-flipped registry
+ * that drives /cfp — the band only exists while the phase is `open`, so the
+ * homepage keeps its 2026 shape until the flip and reverts after the
+ * deadline without a second edit.
+ */
+import type { Locale } from "@/i18n/ui";
+import { getLocalePath, useTranslations } from "@/i18n/utils";
+import { CFP } from "@/config/cfp";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const CFP_HREF = getLocalePath(lang, "/cfp");
+const open = CFP.currentPhase === "open";
+---
+
+{
+  open && (
+    <a
+      href={CFP_HREF}
+      class="block bg-green-600 px-4 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    >
+      {t("cfp.banner.text")}{" "}
+      <span aria-hidden="true">→</span>
+    </a>
+  )
+}
