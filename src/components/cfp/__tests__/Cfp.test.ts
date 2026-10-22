@@ -197,6 +197,18 @@ describe("CfpOpen — editorial pass copy", () => {
   it("the fr page carries no em-dash prose", async () => {
     expect(await mainText(CfpOpen, "fr")).not.toContain(" — ");
   });
+
+  it("the closing section shows the 2026 stage photo with an accurate alt", async () => {
+    const html = await render(CfpOpen, "fr");
+    expect(html).toContain(
+      "Deux intervenantes sur scène à Cloud Native Days France 2026",
+    );
+    const htmlEn = await render(CfpOpen, "en");
+    expect(htmlEn).toContain("Two speakers on stage at Cloud Native Days France 2026");
+    // Its own asset: contact/participant.jpg stays on the contact pages.
+    expect(OPEN_SRC).toContain("photos/cfp/intervenantes-scene.jpg");
+    expect(OPEN_SRC).not.toContain("contact/participant.jpg");
+  });
 });
 
 describe("CfpOpen — themes/formats live in the shared module", () => {

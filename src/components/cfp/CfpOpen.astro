@@ -14,7 +14,7 @@ import { getLocalePath } from "@/i18n/utils";
 import { cfpSubmitUrl, cfpSubmitLabel } from "@/lib/pretalx";
 import { CFP_CONTENT } from "./cfp-content";
 import intervenantPhoto from "@/assets/photos/contact/intervenants.jpg";
-import participantPhoto from "@/assets/photos/contact/participant.jpg";
+import closingPhoto from "@/assets/photos/cfp/intervenantes-scene.jpg";
 
 interface Props {
   lang: Locale;
@@ -79,7 +79,7 @@ const fr = {
   closingCta: "Soumettre une proposition",
   closingDeadline: "Clôture le 31 janvier 2027",
   heroPhotoAlt: "Intervenant(e) sur scène à Cloud Native Days France 2026",
-  closingPhotoAlt: "Participantes et participants à Cloud Native Days France 2026",
+  closingPhotoAlt: "Deux intervenantes sur scène à Cloud Native Days France 2026",
   criteria: [
     {
       key: "Retours d'expérience",
@@ -164,7 +164,7 @@ const COPY: Record<Locale, typeof fr> = {
     closingCta: "Submit a proposal",
     closingDeadline: "Submissions close January 31, 2027.",
     heroPhotoAlt: "Speaker on stage at Cloud Native Days France 2026",
-    closingPhotoAlt: "Attendees at Cloud Native Days France 2026",
+    closingPhotoAlt: "Two speakers on stage at Cloud Native Days France 2026",
     criteria: [
       {
         key: "Experience reports",
@@ -464,7 +464,7 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
         <p class="mt-1 text-xs text-muted-foreground">{CFP_LABEL}</p>
       </div>
       <Picture
-        src={participantPhoto}
+        src={closingPhoto}
         alt={copy.closingPhotoAlt}
         widths={[400, 600, 800, 1200]}
         sizes="(min-width: 768px) 45vw, 100vw"
