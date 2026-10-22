@@ -48,6 +48,8 @@ describe("cfp phase registry", () => {
       "cfp.cta.notify",
       "cfp.cta.submit",
       "cfp.deadline",
+      // The homepage's top CFP band (Nov 3 reveal, CfpBanner.astro).
+      "cfp.banner.text",
     ]);
     for (const locale of LOCALES) {
       for (const key of Object.keys(ui[locale])) {

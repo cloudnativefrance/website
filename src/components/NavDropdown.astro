@@ -9,6 +9,8 @@ interface Item {
   href: string;
   label: string;
   current?: boolean;
+  /** Lead item of the dropdown — rendered bold (the open CFP). */
+  strong?: boolean;
 }
 interface Props {
   key: string;      // i18n key used for the trigger label; used to build DOM ids
@@ -50,7 +52,10 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
           href={item.href}
           aria-current={item.current ? "page" : undefined}
           class:list={[
-            "block px-4 py-2 text-base font-semibold whitespace-nowrap hover:bg-muted focus-visible:bg-muted focus-visible:outline-none",
+            "hover:bg-muted focus-visible:bg-muted block px-4 py-2 text-base whitespace-nowrap focus-visible:outline-none",
+            // The weight is swapped, not stacked: font-bold alongside
+            // font-semibold leaves the winner to the stylesheet's order.
+            item.strong ? "font-bold" : "font-semibold",
             item.current && "text-primary",
           ]}
         >

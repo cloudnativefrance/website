@@ -5,6 +5,7 @@ import FeatureGate from "@/components/flags/FeatureGate.astro";
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { CFP } from "@/config/cfp";
 import logoFullDark from "@/assets/logos/dark/logo.svg";
 import logoFullLight from "@/assets/logos/principal/logo.svg";
 
@@ -14,6 +15,14 @@ const t = useTranslations(lang);
 const TICKETS_HREF = getLocalePath(lang, "/tickets");
 const SCHEDULE_URL: string | null = getLocalePath(lang, "/programme");
 const DISCOVER_URL = getLocalePath(lang, lang === "en" ? "/discover" : "/decouvrir");
+const CFP_HREF = getLocalePath(lang, "/cfp");
+const STRATEGY_URL = getLocalePath(lang, "/track-strategy-leadership");
+
+// The Nov-3 reveal: while the CFP 2027 is open the third CTA submits to the
+// CFP (the published programme is still the 2026 one) and the Strategy &
+// Leadership pill announces the new track. Both revert when the phase flips
+// to `closed` — one registry drives the CFP page, the banner and this hero.
+const cfpOpen = CFP.currentPhase === "open";
 
 // Both logo variants share intrinsic dimensions, so one ratio drives both images.
 const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width);
@@ -93,9 +102,9 @@ const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width)
       >
         {t("hero.cta.discover")}
       </a>
-      {SCHEDULE_URL && (
+      {(cfpOpen || SCHEDULE_URL) && (
         <a
-          href={SCHEDULE_URL}
+          href={cfpOpen ? CFP_HREF : SCHEDULE_URL}
           class={cn(
             buttonVariants({ variant: "outline", size: "lg" }),
             "h-[52px] px-8 text-lg font-bold",
@@ -108,9 +117,19 @@ const LOGO_HEIGHT = Math.round((400 * logoFullDark.height) / logoFullDark.width)
             "focus-visible:ring-primary/50"
           )}
         >
-          {t("hero.cta.schedule")}
+          {cfpOpen ? t("hero.cta.cfp") : t("hero.cta.schedule")}
         </a>
       )}
     </div>
+    {cfpOpen && (
+      <a
+        href={STRATEGY_URL}
+        class="group inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-5 py-2.5 text-sm md:text-base font-semibold text-primary-strong transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <span aria-hidden="true">✨</span>
+        {t("hero.cta.new_track")}
+        <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">→</span>
+      </a>
+    )}
   </div>
 </section>
