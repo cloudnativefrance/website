@@ -171,12 +171,15 @@ describe("CfpOpen — editorial pass copy", () => {
     expect(m).not.toContain("primo-oratrices");
   });
 
-  it("co-speakers are welcome on every format", async () => {
+  it("co-speakers are welcome on every format, inclusively worded", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "Les co-intervenants sont les bienvenus sur tous les formats",
+      "Toutes les personnes co-intervenantes sont bienvenues sur tous les formats",
+    );
+    expect(await mainText(CfpOpen, "fr")).toContain(
+      "chaque personne complète son profil",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "Co-speakers are welcome on every format",
+      "All co-speakers are welcome on every format",
     );
   });
 
