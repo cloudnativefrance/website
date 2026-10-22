@@ -278,9 +278,11 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
                 {th.title}
               </h3>
             </div>
-            <p class="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">
-              {th.body}
-            </p>
+            <ul class="mt-2 list-disc space-y-1 ps-5 text-sm leading-relaxed text-muted-foreground md:text-base" role="list">
+              {th.bullets.map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
           </article>
         ))
       }
@@ -293,9 +295,11 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
             {content.horsPiste.title}
           </h3>
         </div>
-        <p class="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">
-          {content.horsPiste.body}
-        </p>
+        <ul class="mt-2 list-disc space-y-1 ps-5 text-sm leading-relaxed text-muted-foreground md:text-base" role="list">
+          {content.horsPiste.bullets.map((b) => (
+            <li>{b}</li>
+          ))}
+        </ul>
       </article>
     </div>
     <p class="mt-4 rounded-lg border border-primary/40 bg-primary/10 px-5 py-4 text-sm md:text-base text-foreground leading-relaxed">

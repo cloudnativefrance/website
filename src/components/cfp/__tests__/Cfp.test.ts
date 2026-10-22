@@ -7,6 +7,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import CfpOpen from "../CfpOpen.astro";
 import CfpClosed from "../CfpClosed.astro";
+import { CFP_CONTENT } from "../cfp-content";
 
 let container: AstroContainer;
 
@@ -92,59 +93,63 @@ describe("CfpOpen — editorial pass copy", () => {
 
   it("DevEx theme names CI/CD and GitOps, both locales", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "golden paths, self-service, CI/CD, GitOps, réduction de la charge cognitive et autonomie des équipes.",
+      "Golden paths, self-service, CI/CD, GitOps.",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "golden paths, self-service, CI/CD, GitOps, reduced cognitive load and team autonomy.",
+      "Golden paths, self-service, CI/CD, GitOps.",
     );
   });
 
   it("Fondations: storage-focused title, resilience, FinOps and GreenOps named", async () => {
     const m = await mainText(CfpOpen, "fr");
     expect(m).toContain("Fondations\u00a0: infrastructure, stockage, réseau");
+    expect(m).toContain("Calcul, stockage, réseau, bases de données.");
     expect(m).toContain(
-      "Les couches sur lesquelles tout repose : calcul, stockage, réseau, bases de données, architectures résilientes, performance et passage à l'échelle, maîtrise des coûts (FinOps) et impact environnemental (GreenOps).",
+      "Maîtrise des coûts (FinOps) et impact environnemental (GreenOps).",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "The layers everything rests on: compute, storage, networking, databases, resilient architectures, performance and scaling, cost control (FinOps) and environmental impact (GreenOps).",
+      "Cost control (FinOps) and environmental impact (GreenOps).",
     );
   });
 
   it("Autonomie numérique: plural dependencies, contribution angle", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "Maîtriser ses dépendances technologiques : protection des données, alternatives et contribution open source, portabilité des applications et des infrastructures, interopérabilité et réversibilité pour préserver sa liberté de choix technologique.",
+      "Protection des données, alternatives et contribution open source.",
+    );
+    expect(await mainText(CfpOpen, "fr")).toContain(
+      "Réversibilité : préserver sa liberté de choix technologique.",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "Mastering your technology dependencies: data protection, open source alternatives and contribution, application and infrastructure portability, interoperability and reversibility to preserve your freedom of technological choice.",
+      "Reversibility: preserving your freedom of technological choice.",
     );
   });
 
   it("IA body: three pillars, guardrails kept, no anti-demo line", async () => {
     const m = await mainText(CfpOpen, "fr");
     expect(m).toContain(
-      "Déployer et exploiter l'IA en production (GPU, inférence, performances, coûts), concevoir des applications intégrant l'IA (LLM, RAG, agents et garde-fous) et mettre l'IA au service des métiers Cloud Native (développement, CI/CD, observabilité, opérations).",
+      "Concevoir des applications intégrant l'IA : LLM, RAG, agents, garde-fous.",
     );
     expect(m).not.toContain("pas des démos");
     expect(await mainText(CfpOpen, "en")).toContain(
-      "Deploying and operating AI in production (GPUs, inference, performance, cost), building AI-integrated applications (LLMs, RAG, agents and guardrails), and putting AI to work for Cloud Native practices (development, CI/CD, observability, operations).",
+      "Building AI-integrated applications: LLMs, RAG, agents, guardrails.",
     );
   });
 
   it("Observabilité: concrete signals over the old stance wording, dashboards kept", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "Comprendre, surveiller et fiabiliser les systèmes en production : métriques, logs et traces plutôt que des dashboards, SLO tenables et pratiques SRE, disponibilité, gestion des incidents et reprise après défaillance.",
+      "Métriques, logs et traces plutôt que des dashboards.",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "Understanding, monitoring and making production systems reliable: metrics, logs and traces rather than dashboards, sustainable SLOs and SRE practices, availability, incident management and disaster recovery.",
+      "Metrics, logs and traces rather than dashboards.",
     );
   });
 
   it("Sécurité: concrete enumeration keeps the without-blocking stance", async () => {
     expect(await mainText(CfpOpen, "fr")).toContain(
-      "Sécuriser les applications et les infrastructures cloud native, de la conception à la production, sans bloquer le travail des équipes : dépendances logicielles, CI/CD, identités, accès et secrets, gestion des vulnérabilités, détection et réponse aux menaces, conformité.",
+      "Sécuriser de la conception à la production, sans bloquer le travail des équipes.",
     );
     expect(await mainText(CfpOpen, "en")).toContain(
-      "Securing cloud native applications and infrastructure from design to production, without blocking teams' work: software dependencies, CI/CD, identities, access and secrets, vulnerability management, threat detection and response, compliance.",
+      "Securing from design to production, without blocking teams' work.",
     );
   });
 
@@ -217,6 +222,16 @@ describe("CfpOpen — themes/formats live in the shared module", () => {
     expect(OPEN_SRC).not.toMatch(/parcours:\s*\[/);
     expect(OPEN_SRC).not.toMatch(/formats:\s*\[/);
     expect(OPEN_SRC).not.toMatch(/horsPiste:\s*\{/);
+  });
+
+  it("every theme card is a 2 to 4 item bullet list, both locales", () => {
+    for (const locale of ["fr", "en"] as const) {
+      const c = CFP_CONTENT[locale];
+      for (const th of [...c.parcours, c.horsPiste]) {
+        expect(th.bullets.length).toBeGreaterThanOrEqual(2);
+        expect(th.bullets.length).toBeLessThanOrEqual(4);
+      }
+    }
   });
 });
 
