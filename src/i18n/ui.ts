@@ -292,8 +292,7 @@ export const ui = {
       "Organisé sous le statut d'association 1901, par l'association Cloud Native France.",
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Suivez-nous",
-    "newsletter.heading":
-      "Annonces importantes ? Programme ? Début du CFP ?",
+    "newsletter.heading": "Annonces importantes ? Programme ?",
     "newsletter.body": "Restez informé(e) des annonces importantes.",
     "newsletter.cta": "S'inscrire",
     "newsletter.cta_aria":
@@ -939,7 +938,7 @@ export const ui = {
       "Organized by the Cloud Native France association, a French non-profit (loi 1901).",
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Follow us",
-    "newsletter.heading": "Important announcements? Schedule? CFP opening?",
+    "newsletter.heading": "Important announcements? Schedule?",
     "newsletter.body": "Stay posted on every important announcement.",
     "newsletter.cta": "Subscribe",
     "newsletter.cta_aria":

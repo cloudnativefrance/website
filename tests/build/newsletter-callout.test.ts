@@ -113,6 +113,15 @@ describe("newsletter i18n keys", () => {
       expect(ui.en).not.toHaveProperty(key);
     });
   }
+
+  it("the heading no longer pitches the CFP opening (the CFP went live)", () => {
+    expect(
+      (ui.fr as Record<string, string>)["newsletter.heading"],
+    ).not.toContain("Début du CFP");
+    expect(
+      (ui.en as Record<string, string>)["newsletter.heading"],
+    ).not.toContain("CFP opening");
+  });
 });
 
 describe("newsletter callout distribution", () => {
