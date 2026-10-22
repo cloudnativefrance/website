@@ -190,7 +190,16 @@ describe("CfpOpen — editorial pass copy", () => {
     expect(m).toContain(
       "Il n'est pas nécessaire de répondre à tous ces critères",
     );
+    expect(m).toContain(
+      "critères\u00a0: nous recherchons avant tout des conférences",
+    );
     expect(m).not.toContain("au plus grand nombre des critères");
+    // The closing line rides its own soft primary box, lead in bold.
+    const i = OPEN_SRC.indexOf("{copy.committeeClosing.strong}");
+    expect(i).toBeGreaterThan(-1);
+    const block = OPEN_SRC.slice(OPEN_SRC.lastIndexOf("<p", i), i + 120);
+    expect(block).toContain("bg-primary/10");
+    expect(block).toMatch(/<strong[^>]*>\{copy\.committeeClosing\.strong\}/);
   });
 
   it("the lightning talk leads with the idea", async () => {

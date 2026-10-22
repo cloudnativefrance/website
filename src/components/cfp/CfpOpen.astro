@@ -77,8 +77,10 @@ const fr = {
     "Notre comité de sélection, composé de bénévoles de l'organisation et de membres des communautés Cloud Native francophones, sera particulièrement attentif aux points suivants\u00a0:",
   noPitch:
     "Les présentations promotionnelles ou commerciales ne sont pas acceptées et sont automatiquement refusées.",
-  committeeClosing:
-    "Il n'est pas nécessaire de répondre à tous ces critères : nous recherchons avant tout des conférences qui permettent aux participants d'apprendre, de découvrir ou de questionner leurs pratiques.",
+  committeeClosing: {
+    strong: "Il n'est pas nécessaire de répondre à tous ces critères\u00a0:",
+    rest: "nous recherchons avant tout des conférences qui permettent aux participants d'apprendre, de découvrir ou de questionner leurs pratiques.",
+  },
   closingTitle: "Vous avez quelque chose à raconter. Nous avons la scène.",
   closingCta: "Soumettre une proposition",
   closingDeadline: "Clôture le 31 janvier 2027",
@@ -166,8 +168,10 @@ const COPY: Record<Locale, typeof fr> = {
       "Our selection committee — volunteers from the CND France organization and members of the French-speaking Cloud Native communities — will pay particular attention to the following:",
     noPitch:
       "Promotional or commercial talks are not accepted and will be automatically rejected.",
-    committeeClosing:
-      "You don't need to meet all of these criteria: above all, we're looking for talks that let attendees learn, discover, or question their practices.",
+    committeeClosing: {
+      strong: "You don't need to meet all of these criteria:",
+      rest: "above all, we're looking for talks that let attendees learn, discover, or question their practices.",
+    },
     closingTitle: "You have something to say. We have the stage.",
     closingCta: "Submit a proposal",
     closingDeadline: "Submissions close January 31, 2027.",
@@ -452,8 +456,8 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
         ))
       }
     </ul>
-    <p class="mt-6 text-sm md:text-base text-muted-foreground leading-relaxed">
-      {copy.committeeClosing}
+    <p class="mt-6 rounded-lg border border-primary/40 bg-primary/10 px-5 py-4 text-sm md:text-base text-foreground leading-relaxed">
+      <strong class="font-semibold text-foreground">{copy.committeeClosing.strong}</strong>{copy.committeeClosing.rest}
     </p>
   </section>
 
