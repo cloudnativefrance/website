@@ -73,7 +73,13 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
     const menu = wrap.querySelector<HTMLUListElement>('[role="menu"]');
     if (!btn || !menu) return;
 
+    // True while the menu is open only because the mouse hovered it. Clicking
+    // a trigger means "open", but the hover has already opened the menu, so a
+    // plain toggle shut it under the pointer — which reads as the menu
+    // vanishing behind the content below. That click is swallowed instead.
+    let hoverOpened = false;
     const close = () => {
+      hoverOpened = false;
       menu.classList.add("hidden");
       btn.setAttribute("aria-expanded", "false");
     };
@@ -89,7 +95,11 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
       menu.classList.contains("hidden") ? open(true) : close();
     };
 
-    btn.addEventListener("click", (e) => { e.preventDefault(); toggle(); });
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (hoverOpened) { hoverOpened = false; return; }
+      toggle();
+    });
     btn.addEventListener("keydown", (e) => {
       if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -99,7 +109,9 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
 
     // Hover to open on pointer devices. A short close delay lets the cursor
     // travel from the trigger across the gap onto the menu without it
-    // flickering shut. Touch devices fire no mouseenter, so click still works.
+    // flickering shut. Pointer events, not mouse events: a tap fires a
+    // compatibility mouseenter right before its click, so on a touch screen
+    // the hover path would open the menu and the tap would land on it too.
     let closeTimer: number | undefined;
     const cancelClose = () => {
       if (closeTimer !== undefined) {
@@ -111,8 +123,14 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
       cancelClose();
       closeTimer = window.setTimeout(() => { close(); closeTimer = undefined; }, 150);
     };
-    wrap.addEventListener("mouseenter", () => { cancelClose(); open(); });
-    wrap.addEventListener("mouseleave", deferredClose);
+    wrap.addEventListener("pointerenter", (e) => {
+      if (e.pointerType !== "mouse") return;
+      cancelClose();
+      if (menu.classList.contains("hidden")) { open(); hoverOpened = true; }
+    });
+    wrap.addEventListener("pointerleave", (e) => {
+      if (e.pointerType === "mouse") deferredClose();
+    });
     menu.addEventListener("keydown", (e) => {
       const items = Array.from(menu.querySelectorAll<HTMLAnchorElement>('[role="menuitem"]'));
       const idx = items.indexOf(document.activeElement as HTMLAnchorElement);
