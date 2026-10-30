@@ -48,6 +48,7 @@ export const SPEAKER_SLUGS: Readonly<Record<string, string>> = {
   "Jean-Baptiste Kempf": "jean-baptiste-kempf",
   "Johan Lore": "johan-lore",
   "Julien Dauphant": "julien-dauphant",
+  "Laïla": "laila",
   "Laurent Bernaille": "laurent-bernaille",
   "Léonard Suslian": "leonard-suslian",
   "Luc Juggery": "luc-juggery",
