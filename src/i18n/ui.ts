@@ -453,6 +453,7 @@ export const ui = {
     "programme.building.open.title": "Le programme se construit grâce à vous",
     "programme.building.open.body":
       "Le programme de Cloud Native Days France {year} prend forme à partir de vos propositions. Un retour d'expérience, une leçon apprise en production, une idée à partager ? Proposez votre conférence avant le 21 janvier.",
+    "programme.building.replays_cta": "Voir les replays des années précédentes",
     "programme.building.closed.title": "Le programme prend forme",
     "programme.building.closed.body":
       "L'appel à propositions est clôturé : merci pour toutes vos propositions ! Le comité de sélection est au travail, et le programme sera annoncé ici très bientôt.",
@@ -1108,6 +1109,7 @@ export const ui = {
     "programme.building.open.title": "The programme is being built, by you",
     "programme.building.open.body":
       "The Cloud Native Days France {year} programme takes shape from your proposals. A field story, a lesson learned in production, an idea to share? Submit your talk before January 21.",
+    "programme.building.replays_cta": "Watch past editions' replays",
     "programme.building.closed.title": "The programme is taking shape",
     "programme.building.closed.body":
       "The call for papers is closed: thank you for every proposal! The selection committee is at work, and the programme will be announced here very soon.",
