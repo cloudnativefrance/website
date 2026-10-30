@@ -445,6 +445,17 @@ export const ui = {
     "flags.programme.soon.title": "Le programme arrive",
     "flags.programme.soon.body":
       "Le programme complet sera dévoilé en avril 2027.",
+    // --- Programme being built (before the announcement, follows the CFP) ---
+    "programme.building.coming_soon.title": "Le programme {year} se prépare",
+    "programme.building.coming_soon.body":
+      "Il sera construit à partir de vos propositions de conférences. L'appel à propositions ouvre bientôt : préparez vos idées !",
+    "programme.building.coming_soon.cta": "Découvrir l'appel à propositions",
+    "programme.building.open.title": "Le programme se construit grâce à vous",
+    "programme.building.open.body":
+      "Le programme de Cloud Native Days France {year} prend forme à partir de vos propositions. Un retour d'expérience, une leçon apprise en production, une idée à partager ? Proposez votre conférence avant le 21 janvier.",
+    "programme.building.closed.title": "Le programme prend forme",
+    "programme.building.closed.body":
+      "L'appel à propositions est clôturé : merci pour toutes vos propositions ! Le comité de sélection est au travail, et le programme sera annoncé ici très bientôt.",
     "nav.discover": "Découvrir",
     "hero.cta.discover": "Découvrir l'événement",
     "discover.page.title": "Découvrir CND France",
@@ -1089,6 +1100,17 @@ export const ui = {
     "flags.programme.soon.title": "The schedule is coming",
     "flags.programme.soon.body":
       "The full schedule will be unveiled in April 2027.",
+    // --- Programme being built (before the announcement, follows the CFP) ---
+    "programme.building.coming_soon.title": "The {year} programme is in the works",
+    "programme.building.coming_soon.body":
+      "It will be built from your talk proposals. The call for papers opens soon, so start thinking about what you'd like to share!",
+    "programme.building.coming_soon.cta": "About the call for papers",
+    "programme.building.open.title": "The programme is being built, by you",
+    "programme.building.open.body":
+      "The Cloud Native Days France {year} programme takes shape from your proposals. A field story, a lesson learned in production, an idea to share? Submit your talk before January 21.",
+    "programme.building.closed.title": "The programme is taking shape",
+    "programme.building.closed.body":
+      "The call for papers is closed: thank you for every proposal! The selection committee is at work, and the programme will be announced here very soon.",
     "nav.discover": "Discover",
     "hero.cta.discover": "Discover the event",
     "discover.page.title": "Discover CND France",

@@ -1,0 +1,52 @@
+---
+/**
+ * One demo page per Programme phase, only when the demo is on
+ * (src/lib/programme/demo.ts), for the edition the menu leads with.
+ */
+import ProgrammeView from "@/components/schedule/ProgrammeView.astro";
+import { loadSessions } from "@/lib/schedule";
+import { getSpeakersByLocale } from "@/lib/speakers";
+import { loadEventTracks } from "@/lib/tracks";
+import { getLangFromUrl } from "@/i18n/utils";
+import { isEditionLoadable } from "@/lib/edition-visibility";
+import { LEAD_EDITION, type ProgrammePhase } from "@/lib/programme-phase";
+import {
+  programmeDemosEnabled,
+  programmeDemoStaticPaths,
+} from "@/lib/programme/demo";
+
+export function getStaticPaths() {
+  return programmeDemosEnabled() ? programmeDemoStaticPaths() : [];
+}
+
+const { phase } = Astro.props as { phase: ProgrammePhase };
+const lang = getLangFromUrl(Astro.url);
+const year = LEAD_EDITION;
+
+// "announced" previews the real grid, so it reads the edition's data behind
+// the same gate as /programme/[year]. Staging forces the programme flag on for
+// exactly this; without it the page would quietly preview nothing.
+const programmeReady = isEditionLoadable(year) && phase === "announced";
+if (phase === "announced" && !programmeReady) {
+  throw new Error(
+    `[programme demo] "announced" needs ${year}'s programme to be loadable. ` +
+      `Build with FLAG_OVERRIDES=programme=on, as the staging image does.`,
+  );
+}
+
+const sessions = programmeReady ? await loadSessions(year) : [];
+const speakerEntries = programmeReady
+  ? await getSpeakersByLocale(lang, year)
+  : [];
+const eventTracks = programmeReady ? await loadEventTracks(year) : [];
+---
+
+<ProgrammeView
+  lang={lang}
+  year={year}
+  phase={phase}
+  sessions={sessions}
+  speakerEntries={speakerEntries}
+  eventTracks={eventTracks}
+  simulated
+/>

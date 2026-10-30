@@ -48,6 +48,10 @@ export const DATA_LAYER = [
 export const ROUTE_CONSUMERS = [
   "src/pages/programme/[year].astro",
   "src/pages/en/programme/[year].astro",
+  // The Programme demo's "announced" page previews the real grid. Its routes
+  // exist only under CFP_DEMO, which a production build refuses.
+  "src/pages/programme/demo/[phase].astro",
+  "src/pages/en/programme/demo/[phase].astro",
   "src/pages/intervenants/[year]/index.astro",
   "src/pages/en/speakers/[year]/index.astro",
   "src/pages/intervenants/[year]/[slug].astro",

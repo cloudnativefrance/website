@@ -2,7 +2,9 @@
 /**
  * The demo's phase switcher: a striped "DÉMO" pill in the corner, opening a
  * native popover of links to the pre-rendered phases. Hidden by default, so
- * the page reads exactly as production will.
+ * the page reads exactly as production will. `section` picks whose phases it
+ * switches: the CFP's (src/lib/cfp/demo.ts) or the Programme's
+ * (src/lib/programme/demo.ts).
  *
  * Everything the demo needs lives here and is emitted only when it renders,
  * so production carries no trace of it: its copy stays out of `src/i18n/ui.ts`
@@ -13,6 +15,8 @@
 import type { CfpPhase } from "@/config/cfp";
 import type { Locale } from "@/i18n/ui";
 import { DEMO_PHASES, demoPath } from "@/lib/cfp/demo";
+import { PROGRAMME_PHASES, type ProgrammePhase } from "@/lib/programme-phase";
+import { programmeDemoPath } from "@/lib/programme/demo";
 
 const fr = {
   badge: "Démo",
@@ -23,6 +27,12 @@ const fr = {
   coming_soon: "Avant ouverture",
   open: "Ouvert",
   closed: "Clôturé",
+  programme: {
+    coming_soon: "CFP avant ouverture",
+    open: "CFP ouvert",
+    closed: "CFP clôturé",
+    announced: "Programme annoncé",
+  } as Record<ProgrammePhase, string>,
 };
 const COPY: Record<Locale, typeof fr> = {
   fr,
@@ -35,17 +45,29 @@ const COPY: Record<Locale, typeof fr> = {
     coming_soon: "Coming soon",
     open: "Open",
     closed: "Closed",
+    programme: {
+      coming_soon: "CFP not open yet",
+      open: "CFP open",
+      closed: "CFP closed",
+      announced: "Programme announced",
+    },
   },
 };
 
-interface Props {
-  lang: Locale;
-  phase: CfpPhase;
-  simulated: boolean;
-}
+type Props =
+  | { lang: Locale; section?: "cfp"; phase: CfpPhase; simulated: boolean }
+  | { lang: Locale; section: "programme"; phase: ProgrammePhase; simulated: boolean };
 
-const { lang, phase, simulated } = Astro.props;
+const { lang, section = "cfp", phase, simulated } = Astro.props;
 const copy = COPY[lang];
+const links =
+  section === "programme"
+    ? PROGRAMME_PHASES.map((p) => ({
+        phase: p,
+        href: programmeDemoPath(p, lang),
+        label: copy.programme[p],
+      }))
+    : DEMO_PHASES.map((p) => ({ phase: p, href: demoPath(p, lang), label: copy[p] }));
 
 const legend =
   "text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-muted-foreground";
@@ -137,14 +159,14 @@ const active = "bg-foreground text-background";
         <span class={legend}>{copy.phase}</span>
         <div class="flex flex-wrap gap-1">
           {
-            DEMO_PHASES.map((p) => (
+            links.map((l) => (
               <a
-                href={demoPath(p, lang)}
-                class:list={[chip, simulated && p === phase ? active : idle]}
-                aria-current={simulated && p === phase ? "page" : undefined}
+                href={l.href}
+                class:list={[chip, simulated && l.phase === phase ? active : idle]}
+                aria-current={simulated && l.phase === phase ? "page" : undefined}
                 data-demo-link
               >
-                {copy[p]}
+                {l.label}
               </a>
             ))
           }

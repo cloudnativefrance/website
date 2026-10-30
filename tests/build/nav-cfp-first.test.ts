@@ -11,6 +11,7 @@ import { describe, it, expect } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { getLocalePath } from "@/i18n/utils";
+import { LEAD_EDITION, programmePhase } from "@/lib/programme-phase";
 
 const DIST = resolve(import.meta.dirname, "../../dist");
 const distExists = existsSync(resolve(DIST, "index.html"));
@@ -20,6 +21,10 @@ function readPage(relative: string): string {
 }
 
 const CFP_MENU_ID = "nav-dd-menu-nav-programme-label";
+
+// Intervenant(e)s is listed only once the programme is announced
+// (src/lib/programme-phase.ts), so the speakers checks below apply then.
+const speakersListed = programmePhase(LEAD_EDITION) === "announced";
 
 /** The desktop dropdown is the <ul> that follows its menu id. */
 function desktopProgrammeMenu(html: string): string {
@@ -55,7 +60,7 @@ for (const [page, lang] of [
     const speakersHref = getLocalePath(lang, "/speakers") + "/";
 
     it.skipIf(!distExists)(
-      `${page}: the CFP is the first dropdown item, before programme and speakers`,
+      `${page}: the CFP is the first dropdown item, before programme (and speakers once announced)`,
       () => {
         const html = readPage(page);
         const menu = desktopProgrammeMenu(html);
@@ -66,7 +71,8 @@ for (const [page, lang] of [
         );
         const speakersIdx = hrefs.findIndex((h) => h.startsWith(speakersHref));
         expect(programmeIdx).toBeGreaterThan(0);
-        expect(speakersIdx).toBeGreaterThan(0);
+        if (speakersListed) expect(speakersIdx).toBeGreaterThan(0);
+        else expect(speakersIdx, "no Intervenant(e)s before the announcement").toBe(-1);
       },
     );
 
@@ -93,9 +99,11 @@ for (const [page, lang] of [
         expect(hrefs.indexOf(cfpHref)).toBeLessThan(
           hrefs.findIndex((h) => h.startsWith(programmeHref)),
         );
-        expect(hrefs.indexOf(cfpHref)).toBeLessThan(
-          hrefs.findIndex((h) => h.startsWith(speakersHref)),
-        );
+        if (speakersListed) {
+          expect(hrefs.indexOf(cfpHref)).toBeLessThan(
+            hrefs.findIndex((h) => h.startsWith(speakersHref)),
+          );
+        }
         expect(anchorTag(panel, cfpHref)).toContain("font-bold");
       },
     );
