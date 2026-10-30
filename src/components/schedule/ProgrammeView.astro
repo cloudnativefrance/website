@@ -73,6 +73,7 @@ const band = phase === "announced";
   title={`${t("schedule.heading")} ${year} | ${t("site.title")}`}
   newsletter={band}
   noindex={simulated}
+  programmePhase={simulated ? phase : undefined}
 >
   {
     demos && (

@@ -2,7 +2,12 @@
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { TARGET_DATE } from "@/lib/event";
 import { EDITIONS_DESC } from "@/lib/editions";
-import { ARCHIVED_EDITIONS, LEAD_EDITION, programmePhase } from "@/lib/programme-phase";
+import {
+  ARCHIVED_EDITIONS,
+  LEAD_EDITION,
+  programmePhase,
+  type ProgrammePhase,
+} from "@/lib/programme-phase";
 import { isCurrentPath } from "@/lib/nav-path";
 import LanguageToggle from "@/components/LanguageToggle.astro";
 import ThemeToggle from "@/components/ThemeToggle.astro";
@@ -10,6 +15,12 @@ import NavDropdown from "@/components/NavDropdown.astro";
 import logoCompactDark from "@/assets/logos/dark/logo-notext.svg";
 import logoCompactLight from "@/assets/logos/principal/logo-notext.svg";
 
+interface Props {
+  /** A Programme demo page's simulated phase; see Layout's prop of that name. */
+  programmePhase?: ProgrammePhase;
+}
+
+const { programmePhase: simulatedPhase } = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
@@ -80,8 +91,9 @@ const programmeDD = (() => {
   const onCfp         = currentPath.startsWith(cfpPath);
   const lead          = LEAD_EDITION;
   // Speakers are listed only once the programme is announced: before that the
-  // page would be empty, or name people not yet told they were picked.
-  const announced     = programmePhase(lead) === "announced";
+  // page would be empty, or name people not yet told they were picked. A
+  // Programme demo page previews the menu of the phase it simulates.
+  const announced     = (simulatedPhase ?? programmePhase(lead)) === "announced";
   // Every item answers "am I the current page?" the same way — see nav-path.ts
   // for the two ways this dropdown used to answer it, and what that broke.
   const item = (href: string, label: string, strong = false): NavItem => ({
