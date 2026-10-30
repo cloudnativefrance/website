@@ -2,7 +2,7 @@
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { TARGET_DATE } from "@/lib/event";
 import { EDITIONS_DESC } from "@/lib/editions";
-import { featuredEdition, archivedEditions } from "@/lib/edition-visibility";
+import { ARCHIVED_EDITIONS, LEAD_EDITION, programmePhase } from "@/lib/programme-phase";
 import { isCurrentPath } from "@/lib/nav-path";
 import LanguageToggle from "@/components/LanguageToggle.astro";
 import ThemeToggle from "@/components/ThemeToggle.astro";
@@ -78,8 +78,10 @@ const programmeDD = (() => {
   const onProgramme   = currentPath.startsWith(programmeBase);
   const onSpeakers    = currentPath.startsWith(speakersBase);
   const onCfp         = currentPath.startsWith(cfpPath);
-  const featured      = featuredEdition();
-  const archives      = archivedEditions();
+  const lead          = LEAD_EDITION;
+  // Speakers are listed only once the programme is announced: before that the
+  // page would be empty, or name people not yet told they were picked.
+  const announced     = programmePhase(lead) === "announced";
   // Every item answers "am I the current page?" the same way — see nav-path.ts
   // for the two ways this dropdown used to answer it, and what that broke.
   const item = (href: string, label: string, strong = false): NavItem => ({
@@ -97,19 +99,23 @@ const programmeDD = (() => {
       // is open, its visibility outranks the edition views below — it is the
       // one entry that asks something of the reader. Programme and
       // Intervenant(e)s are two views of the same edition and stay side by
-      // side immediately after it, ahead of the finished editions.
+      // side immediately after it, ahead of the finished editions. Before the
+      // announcement, Programme is the "being built" page that leads back to
+      // the CFP (src/lib/programme-phase.ts).
       item(cfpPath, t("nav.programme.submenu.cfp"), true),
-      item(`${programmeBase}/${featured}`, t("nav.programme.submenu.programme")),
-      item(`${speakersBase}/${featured}`,  t("nav.programme.submenu.intervenants")),
+      item(`${programmeBase}/${lead}`, t("nav.programme.submenu.programme")),
+      ...(announced
+        ? [item(`${speakersBase}/${lead}`, t("nav.programme.submenu.intervenants"))]
+        : []),
       // A finished edition gets ONE entry: its programme. An earlier version
       // listed its speakers too, on the grounds that /intervenants/<year> would
       // otherwise have no route from the nav — true of the nav, but not of the
       // site. Every session card on that programme links its own speakers, so
       // they stay one click away from the page a visitor actually lands on,
       // and the menu keeps one line per edition instead of two.
-      // `archivedEditions` already excludes 2023, which has its own dedicated
+      // `ARCHIVED_EDITIONS` already excludes 2023, which has its own dedicated
       // retrospective linked from the About menu.
-      ...archives.map((y) =>
+      ...ARCHIVED_EDITIONS.map((y) =>
         item(
           `${programmeBase}/${y}`,
           t("nav.programme.submenu.archive").replace("{year}", String(y)),

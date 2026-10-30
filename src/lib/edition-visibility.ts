@@ -22,12 +22,7 @@
  * loads this same config through `getViteConfig`) with a bare "Cannot find
  * module '@/…'" that names neither the alias nor the reason.
  */
-import {
-  CURRENT_EDITION,
-  EDITIONS_DESC,
-  FIRST_PROGRAMME_EDITION,
-  type Edition,
-} from "./editions";
+import { CURRENT_EDITION, type Edition } from "./editions";
 import { isFlagActive } from "./flags";
 import { PRETALX_EVENT, type EditionAccess } from "./edition-registry";
 import { fixtureEvent } from "./preview-fixture";
@@ -102,82 +97,6 @@ export function isEditionLoadable(year: Edition, now?: Date): boolean {
     CURRENT_EDITION,
     isFlagActive("programme", now),
   );
-}
-
-/**
- * Every edition the site is allowed to show, newest first.
- *
- * The single derivation `featuredEdition` and `archivedEditions` are both views
- * of: the first entry leads, the rest are the archive. They used to each redo
- * this sort-and-filter, and `archivedEditions` also called `featuredEdition`,
- * so a nav render paid for it three times over.
- */
-function shownEditions(now?: Date): readonly Edition[] {
-  return EDITIONS_DESC.filter((y) => isEditionLoadable(y, now));
-}
-
-/**
- * The answer for THIS build, computed once.
- *
- * Every input is build-invariant — `EDITIONS` is a literal, the flag state
- * comes from `process.env` and a clock that only crosses a boundary between
- * builds — while `Navigation.astro` asks the question on every one of the
- * several hundred pages a build emits. Same pattern as `pretalx-preview.ts`'s
- * `CACHE`.
- *
- * Only the no-argument case is memoised. An injected `now` is a test asking
- * about a different moment, and caching across those would make one case's
- * clock leak into the next.
- */
-let shownCache: readonly Edition[] | undefined;
-
-function shownEditionsCached(now?: Date): readonly Edition[] {
-  if (now !== undefined) return shownEditions(now);
-  return (shownCache ??= shownEditions());
-}
-
-/**
- * The edition whose programme the site currently leads with.
- *
- * Deliberately NOT `CURRENT_EDITION`, which must stay pinned to the last
- * edition with public data — moving it forward re-opens the production gate
- * (see the guard test in edition-visibility.test.ts). This asks the live
- * question instead: which is the newest edition we are allowed to show? On
- * production that is 2026; on staging, where the programme flag is forced on,
- * it is 2027. The staging-only behaviour therefore falls out of the existing
- * flag rather than needing a second switch to keep in step.
- *
- * `EDITIONS` always contains at least one past edition (2023), and a past
- * edition is loadable unconditionally, so `shownEditions` is never empty. There
- * is deliberately no `?? CURRENT_EDITION` fallback: it was unreachable by that
- * same argument, and an unreachable fallback only invites the reader to believe
- * the two answers could differ.
- */
-export function featuredEdition(now?: Date): Edition {
-  return shownEditionsCached(now)[0];
-}
-
-/**
- * Finished editions that were themselves the headline programme, newest first.
- *
- * Everything shown that is not the current headline — `slice(1)`, since the
- * headline is by definition the newest shown one — EXCEPT anything older than
- * `FIRST_PROGRAMME_EDITION`, i.e. 2023, which has its own /2023 retrospective
- * linked from the About menu.
- *
- * The bound is a fixed year, not `CURRENT_EDITION`. `>= CURRENT_EDITION` gave
- * the right answer only while CURRENT_EDITION was 2026; bumping it to 2027
- * would have emptied this list and dropped "Programme 2026" out of the nav —
- * using a moving value to express a fixed intent, in the one edit the design
- * anticipates. See FIRST_PROGRAMME_EDITION.
- *
- * That filter used to live at the one call site in Navigation.astro, which made
- * this function's own return value something no caller wanted.
- */
-export function archivedEditions(now?: Date): Edition[] {
-  return shownEditionsCached(now)
-    .slice(1)
-    .filter((y) => y >= FIRST_PROGRAMME_EDITION);
 }
 
 /**
