@@ -7,6 +7,7 @@ import NewsletterCallout from "@/components/newsletter/NewsletterCallout.astro";
 import { type Locale } from "@/i18n/ui";
 import { getLangFromUrl, useTranslations, getLocalePath } from "@/i18n/utils";
 import { isProductionOrigin } from "@/lib/site-env";
+import type { ProgrammePhase } from "@/lib/programme-phase";
 
 interface Props {
   title?: string;
@@ -23,6 +24,12 @@ interface Props {
   newsletter?: boolean;
   /** Never index this page, whatever the origin (the ticketing and CFP demos). */
   noindex?: boolean;
+  /**
+   * The Programme phase the menu should reflect, for a Programme demo page
+   * previewing one. Omitted everywhere else: the menu then follows the real
+   * phase (src/lib/programme-phase.ts).
+   */
+  programmePhase?: ProgrammePhase;
 }
 
 // Bump ?v= whenever public/og-default.png changes. Browsers would pick up a
@@ -40,6 +47,7 @@ const {
   canonicalPath,
   newsletter = true,
   noindex = false,
+  programmePhase,
 } = Astro.props;
 
 const resolvedLang = (lang ?? getLangFromUrl(Astro.url)) as Locale;
@@ -152,7 +160,7 @@ const analyticsEnabled =
     <Font cssVariable="--font-dm-sans" preload />
   </head>
   <body class="bg-background text-foreground font-sans antialiased min-h-screen">
-    <Navigation />
+    <Navigation programmePhase={programmePhase} />
     <slot />
     {newsletter && <NewsletterCallout lang={resolvedLang} />}
     <Footer />

@@ -31,6 +31,18 @@ const NAV = readFileSync(
   "utf-8",
 );
 
+const LAYOUT = readFileSync(
+  resolve(import.meta.dirname, "../../src/layouts/Layout.astro"),
+  "utf-8",
+);
+const VIEW = readFileSync(
+  resolve(
+    import.meta.dirname,
+    "../../src/components/schedule/ProgrammeView.astro",
+  ),
+  "utf-8",
+);
+
 const BEFORE = new Date("2026-11-03T12:00:00+01:00");
 const AFTER = new Date("2027-04-02T12:00:00+02:00");
 
@@ -92,10 +104,19 @@ describe("Navigation.astro", () => {
   });
 
   it("lists Intervenant(e)s only once the programme is announced", () => {
-    expect(dd).toMatch(/programmePhase\(lead\)\s*===\s*"announced"/);
+    expect(dd).toMatch(
+      /\(simulatedPhase \?\? programmePhase\(lead\)\)\s*===\s*"announced"/,
+    );
     expect(dd).toMatch(
       /announced\s*\?\s*\[item\(`\$\{speakersBase\}\/\$\{lead\}`/,
     );
+  });
+
+  it("lets only a Programme demo page override the phase the menu reflects", () => {
+    // Layout passes the prop through; ProgrammeView sets it only when simulated,
+    // so every real page's menu follows the real phase.
+    expect(LAYOUT).toContain("<Navigation programmePhase={programmePhase} />");
+    expect(VIEW).toContain("programmePhase={simulated ? phase : undefined}");
   });
 
   it("gives an archived edition ONE entry — its programme, not its speakers", () => {
