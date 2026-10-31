@@ -119,12 +119,9 @@ describe("Navigation.astro", () => {
     expect(VIEW).toContain("programmePhase={simulated ? phase : undefined}");
   });
 
-  it("gives an archived edition ONE entry — its programme, not its speakers", () => {
-    // Every session card on that programme links its own speakers, so they
-    // stay one click from the page a visitor actually lands on.
-    expect(dd).toContain("ARCHIVED_EDITIONS.map");
-    expect(dd).toMatch(/programmeBase\}\/\$\{y\}/);
-    expect(dd).not.toMatch(/speakersBase\}\/\$\{y\}/);
+  it("gives an archived edition two entries — its programme, then its speakers", () => {
+    expect(dd).toContain("ARCHIVED_EDITIONS.flatMap");
+    expect(dd).toMatch(/programmeBase\}\/\$\{y\}[\s\S]*speakersBase\}\/\$\{y\}/);
   });
 
   it("decides `current` the same way for every dropdown item", () => {

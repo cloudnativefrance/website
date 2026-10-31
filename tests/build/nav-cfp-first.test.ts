@@ -57,7 +57,8 @@ for (const [page, lang] of [
   describe(`programme dropdown on /${page} (phase: CFP leads)`, () => {
     const cfpHref = getLocalePath(lang, "/cfp");
     const programmeHref = getLocalePath(lang, "/programme") + "/";
-    const speakersHref = getLocalePath(lang, "/speakers") + "/";
+    // The lead edition's speakers only: archived editions list theirs always.
+    const speakersHref = getLocalePath(lang, "/speakers") + `/${LEAD_EDITION}`;
 
     it.skipIf(!distExists)(
       `${page}: the CFP is the first dropdown item, before programme (and speakers once announced)`,

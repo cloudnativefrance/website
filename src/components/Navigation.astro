@@ -119,20 +119,20 @@ const programmeDD = (() => {
       ...(announced
         ? [item(`${speakersBase}/${lead}`, t("nav.programme.submenu.intervenants"))]
         : []),
-      // A finished edition gets ONE entry: its programme. An earlier version
-      // listed its speakers too, on the grounds that /intervenants/<year> would
-      // otherwise have no route from the nav — true of the nav, but not of the
-      // site. Every session card on that programme links its own speakers, so
-      // they stay one click away from the page a visitor actually lands on,
-      // and the menu keeps one line per edition instead of two.
+      // A finished edition keeps both of its views: its programme, then its
+      // speakers, so the lineup of a past edition stays one menu click away.
       // `ARCHIVED_EDITIONS` already excludes 2023, which has its own dedicated
       // retrospective linked from the About menu.
-      ...ARCHIVED_EDITIONS.map((y) =>
+      ...ARCHIVED_EDITIONS.flatMap((y) => [
         item(
           `${programmeBase}/${y}`,
           t("nav.programme.submenu.archive").replace("{year}", String(y)),
         ),
-      ),
+        item(
+          `${speakersBase}/${y}`,
+          t("nav.programme.submenu.archive_intervenants").replace("{year}", String(y)),
+        ),
+      ]),
     ],
   };
 })();
