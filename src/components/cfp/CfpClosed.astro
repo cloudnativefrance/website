@@ -2,9 +2,13 @@
 /**
  * The `closed` phase: the deadline has passed, the programme is next. The
  * layout's newsletter band stays on — it is the page's only action.
+ * The edition's themes and formats stay visible: they are what the 2027
+ * programme is made of, and next year's speakers read them here first.
+ * The grids come from cfp-content.ts — the same data the open page renders.
  */
 import type { Locale } from "@/i18n/ui";
 import { useTranslations } from "@/i18n/utils";
+import { CFP_CONTENT } from "./cfp-content";
 
 interface Props {
   lang: Locale;
@@ -12,16 +16,99 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+const content = CFP_CONTENT[lang];
 ---
 
-<main class="mx-auto max-w-3xl px-4 py-24 text-center md:px-6 md:py-32">
-  <h1
-    class="text-foreground text-4xl font-bold tracking-tight md:text-5xl"
-    style="letter-spacing:-0.02em;"
-  >
-    {t("cfp.closed.title")}
-  </h1>
-  <p class="text-muted-foreground mt-6 text-base md:text-lg">
-    {t("cfp.closed.body")}
-  </p>
+<main>
+  <div class="mx-auto max-w-3xl px-4 py-24 text-center md:px-6 md:py-32">
+    <h1
+      class="text-foreground text-4xl font-bold tracking-tight md:text-5xl"
+      style="letter-spacing:-0.02em;"
+    >
+      {t("cfp.closed.title")}
+    </h1>
+    <p class="text-muted-foreground mt-6 text-base md:text-lg">
+      {t("cfp.closed.body")}
+    </p>
+  </div>
+
+  <section class="mx-auto max-w-6xl px-4 pb-24 md:px-6 md:pb-32">
+    <h2
+      class="text-foreground text-xl font-bold tracking-tight md:text-2xl"
+      style="letter-spacing:-0.02em;"
+    >
+      {content.closedSectionTitle}
+    </h2>
+    <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        content.parcours.map((th) => (
+          <article class="border-border bg-card hover:border-primary/60 rounded-lg border p-4 transition-colors md:p-5">
+            <div class="flex items-center gap-3">
+              <div
+                class="bg-primary/10 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg"
+                aria-hidden="true"
+              >
+                {th.emoji}
+              </div>
+              <h3 class="text-foreground text-base font-bold tracking-tight md:text-lg">
+                {th.title}
+              </h3>
+            </div>
+            <ul
+              class="text-muted-foreground mt-2 list-disc space-y-1 ps-5 text-sm leading-relaxed md:text-base"
+              role="list"
+            >
+              {th.bullets.map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
+          </article>
+        ))
+      }
+      <article
+        class="border-border bg-card hover:border-primary/60 rounded-lg border p-4 transition-colors sm:col-span-2 md:p-5 lg:col-span-3"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="bg-primary/10 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg"
+            aria-hidden="true"
+          >
+            {content.horsPiste.emoji}
+          </div>
+          <h3
+            class="text-foreground text-base font-bold tracking-tight md:text-lg"
+          >
+            {content.horsPiste.title}
+          </h3>
+        </div>
+        <ul
+          class="text-muted-foreground mt-2 list-disc space-y-1 ps-5 text-sm leading-relaxed md:text-base"
+          role="list"
+        >
+          {content.horsPiste.bullets.map((b) => (
+            <li>{b}</li>
+          ))}
+        </ul>
+      </article>
+    </div>
+    <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      {
+        content.formats.map((f) => (
+          <article class="border-border bg-card rounded-lg border p-4 md:p-5">
+            <div class="flex items-center gap-3">
+              <span class="bg-primary/10 text-primary inline-flex shrink-0 items-center rounded-full px-3 py-1.5 text-xs font-bold md:text-sm">
+                {f.duration}
+              </span>
+              <h3 class="text-foreground text-base font-bold tracking-tight md:text-lg">
+                {f.title}
+              </h3>
+            </div>
+            <p class="text-muted-foreground mt-2 text-sm leading-relaxed md:text-base">
+              {f.body}
+            </p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
 </main>

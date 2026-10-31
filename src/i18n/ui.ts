@@ -53,6 +53,8 @@ export const ui = {
     "hero.venue": "CENTQUATRE-PARIS",
     "hero.cta.register": "Prenez votre place",
     "hero.cta.schedule": "Voir le programme",
+    "hero.cta.cfp": "Postuler au CFP",
+    "hero.cta.new_track": "Découvrir le nouveau track : Strategy & Leadership",
     "hero.description":
       "La communaut\u00e9 francophone passionn\u00e9e de devops et de cloud native se retrouve \u00e0 Paris. Une journ\u00e9e de retours d'exp\u00e9rience et de rencontres - ouverte \u00e0 toutes et tous, des juniors curieux \u00e0 l'archi senior jusqu'aux d\u00e9cideurs en qu\u00eate des derni\u00e8res tendances.",
     "hero.logo_alt": "Cloud Native Days France",
@@ -83,6 +85,8 @@ export const ui = {
     "cfp.deadline": "Clôture le {date}",
     // Phase copy for the commit-flipped phase system (src/config/cfp.ts).
     "cfp.meta.title": "Appel à conférences (CFP)",
+    "cfp.banner.text":
+      "Le CFP 2027 est ouvert : proposez votre conférence avant le 21 janvier",
     "cfp.meta.description":
       "Proposez votre conférence à Cloud Native Days France 2027 : 7 thèmes, 3 formats.",
     "cfp.coming_soon.title": "L'appel à propositions arrive",
@@ -288,8 +292,7 @@ export const ui = {
       "Organisé sous le statut d'association 1901, par l'association Cloud Native France.",
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Suivez-nous",
-    "newsletter.heading":
-      "Annonces importantes ? Programme ? Début du CFP ?",
+    "newsletter.heading": "Annonces importantes ? Programme ?",
     "newsletter.body": "Restez informé(e) des annonces importantes.",
     "newsletter.cta": "S'inscrire",
     "newsletter.cta_aria":
@@ -442,6 +445,18 @@ export const ui = {
     "flags.programme.soon.title": "Le programme arrive",
     "flags.programme.soon.body":
       "Le programme complet sera dévoilé en avril 2027.",
+    // --- Programme being built (before the announcement, follows the CFP) ---
+    "programme.building.coming_soon.title": "Le programme {year} se prépare",
+    "programme.building.coming_soon.body":
+      "Il sera construit à partir de vos propositions de conférences. L'appel à propositions ouvre bientôt : préparez vos idées !",
+    "programme.building.coming_soon.cta": "Découvrir l'appel à propositions",
+    "programme.building.open.title": "Le programme se construit grâce à vous",
+    "programme.building.open.body":
+      "Le programme de Cloud Native Days France {year} prend forme à partir de vos propositions. Un retour d'expérience, une leçon apprise en production, une idée à partager ? Proposez votre conférence avant le 21 janvier.",
+    "programme.building.replays_cta": "Voir les replays des années précédentes",
+    "programme.building.closed.title": "Le programme prend forme",
+    "programme.building.closed.body":
+      "L'appel à propositions est clôturé : merci pour toutes vos propositions ! Le comité de sélection est au travail, et le programme sera annoncé ici très bientôt.",
     "nav.discover": "Découvrir",
     "hero.cta.discover": "Découvrir l'événement",
     "discover.page.title": "Découvrir CND France",
@@ -715,6 +730,8 @@ export const ui = {
     "hero.venue": "CENTQUATRE-PARIS",
     "hero.cta.register": "Get your ticket",
     "hero.cta.schedule": "View schedule",
+    "hero.cta.cfp": "Submit to the CFP",
+    "hero.cta.new_track": "Discover the new track: Strategy & Leadership",
     "hero.description":
       "The French-speaking DevOps and cloud-native community comes together in Paris. A day of real-world experience reports and conversations \u2014 open to everyone, from curious juniors to senior architects all the way to decision-makers tracking the latest trends.",
     "hero.logo_alt": "Cloud Native Days France",
@@ -745,6 +762,7 @@ export const ui = {
     "cfp.deadline": "Submissions close {date}",
     // Phase copy for the commit-flipped phase system (src/config/cfp.ts).
     "cfp.meta.title": "Call for Papers (CFP)",
+    "cfp.banner.text": "The 2027 CFP is open: submit your talk before January 21",
     "cfp.meta.description":
       "Submit your talk to Cloud Native Days France 2027: 7 themes, 3 formats.",
     "cfp.coming_soon.title": "The Call for Papers is coming",
@@ -932,7 +950,7 @@ export const ui = {
       "Organized by the Cloud Native France association, a French non-profit (loi 1901).",
     "footer.nav.heading": "Navigation",
     "footer.community.heading": "Follow us",
-    "newsletter.heading": "Important announcements? Schedule? CFP opening?",
+    "newsletter.heading": "Important announcements? Schedule?",
     "newsletter.body": "Stay posted on every important announcement.",
     "newsletter.cta": "Subscribe",
     "newsletter.cta_aria":
@@ -1083,6 +1101,18 @@ export const ui = {
     "flags.programme.soon.title": "The schedule is coming",
     "flags.programme.soon.body":
       "The full schedule will be unveiled in April 2027.",
+    // --- Programme being built (before the announcement, follows the CFP) ---
+    "programme.building.coming_soon.title": "The {year} programme is in the works",
+    "programme.building.coming_soon.body":
+      "It will be built from your talk proposals. The call for papers opens soon, so start thinking about what you'd like to share!",
+    "programme.building.coming_soon.cta": "About the call for papers",
+    "programme.building.open.title": "The programme is being built, by you",
+    "programme.building.open.body":
+      "The Cloud Native Days France {year} programme takes shape from your proposals. A field story, a lesson learned in production, an idea to share? Submit your talk before January 21.",
+    "programme.building.replays_cta": "Watch past editions' replays",
+    "programme.building.closed.title": "The programme is taking shape",
+    "programme.building.closed.body":
+      "The call for papers is closed: thank you for every proposal! The selection committee is at work, and the programme will be announced here very soon.",
     "nav.discover": "Discover",
     "hero.cta.discover": "Discover the event",
     "discover.page.title": "Discover CND France",

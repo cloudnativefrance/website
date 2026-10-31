@@ -61,10 +61,10 @@ const WITHOUT_BAND = [
 
 /**
  * The 2027 programme page follows its rendering, the way the CFP page follows
- * its phase: while the programme flag is off the page is a ComingSoonLayout
- * (newsletter={false}, because it IS the newsletter appeal); with the flag on
- * it is a normal content page and carries the band exactly once, like
- * programme/2026. The discriminator is read off the BUILT page, not the test's
+ * its phase: before the announcement it is the "being built" page, or a
+ * ComingSoonLayout if the edition cannot load — both newsletter={false}, as
+ * each carries its own CTA; once announced it is a normal content page and
+ * carries the band exactly once, like programme/2026. The discriminator is read off the BUILT page, not the test's
  * own flag environment — vitest never sees the build's FLAG_OVERRIDES, and a
  * hardcoded entry here failed the moment the preview edition rendered.
  */
@@ -113,6 +113,15 @@ describe("newsletter i18n keys", () => {
       expect(ui.en).not.toHaveProperty(key);
     });
   }
+
+  it("the heading no longer pitches the CFP opening (the CFP went live)", () => {
+    expect(
+      (ui.fr as Record<string, string>)["newsletter.heading"],
+    ).not.toContain("Début du CFP");
+    expect(
+      (ui.en as Record<string, string>)["newsletter.heading"],
+    ).not.toContain("CFP opening");
+  });
 });
 
 describe("newsletter callout distribution", () => {
@@ -139,14 +148,19 @@ describe("newsletter callout distribution", () => {
   }
 
   it.skipIf(!distExists)(
-    `${PROGRAMME_2027} opts out only while it renders ComingSoon (0), and carries the band once as a content page (1)`,
+    `${PROGRAMME_2027} opts out only while it renders a coming-soon or "being built" page (0), and carries the band once as a content page (1)`,
     () => {
       const html = readPage(PROGRAMME_2027);
-      const soonTitle = (ui.fr as Record<string, string>)[
-        "flags.programme.soon.title"
+      const fr = ui.fr as Record<string, string>;
+      const placeholderTitles = [
+        fr["flags.programme.soon.title"],
+        ...["coming_soon", "open", "closed"].map((phase) =>
+          fr[`programme.building.${phase}.title`].replace("{year}", "2027"),
+        ),
       ];
       const occurrences = html.split(`id="${HEADING_ID}"`).length - 1;
-      expect(occurrences).toBe(html.includes(soonTitle) ? 0 : 1);
+      const placeholder = placeholderTitles.some((title) => html.includes(title));
+      expect(occurrences).toBe(placeholder ? 0 : 1);
     },
   );
 

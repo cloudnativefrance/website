@@ -9,6 +9,8 @@ interface Item {
   href: string;
   label: string;
   current?: boolean;
+  /** Lead item of the dropdown — rendered bold (the open CFP). */
+  strong?: boolean;
 }
 interface Props {
   key: string;      // i18n key used for the trigger label; used to build DOM ids
@@ -50,7 +52,10 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
           href={item.href}
           aria-current={item.current ? "page" : undefined}
           class:list={[
-            "block px-4 py-2 text-base font-semibold whitespace-nowrap hover:bg-muted focus-visible:bg-muted focus-visible:outline-none",
+            "hover:bg-muted focus-visible:bg-muted block px-4 py-2 text-base whitespace-nowrap focus-visible:outline-none",
+            // The weight is swapped, not stacked: font-bold alongside
+            // font-semibold leaves the winner to the stylesheet's order.
+            item.strong ? "font-bold" : "font-semibold",
             item.current && "text-primary",
           ]}
         >
@@ -68,7 +73,13 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
     const menu = wrap.querySelector<HTMLUListElement>('[role="menu"]');
     if (!btn || !menu) return;
 
+    // True while the menu is open only because the mouse hovered it. Clicking
+    // a trigger means "open", but the hover has already opened the menu, so a
+    // plain toggle shut it under the pointer — which reads as the menu
+    // vanishing behind the content below. That click is swallowed instead.
+    let hoverOpened = false;
     const close = () => {
+      hoverOpened = false;
       menu.classList.add("hidden");
       btn.setAttribute("aria-expanded", "false");
     };
@@ -84,7 +95,11 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
       menu.classList.contains("hidden") ? open(true) : close();
     };
 
-    btn.addEventListener("click", (e) => { e.preventDefault(); toggle(); });
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (hoverOpened) { hoverOpened = false; return; }
+      toggle();
+    });
     btn.addEventListener("keydown", (e) => {
       if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -94,7 +109,9 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
 
     // Hover to open on pointer devices. A short close delay lets the cursor
     // travel from the trigger across the gap onto the menu without it
-    // flickering shut. Touch devices fire no mouseenter, so click still works.
+    // flickering shut. Pointer events, not mouse events: a tap fires a
+    // compatibility mouseenter right before its click, so on a touch screen
+    // the hover path would open the menu and the tap would land on it too.
     let closeTimer: number | undefined;
     const cancelClose = () => {
       if (closeTimer !== undefined) {
@@ -106,8 +123,14 @@ const menuId = `nav-dd-menu-${key.replace(/\W/g, "-")}`;
       cancelClose();
       closeTimer = window.setTimeout(() => { close(); closeTimer = undefined; }, 150);
     };
-    wrap.addEventListener("mouseenter", () => { cancelClose(); open(); });
-    wrap.addEventListener("mouseleave", deferredClose);
+    wrap.addEventListener("pointerenter", (e) => {
+      if (e.pointerType !== "mouse") return;
+      cancelClose();
+      if (menu.classList.contains("hidden")) { open(); hoverOpened = true; }
+    });
+    wrap.addEventListener("pointerleave", (e) => {
+      if (e.pointerType === "mouse") deferredClose();
+    });
     menu.addEventListener("keydown", (e) => {
       const items = Array.from(menu.querySelectorAll<HTMLAnchorElement>('[role="menuitem"]'));
       const idx = items.indexOf(document.activeElement as HTMLAnchorElement);

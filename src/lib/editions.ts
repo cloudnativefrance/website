@@ -15,7 +15,7 @@ export const CURRENT_EDITION: Edition = 2026;
  * written `>= CURRENT_EDITION`, which produced the right answer only because
  * CURRENT_EDITION happened to be 2026: it expressed a moving value where the
  * intent is a fixed one. Bumping CURRENT_EDITION to 2027 — the edit this whole
- * design is preparing for — would have made `archivedEditions()` return [] and
+ * design is preparing for — would have emptied the Programme archive list and
  * silently dropped "Programme 2026" out of the nav, which is the requirement
  * the function exists to satisfy.
  */

@@ -1,0 +1,101 @@
+---
+/**
+ * An upcoming edition's Programme page before its programme is announced:
+ * "the programme is being built", in the CFP's own words for where it stands
+ * (src/lib/programme-phase.ts). Same shell as <CfpComingSoon> (hex-mesh
+ * background, radial overlay, centered heading + body). The CTA is the one
+ * thing a visitor can do about it: reach the CFP while it can still be
+ * answered, or be told when the programme lands once it cannot. Beside it, a
+ * quieter way to wait: the past editions' replays on YouTube.
+ */
+import GeoBackground from "@/components/patterns/GeoBackground.astro";
+import type { CfpPhase } from "@/config/cfp";
+import type { Locale } from "@/i18n/ui";
+import { getLocalePath, useTranslations } from "@/i18n/utils";
+import { NEWSLETTER_URL, SOCIAL_LINKS } from "@/lib/event";
+
+interface Props {
+  lang: Locale;
+  year: number;
+  phase: CfpPhase;
+}
+
+const { lang, year, phase } = Astro.props;
+const t = useTranslations(lang);
+const fill = (s: string) => s.replace("{year}", String(year));
+
+const cta: Record<
+  CfpPhase,
+  { label: string; href: string; external?: boolean }
+> = {
+  coming_soon: {
+    label: t("programme.building.coming_soon.cta"),
+    href: getLocalePath(lang, "/cfp"),
+  },
+  open: { label: t("cfp.cta.submit"), href: getLocalePath(lang, "/cfp") },
+  closed: {
+    label: t("flags.soon.notify_cta"),
+    href: NEWSLETTER_URL,
+    external: true,
+  },
+};
+const action = cta[phase];
+---
+
+<main>
+  <section
+    class="relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden px-4 py-16 md:py-24"
+  >
+    <GeoBackground class="absolute inset-0" />
+    <div
+      class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--color-background)_0%,_var(--color-secondary)_100%)] opacity-40"
+    >
+    </div>
+    <div
+      class="relative z-10 mx-auto flex w-full max-w-2xl flex-col items-center gap-6 text-center"
+    >
+      <p
+        class="text-xs font-semibold tracking-[0.2em] uppercase"
+        style="color: var(--color-primary, #4985e8);"
+      >
+        {`${t("schedule.heading")} ${year}`}
+      </p>
+      <h1
+        class="text-foreground text-3xl leading-tight font-bold tracking-[-0.02em] text-balance md:text-4xl"
+      >
+        {fill(t(`programme.building.${phase}.title`))}
+      </h1>
+      <p
+        class="text-muted-foreground max-w-[60ch] text-base leading-[1.6] text-pretty md:text-lg"
+      >
+        {fill(t(`programme.building.${phase}.body`))}
+      </p>
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <a
+          href={action.href}
+          {...action.external
+            ? { target: "_blank", rel: "noopener noreferrer" }
+            : {}}
+          class="border-destructive-strong text-destructive-strong hover:bg-destructive-strong/10 hover:text-destructive-strong hover:border-destructive-strong focus-visible:ring-destructive-strong/50 focus-visible:ring-offset-background inline-flex h-[52px] items-center justify-center rounded-md border-2 bg-transparent px-8 text-lg font-bold transition-[color,background-color,border-color,box-shadow] duration-150 hover:shadow-[0_0_0_4px_color-mix(in_oklab,var(--destructive-strong)_15%,transparent)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+        >
+          {action.label}
+        </a>
+        <a
+          href={SOCIAL_LINKS.youtube}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-foreground border-border hover:bg-muted focus-visible:ring-ring focus-visible:ring-offset-background inline-flex h-[52px] items-center justify-center gap-2 rounded-md border-2 bg-transparent px-6 text-base font-semibold transition-[background-color,border-color] duration-150 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+        >
+          <svg
+            aria-hidden="true"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="currentColor"><path d="M8 5v14l11-7z"></path></svg
+          >
+          {t("programme.building.replays_cta")}
+        </a>
+      </div>
+    </div>
+  </section>
+</main>

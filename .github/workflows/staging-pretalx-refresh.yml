@@ -1,0 +1,78 @@
+# Hourly staging rebuild when the Pretalx programme changed.
+#
+# The site reads Pretalx at image build time, and only a push to `staging` or a
+# manual dispatch builds a staging image — so a schedule edit in Pretalx never
+# reached staging on its own. This checks the data the build would render and
+# dispatches build-image.yml on `staging` only when it differs from the last
+# successful refresh, so an unchanged hour costs no image and no fluxcdbot
+# commit in cnd-platform.
+#
+# Scheduled workflows only run from the default branch: this file takes effect
+# once it reaches `main`, but it always builds `staging`.
+name: Staging Pretalx refresh
+
+on:
+  schedule:
+    - cron: "17 6-21 * * *" # hourly, 07:17–22:17 Paris in winter
+  workflow_dispatch:
+
+# Never two refreshes in flight: the second would dispatch the same build.
+concurrency:
+  group: staging-pretalx-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write # dispatch build-image.yml and save the cache marker
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The registry and loaders on `staging` decide what staging renders.
+          ref: staging
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+
+      - id: fp
+        run: pnpm tsx scripts/pretalx-fingerprint.ts
+        env:
+          PRETALX_API_TOKEN: ${{ secrets.PRETALX_API_TOKEN }}
+
+      # The cache holds no data — the key IS the record of "this fingerprint
+      # was already built". An exact hit means staging already shows it.
+      - id: seen
+        uses: actions/cache/restore@v4
+        with:
+          path: .pretalx-fingerprint
+          key: staging-pretalx-${{ steps.fp.outputs.fingerprint }}
+          lookup-only: true
+
+      - name: Rebuild staging
+        if: steps.seen.outputs.cache-hit != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_id=$(gh api -X POST \
+            "repos/${{ github.repository }}/actions/workflows/build-image.yml/dispatches" \
+            -f ref=staging -F return_run_details=true --jq .workflow_run_id)
+          echo "Dispatched build-image.yml on staging: run ${run_id}"
+          # Recorded only once the image exists, so a failed build is retried
+          # next hour instead of being marked as done.
+          gh run watch "${run_id}" --repo "${{ github.repository }}" --exit-status
+
+      - name: Record fingerprint
+        if: steps.seen.outputs.cache-hit != 'true'
+        run: echo "${{ steps.fp.outputs.fingerprint }}" > .pretalx-fingerprint
+      - if: steps.seen.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .pretalx-fingerprint
+          key: staging-pretalx-${{ steps.fp.outputs.fingerprint }}

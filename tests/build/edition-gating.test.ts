@@ -94,6 +94,31 @@ describe.each(PROGRAMME_ROUTES)("%s", (rel) => {
   });
 });
 
+const PROGRAMME_DEMO_ROUTES = [
+  "src/pages/programme/demo/[phase].astro",
+  "src/pages/en/programme/demo/[phase].astro",
+];
+
+describe.each(PROGRAMME_DEMO_ROUTES)("%s", (rel) => {
+  const source = read(rel);
+
+  it("emits no page unless the demo is on", () => {
+    expect(extractGetStaticPaths(source)).toMatch(
+      /programmeDemosEnabled\(\)\s*\?\s*programmeDemoStaticPaths\(\)\s*:\s*\[\]/,
+    );
+  });
+
+  it("asks the same gate as the real route before loading anything", () => {
+    expect(source).toMatch(
+      /const\s+programmeReady\s*=\s*isEditionLoadable\(\s*year\s*\)/,
+    );
+    expect(source).toMatch(/programmeReady\s*\?\s*await loadSessions\(year\)/);
+    expect(source).toMatch(
+      /programmeReady\s*\?\s*await getSpeakersByLocale\(lang,\s*year\)/,
+    );
+  });
+});
+
 const SPEAKER_INDEX_ROUTES = [
   "src/pages/intervenants/[year]/index.astro",
   "src/pages/en/speakers/[year]/index.astro",

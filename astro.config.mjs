@@ -7,7 +7,7 @@ import tailwindcss from "@tailwindcss/vite";
 // Use relative import to resolve @ alias at config load time
 import { generateFlagEnvSchema } from "./src/config/flags-env.ts";
 import { resolveSiteOrigin } from "./src/lib/site-env.ts";
-import { featuredEdition } from "./src/lib/edition-visibility.ts";
+import { LEAD_EDITION, speakersEdition } from "./src/lib/programme-phase.ts";
 import { loadLocalEnv } from "./scripts/load-local-env.mjs";
 
 // Astro surfaces .env values through import.meta.env, not process.env, and the
@@ -34,12 +34,12 @@ try {
   );
 }
 
-// Which edition the /programme, /speakers and /intervenants redirects should
-// land on: the newest one the site is allowed to show. Production stays on
-// 2026; staging, with the programme flag forced on, resolves to 2027 — so a
-// visitor following one of these short links lands on the live programme,
-// not the archive.
-const featured = featuredEdition();
+// Where the /programme, /speakers and /intervenants short links land. The
+// programme one follows the menu to the newest edition, whose page says the
+// programme is being built until it is announced; the speakers ones stay on
+// the newest edition that has announced speakers. See src/lib/programme-phase.ts.
+const programmeYear = LEAD_EDITION;
+const speakersYear = speakersEdition();
 
 // https://astro.build/config
 // Build is fully static; bump this file to force a CI rebuild that
@@ -56,9 +56,9 @@ export default defineConfig({
   // preview-fixture.ts that decides whether a build may use the fixture.
   site: resolveSiteOrigin(),
   redirects: {
-    "/programme":    `/programme/${featured}`,
+    "/programme":    `/programme/${programmeYear}`,
     "/sponsors":     "/sponsors/2026",
-    "/speakers":     `/speakers/${featured}`,
+    "/speakers":     `/speakers/${speakersYear}`,
     // The FR slugs need their own entries: nginx rewrites /sponsors ->
     // /partenaires and /speakers -> /intervenants before Astro's redirects
     // above ever run, and with no year in the path that lands on a bare
@@ -66,10 +66,10 @@ export default defineConfig({
     // a 404 on production — /speakers has been a dead link, first behind a
     // wrong port and then behind a missing page.
     "/partenaires":  "/partenaires/2026",
-    "/intervenants": `/intervenants/${featured}`,
-    "/en/programme": `/en/programme/${featured}`,
+    "/intervenants": `/intervenants/${speakersYear}`,
+    "/en/programme": `/en/programme/${programmeYear}`,
     "/en/sponsors":  "/en/sponsors/2026",
-    "/en/speakers":  `/en/speakers/${featured}`,
+    "/en/speakers":  `/en/speakers/${speakersYear}`,
     // Slug renames — keep old URLs alive for SEO + inbound links.
     "/venue":            "/informations-utiles",
     "/en/venue":         "/en/informations-utiles",
@@ -84,14 +84,17 @@ export default defineConfig({
       // these routes are excluded permanently. Post-event inbound links come
       // from CountdownTimer and the conditional nav entry.
       // The ticketing demo (src/lib/tickets/demo.ts) is never indexed.
-      // The CFP demo (src/lib/cfp/demo.ts) is never indexed.
+      // The CFP and Programme demos (src/lib/cfp/demo.ts,
+      // src/lib/programme/demo.ts) are never indexed.
       filter: (page) =>
         !/\/replays\/?$/.test(page) &&
         !/\/en\/replays\/?$/.test(page) &&
         !/\/billetterie\/demo(\/|$)/.test(page) &&
         !/\/en\/tickets\/demo(\/|$)/.test(page) &&
         !/\/cfp\/demo(\/|$)/.test(page) &&
-        !/\/en\/cfp\/demo(\/|$)/.test(page),
+        !/\/en\/cfp\/demo(\/|$)/.test(page) &&
+        !/\/programme\/demo(\/|$)/.test(page) &&
+        !/\/en\/programme\/demo(\/|$)/.test(page),
       i18n: {
         defaultLocale: "fr",
         locales: { fr: "fr-FR", en: "en-US" },

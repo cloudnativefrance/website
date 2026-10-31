@@ -8,6 +8,8 @@ import { EDITIONS, isEdition, CURRENT_EDITION, type Edition } from "@/lib/editio
 import ComingNotice from "@/components/ComingNotice.astro";
 import ComingSoonLayout from "@/components/flags/ComingSoonLayout.astro";
 import { isEditionLoadable } from "@/lib/edition-visibility";
+import { programmePhase } from "@/lib/programme-phase";
+import { programmeDemosEnabled } from "@/lib/programme/demo";
 
 export async function getStaticPaths() {
   return EDITIONS.map((year) => ({ params: { year: String(year) } }));
@@ -23,7 +25,13 @@ const year: Edition = yearNum;
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-const speakersReady = isEditionLoadable(year);
+// Loadable is not enough: staging can load the 2027 data for its demo, but
+// nobody is listed before the programme is announced (src/lib/programme-phase.ts).
+// Except under the demo, whose "Programme annoncé" menu links here: the demo
+// switch is one a production build refuses (src/lib/cfp/demo.ts).
+const speakersReady =
+  isEditionLoadable(year) &&
+  (programmePhase(year) === "announced" || programmeDemosEnabled());
 const speakers = speakersReady ? await getSpeakersByLocale(lang, year) : [];
 const sessions: SessionRow[] = speakersReady ? await loadSessions(year) : [];
 const primaryTalkBySlug = new Map<string, SessionRow>();

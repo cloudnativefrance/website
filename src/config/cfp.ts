@@ -16,6 +16,6 @@ export interface CfpConfig {
 }
 
 export const CFP: CfpConfig = {
-  // Flip to "open" the day the CFP 2027 is announced.
-  currentPhase: "coming_soon",
+  // The CFP 2027 opened — announced Nov 3, 2026.
+  currentPhase: "open",
 };

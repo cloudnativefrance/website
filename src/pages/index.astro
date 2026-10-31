@@ -4,6 +4,7 @@ import HeroSection from "@/components/hero/HeroSection.astro";
 import KeyNumbers from "@/components/hero/KeyNumbers";
 import Edition2026Combined from "@/components/past-editions/Edition2026Combined.astro";
 import NewsletterCallout from "@/components/newsletter/NewsletterCallout.astro";
+import CfpBanner from "@/components/cfp/CfpBanner.astro";
 import SponsorsPlatinumStrip from "@/components/sponsors/SponsorsPlatinumStrip.astro";
 import { getSponsors } from "@/lib/sponsor-utils";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
@@ -32,6 +33,7 @@ const platinumSponsors = allSponsors.filter((s) => s.data.tier === "platinum");
   ogType="event"
 >
   <script type="application/ld+json" set:html={schemaJson} />
+  <CfpBanner lang={lang} />
   <main>
     <HeroSection />
     <KeyNumbers client:idle lang={lang} />
