@@ -81,7 +81,7 @@ export const ui = {
     "cfp.closed.note":
       "CFP clôturé — merci à toutes les personnes ayant soumis une proposition. Rendez-vous le 3 juin 2027.",
     "cfp.cta.notify": "Me notifier",
-    "cfp.cta.submit": "Soumettre une conférence",
+    "cfp.cta.submit": "Soumettre une présentation",
     "cfp.deadline": "Clôture le {date}",
     // Phase copy for the commit-flipped phase system (src/config/cfp.ts).
     "cfp.meta.title": "Appel à conférences (CFP)",
