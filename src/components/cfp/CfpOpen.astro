@@ -11,7 +11,7 @@
 import { Picture } from "astro:assets";
 import type { Locale } from "@/i18n/ui";
 import { getLocalePath } from "@/i18n/utils";
-import { cfpSubmitUrl, cfpSubmitLabel } from "@/lib/pretalx";
+import { cfpSubmitUrl } from "@/lib/pretalx";
 import { CFP_CONTENT } from "./cfp-content";
 import intervenantPhoto from "@/assets/photos/contact/intervenants.jpg";
 import closingPhoto from "@/assets/photos/cfp/intervenantes-scene.jpg";
@@ -22,7 +22,6 @@ interface Props {
 
 const { lang } = Astro.props;
 const CFP_URL = cfpSubmitUrl();
-const CFP_LABEL = cfpSubmitLabel();
 
 const fr = {
   badge: "CFP 2027 · ouvert",
@@ -480,7 +479,6 @@ const SPEAKERS_MAILTO = "mailto:speakers@cloudnativedays.fr";
         >
           {copy.closingDeadline}
         </p>
-        <p class="mt-1 text-xs text-muted-foreground">{CFP_LABEL}</p>
       </div>
       <Picture
         src={closingPhoto}
