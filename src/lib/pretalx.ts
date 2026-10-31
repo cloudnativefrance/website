@@ -69,12 +69,6 @@ export function cfpSubmitUrl(): string {
   return `${PRETALX_BASE}/2027/submit`;
 }
 
-/** The submit URL as a display string — same treatment as cfpEventLabel, so
- *  the label under the CTA and the link it describes never diverge. */
-export function cfpSubmitLabel(): string {
-  return displayUrl(cfpSubmitUrl());
-}
-
 export function scheduleExportUrl(slug: string): string {
   return `${PRETALX_BASE}/${slug}/schedule/export/schedule.json`;
 }
