@@ -48,7 +48,7 @@ export const SOCIAL_LINKS = {
  */
 export const CONTACT_EMAILS = {
   participants: "contact@cloudnativedays.fr",
-  speakers: "speakers@cloudnativedays.fr",
+  speakers: "orga-cfp@cloudnativedays.fr",
   sponsors: "sponsors@cloudnativedays.fr",
   tickets: "billetterie@cloudnativedays.fr",
 } as const;
