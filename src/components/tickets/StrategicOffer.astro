@@ -73,7 +73,10 @@ const perks = [
       </p>
       <BigPrice amount={price} lang={lang} />
       <div class="flex max-w-[52ch] flex-col gap-2.5 pt-1 text-base">
-        <p class="text-muted-foreground text-pretty">
+        {
+          /* A condition of sale, not a suggestion: set like the checks below. */
+        }
+        <p class="text-foreground font-semibold text-pretty">
           {t("tickets.strategic.audience")}
         </p>
         <ul class="flex flex-col gap-2">
@@ -90,6 +93,9 @@ const perks = [
             ))
           }
         </ul>
+        <p class="text-muted-foreground pt-1 text-sm text-pretty">
+          {t("tickets.strategic.eligibility")}
+        </p>
       </div>
       {
         /* Inline, not flex: when the line wraps, the arrow follows the last word. */
