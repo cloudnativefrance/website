@@ -657,6 +657,10 @@ export const ui = {
       "J'ai un code partenaire ou une invitation, comment faire\u202f?",
     "tickets.faq.code.a":
       "Saisissez-le dans «\u00a0J'ai un code\u00a0», juste sous les billets. Vous avez reçu un lien\u202f? Cliquez dessus, le code s'applique tout seul.",
+    "tickets.faq.cfp.q":
+      "Je soumets une proposition au CFP, dois-je prendre ma place\u202f?",
+    "tickets.faq.cfp.a":
+      "Oui, nous vous le conseillons\u00a0: une proposition ne réserve pas de place. Prenez la vôtre sans attendre pour profiter des tarifs Super Early Bird ou Early Bird. Si votre proposition est retenue, votre place vous est offerte\u00a0: nous vous remboursons votre billet.",
     "tickets.faq.inclusion.q":
       "Existe-t-il un tarif étudiant ou solidaire\u202f?",
     "tickets.faq.inclusion.a":
@@ -1304,6 +1308,10 @@ export const ui = {
       "I have a partner code or an invitation. What do I do?",
     "tickets.faq.code.a":
       "Enter it under “I have a code”, just below the tickets. Got a link? Click it and the code applies by itself.",
+    "tickets.faq.cfp.q":
+      "I'm submitting a proposal to the CFP. Should I get my ticket?",
+    "tickets.faq.cfp.a":
+      "Yes, we recommend it: a proposal doesn't hold a seat. Get yours now to make the most of the Super Early Bird or Early Bird prices. If your proposal is accepted, your seat is on us: we'll refund your ticket.",
     "tickets.faq.inclusion.q": "Is there a student or solidarity rate?",
     "tickets.faq.inclusion.a":
       "Yes, case by case, for students and for anyone the price would keep away. Write to us at",
