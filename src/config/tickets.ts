@@ -77,7 +77,7 @@ export interface TicketingConfig {
 export const TICKETING: TicketingConfig = {
   listingUrl: "https://billetterie.cloudnativedays.fr/event/cndfr2027",
   // Change this line manually to change the current phase:
-  currentPhase: "seb",
+  currentPhase: "eb",
   // Lower-case, as prose uses it; card titles capitalise it.
   standardName: { fr: "standard", en: "standard" },
   tiers: [
